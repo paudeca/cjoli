@@ -1,3 +1,4 @@
+using cjoli.Server.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace cjoli.Server.Controllers
@@ -13,7 +14,7 @@ namespace cjoli.Server.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, CJoliContext context)
         {
             _logger = logger;
         }
