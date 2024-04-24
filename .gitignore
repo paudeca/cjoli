@@ -1,2 +1,4 @@
 /.vs
 /cjoli.Server/obj
+/cjoli.client/obj
+/cjoli.Server/bin
