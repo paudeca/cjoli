@@ -1,4 +1,4 @@
-using cjoli.Server.Data;
+using cjoli.Server.Datas;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddDbContextPool<CJoliContext>(options =>
 {
@@ -14,10 +15,12 @@ builder.Services.AddDbContextPool<CJoliContext>(options =>
 }
 );
 
+
 var app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
 
 // Configure the HTTP request pipeline.
 
@@ -28,5 +31,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
+
+using var scope = app.Services.CreateScope();
+var context = scope.ServiceProvider.GetRequiredService<CJoliContext>();
+context.Database.Migrate();
 
 app.Run();

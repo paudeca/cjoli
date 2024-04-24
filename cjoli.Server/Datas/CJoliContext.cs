@@ -1,7 +1,7 @@
 ﻿using cjoli.Server.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace cjoli.Server.Data
+namespace cjoli.Server.Datas
 {
     public class CJoliContext : DbContext
     {

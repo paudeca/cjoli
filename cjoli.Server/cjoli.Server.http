@@ -1,6 +1,6 @@
 @cjoli.Server_HostAddress = http://localhost:5002
 
-GET {{cjoli.Server_HostAddress}}/weatherforecast/
+GET {{cjoli.Server_HostAddress}}/cjoli/
 Accept: application/json
 
 ###

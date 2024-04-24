@@ -1,4 +1,5 @@
-# cjoli
+# CJoli
+Web application to follow a local Ice Hockey Tournament
 
 To create a new Migration file
 ```sh
