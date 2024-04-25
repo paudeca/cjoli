@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using cjoli.Server.Dtos;
 using cjoli.Server.Models;
+using cjoli.Server.Services;
 
 namespace cjoli.Server
 {
@@ -16,6 +17,10 @@ namespace cjoli.Server
                 .ForMember(x => x.PositionA, opt => opt.MapFrom(a => a.PositionA.Id))
                 .ForMember(x => x.PositionB, opt => opt.MapFrom(a => a.PositionB.Id));
             CreateMap<Team, TeamDto>();
+
+            CreateMap<Ranking, RankingDto>();
+            CreateMap<ScoreSquad, ScoreSquad>();
+            CreateMap<Score, Score>();
         }
     }
 }

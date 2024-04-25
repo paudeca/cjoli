@@ -21,10 +21,10 @@ namespace cjoli.Server.Controllers
             _context = context;
         }
         [HttpGet]
-        public TourneyDto Get()
+        public RankingDto Get()
         {
-            //return _context.Tourneys.Select(t => _mapper.Map<TourneyDto>(t)).ToList();
-            return _mapper.Map<TourneyDto>(_service.GetRanking("123", _context));
+            return _mapper.Map<RankingDto>(_service.GetRanking("123", _context));
+            //return _service.GetRanking("123", _context);
         }
     }
 }
