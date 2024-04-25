@@ -8,8 +8,14 @@ namespace cjoli.Server
     {
         public AutoMapper()
         {
-            //CreateMap<TourneyDto, Tourney>().ForMember(x => x.Teams, opt => opt.Ignore()).ForMember(x => x.Matches, opt => opt.Ignore());
             CreateMap<Tourney, TourneyDto>();
+            CreateMap<Phase, PhaseDto>();
+            CreateMap<Squad, SquadDto>();
+            CreateMap<Position, PositionDto>().ForMember(x => x.TeamId, opt => opt.MapFrom(a => a.Team != null ? a.Team.Id : 0));
+            CreateMap<Match, MatchDto>()
+                .ForMember(x => x.PositionA, opt => opt.MapFrom(a => a.PositionA.Id))
+                .ForMember(x => x.PositionB, opt => opt.MapFrom(a => a.PositionB.Id));
+            CreateMap<Team, TeamDto>();
         }
     }
 }

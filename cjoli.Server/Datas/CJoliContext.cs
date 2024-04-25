@@ -8,5 +8,6 @@ namespace cjoli.Server.Datas
         public DbSet<Tourney> Tourneys { get; set; }
 
         public CJoliContext(DbContextOptions<CJoliContext> options) : base(options) { }
+
     }
 }
