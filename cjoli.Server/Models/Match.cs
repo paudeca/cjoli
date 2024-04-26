@@ -14,5 +14,6 @@ namespace cjoli.Server.Models
         public bool ForfeitA { get; set; }
         public bool ForfeitB { get; set; }
         public DateTime Time { get; set; }
+        public Squad? Squad { get; set; }
     }
 }

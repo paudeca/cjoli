@@ -14,8 +14,8 @@ namespace cjoli.Server
             CreateMap<Squad, SquadDto>();
             CreateMap<Position, PositionDto>().ForMember(x => x.TeamId, opt => opt.MapFrom(a => a.Team != null ? a.Team.Id : 0));
             CreateMap<Match, MatchDto>()
-                .ForMember(x => x.PositionA, opt => opt.MapFrom(a => a.PositionA.Id))
-                .ForMember(x => x.PositionB, opt => opt.MapFrom(a => a.PositionB.Id));
+                .ForMember(x => x.PositionA, opt => opt.MapFrom(a => a.PositionA.Value))
+                .ForMember(x => x.PositionB, opt => opt.MapFrom(a => a.PositionB.Value));
             CreateMap<Team, TeamDto>();
 
             CreateMap<Ranking, RankingDto>();

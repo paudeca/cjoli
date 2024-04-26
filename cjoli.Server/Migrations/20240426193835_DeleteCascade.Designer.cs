@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using cjoli.Server.Datas;
 
@@ -11,9 +12,11 @@ using cjoli.Server.Datas;
 namespace cjoli.Server.Migrations
 {
     [DbContext(typeof(CJoliContext))]
-    partial class CJoliContextModelSnapshot : ModelSnapshot
+    [Migration("20240426193835_DeleteCascade")]
+    partial class DeleteCascade
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -237,9 +240,8 @@ namespace cjoli.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("cjoli.Server.Models.Team", "Team")
-                        .WithMany("Positions")
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .WithMany()
+                        .HasForeignKey("TeamId");
 
                     b.Navigation("Squad");
 
@@ -275,11 +277,6 @@ namespace cjoli.Server.Migrations
                 {
                     b.Navigation("Matches");
 
-                    b.Navigation("Positions");
-                });
-
-            modelBuilder.Entity("cjoli.Server.Models.Team", b =>
-                {
                     b.Navigation("Positions");
                 });
 

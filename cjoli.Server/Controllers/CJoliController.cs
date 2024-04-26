@@ -21,10 +21,26 @@ namespace cjoli.Server.Controllers
             _context = context;
         }
         [HttpGet]
-        public RankingDto Get()
+        [Route("Ranking/{uuid}")]
+        public RankingDto GetRanking(string uuid)
         {
-            return _mapper.Map<RankingDto>(_service.GetRanking("123", _context));
-            //return _service.GetRanking("123", _context);
+            return _mapper.Map<RankingDto>(_service.GetRanking(uuid, _context));
         }
+
+        [HttpGet]
+        [Route("Export/{uuid}")]
+        public TourneyDto Export(string uuid)
+        {
+            return _mapper.Map<TourneyDto>(_service.GetTourney(uuid, _context));
+        }
+
+        [HttpPost]
+        [Route("Import")]
+        public string Import(TourneyDto tourneyDto)
+        {
+            var tourney = _service.Import(tourneyDto, _context);
+            return tourney.Uid;
+        }
+
     }
 }

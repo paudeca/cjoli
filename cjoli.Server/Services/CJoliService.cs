@@ -1,4 +1,5 @@
 ﻿using cjoli.Server.Datas;
+using cjoli.Server.Dtos;
 using cjoli.Server.Exceptions;
 using cjoli.Server.Models;
 using Microsoft.EntityFrameworkCore;
@@ -7,8 +8,7 @@ namespace cjoli.Server.Services
 {
     public class CJoliService
     {
-
-        public Ranking GetRanking(string tourneyUid, CJoliContext context)
+        public Tourney GetTourney(string tourneyUid, CJoliContext context)
         {
             Tourney? tourney = context.Tourneys
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.Team)
@@ -19,6 +19,12 @@ namespace cjoli.Server.Services
             {
                 throw new NotFoundException("Tourney", tourneyUid);
             }
+            return tourney;
+        }
+
+        public Ranking GetRanking(string tourneyUid, CJoliContext context)
+        {
+            var tourney = GetTourney(tourneyUid, context);
             var scores = CalculateScores(tourney);
             return new Ranking() { Tourney = tourney, Scores = scores };
         }
@@ -79,6 +85,134 @@ namespace cjoli.Server.Services
                 }
             }
             return scoreSquads;
+        }
+
+        public Tourney Import(TourneyDto tourneyDto, CJoliContext context)
+        {
+            Tourney? tourney = context.Tourneys
+                .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions)
+                .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches)
+                .Include(t => t.Teams)
+                .SingleOrDefault(t => t.Uid == tourneyDto.Uid);
+            if (tourney == null)
+            {
+                tourney = new Tourney() { Uid = Guid.NewGuid().ToString(), Name = "" };
+                context.Tourneys.Add(tourney);
+            }
+            tourney.Name = tourneyDto.Name ?? tourney.Name;
+
+            if (tourneyDto.Teams != null)
+            {
+                foreach (var teamDto in tourneyDto.Teams)
+                {
+                    var team = ImportTeam(teamDto, tourney, context);
+                }
+            }
+            if (tourneyDto.Phases != null)
+            {
+                foreach (var phaseDto in tourneyDto.Phases)
+                {
+                    var phase = ImportPhase(phaseDto, tourney, context);
+                }
+            }
+
+            context.SaveChanges();
+            return tourney;
+        }
+
+        private Team ImportTeam(TeamDto teamDto, Tourney tourney, CJoliContext context)
+        {
+            Team? team = tourney.Teams.SingleOrDefault(t => t.Id == teamDto.Id);
+            if (team == null)
+            {
+                team = new Team() { Name = "" };
+                tourney.Teams.Add(team);
+            }
+            team.Name = teamDto.Name ?? team.Name;
+            context.SaveChanges();
+            return team;
+        }
+
+        private Phase ImportPhase(PhaseDto phaseDto, Tourney tourney, CJoliContext context)
+        {
+            Phase? phase = tourney.Phases.SingleOrDefault(p => p.Id == phaseDto.Id);
+            if (phase == null)
+            {
+                phase = new Phase() { Name = "" };
+                tourney.Phases.Add(phase);
+            }
+            phase.Name = phaseDto.Name ?? phase.Name;
+
+            if (phaseDto.Squads != null)
+            {
+                foreach (var squadsDto in phaseDto.Squads)
+                {
+                    var squad = ImportSquad(squadsDto, phase, tourney, context);
+                }
+            }
+            context.SaveChanges();
+            return phase;
+        }
+
+        private Squad ImportSquad(SquadDto squadDto, Phase phase, Tourney tourney, CJoliContext context)
+        {
+            Squad? squad = phase.Squads.SingleOrDefault(s => s.Id == squadDto.Id);
+            if (squad == null)
+            {
+                squad = new Squad() { Name = "" };
+                phase.Squads.Add(squad);
+            }
+            squad.Name = squadDto.Name ?? squad.Name;
+
+            if (squadDto.Positions != null)
+            {
+                foreach (var positionDto in squadDto.Positions)
+                {
+                    ImportPosition(positionDto, squad, tourney, context);
+                }
+            }
+            if (squadDto.Matches != null)
+            {
+                foreach (var matchDto in squadDto.Matches)
+                {
+                    ImportMatch(matchDto, squad, context);
+                }
+            }
+            context.SaveChanges();
+            return squad;
+        }
+
+        private Position ImportPosition(PositionDto positionDto, Squad squad, Tourney tourney, CJoliContext context)
+        {
+            Position? position = squad.Positions.SingleOrDefault(p => p.Value == positionDto.Value);
+            if (position == null)
+            {
+                position = new Position() { Value = positionDto.Value };
+                squad.Positions.Add(position);
+            }
+            Team? team = tourney.Teams.SingleOrDefault(t => t.Id == positionDto.TeamId);
+            position.Team = team;
+            context.SaveChanges();
+            return position;
+        }
+
+        private Match ImportMatch(MatchDto matchDto, Squad squad, CJoliContext context)
+        {
+            Match? match = squad.Matches.SingleOrDefault(m => m.PositionA.Value == matchDto.PositionA && m.PositionB.Value == matchDto.PositionB);
+            if (match == null)
+            {
+                var positionA = squad.Positions.Single(m => m.Value == matchDto.PositionA);
+                var positionB = squad.Positions.Single(m => m.Value == matchDto.PositionB);
+                match = new Match() { PositionA = positionA, PositionB = positionB };
+                squad.Matches.Add(match);
+            }
+            match.ScoreA = matchDto.ScoreA;
+            match.ScoreB = matchDto.ScoreB;
+            match.ForfeitA = matchDto.ForfeitA;
+            match.ForfeitB = matchDto.ForfeitB;
+            match.Done = matchDto.Done;
+            context.SaveChanges();
+            return match;
         }
 
     }

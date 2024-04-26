@@ -4,8 +4,8 @@
     {
         public int Id { get; set; }
         public required string Name { get; set; }
-        public required List<PositionDto> Positions { get; set; }
-        public required List<MatchDto> Matches { get; set; }
+        public List<PositionDto>? Positions { get; set; }
+        public List<MatchDto>? Matches { get; set; }
 
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using cjoli.Server.Datas;
 
@@ -11,9 +12,11 @@ using cjoli.Server.Datas;
 namespace cjoli.Server.Migrations
 {
     [DbContext(typeof(CJoliContext))]
-    partial class CJoliContextModelSnapshot : ModelSnapshot
+    [Migration("20240426182843_UniqueUid")]
+    partial class UniqueUid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -207,63 +210,47 @@ namespace cjoli.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("cjoli.Server.Models.Squad", "Squad")
+                    b.HasOne("cjoli.Server.Models.Squad", null)
                         .WithMany("Matches")
-                        .HasForeignKey("SquadId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("SquadId");
 
                     b.Navigation("PositionA");
 
                     b.Navigation("PositionB");
-
-                    b.Navigation("Squad");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Phase", b =>
                 {
-                    b.HasOne("cjoli.Server.Models.Tourney", "Tourney")
+                    b.HasOne("cjoli.Server.Models.Tourney", null)
                         .WithMany("Phases")
-                        .HasForeignKey("TourneyId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Tourney");
+                        .HasForeignKey("TourneyId");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Position", b =>
                 {
-                    b.HasOne("cjoli.Server.Models.Squad", "Squad")
+                    b.HasOne("cjoli.Server.Models.Squad", null)
                         .WithMany("Positions")
-                        .HasForeignKey("SquadId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("SquadId");
 
                     b.HasOne("cjoli.Server.Models.Team", "Team")
-                        .WithMany("Positions")
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Squad");
+                        .WithMany()
+                        .HasForeignKey("TeamId");
 
                     b.Navigation("Team");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Squad", b =>
                 {
-                    b.HasOne("cjoli.Server.Models.Phase", "Phase")
+                    b.HasOne("cjoli.Server.Models.Phase", null)
                         .WithMany("Squads")
-                        .HasForeignKey("PhaseId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Phase");
+                        .HasForeignKey("PhaseId");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Team", b =>
                 {
-                    b.HasOne("cjoli.Server.Models.Tourney", "Tourney")
+                    b.HasOne("cjoli.Server.Models.Tourney", null)
                         .WithMany("Teams")
-                        .HasForeignKey("TourneyId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Tourney");
+                        .HasForeignKey("TourneyId");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Phase", b =>
@@ -275,11 +262,6 @@ namespace cjoli.Server.Migrations
                 {
                     b.Navigation("Matches");
 
-                    b.Navigation("Positions");
-                });
-
-            modelBuilder.Entity("cjoli.Server.Models.Team", b =>
-                {
                     b.Navigation("Positions");
                 });
 

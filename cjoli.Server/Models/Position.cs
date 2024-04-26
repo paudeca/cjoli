@@ -8,5 +8,6 @@ namespace cjoli.Server.Models
         public int Id { get; set; }
         public int Value { get; set; }
         public Team? Team { get; set; }
+        public Squad? Squad { get; set; }
     }
 }
