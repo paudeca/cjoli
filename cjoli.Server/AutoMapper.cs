@@ -21,6 +21,8 @@ namespace cjoli.Server
             CreateMap<Ranking, RankingDto>();
             CreateMap<ScoreSquad, ScoreSquad>();
             CreateMap<Score, Score>();
+
+            CreateMap<User, UserDto>();
         }
     }
 }

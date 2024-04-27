@@ -12,7 +12,8 @@ namespace cjoli.Server.Models
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
 
-        public virtual IList<Team> Teams { get; set; } = new List<Team>();
-        public virtual IList<Phase> Phases { get; set; } = new List<Phase>();
+        public IList<Team> Teams { get; set; } = new List<Team>();
+        public IList<Phase> Phases { get; set; } = new List<Phase>();
+        public IList<User> Users { get; set; } = new List<User>();
     }
 }
