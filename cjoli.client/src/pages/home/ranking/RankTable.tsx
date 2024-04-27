@@ -32,40 +32,38 @@ const RankTable = ({ phase }: { phase: Phase }) => {
         return (
           <Card.Body key={squad.id}>
             <Card.Title>{squad.name}</Card.Title>
-            <Card.Text>
-              <Table striped bordered hover size='sm' style={{ textAlign: "center" }}>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th className='w-50'>Team</th>
-                    <MyTh>PTS</MyTh>
-                    <th>J</th>
-                    <th>G</th>
-                    <th>N</th>
-                    <th>P</th>
-                    <th>BP</th>
-                    <th>BC</th>
-                    <th>+/-</th>
+            <Table striped bordered hover size='sm' style={{ textAlign: "center" }}>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th className='w-50'>Team</th>
+                  <MyTh>PTS</MyTh>
+                  <th>J</th>
+                  <th>G</th>
+                  <th>N</th>
+                  <th>P</th>
+                  <th>BP</th>
+                  <th>BC</th>
+                  <th>+/-</th>
+                </tr>
+              </thead>
+              <tbody>
+                {datas.map((score, index) => (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{getTeam(getPosition(score.positionId)!.teamId)!.name}</td>
+                    <MyTd>{score.total}</MyTd>
+                    <td>{score.game}</td>
+                    <td>{score.win}</td>
+                    <td>{score.neutral}</td>
+                    <td>{score.loss}</td>
+                    <td>{score.goalFor}</td>
+                    <td>{score.goalAgainst}</td>
+                    <td>{score.goalDiff}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {datas.map((score, index) => (
-                    <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td>{getTeam(getPosition(score.positionId)?.teamId).name}</td>
-                      <MyTd>{score.total}</MyTd>
-                      <td>{score.game}</td>
-                      <td>{score.win}</td>
-                      <td>{score.neutral}</td>
-                      <td>{score.loss}</td>
-                      <td>{score.goalFor}</td>
-                      <td>{score.goalAgainst}</td>
-                      <td>{score.goalDiff}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </Card.Text>
+                ))}
+              </tbody>
+            </Table>
           </Card.Body>
         );
       })}

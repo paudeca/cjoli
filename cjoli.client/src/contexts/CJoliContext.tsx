@@ -20,7 +20,7 @@ interface CJoliAction {
   getPosition: (positionId: number) => Position | undefined;
 }
 
-export const CJoliContext = React.createContext<({ state: CJoliState } & CJoliAction) | null>(null);
+const CJoliContext = React.createContext<({ state: CJoliState } & CJoliAction) | null>(null);
 
 const initialState: CJoliState = {};
 
@@ -57,6 +57,7 @@ export const CJoliProvider = ({ children }: { children: React.ReactNode }) => {
   return <CJoliContext.Provider value={{ state, loadRanking, getTeam, getPosition }}>{children}</CJoliContext.Provider>;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCJoli = () => {
   const ctx = React.useContext(CJoliContext);
   if (!ctx) {

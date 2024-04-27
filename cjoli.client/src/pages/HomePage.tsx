@@ -4,9 +4,11 @@ import MatchesStack from "./home/MatchesStack";
 import * as cjoliService from "../services/cjoliService";
 import React from "react";
 import { useCJoli } from "../contexts/CJoliContext";
+import MenuNav from "./MenuNav";
 
 const HomePage = () => {
   const { loadRanking } = useCJoli();
+
   React.useEffect(() => {
     const call = async () => {
       const ranking = await cjoliService.getRanking();
@@ -16,6 +18,7 @@ const HomePage = () => {
   }, [loadRanking]);
   return (
     <>
+      <MenuNav />
       <RankingStack />
       <MatchesStack />
     </>

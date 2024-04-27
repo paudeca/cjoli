@@ -12,7 +12,6 @@ using System.Text;
 namespace cjoli.Server.Controllers
 {
 
-    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class CJoliController : ControllerBase

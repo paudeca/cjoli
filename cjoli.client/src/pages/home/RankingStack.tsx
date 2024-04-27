@@ -24,7 +24,7 @@ const RankingStack = () => {
                 ))}
               </Nav>
             </Card.Header>
-            <RankTable phase={phase} />
+            {phase && <RankTable phase={phase} />}
           </CJoliCard>
         </div>
       </CJoliStack>

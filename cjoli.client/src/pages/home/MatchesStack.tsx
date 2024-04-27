@@ -40,7 +40,7 @@ const MatchesStack = () => {
                   const textB = badgeB == "warning" ? "black" : "white";
                   return (
                     <tr key={match.id}>
-                      <td>{getTeam(getPosition(match.positionA).teamId).name}</td>
+                      <td>{getTeam(getPosition(match.positionA)!.teamId)!.name}</td>
                       <td>
                         {match.done && (
                           <>
@@ -65,7 +65,7 @@ const MatchesStack = () => {
                           </>
                         )}
                       </td>
-                      <td>{getTeam(getPosition(match.positionB).teamId).name}</td>
+                      <td>{getTeam(getPosition(match.positionB)!.teamId)!.name}</td>
                     </tr>
                   );
                 })}
