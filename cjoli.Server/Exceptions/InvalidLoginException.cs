@@ -2,6 +2,6 @@
 {
     public class InvalidLoginException : Exception
     {
-        public InvalidLoginException(string login) : base($"Invalid login in {login}") { }
+        public InvalidLoginException(string login) : base($"Invalid login with {login}") { }
     }
 }

@@ -7,15 +7,17 @@ import { useCJoli } from "../contexts/CJoliContext";
 import MenuNav from "./MenuNav";
 
 const HomePage = () => {
-  const { loadRanking } = useCJoli();
+  const { loadUser, loadRanking } = useCJoli();
 
   React.useEffect(() => {
     const call = async () => {
+      const user = await cjoliService.getUser();
+      loadUser(user);
       const ranking = await cjoliService.getRanking();
       loadRanking(ranking);
     };
     call();
-  }, [loadRanking]);
+  }, [loadRanking, loadUser]);
   return (
     <>
       <MenuNav />

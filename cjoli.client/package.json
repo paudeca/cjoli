@@ -20,7 +20,8 @@
     "react-bootstrap": "^2.10.2",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.51.3",
-    "react-router-dom": "^6.23.0"
+    "react-router-dom": "^6.23.0",
+    "universal-cookie": "^7.1.4"
   },
   "devDependencies": {
     "@types/node": "^20.12.7",

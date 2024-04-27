@@ -5,8 +5,10 @@ import { Position } from "../models/Position";
 import { Phase } from "../models/Phase";
 import { Squad } from "../models/Squad";
 import { Match } from "../models/Match";
+import { User } from "../models/User";
 
 interface CJoliState {
+  user?: User;
   ranking?: Ranking;
   teams?: Team[];
   phases?: Phase[];
@@ -15,6 +17,7 @@ interface CJoliState {
   matches?: Match[];
 }
 interface CJoliAction {
+  loadUser: (user: User) => void;
   loadRanking: (ranking: Ranking) => void;
   getTeam: (teamId: number) => Team | undefined;
   getPosition: (positionId: number) => Position | undefined;
@@ -25,6 +28,7 @@ const CJoliContext = React.createContext<({ state: CJoliState } & CJoliAction) |
 const initialState: CJoliState = {};
 
 enum Actions {
+  LOAD_USER = "LOAD_USER",
   LOAD_RANKING = "LOAD_RANKING",
 }
 
@@ -34,6 +38,10 @@ interface Action {
 }
 const reducer = (state: CJoliState, action: Action) => {
   switch (action.type) {
+    case Actions.LOAD_USER: {
+      const user = action.payload as User;
+      return { ...state, user };
+    }
     case Actions.LOAD_RANKING: {
       const ranking = action.payload as Ranking;
       const teams = ranking.tourney.teams;
@@ -50,11 +58,12 @@ const reducer = (state: CJoliState, action: Action) => {
 export const CJoliProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
 
+  const loadUser = React.useCallback((user?: User) => dispatch({ type: Actions.LOAD_USER, payload: user }), []);
   const loadRanking = React.useCallback((ranking: Ranking) => dispatch({ type: Actions.LOAD_RANKING, payload: ranking }), []);
   const getTeam = React.useCallback((teamId: number) => state.teams?.find((t) => t.id === teamId), [state.teams]);
   const getPosition = React.useCallback((positionId: number) => state.positions?.find((p) => p.id === positionId), [state.positions]);
 
-  return <CJoliContext.Provider value={{ state, loadRanking, getTeam, getPosition }}>{children}</CJoliContext.Provider>;
+  return <CJoliContext.Provider value={{ state, loadUser, loadRanking, getTeam, getPosition }}>{children}</CJoliContext.Provider>;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components

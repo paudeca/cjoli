@@ -3,6 +3,7 @@ using cjoli.Server.Datas;
 using cjoli.Server.Dtos;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace cjoli.Server.Controllers
 {
@@ -20,6 +21,13 @@ namespace cjoli.Server.Controllers
             _service = service;
             _mapper = mapper;
             _context = context;
+        }
+
+        [HttpGet]
+        public UserDto Get()
+        {
+            var login = this.User.Claims.First(i => i.Type == ClaimTypes.NameIdentifier).Value;
+            return _mapper.Map<UserDto>(_context.Users.SingleOrDefault(u => u.Login == login));
         }
 
         [HttpPost]

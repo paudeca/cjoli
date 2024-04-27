@@ -22,7 +22,7 @@ namespace cjoli.Server
             CreateMap<ScoreSquad, ScoreSquad>();
             CreateMap<Score, Score>();
 
-            CreateMap<User, UserDto>();
+            CreateMap<User, UserDto>().ForMember(x => x.Password, opt => opt.Ignore());
         }
     }
 }

@@ -3,14 +3,24 @@ import { ModalProvider, useModal } from "../contexts/ModalContext";
 import styled from "@emotion/styled";
 import LoginModal from "../modals/LoginModal";
 import RegisterModal from "../modals/RegisterModal";
+import { useCJoli } from "../contexts/CJoliContext";
+import * as cjoliService from "../services/cjoliService";
 
 const MyImg = styled.img<{ width: string }>`
   width: ${(props) => props.width};
 `;
 
 const MenuNav = () => {
+  const {
+    state: { user },
+    loadUser,
+  } = useCJoli();
   const { setShow } = useModal("login");
   const { setShow: setShowRegister } = useModal("register");
+  const logout = () => {
+    cjoliService.logout();
+    loadUser(undefined);
+  };
   return (
     <Navbar expand='sm' className='bg-body-tertiary mb-3' sticky='top'>
       <Container fluid>
@@ -29,15 +39,20 @@ const MenuNav = () => {
                 title={
                   <>
                     <MyImg src='./user.png' width='30px' className='mx-2' />
-                    <span>Visitor</span>
+                    <span>{user?.login || "Visitor"}</span>
                   </>
                 }
                 className='px-0'
                 style={{ minWidth: "140px" }}
                 align='end'
               >
-                <NavDropdown.Item onClick={() => setShow(true)}>Login</NavDropdown.Item>
-                <NavDropdown.Item onClick={() => setShowRegister(true)}>Register</NavDropdown.Item>
+                {!user && (
+                  <>
+                    <NavDropdown.Item onClick={() => setShow(true)}>Login</NavDropdown.Item>
+                    <NavDropdown.Item onClick={() => setShowRegister(true)}>Register</NavDropdown.Item>
+                  </>
+                )}
+                {user && <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>}
               </NavDropdown>
             </Nav>
           </Offcanvas.Body>

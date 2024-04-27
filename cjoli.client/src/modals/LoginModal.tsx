@@ -1,19 +1,21 @@
 import { Modal, Form, Button } from "react-bootstrap";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useModal } from "../contexts/ModalContext";
-
-type Login = {
-  login: string;
-  password: string;
-};
+import * as cjoliService from "../services/cjoliService";
+import { User } from "../models/User";
+import { useCJoli } from "../contexts/CJoliContext";
 
 const LoginModal = ({ id }: { id: string }) => {
   const { show, setShow } = useModal(id);
+  const { loadUser } = useCJoli();
   const handleClose = () => setShow(false);
 
-  const { register, handleSubmit } = useForm<Login>();
-  const onSubmit: SubmitHandler<Login> = (data) => {
-    console.log(data);
+  const { register, handleSubmit } = useForm<User>();
+  const onSubmit: SubmitHandler<User> = async (user) => {
+    await cjoliService.login(user);
+    user = await cjoliService.getUser();
+    loadUser(user);
+    handleClose();
   };
 
   return (
