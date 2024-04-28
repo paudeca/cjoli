@@ -1,6 +1,5 @@
 import styled from "@emotion/styled";
-import React from "react";
-import { Card, Table, Button, Offcanvas, Toast, ToastContainer } from "react-bootstrap";
+import { Card, Table } from "react-bootstrap";
 import { Phase } from "../../../models/Phase";
 import { useCJoli } from "../../../contexts/CJoliContext";
 
@@ -17,7 +16,6 @@ const MyTd = styled("td")`
 `;
 
 const RankTable = ({ phase }: { phase: Phase }) => {
-  const [show, setShow] = React.useState(false);
   const {
     getTeam,
     getPosition,
@@ -67,24 +65,6 @@ const RankTable = ({ phase }: { phase: Phase }) => {
           </Card.Body>
         );
       })}
-      <Button onClick={() => setShow(true)}>Create</Button>
-
-      <Offcanvas show={false && show} onHide={() => setShow(false)}>
-        <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Create Team</Offcanvas.Title>
-        </Offcanvas.Header>
-        <Offcanvas.Body>Some text as placeholder. In real life you can have the elements you have chosen. Like, text, images, lists, etc.</Offcanvas.Body>
-      </Offcanvas>
-
-      <ToastContainer position='top-end'>
-        <Toast onClose={() => setShow(false)} show={show} delay={3000} autohide bg='success'>
-          <Toast.Header>
-            <strong className='me-auto'>Bootstrap</strong>
-            <small>11 mins ago</small>
-          </Toast.Header>
-          <Toast.Body>Woohoo, you're reading this text in a Toast!</Toast.Body>
-        </Toast>
-      </ToastContainer>
     </>
   );
 };

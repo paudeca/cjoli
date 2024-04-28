@@ -71,6 +71,14 @@ const MatchesStack = () => {
                 })}
             </tbody>
           </Table>
+          <MyRow className='justify-content-md-center pt-4'>
+            <MyCol xs={{ span: 6, offset: 3 }} md={{ span: 6, offset: 0 }} lg={{ span: 3, offset: 0 }} className='text-center'>
+              <div className='d-grid gap-2 pb-3'>
+                <Button variant='primary'>Save</Button>
+              </div>
+            </MyCol>
+          </MyRow>
+
         </CJoliCard>
       </div>
     </CJoliStack>
