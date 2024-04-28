@@ -70,7 +70,7 @@ export const CJoliProvider = ({ children }: { children: React.ReactNode }) => {
 export const useCJoli = () => {
   const ctx = React.useContext(CJoliContext);
   if (!ctx) {
-    throw new Error("useCJoli has to be used within <CJoliContext.Provider>");
+    throw new Error("useCJoli has to be used within <CJoliProvider>");
   }
   return ctx;
 };

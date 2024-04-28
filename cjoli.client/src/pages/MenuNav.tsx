@@ -3,6 +3,7 @@ import { ModalProvider, useModal } from "../contexts/ModalContext";
 import styled from "@emotion/styled";
 import LoginModal from "../modals/LoginModal";
 import RegisterModal from "../modals/RegisterModal";
+import UpdateModal from "../modals/UpdateModal";
 import { useCJoli } from "../contexts/CJoliContext";
 import * as cjoliService from "../services/cjoliService";
 
@@ -15,8 +16,9 @@ const MenuNav = () => {
     state: { user },
     loadUser,
   } = useCJoli();
-  const { setShow } = useModal("login");
-  const { setShow: setShowRegister } = useModal("register");
+  const { setShow: showLogin } = useModal("login");
+  const { setShow: showRegister } = useModal("register");
+  const { setShow: showUpdate } = useModal("update");
   const logout = () => {
     cjoliService.logout();
     loadUser(undefined);
@@ -48,11 +50,18 @@ const MenuNav = () => {
               >
                 {!user && (
                   <>
-                    <NavDropdown.Item onClick={() => setShow(true)}>Login</NavDropdown.Item>
-                    <NavDropdown.Item onClick={() => setShowRegister(true)}>Register</NavDropdown.Item>
+                    <NavDropdown.Item onClick={() => showLogin(true)}>Login</NavDropdown.Item>
+                    <NavDropdown.Item onClick={() => showRegister(true)}>Register</NavDropdown.Item>
                   </>
                 )}
-                {user && <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>}
+
+                {user && (
+                  <>
+                    <NavDropdown.Item onClick={() => showUpdate(true)}>Update</NavDropdown.Item>
+                    <NavDropdown.Divider />
+                    <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
+                  </>
+                )}
               </NavDropdown>
             </Nav>
           </Offcanvas.Body>
@@ -60,6 +69,7 @@ const MenuNav = () => {
       </Container>
       <LoginModal id='login' />
       <RegisterModal id='register' />
+      <UpdateModal id='update' />
     </Navbar>
   );
 };

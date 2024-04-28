@@ -4,6 +4,8 @@ const ModalContext = React.createContext<{ show: Record<string, boolean>; setSho
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const [show, setShow] = React.useState<Record<string, boolean>>({});
+  const open = (id: string) => setShow({ ...show, [id]: true });
+  const close = (id: string) => setShow({ ...show, [id]: false });
   return <ModalContext.Provider value={{ show, setShow }}>{children}</ModalContext.Provider>;
 };
 
@@ -11,7 +13,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
 export const useModal = (id: string) => {
   const ctx = React.useContext(ModalContext);
   if (!ctx) {
-    throw new Error("useModal has to be used within <Modal.Provider>");
+    throw new Error("useModal has to be used within <ModalProvider>");
   }
   return { show: ctx.show[id], setShow: (show: boolean) => ctx.setShow({ ...ctx.show, [id]: show }) };
 };

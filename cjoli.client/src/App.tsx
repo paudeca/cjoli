@@ -34,6 +34,10 @@ const App = () => {
             --bs-btn-hover-border-color: #2a365c;
             --bs-btn-active-bg: #394874;
             --bs-btn-active-border-color: #394874;
+            --bs-btn-disabled-bg: #313f69;
+          }
+          .progress {
+            --bs-progress-bar-bg: #932829;
           }
         `}
       />

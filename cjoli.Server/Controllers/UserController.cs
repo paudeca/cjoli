@@ -24,8 +24,12 @@ namespace cjoli.Server.Controllers
         }
 
         [HttpGet]
-        public UserDto Get()
+        public UserDto? Get()
         {
+            if (this.User.Identity == null || !this.User.Identity.IsAuthenticated)
+            {
+                return null;
+            }
             var login = this.User.Claims.First(i => i.Type == ClaimTypes.NameIdentifier).Value;
             return _mapper.Map<UserDto>(_context.Users.SingleOrDefault(u => u.Login == login));
         }

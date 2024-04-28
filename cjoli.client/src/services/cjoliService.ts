@@ -16,9 +16,18 @@ export const getUser = async () => {
 };
 
 export const login = async (user: User) => {
-  const { data: token } = await axios.post<string>(`${import.meta.env.VITE_API_URL}/user/login`, user);
-  const cookie = new Cookie();
-  cookie.set("CJOLI_AUTH_TOKEN", token, { path: "/", maxAge: 24 * 60 * 60 });
+  return await axios
+    .post<string>(`${import.meta.env.VITE_API_URL}/user/login`, user)
+    .then(({ data }) => {
+      console.log("Data", data);
+      const cookie = new Cookie();
+      cookie.set("CJOLI_AUTH_TOKEN", data, { path: "/", maxAge: 24 * 60 * 60 });
+      return true;
+    })
+    .catch((error) => {
+      console.log("Error", error);
+      return false;
+    });
 };
 
 export const logout = () => {
