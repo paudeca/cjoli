@@ -19,16 +19,27 @@ export const login = async (user: User) => {
   return await axios
     .post<string>(`${import.meta.env.VITE_API_URL}/user/login`, user)
     .then(({ data }) => {
-      console.log("Data", data);
       const cookie = new Cookie();
       cookie.set("CJOLI_AUTH_TOKEN", data, { path: "/", maxAge: 24 * 60 * 60 });
       return true;
     })
     .catch((error) => {
-      console.log("Error", error);
+      console.log("Unable to login", error);
       return false;
     });
 };
+
+export const register = async (user:User)=>{
+  return await axios.post<User>(`${import.meta.env.VITE_API_URL}/user/register`,user)
+  .then(async ({data})=>{
+    await login(user);
+    return true;
+  })
+  .catch(error=>{
+    console.log("Unable to register", error);
+    return false;
+  })
+}
 
 export const logout = () => {
   const cookie = new Cookie();

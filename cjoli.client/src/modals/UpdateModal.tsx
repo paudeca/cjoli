@@ -7,7 +7,8 @@ import { useCJoli } from "../contexts/CJoliContext";
 import React from "react";
 import { useToast } from "../contexts/ToastContext";
 
-const UpdateModel = ({ id }: { id: string }) => {
+const UpdateModel = () => {
+  const id = 'update';
   const { show, setShow } = useModal(id);
   const { loadUser } = useCJoli();
   const handleClose = () => setShow(false);

@@ -67,9 +67,9 @@ const MenuNav = () => {
           </Offcanvas.Body>
         </Navbar.Offcanvas>
       </Container>
-      <LoginModal id='login' />
-      <RegisterModal id='register' />
-      <UpdateModal id='update' />
+      <LoginModal />
+      <RegisterModal />
+      <UpdateModal />
     </Navbar>
   );
 };

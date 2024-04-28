@@ -17,7 +17,7 @@ interface CJoliState {
   matches?: Match[];
 }
 interface CJoliAction {
-  loadUser: (user: User) => void;
+  loadUser: (user?: User) => void;
   loadRanking: (ranking: Ranking) => void;
   getTeam: (teamId: number) => Team | undefined;
   getPosition: (positionId: number) => Position | undefined;

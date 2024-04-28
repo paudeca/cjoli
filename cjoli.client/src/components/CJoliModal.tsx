@@ -1,46 +1,40 @@
 import { Fade, Modal, Form, Button, ProgressBar, Spinner } from "react-bootstrap";
 import { useForm, SubmitHandler, FieldValues, Path } from "react-hook-form";
 import { useModal } from "../contexts/ModalContext";
-import * as cjoliService from "../services/cjoliService";
-import { useCJoli } from "../contexts/CJoliContext";
 import React from "react";
-import { useToast } from "../contexts/ToastContext";
 
-interface Field<T extends FieldValues> {
-  id: keyof T;
+export interface Field<T extends FieldValues> {
+  id: Path<T>;
   label: string;
   type: "text" | "password";
   required?: boolean;
+  validate?:Path<T>;
 }
 
 interface CJoliModalProps<T extends FieldValues> {
   id: string;
   title: string;
   fields: Field<T>[];
+  onSubmit:(data:T)=>Promise<boolean>;
 }
 
-function CJoliModal<T extends FieldValues>({ id, title, fields }: CJoliModalProps<T>) {
+function CJoliModal<T extends FieldValues>({ id, title, fields,onSubmit }: CJoliModalProps<T>) {
   const { show, setShow } = useModal(id);
-  const { loadUser } = useCJoli();
-  const { showToast } = useToast();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     resetField,
+    watch
   } = useForm<T>();
 
   const [running, setRunning] = React.useState(false);
 
-  const onSubmit: SubmitHandler<T> = async (user) => {
+  const submit: SubmitHandler<T> = async (data) => {
     setRunning(true);
-    const result = await cjoliService.login(user);
-    if (!result) {
-      showToast("danger", "Invalid login");
-    } else {
-      user = await cjoliService.getUser();
-      loadUser(user);
+    const result = await onSubmit(data);
+    if(result) {
       setShow(false);
     }
     setRunning(false);
@@ -56,22 +50,25 @@ function CJoliModal<T extends FieldValues>({ id, title, fields }: CJoliModalProp
       style={{ color: "black" }}
       autoFocus
       onShow={() => {
-        fields.map((f) => resetField(f.id as Path<T>));
+        fields.map((f) => resetField(f.id));
         setRunning(false);
       }}
     >
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(submit)}>
         <Modal.Header closeButton>
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {fields.map((f) => (
-            <Form.Group className='mb-3' controlId={f.id as string}>
+            <Form.Group key={f.id} className='mb-3' controlId={f.id as string}>
               <Form.Label>{f.label}</Form.Label>
               <Form.Control
                 type={f.type}
                 autoFocus
-                {...register(f.id as Path<T>, { required: f.required ? `${f.label} is required` : false })}
+                {...register(f.id, { 
+                  required: f.required ? `${f.label} is required` : false ,
+                  validate: (value)=>f.validate && watch(f.validate)!==value?`${f.label} is invalid`:undefined
+                })}
                 className={`${errors[f.id] ? "is-invalid" : ""}`}
               />
               <Form.Control.Feedback type='invalid'>{errors[f.id]?.message as string}</Form.Control.Feedback>
