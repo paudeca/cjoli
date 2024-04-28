@@ -31,12 +31,25 @@ export const login = async (user: User) => {
 
 export const register = async (user:User)=>{
   return await axios.post<User>(`${import.meta.env.VITE_API_URL}/user/register`,user)
-  .then(async ({data})=>{
+  .then(async ()=>{
     await login(user);
     return true;
   })
   .catch(error=>{
     console.log("Unable to register", error);
+    return false;
+  })
+}
+
+export const update = async(user:User)=>{
+  const cookie = new Cookie();
+  const token = cookie.get("CJOLI_AUTH_TOKEN");
+  return await axios.post<boolean>(`${import.meta.env.VITE_API_URL}/user/update`,user, { headers: { Authorization: `Bearer ${token}` } })
+  .then(async ({data})=>{
+    return data;
+  })
+  .catch(error=>{
+    console.log("Unable to update", error);
     return false;
   })
 }

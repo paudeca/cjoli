@@ -34,13 +34,27 @@ namespace cjoli.Server.Services
             return user;
         }
 
-        public string Login(string login, string password, CJoliContext context)
+        private User GetUser(string login, CJoliContext context)
         {
             User? user = context.Users.SingleOrDefault(u => u.Login == login);
             if (user == null)
             {
                 throw new NotFoundException("User", login);
             }
+            return user;
+        }
+
+        public bool Update(string login, string password, CJoliContext context)
+        {
+            User user = GetUser(login, context);
+            user.Password = password;
+            context.SaveChanges();
+            return true;
+        }
+
+        public string Login(string login, string password, CJoliContext context)
+        {
+            User user = GetUser(login, context);
             if (user.Password != password)
             {
                 throw new InvalidLoginException(login);

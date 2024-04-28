@@ -49,6 +49,24 @@ namespace cjoli.Server.Controllers
             return Results.Ok(token);
         }
 
+        [HttpPost]
+        [Route("Update")]
+        public bool Update(UserUpdate user)
+        {
+            if (this.User.Identity == null || !this.User.Identity.IsAuthenticated)
+            {
+                return false;
+            }
+            var login = this.User.Claims.First(i => i.Type == ClaimTypes.NameIdentifier).Value;
+            return _service.Update(login, user.Password, _context);
+        }
 
+
+
+    }
+
+    public class UserUpdate
+    {
+        public required string Password { get; set; }
     }
 }
