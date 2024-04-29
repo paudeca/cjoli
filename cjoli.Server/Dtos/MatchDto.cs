@@ -11,5 +11,7 @@
         public bool ForfeitA { get; set; }
         public bool ForfeitB { get; set; }
         public DateTime Time { get; set; }
+        public int SquadId { get; set; }
+        public int PhaseId { get; set; }
     }
 }

@@ -18,6 +18,7 @@ const MyTd = styled("td")`
 
 const RankTable = ({ phase }: { phase: Phase }) => {
   const {
+    getTeamOrPositionName,
     getTeam,
     getPosition,
     state: { ranking },
@@ -56,9 +57,7 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                 {datas.map((score, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
-                    <td>
-                      {getTeam(getPosition(score.positionId)!.teamId)!.name}
-                    </td>
+                    <td>{getTeamOrPositionName(score.positionId)}</td>
                     <MyTd>{score.total}</MyTd>
                     <td>{score.game}</td>
                     <td>{score.win}</td>

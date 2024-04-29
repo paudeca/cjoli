@@ -9,4 +9,5 @@ export interface Match {
   forfeitB: BooleanConstructor;
   time: Date;
   squadId: number;
+  phaseId: number;
 }

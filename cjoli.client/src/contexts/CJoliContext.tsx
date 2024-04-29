@@ -24,8 +24,9 @@ interface CJoliAction {
   getTeamFromPosition: (
     positionValue: number,
     squadId: number
-  ) => Team | undefined;
+  ) => Team | Position | undefined;
   getPosition: (positionId: number) => Position | undefined;
+  getTeamOrPositionName: (positionId: number) => string;
 }
 
 const CJoliContext = React.createContext<
@@ -58,17 +59,11 @@ const reducer = (state: CJoliState, action: Action) => {
         []
       );
       const positions = squads.reduce<Position[]>(
-        (acc, squad) => [
-          ...acc,
-          ...squad.positions.map((p) => ({ ...p, squadId: squad.id })),
-        ],
+        (acc, squad) => [...acc, ...squad.positions],
         []
       );
       const matches = squads.reduce<Match[]>(
-        (acc, squad) => [
-          ...acc,
-          ...squad.matches.map((m) => ({ ...m, squadId: squad.id })),
-        ],
+        (acc, squad) => [...acc, ...squad.matches],
         []
       );
       return { ...state, ranking, teams, phases, squads, positions, matches };
@@ -106,9 +101,18 @@ export const CJoliProvider = ({ children }: { children: React.ReactNode }) => {
       const position = state.positions?.find(
         (p) => p.value == positionValue && p.squadId == squadId
       );
-      return position?.teamId ? getTeam(position?.teamId) : undefined;
+      return position?.teamId ? getTeam(position?.teamId) : position;
     },
     [state.positions]
+  );
+  const getTeamOrPositionName = React.useCallback(
+    (positionId: number) => {
+      const position = getPosition(positionId);
+      if (!position) return "no position";
+      const team = getTeam(position?.teamId);
+      return team ? team.name : position?.name ?? "no name";
+    },
+    [getPosition, getTeam]
   );
 
   return (
@@ -121,6 +125,7 @@ export const CJoliProvider = ({ children }: { children: React.ReactNode }) => {
         getTeam,
         getPosition,
         getTeamFromPosition,
+        getTeamOrPositionName,
       }}
     >
       {children}

@@ -8,9 +8,14 @@ import { ToastProvider, useToast } from "../contexts/ToastContext";
 import MenuNav from "./MenuNav";
 import { ToastContainer, Toast, ProgressBar } from "react-bootstrap";
 import Loading from "../components/Loading";
+import { useLocation } from "react-router-dom";
 
 const HomePage = () => {
-  const { loadUser, loadRanking } = useCJoli();
+  const {
+    loadUser,
+    loadRanking,
+    state: { phases },
+  } = useCJoli();
   const {
     state: { show, type, message },
     hideToast,
@@ -27,11 +32,18 @@ const HomePage = () => {
     };
     call();
   }, [loadRanking, loadUser]);
+
+  const { hash } = useLocation();
+  let phase = phases && phases.find((p) => `#${p.id}` == hash);
+  if (!phase && phases && phases?.length > 0) {
+    phase = phases[0];
+  }
+
   return (
     <Loading ready={ready}>
       <MenuNav />
-      <RankingStack />
-      <MatchesStack />
+      <RankingStack phase={phase} />
+      <MatchesStack phase={phase} />
       <ToastContainer position="top-end">
         <Toast onClose={hideToast} show={show} delay={5000} autohide bg={type}>
           <Toast.Header>

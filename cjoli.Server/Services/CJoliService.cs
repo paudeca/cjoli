@@ -192,6 +192,7 @@ namespace cjoli.Server.Services
             }
             Team? team = tourney.Teams.SingleOrDefault(t => t.Id == positionDto.TeamId);
             position.Team = team;
+            position.Name = positionDto.Name ?? position.Name;
             context.SaveChanges();
             return position;
         }
