@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import React from "react";
 import { Card, Table } from "react-bootstrap";
 import { Phase } from "../../../models/Phase";
 import { useCJoli } from "../../../contexts/CJoliContext";
@@ -23,18 +24,24 @@ const RankTable = ({ phase }: { phase: Phase }) => {
   } = useCJoli();
   return (
     <>
-      {phase?.squads.map((squad) => {
+      {phase.squads.map((squad) => {
         const scores = ranking?.scores.find((s) => s.squadId == squad.id);
         const datas = scores ? scores.scores : [];
         datas.sort((a, b) => (a.total > b.total ? -1 : 1));
         return (
           <Card.Body key={squad.id}>
             <Card.Title>{squad.name}</Card.Title>
-            <Table striped bordered hover size='sm' style={{ textAlign: "center" }}>
+            <Table
+              striped
+              bordered
+              hover
+              size="sm"
+              style={{ textAlign: "center" }}
+            >
               <thead>
                 <tr>
                   <th>#</th>
-                  <th className='w-50'>Team</th>
+                  <th className="w-50">Team</th>
                   <MyTh>PTS</MyTh>
                   <th>J</th>
                   <th>G</th>
@@ -49,7 +56,9 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                 {datas.map((score, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
-                    <td>{getTeam(getPosition(score.positionId)!.teamId)!.name}</td>
+                    <td>
+                      {getTeam(getPosition(score.positionId)!.teamId)!.name}
+                    </td>
                     <MyTd>{score.total}</MyTd>
                     <td>{score.game}</td>
                     <td>{score.win}</td>

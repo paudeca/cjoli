@@ -211,6 +211,7 @@ namespace cjoli.Server.Services
             match.ForfeitA = matchDto.ForfeitA;
             match.ForfeitB = matchDto.ForfeitB;
             match.Done = matchDto.Done;
+            match.Time = matchDto.Time;
             context.SaveChanges();
             return match;
         }

@@ -19,11 +19,18 @@ interface CJoliState {
 interface CJoliAction {
   loadUser: (user?: User) => void;
   loadRanking: (ranking: Ranking) => void;
+  getSquad: (squadId: number) => Squad | undefined;
   getTeam: (teamId: number) => Team | undefined;
+  getTeamFromPosition: (
+    positionValue: number,
+    squadId: number
+  ) => Team | undefined;
   getPosition: (positionId: number) => Position | undefined;
 }
 
-const CJoliContext = React.createContext<({ state: CJoliState } & CJoliAction) | null>(null);
+const CJoliContext = React.createContext<
+  ({ state: CJoliState } & CJoliAction) | null
+>(null);
 
 const initialState: CJoliState = {};
 
@@ -46,9 +53,24 @@ const reducer = (state: CJoliState, action: Action) => {
       const ranking = action.payload as Ranking;
       const teams = ranking.tourney.teams;
       const phases = ranking.tourney.phases;
-      const squads = phases.reduce<Squad[]>((acc, phase) => [...acc, ...phase.squads], []);
-      const positions = squads.reduce<Position[]>((acc, squad) => [...acc, ...squad.positions], []);
-      const matches = squads.reduce<Match[]>((acc, squad) => [...acc, ...squad.matches], []);
+      const squads = phases.reduce<Squad[]>(
+        (acc, phase) => [...acc, ...phase.squads],
+        []
+      );
+      const positions = squads.reduce<Position[]>(
+        (acc, squad) => [
+          ...acc,
+          ...squad.positions.map((p) => ({ ...p, squadId: squad.id })),
+        ],
+        []
+      );
+      const matches = squads.reduce<Match[]>(
+        (acc, squad) => [
+          ...acc,
+          ...squad.matches.map((m) => ({ ...m, squadId: squad.id })),
+        ],
+        []
+      );
       return { ...state, ranking, teams, phases, squads, positions, matches };
     }
   }
@@ -58,12 +80,52 @@ const reducer = (state: CJoliState, action: Action) => {
 export const CJoliProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
 
-  const loadUser = React.useCallback((user?: User) => dispatch({ type: Actions.LOAD_USER, payload: user }), []);
-  const loadRanking = React.useCallback((ranking: Ranking) => dispatch({ type: Actions.LOAD_RANKING, payload: ranking }), []);
-  const getTeam = React.useCallback((teamId: number) => state.teams?.find((t) => t.id === teamId), [state.teams]);
-  const getPosition = React.useCallback((positionId: number) => state.positions?.find((p) => p.id === positionId), [state.positions]);
+  const loadUser = React.useCallback(
+    (user?: User) => dispatch({ type: Actions.LOAD_USER, payload: user }),
+    []
+  );
+  const loadRanking = React.useCallback(
+    (ranking: Ranking) =>
+      dispatch({ type: Actions.LOAD_RANKING, payload: ranking }),
+    []
+  );
+  const getSquad = React.useCallback(
+    (squadId: number) => state.squads?.find((s) => s.id === squadId),
+    [state.squads]
+  );
+  const getTeam = React.useCallback(
+    (teamId: number) => state.teams?.find((t) => t.id === teamId),
+    [state.teams]
+  );
+  const getPosition = React.useCallback(
+    (positionId: number) => state.positions?.find((p) => p.id === positionId),
+    [state.positions]
+  );
+  const getTeamFromPosition = React.useCallback(
+    (positionValue: number, squadId: number) => {
+      const position = state.positions?.find(
+        (p) => p.value == positionValue && p.squadId == squadId
+      );
+      return position?.teamId ? getTeam(position?.teamId) : undefined;
+    },
+    [state.positions]
+  );
 
-  return <CJoliContext.Provider value={{ state, loadUser, loadRanking, getTeam, getPosition }}>{children}</CJoliContext.Provider>;
+  return (
+    <CJoliContext.Provider
+      value={{
+        state,
+        loadUser,
+        loadRanking,
+        getSquad,
+        getTeam,
+        getPosition,
+        getTeamFromPosition,
+      }}
+    >
+      {children}
+    </CJoliContext.Provider>
+  );
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
