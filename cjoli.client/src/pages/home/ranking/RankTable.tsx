@@ -28,7 +28,7 @@ const RankTable = ({ phase }: { phase: Phase }) => {
       {phase.squads.map((squad) => {
         const scores = ranking?.scores.find((s) => s.squadId == squad.id);
         const datas = scores ? scores.scores : [];
-        datas.sort((a, b) => (a.total > b.total ? -1 : 1));
+        //datas.sort((a, b) => (a.total > b.total ? -1 : 1));
         return (
           <Card.Body key={squad.id}>
             <Card.Title>{squad.name}</Card.Title>
@@ -57,7 +57,13 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                 {datas.map((score, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
-                    <td>{getTeamOrPositionName(score.positionId)}</td>
+                    <td>
+                      <img
+                        src={getTeamOrPositionName(score.positionId).logo}
+                        style={{ width: "30px" }}
+                      />
+                      {getTeamOrPositionName(score.positionId).label}
+                    </td>
                     <MyTd>{score.total}</MyTd>
                     <td>{score.game}</td>
                     <td>{score.win}</td>

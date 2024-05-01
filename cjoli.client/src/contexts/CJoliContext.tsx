@@ -21,12 +21,12 @@ interface CJoliAction {
   loadRanking: (ranking: Ranking) => void;
   getSquad: (squadId: number) => Squad | undefined;
   getTeam: (teamId: number) => Team | undefined;
-  getTeamFromPosition: (
-    positionValue: number,
-    squadId: number
-  ) => Team | Position | undefined;
+  getTeamFromPosition: (positionValue: number, squadId: number) => string;
   getPosition: (positionId: number) => Position | undefined;
-  getTeamOrPositionName: (positionId: number) => string;
+  getTeamOrPositionName: (positionId: number) => {
+    label: string;
+    logo?: string;
+  };
 }
 
 const CJoliContext = React.createContext<
@@ -101,16 +101,22 @@ export const CJoliProvider = ({ children }: { children: React.ReactNode }) => {
       const position = state.positions?.find(
         (p) => p.value == positionValue && p.squadId == squadId
       );
-      return position?.teamId ? getTeam(position?.teamId) : position;
+      let name = position?.name || "";
+      if (position?.teamId) {
+        name = `${getTeam(position?.teamId)?.name} - ${name}`;
+      }
+      //return position?.teamId ? getTeam(position?.teamId) : position;
+      return name;
     },
     [state.positions]
   );
   const getTeamOrPositionName = React.useCallback(
     (positionId: number) => {
       const position = getPosition(positionId);
-      if (!position) return "no position";
+      if (!position) return { label: "no position" };
       const team = getTeam(position?.teamId);
-      return team ? team.name : position?.name ?? "no name";
+      return { label: `${team?.name} - ${position.name}`, logo: team?.logo };
+      //return team ? team.name : position?.name ?? "no name";
     },
     [getPosition, getTeam]
   );

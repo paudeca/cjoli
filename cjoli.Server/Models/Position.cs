@@ -10,5 +10,6 @@ namespace cjoli.Server.Models
         public string? Name { get; set; }
         public Team? Team { get; set; }
         public Squad? Squad { get; set; }
+        public ParentPosition? ParentPosition { get; set; }
     }
 }

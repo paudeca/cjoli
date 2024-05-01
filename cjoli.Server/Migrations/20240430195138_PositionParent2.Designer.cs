@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using cjoli.Server.Datas;
 
@@ -11,9 +12,11 @@ using cjoli.Server.Datas;
 namespace cjoli.Server.Migrations
 {
     [DbContext(typeof(CJoliContext))]
-    partial class CJoliContextModelSnapshot : ModelSnapshot
+    [Migration("20240430195138_PositionParent2")]
+    partial class PositionParent2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,9 +94,6 @@ namespace cjoli.Server.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("PositionId")
-                        .HasColumnType("int");
-
                     b.Property<int>("SquadId")
                         .HasColumnType("int");
 
@@ -101,9 +101,6 @@ namespace cjoli.Server.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PositionId")
-                        .IsUnique();
 
                     b.HasIndex("SquadId");
 
@@ -146,6 +143,9 @@ namespace cjoli.Server.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("longtext");
 
+                    b.Property<int?>("ParentPositionId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("SquadId")
                         .HasColumnType("int");
 
@@ -156,6 +156,8 @@ namespace cjoli.Server.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentPositionId");
 
                     b.HasIndex("SquadId");
 
@@ -176,7 +178,7 @@ namespace cjoli.Server.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("PhaseId")
+                    b.Property<int?>("PhaseId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -193,9 +195,6 @@ namespace cjoli.Server.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Logo")
-                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -308,19 +307,11 @@ namespace cjoli.Server.Migrations
 
             modelBuilder.Entity("cjoli.Server.Models.ParentPosition", b =>
                 {
-                    b.HasOne("cjoli.Server.Models.Position", "Position")
-                        .WithOne("ParentPosition")
-                        .HasForeignKey("cjoli.Server.Models.ParentPosition", "PositionId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("cjoli.Server.Models.Squad", "Squad")
                         .WithMany("ParentPositions")
                         .HasForeignKey("SquadId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Position");
 
                     b.Navigation("Squad");
                 });
@@ -337,6 +328,10 @@ namespace cjoli.Server.Migrations
 
             modelBuilder.Entity("cjoli.Server.Models.Position", b =>
                 {
+                    b.HasOne("cjoli.Server.Models.ParentPosition", "ParentPosition")
+                        .WithMany()
+                        .HasForeignKey("ParentPositionId");
+
                     b.HasOne("cjoli.Server.Models.Squad", "Squad")
                         .WithMany("Positions")
                         .HasForeignKey("SquadId")
@@ -346,6 +341,8 @@ namespace cjoli.Server.Migrations
                         .WithMany("Positions")
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ParentPosition");
 
                     b.Navigation("Squad");
 
@@ -357,8 +354,7 @@ namespace cjoli.Server.Migrations
                     b.HasOne("cjoli.Server.Models.Phase", "Phase")
                         .WithMany("Squads")
                         .HasForeignKey("PhaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Phase");
                 });
@@ -376,11 +372,6 @@ namespace cjoli.Server.Migrations
             modelBuilder.Entity("cjoli.Server.Models.Phase", b =>
                 {
                     b.Navigation("Squads");
-                });
-
-            modelBuilder.Entity("cjoli.Server.Models.Position", b =>
-                {
-                    b.Navigation("ParentPosition");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Squad", b =>

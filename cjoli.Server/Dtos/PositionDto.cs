@@ -7,6 +7,8 @@
         public string? Name { get; set; }
         public int TeamId { get; set; }
         public int SquadId { get; set; }
+        public ParentPositionDto? ParentPosition { get; set; }
 
     }
+
 }

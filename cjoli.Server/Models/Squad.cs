@@ -9,6 +9,7 @@ namespace cjoli.Server.Models
         public required string Name { get; set; }
         public IList<Position> Positions { get; set; } = new List<Position>();
         public IList<Match> Matches { get; set; } = new List<Match>();
-        public Phase? Phase { get; set; }
+        public required Phase Phase { get; set; }
+        public IList<ParentPosition>? ParentPositions { get; set; }
     }
 }

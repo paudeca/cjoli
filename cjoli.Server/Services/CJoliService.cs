@@ -12,6 +12,7 @@ namespace cjoli.Server.Services
         {
             Tourney? tourney = context.Tourneys
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.Team)
+                .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.ParentPosition)
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches)
                 .Include(t => t.Teams)
                 .FirstOrDefault(t => t.Uid == tourneyUid);
@@ -26,6 +27,7 @@ namespace cjoli.Server.Services
         {
             var tourney = GetTourney(tourneyUid, context);
             var scores = CalculateScores(tourney);
+            //AffectationTeams(scores, tourney);
             return new Ranking() { Tourney = tourney, Scores = scores };
         }
 
@@ -80,17 +82,42 @@ namespace cjoli.Server.Services
 
                         return scores;
                     });
-                    var scoreSquad = new ScoreSquad() { SquadId = squad.Id, Scores = scores.Select(kv => kv.Value).ToList() };
+                    var scoreSquad = new ScoreSquad() { SquadId = squad.Id, Scores = scores.Select(kv => kv.Value).OrderByDescending(x => x.Total).ToList() };
                     scoreSquads.Add(scoreSquad);
                 }
             }
             return scoreSquads;
         }
 
+        public void AffectationTeams(RankingDto ranking)
+        {
+            var positions = (ranking.Tourney.Phases ?? []).SelectMany(p => p.Squads ?? []).SelectMany(s => s.Positions ?? []);
+            foreach (var position in positions.Where(p => p.ParentPosition != null))
+            {
+                var scoreSquad = ranking.Scores.Find(s => s.SquadId == (position.ParentPosition?.SquadId ?? 0));
+                var score = (scoreSquad?.Scores ?? [])[(position.ParentPosition?.Value ?? 1) - 1];
+                var positionParent = positions.Single(p => p.Id == score.PositionId);
+                position.TeamId = positionParent.TeamId;
+            }
+        }
+
+        private M Import<M, D>(D dto, CJoliContext context, Func<M?> select, Func<M> create, Action<M> update, List<Action> children)
+        {
+            M? model = select();
+            if (model == null)
+            {
+                model = create();
+            }
+            update(model);
+            context.SaveChanges();
+            return model;
+        }
+
+
         public Tourney Import(TourneyDto tourneyDto, CJoliContext context)
         {
             Tourney? tourney = context.Tourneys
-                .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions)
+                .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.ParentPosition)
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches)
                 .Include(t => t.Teams)
                 .SingleOrDefault(t => t.Uid == tourneyDto.Uid);
@@ -101,6 +128,10 @@ namespace cjoli.Server.Services
             }
             tourney.Name = tourneyDto.Name ?? tourney.Name;
 
+            var list = new List<Action>();
+            list.Add(() => { });
+            list.Add(() => { });
+            //list.Add(tourneyDto.Phases);
             if (tourneyDto.Teams != null)
             {
                 foreach (var teamDto in tourneyDto.Teams)
@@ -129,13 +160,15 @@ namespace cjoli.Server.Services
                 tourney.Teams.Add(team);
             }
             team.Name = teamDto.Name ?? team.Name;
+            team.Logo = teamDto.Logo ?? team.Logo;
             context.SaveChanges();
             return team;
         }
 
         private Phase ImportPhase(PhaseDto phaseDto, Tourney tourney, CJoliContext context)
         {
-            Phase? phase = tourney.Phases.SingleOrDefault(p => p.Id == phaseDto.Id);
+            Func<Phase, bool> filter = phaseDto.Id > 0 ? (p) => p.Id == phaseDto.Id : (p) => p.Name == phaseDto.Name;
+            Phase? phase = tourney.Phases.SingleOrDefault(filter);
             if (phase == null)
             {
                 phase = new Phase() { Name = "" };
@@ -156,10 +189,11 @@ namespace cjoli.Server.Services
 
         private Squad ImportSquad(SquadDto squadDto, Phase phase, Tourney tourney, CJoliContext context)
         {
-            Squad? squad = phase.Squads.SingleOrDefault(s => s.Id == squadDto.Id);
+            Func<Squad, bool> filter = squadDto.Id > 0 ? (p) => p.Id == squadDto.Id : (p) => p.Name == squadDto.Name;
+            Squad? squad = phase.Squads.SingleOrDefault(filter);
             if (squad == null)
             {
-                squad = new Squad() { Name = "" };
+                squad = new Squad() { Name = "", Phase = phase };
                 phase.Squads.Add(squad);
             }
             squad.Name = squadDto.Name ?? squad.Name;
@@ -193,6 +227,22 @@ namespace cjoli.Server.Services
             Team? team = tourney.Teams.SingleOrDefault(t => t.Id == positionDto.TeamId);
             position.Team = team;
             position.Name = positionDto.Name ?? position.Name;
+            if (positionDto.ParentPosition != null)
+            {
+                var parent = positionDto.ParentPosition;
+                var squadParent = tourney.Phases.Single(p => p.Name == parent.Phase).Squads.Single(s => s.Name == parent.Squad);
+
+                if (position.ParentPosition == null)
+                {
+                    position.ParentPosition = new ParentPosition() { Position = position, Squad = squadParent, Value = parent.Value };
+                }
+                else
+                {
+                    position.ParentPosition.Value = parent.Value;
+                    position.ParentPosition.Squad = squadParent;
+                }
+
+            }
             context.SaveChanges();
             return position;
         }

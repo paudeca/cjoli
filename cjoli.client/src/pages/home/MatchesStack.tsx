@@ -106,12 +106,10 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                                   )}
                                   <td>{getSquad(match.squadId)!.name}</td>
                                   <td>
-                                    {
-                                      getTeamFromPosition(
-                                        match.positionA,
-                                        match.squadId
-                                      )?.name
-                                    }
+                                    {getTeamFromPosition(
+                                      match.positionA,
+                                      match.squadId
+                                    )}
                                   </td>
                                   <td>
                                     {match.done && (
@@ -156,12 +154,10 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                                     )}
                                   </td>
                                   <td>
-                                    {
-                                      getTeamFromPosition(
-                                        match.positionB,
-                                        match.squadId
-                                      )?.name
-                                    }
+                                    {getTeamFromPosition(
+                                      match.positionB,
+                                      match.squadId
+                                    )}
                                   </td>
                                 </tr>
                               );

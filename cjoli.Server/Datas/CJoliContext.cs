@@ -26,6 +26,11 @@ namespace cjoli.Server.Datas
 
             modelBuilder.Entity<Squad>().HasMany(s => s.Positions).WithOne(p => p.Squad).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Squad>().HasMany(s => s.Matches).WithOne(m => m.Squad).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Squad>().HasMany(s => s.ParentPositions).WithOne(p => p.Squad).OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Position>().HasOne(p => p.ParentPosition).WithOne(p => p.Position).OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ParentPosition>().HasOne(p => p.Position).WithOne(p => p.ParentPosition).OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Team>().HasMany(t => t.Positions).WithOne(p => p.Team).OnDelete(DeleteBehavior.SetNull);
 

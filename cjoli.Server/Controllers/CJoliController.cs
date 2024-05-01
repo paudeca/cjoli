@@ -26,7 +26,9 @@ namespace cjoli.Server.Controllers
         [Route("Ranking/{uuid}")]
         public RankingDto GetRanking(string uuid)
         {
-            return _mapper.Map<RankingDto>(_service.GetRanking(uuid, _context));
+            var ranking = _mapper.Map<RankingDto>(_service.GetRanking(uuid, _context));
+            _service.AffectationTeams(ranking);
+            return ranking;
         }
 
         [HttpGet]

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using cjoli.Server.Datas;
 
@@ -11,9 +12,11 @@ using cjoli.Server.Datas;
 namespace cjoli.Server.Migrations
 {
     [DbContext(typeof(CJoliContext))]
-    partial class CJoliContextModelSnapshot : ModelSnapshot
+    [Migration("20240430195515_PositionParent3")]
+    partial class PositionParent3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -176,7 +179,7 @@ namespace cjoli.Server.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("PhaseId")
+                    b.Property<int?>("PhaseId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -193,9 +196,6 @@ namespace cjoli.Server.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Logo")
-                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -311,7 +311,7 @@ namespace cjoli.Server.Migrations
                     b.HasOne("cjoli.Server.Models.Position", "Position")
                         .WithOne("ParentPosition")
                         .HasForeignKey("cjoli.Server.Models.ParentPosition", "PositionId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("cjoli.Server.Models.Squad", "Squad")
@@ -357,8 +357,7 @@ namespace cjoli.Server.Migrations
                     b.HasOne("cjoli.Server.Models.Phase", "Phase")
                         .WithMany("Squads")
                         .HasForeignKey("PhaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Phase");
                 });
