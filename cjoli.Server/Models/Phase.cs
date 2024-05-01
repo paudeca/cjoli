@@ -9,6 +9,6 @@ namespace cjoli.Server.Models
         public required string Name { get; set; }
         public IList<Squad> Squads { get; set; } = new List<Squad>();
         public DateTime Time { get; set; }
-        public Tourney? Tourney { get; set; }
+        public required Tourney Tourney { get; set; }
     }
 }

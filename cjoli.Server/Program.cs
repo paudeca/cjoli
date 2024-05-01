@@ -59,6 +59,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDataProtection();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddSingleton<CJoliService>();
+builder.Services.AddSingleton<ImportService>();
 builder.Services.AddSingleton<UserService>();
 
 builder.Services.AddDbContextPool<CJoliContext>(options =>
