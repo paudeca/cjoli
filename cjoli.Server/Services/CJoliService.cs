@@ -27,7 +27,6 @@ namespace cjoli.Server.Services
         {
             var tourney = GetTourney(tourneyUid, context);
             var scores = CalculateScores(tourney);
-            //AffectationTeams(scores, tourney);
             return new Ranking() { Tourney = tourney, Scores = scores };
         }
 
@@ -82,7 +81,54 @@ namespace cjoli.Server.Services
 
                         return scores;
                     });
-                    var scoreSquad = new ScoreSquad() { SquadId = squad.Id, Scores = scores.Select(kv => kv.Value).OrderByDescending(x => x.Total).ToList() };
+                    //var scoreSquad = new ScoreSquad() { SquadId = squad.Id, Scores = scores.Select(kv => kv.Value).OrderByDescending(x => x.Total).ToList() };
+                    var listScores = scores.Select(kv => kv.Value).OrderByDescending(x => x.Total).ToList();
+                    listScores.Sort((a, b) =>
+                    {
+                        var diff = a.Total.CompareTo(b.Total);
+                        if (diff != 0)
+                        {
+                            return -diff;
+                        }
+                        var positionA = squad.Positions.Single(p => p.Id == a.PositionId);
+                        var positionB = squad.Positions.Single(p => p.Id == b.PositionId);
+                        //var matchs = squad.Matches.Where(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB)).ToList();
+                        var match = squad.Matches.SingleOrDefault(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB));
+                        if ((match != null))
+                        {
+                            if (match.ScoreA > match.ScoreB || match.ForfeitB)
+                            {
+                                return match.PositionA == positionA ? -1 : 1;
+                            }
+                            else if (match.ScoreB > match.ScoreA || match.ForfeitA)
+                            {
+                                return match.PositionB == positionA ? -1 : 1;
+                            }
+                        }
+                        diff = a.GoalDiff.CompareTo(b.GoalDiff);
+                        if (diff != 0)
+                        {
+                            return -diff;
+                        }
+                        diff = a.GoalFor.CompareTo(b.GoalFor);
+                        if (diff != 0)
+                        {
+                            return -diff;
+                        }
+                        diff = a.GoalAgainst.CompareTo(b.GoalAgainst);
+                        if (diff != 0)
+                        {
+                            return diff;
+                        }
+                        var teamA = positionA.Team;
+                        var teamB = positionB.Team;
+                        if (teamA != null && teamB != null)
+                        {
+                            return -teamA.Youngest?.CompareTo(teamB.Youngest) ?? 0;
+                        }
+                        return 0;
+                    });
+                    var scoreSquad = new ScoreSquad() { SquadId = squad.Id, Scores = listScores };
                     scoreSquads.Add(scoreSquad);
                 }
             }
@@ -140,6 +186,24 @@ namespace cjoli.Server.Services
             match.ForfeitA = false;
             match.ForfeitB = false;
             context.SaveChanges();
+        }
+
+        public void UpdateTeam(string uuid, TeamDto teamDto, CJoliContext context)
+        {
+            Tourney? tourney = context.Tourneys.Include(t => t.Teams).SingleOrDefault(t => t.Uid == uuid);
+            if (tourney == null)
+            {
+                throw new NotFoundException("Tourney", uuid);
+            }
+            Team? team = tourney.Teams.SingleOrDefault(t => t.Id == teamDto.Id);
+            if (team == null)
+            {
+                throw new NotFoundException("Team", teamDto.Id);
+            }
+            team.Logo = teamDto.Logo ?? team.Logo;
+            team.Youngest = teamDto.Youngest ?? team.Youngest;
+            context.SaveChanges();
+
         }
 
     }

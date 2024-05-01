@@ -4,6 +4,7 @@ import { User } from "../models/User";
 import Cookie from "universal-cookie";
 import { Score } from "../models/Score";
 import { Match } from "../models/Match";
+import { Team } from "../models/Team";
 
 export const getRanking = async () => {
   const { data } = await axios.get<Ranking>(
@@ -56,6 +57,26 @@ export const update = async (user: User) => {
     .post<boolean>(`${import.meta.env.VITE_API_URL}/user/update`, user, {
       headers: { Authorization: `Bearer ${token}` },
     })
+    .then(async ({ data }) => {
+      return data;
+    })
+    .catch((error) => {
+      console.log("Unable to update", error);
+      return false;
+    });
+};
+
+export const updateTeam = async (team: Team) => {
+  const cookie = new Cookie();
+  const token = cookie.get("CJOLI_AUTH_TOKEN");
+  return await axios
+    .post<boolean>(
+      `${import.meta.env.VITE_API_URL}/cjoli/updateTeam/123`,
+      team,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
     .then(async ({ data }) => {
       return data;
     })

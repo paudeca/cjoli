@@ -3,6 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import { CJoliProvider } from "./contexts/CJoliContext";
+import { ModalProvider } from "./contexts/ModalContext";
 
 const theme = {
   colors: {
@@ -48,7 +49,9 @@ const App = () => {
         `}
       />
       <CJoliProvider>
-        <RouterProvider router={router} />
+        <ModalProvider>
+          <RouterProvider router={router} />
+        </ModalProvider>
       </CJoliProvider>
     </ThemeProvider>
   );

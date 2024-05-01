@@ -87,8 +87,4 @@ const MenuNav = () => {
   );
 };
 
-export default () => (
-  <ModalProvider>
-    <MenuNav />
-  </ModalProvider>
-);
+export default MenuNav;

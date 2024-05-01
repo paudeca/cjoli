@@ -1,21 +1,25 @@
-import CJoliModal,{Field} from "../components/CJoliModal";
+import CJoliModal, { Field } from "../components/CJoliModal";
 import { useCJoli } from "../contexts/CJoliContext";
 import { useToast } from "../contexts/ToastContext";
 import { User } from "../models/User";
-import * as cjoliService from '../services/cjoliService';
+import * as cjoliService from "../services/cjoliService";
 
-type UserUpdate = User & {passwordConfirm:string};
+type UserUpdate = User & { passwordConfirm: string };
 
 const UpdateModal = () => {
-  const { loadUser } = useCJoli();
   const { showToast } = useToast();
 
-
-  const fields:Field<UserUpdate>[] = [
+  const fields: Field<UserUpdate>[] = [
     { id: "password", label: "Password", type: "password", required: true },
-    { id: "passwordConfirm", label: "Confirm Password", type: "password", required: true, validate:'password' },
+    {
+      id: "passwordConfirm",
+      label: "Confirm Password",
+      type: "password",
+      required: true,
+      validate: "password",
+    },
   ];
-  const onSubmit = async (user:User)=>{
+  const onSubmit = async (user: User) => {
     const result = await cjoliService.update(user);
     if (!result) {
       showToast("danger", "Unable to update account");
@@ -24,8 +28,15 @@ const UpdateModal = () => {
       showToast("success", "Account updated");
       return true;
     }
-  }
-  return <CJoliModal<UserUpdate> id='update' title='Update' fields={fields} onSubmit={onSubmit}/>;
+  };
+  return (
+    <CJoliModal
+      id="update"
+      title="Update"
+      fields={fields}
+      onSubmit={onSubmit}
+    />
+  );
 };
 
 export default UpdateModal;

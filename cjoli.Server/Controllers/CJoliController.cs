@@ -66,5 +66,14 @@ namespace cjoli.Server.Controllers
             return GetRanking(uuid);
         }
 
+
+        [HttpPost]
+        [Route("UpdateTeam/{uuid}")]
+        public bool UpdateTeam([FromRoute] string uuid, [FromBody] TeamDto teamDto)
+        {
+            _service.UpdateTeam(uuid, teamDto, _context);
+            return true;
+        }
+
     }
 }

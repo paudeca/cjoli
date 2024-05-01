@@ -10,5 +10,6 @@ namespace cjoli.Server.Models
         public Tourney? Tourney { get; set; }
         public IList<Position> Positions { get; set; } = new List<Position>();
         public string? Logo { get; set; }
+        public DateOnly? Youngest { get; set; }
     }
 }

@@ -64,6 +64,7 @@ namespace cjoli.Server.Services
                 {
                     team.Name = teamDto.Name ?? team.Name;
                     team.Logo = teamDto.Logo ?? team.Logo;
+                    team.Youngest = teamDto.Youngest ?? team.Youngest;
                 }
             );
         }
