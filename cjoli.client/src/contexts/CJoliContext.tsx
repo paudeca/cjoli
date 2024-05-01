@@ -101,6 +101,9 @@ export const CJoliProvider = ({ children }: { children: React.ReactNode }) => {
       if (!position)
         throw new Error(`position not found with id:${positionId}`);
       const team = getTeam(position.teamId);
+      if (!team) {
+        return { label: position.name || "noname" };
+      }
       const label = position.name
         ? `${team?.name} - ${position.short}`
         : team?.name || "noname";

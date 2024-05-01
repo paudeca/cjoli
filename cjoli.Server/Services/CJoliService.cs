@@ -96,8 +96,11 @@ namespace cjoli.Server.Services
             {
                 var scoreSquad = ranking.Scores.Find(s => s.SquadId == (position.ParentPosition?.SquadId ?? 0));
                 var score = (scoreSquad?.Scores ?? [])[(position.ParentPosition?.Value ?? 1) - 1];
-                var positionParent = positions.Single(p => p.Id == score.PositionId);
-                position.TeamId = positionParent.TeamId;
+                if (score.Game > 0)
+                {
+                    var positionParent = positions.Single(p => p.Id == score.PositionId);
+                    position.TeamId = positionParent.TeamId;
+                }
             }
         }
 
@@ -109,8 +112,18 @@ namespace cjoli.Server.Services
                 throw new NotFoundException("Match", dto.Id);
             }
             match.Done = true;
-            match.ScoreA = dto.ScoreA;
-            match.ScoreB = dto.ScoreB;
+            if (dto.ForfeitA || dto.ForfeitB)
+            {
+                match.ForfeitA = dto.ForfeitA;
+                match.ForfeitB = dto.ForfeitB;
+                match.ScoreA = 0;
+                match.ScoreB = 0;
+            }
+            else
+            {
+                match.ScoreA = dto.ScoreA;
+                match.ScoreB = dto.ScoreB;
+            }
             context.SaveChanges();
         }
 
@@ -124,6 +137,8 @@ namespace cjoli.Server.Services
             match.Done = false;
             match.ScoreA = 0;
             match.ScoreB = 0;
+            match.ForfeitA = false;
+            match.ForfeitB = false;
             context.SaveChanges();
         }
 

@@ -8,7 +8,7 @@ export interface Match {
   scoreA: number;
   scoreB: number;
   forfeitA: boolean;
-  forfeitB: BooleanConstructor;
+  forfeitB: boolean;
   time: Date;
   squadId: number;
   phaseId: number;

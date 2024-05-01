@@ -35,7 +35,7 @@ const MenuNav = () => {
       <Container fluid>
         <Navbar.Brand href="#">
           <MyImg src="./logo.png" width="60px" className="mx-4" />
-          CJoli - Ice Hockey Tournament
+          CJoli - Ice Hockey Tournament - 1.0.0-beta
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="menu" />
         <Navbar.Offcanvas id="menu" aria-labelledby="menu" placement="end">

@@ -5,6 +5,11 @@ import {
   Accordion,
   Popover,
   OverlayTrigger,
+  Form,
+  InputGroup,
+  Dropdown,
+  SplitButton,
+  DropdownButton,
 } from "react-bootstrap";
 import CJoliCard from "../../components/CJoliCard";
 import CJoliStack from "../../components/CJoliStack";
@@ -20,6 +25,20 @@ import useScreenSize from "../../hooks/useScreenSize";
 import { CheckCircle, XCircle } from "react-bootstrap-icons";
 import { useForm } from "react-hook-form";
 import * as cjoliService from "../../services/cjoliService";
+import styled from "@emotion/styled";
+
+const MyScoreDiv = styled("div")<{ isMobile: boolean }>`
+  display: flex;
+  align-items: ${(props) => (props.isMobile ? "flex-end" : "center")};
+  justify-content: center;
+  flex-direction: ${(props) => (props.isMobile ? "column" : "row")};
+  & svg {
+    ${(props) =>
+      props.isMobile
+        ? "margin-top: 0.5rem !important;"
+        : "margin-left: 0.5rem !important;"}
+  }
+`;
 
 const MatchesStack = ({ phase }: { phase?: Phase }) => {
   const {
@@ -47,10 +66,14 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
   };
 
   const saveMatch = async (match: Match) => {
-    const { scoreA, scoreB } = getValues(`m${match.id}`) as {
+    let { scoreA, scoreB } = getValues(`m${match.id}`) as {
       scoreA: number;
       scoreB: number;
     };
+    if (match.forfeitA || match.forfeitB) {
+      scoreA = 0;
+      scoreB = 0;
+    }
     const ranking = await cjoliService.saveMatch({ ...match, scoreA, scoreB });
     loadRanking(ranking);
   };
@@ -65,10 +88,6 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
       <div className="p-2">
         <CJoliCard>
           <Loading ready={!!matches}>
-            <div className="d-grid gap-2 py-3 m-auto w-25">
-              <Button variant="primary">Save</Button>
-            </div>
-
             <Accordion defaultActiveKey="0">
               {keys.map((key, index) => {
                 const datasOrder = datas ? datas[key] : [];
@@ -97,18 +116,25 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                         <tbody>
                           {Object.keys(map).map((k) =>
                             map[k].map((match, i) => {
-                              const badgeA =
+                              let badgeA =
                                 match.scoreA > match.scoreB
                                   ? "success"
                                   : match.scoreA === match.scoreB
                                   ? "warning"
                                   : "danger";
-                              const badgeB =
+                              let badgeB =
                                 match.scoreA < match.scoreB
                                   ? "success"
                                   : match.scoreA === match.scoreB
                                   ? "warning"
                                   : "danger";
+                              if (match.forfeitA) {
+                                badgeA = "danger";
+                                badgeB = "success";
+                              } else if (match.forfeitB) {
+                                badgeB = "danger";
+                                badgeA = "success";
+                              }
                               const textA =
                                 badgeA == "warning" ? "black" : "white";
                               const textB =
@@ -126,22 +152,33 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                                       <TeamName
                                         positionId={match.positionIdA}
                                       />
+                                      {match.forfeitA && (
+                                        <Badge bg="danger" className="mx-2">
+                                          Forfait
+                                        </Badge>
+                                      )}
                                     </LeftCenterDiv>
                                     {isMobile && (
                                       <LeftCenterDiv>
                                         <TeamName
                                           positionId={match.positionIdB}
                                         />
+                                        {match.forfeitB && (
+                                          <Badge bg="danger" className="mx-2">
+                                            Forfait
+                                          </Badge>
+                                        )}
                                       </LeftCenterDiv>
                                     )}
                                   </td>
                                   <td>
                                     {match.done && (
-                                      <>
+                                      <MyScoreDiv isMobile={isMobile}>
                                         <Badge
                                           bg={badgeA}
                                           text={textA}
                                           style={{ fontSize: "16px" }}
+                                          className="my-1"
                                         >
                                           {match.scoreA}
                                         </Badge>
@@ -159,42 +196,87 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                                         </Badge>
                                         <XCircle
                                           color="red"
-                                          size={20}
-                                          className="mx-2"
+                                          size={24}
                                           role="button"
                                           onClick={() => clearMatch(match)}
                                         />
-                                      </>
+                                      </MyScoreDiv>
                                     )}
                                     {!match.done && (
-                                      <>
-                                        <input
-                                          type="number"
-                                          min="0"
-                                          max="10"
-                                          style={{ width: "50px" }}
-                                          {...register(`m${match.id}.scoreA`)}
-                                        />
+                                      <MyScoreDiv isMobile={isMobile}>
+                                        <InputGroup
+                                          size="sm"
+                                          style={{ width: "80px" }}
+                                        >
+                                          <Form.Control
+                                            type="number"
+                                            min="0"
+                                            max="100"
+                                            {...register(`m${match.id}.scoreA`)}
+                                          />
+                                          <DropdownButton
+                                            variant="outline-secondary"
+                                            title=""
+                                          >
+                                            <Dropdown.Item
+                                              href="#"
+                                              onClick={() =>
+                                                saveMatch({
+                                                  ...match,
+                                                  forfeitA: true,
+                                                  forfeitB: false,
+                                                  scoreA: 0,
+                                                  scoreB: 0,
+                                                })
+                                              }
+                                            >
+                                              Forfait
+                                            </Dropdown.Item>
+                                          </DropdownButton>
+                                        </InputGroup>
                                         {!isMobile && (
                                           <Badge bg="light" text="black">
                                             <b>-</b>
                                           </Badge>
                                         )}
-                                        <input
-                                          type="number"
-                                          min="0"
-                                          max="100"
-                                          style={{ width: "50px" }}
-                                          {...register(`m${match.id}.scoreB`)}
-                                        />
+                                        <InputGroup
+                                          size="sm"
+                                          style={{ width: "80px" }}
+                                        >
+                                          <Form.Control
+                                            type="number"
+                                            min="0"
+                                            max="100"
+                                            {...register(`m${match.id}.scoreB`)}
+                                          />
+                                          <DropdownButton
+                                            variant="outline-secondary"
+                                            title=""
+                                          >
+                                            <Dropdown.Item
+                                              href="#"
+                                              onClick={() =>
+                                                saveMatch({
+                                                  ...match,
+                                                  forfeitB: true,
+                                                  forfeitA: false,
+                                                  scoreA: 0,
+                                                  scoreB: 0,
+                                                })
+                                              }
+                                            >
+                                              Forfait
+                                            </Dropdown.Item>
+                                          </DropdownButton>
+                                        </InputGroup>
+
                                         <CheckCircle
                                           color="green"
-                                          size={20}
-                                          className="mx-2"
+                                          size={24}
                                           onClick={() => saveMatch(match)}
                                           role="button"
                                         />
-                                      </>
+                                      </MyScoreDiv>
                                     )}
                                   </td>
                                   {!isMobile && (
@@ -203,6 +285,11 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                                         <TeamName
                                           positionId={match.positionIdB}
                                         />
+                                        {match.forfeitB && (
+                                          <Badge bg="danger" className="mx-2">
+                                            Forfait
+                                          </Badge>
+                                        )}
                                       </LeftCenterDiv>
                                     </td>
                                   )}
@@ -217,9 +304,6 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                 );
               })}
             </Accordion>
-            <div className="d-grid gap-2 py-3 m-auto w-25">
-              <Button variant="primary">Save</Button>
-            </div>
           </Loading>
         </CJoliCard>
       </div>
