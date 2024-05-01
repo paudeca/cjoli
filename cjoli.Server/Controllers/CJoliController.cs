@@ -48,5 +48,23 @@ namespace cjoli.Server.Controllers
             return tourney.Uid;
         }
 
+        [HttpPost]
+        //[Authorize]
+        [Route("SaveMatch/{uuid}")]
+        public RankingDto SaveMatch([FromRoute] string uuid, [FromBody] MatchDto match)
+        {
+            _service.SaveMatch(match, _context);
+            return GetRanking(uuid);
+        }
+
+        [HttpPost]
+        //[Authorize]
+        [Route("ClearMatch/{uuid}")]
+        public RankingDto ClearMatch([FromRoute] string uuid, [FromBody] MatchDto match)
+        {
+            _service.ClearMatch(match, _context);
+            return GetRanking(uuid);
+        }
+
     }
 }

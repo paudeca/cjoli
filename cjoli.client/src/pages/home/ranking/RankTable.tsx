@@ -1,8 +1,9 @@
 import styled from "@emotion/styled";
-import React from "react";
 import { Card, Table } from "react-bootstrap";
 import { Phase } from "../../../models/Phase";
 import { useCJoli } from "../../../contexts/CJoliContext";
+import TeamName from "../../../components/TeamName";
+import LeftCenterDiv from "../../../components/LeftCenterDiv";
 
 const MyTh = styled("th")`
   background-color: ${(props) => props.theme.colors.secondary} !important;
@@ -18,9 +19,6 @@ const MyTd = styled("td")`
 
 const RankTable = ({ phase }: { phase: Phase }) => {
   const {
-    getTeamOrPositionName,
-    getTeam,
-    getPosition,
     state: { ranking },
   } = useCJoli();
   return (
@@ -58,11 +56,9 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                   <tr key={index}>
                     <td>{index + 1}</td>
                     <td>
-                      <img
-                        src={getTeamOrPositionName(score.positionId).logo}
-                        style={{ width: "30px" }}
-                      />
-                      {getTeamOrPositionName(score.positionId).label}
+                      <LeftCenterDiv>
+                        <TeamName positionId={score.positionId} />
+                      </LeftCenterDiv>
                     </td>
                     <MyTd>{score.total}</MyTd>
                     <td>{score.game}</td>

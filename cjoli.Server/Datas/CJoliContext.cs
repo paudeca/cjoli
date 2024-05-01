@@ -9,6 +9,7 @@ namespace cjoli.Server.Datas
     {
         public DbSet<Tourney> Tourneys { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Match> Match { get; set; }
 
         private const string CRYPT_PURPOSE = "CJoliCryptPurpose";
 

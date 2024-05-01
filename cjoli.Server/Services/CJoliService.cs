@@ -100,6 +100,33 @@ namespace cjoli.Server.Services
                 position.TeamId = positionParent.TeamId;
             }
         }
+
+        public void SaveMatch(MatchDto dto, CJoliContext context)
+        {
+            Match? match = context.Match.SingleOrDefault(m => m.Id == dto.Id);
+            if (match == null)
+            {
+                throw new NotFoundException("Match", dto.Id);
+            }
+            match.Done = true;
+            match.ScoreA = dto.ScoreA;
+            match.ScoreB = dto.ScoreB;
+            context.SaveChanges();
+        }
+
+        public void ClearMatch(MatchDto dto, CJoliContext context)
+        {
+            Match? match = context.Match.SingleOrDefault(m => m.Id == dto.Id);
+            if (match == null)
+            {
+                throw new NotFoundException("Match", dto.Id);
+            }
+            match.Done = false;
+            match.ScoreA = 0;
+            match.ScoreB = 0;
+            context.SaveChanges();
+        }
+
     }
 
     public class Ranking

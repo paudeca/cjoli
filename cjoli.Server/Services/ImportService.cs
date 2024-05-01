@@ -139,6 +139,7 @@ namespace cjoli.Server.Services
                     Team? team = squad.Phase.Tourney.Teams.SingleOrDefault(t => t.Id == positionDto.TeamId);
                     position.Team = team;
                     position.Name = positionDto.Name ?? position.Name;
+                    position.Short = positionDto.Short ?? position.Short;
                 },
                 children: [
                     (position)=>{

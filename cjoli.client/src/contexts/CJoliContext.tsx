@@ -21,9 +21,8 @@ interface CJoliAction {
   loadRanking: (ranking: Ranking) => void;
   getSquad: (squadId: number) => Squad | undefined;
   getTeam: (teamId: number) => Team | undefined;
-  getTeamFromPosition: (positionValue: number, squadId: number) => string;
   getPosition: (positionId: number) => Position | undefined;
-  getTeamOrPositionName: (positionId: number) => {
+  getTeamInfo: (positionId: number) => {
     label: string;
     logo?: string;
   };
@@ -96,27 +95,16 @@ export const CJoliProvider = ({ children }: { children: React.ReactNode }) => {
     (positionId: number) => state.positions?.find((p) => p.id === positionId),
     [state.positions]
   );
-  const getTeamFromPosition = React.useCallback(
-    (positionValue: number, squadId: number) => {
-      const position = state.positions?.find(
-        (p) => p.value == positionValue && p.squadId == squadId
-      );
-      let name = position?.name || "";
-      if (position?.teamId) {
-        name = `${getTeam(position?.teamId)?.name} - ${name}`;
-      }
-      //return position?.teamId ? getTeam(position?.teamId) : position;
-      return name;
-    },
-    [state.positions]
-  );
-  const getTeamOrPositionName = React.useCallback(
+  const getTeamInfo = React.useCallback(
     (positionId: number) => {
       const position = getPosition(positionId);
-      if (!position) return { label: "no position" };
-      const team = getTeam(position?.teamId);
-      return { label: `${team?.name} - ${position.name}`, logo: team?.logo };
-      //return team ? team.name : position?.name ?? "no name";
+      if (!position)
+        throw new Error(`position not found with id:${positionId}`);
+      const team = getTeam(position.teamId);
+      const label = position.name
+        ? `${team?.name} - ${position.short}`
+        : team?.name || "noname";
+      return { label, logo: team?.logo };
     },
     [getPosition, getTeam]
   );
@@ -130,8 +118,7 @@ export const CJoliProvider = ({ children }: { children: React.ReactNode }) => {
         getSquad,
         getTeam,
         getPosition,
-        getTeamFromPosition,
-        getTeamOrPositionName,
+        getTeamInfo,
       }}
     >
       {children}

@@ -1,5 +1,11 @@
-import styled from "@emotion/styled";
-import { Row, Col, Button, Badge, Table, Accordion } from "react-bootstrap";
+import {
+  Button,
+  Badge,
+  Table,
+  Accordion,
+  Popover,
+  OverlayTrigger,
+} from "react-bootstrap";
 import CJoliCard from "../../components/CJoliCard";
 import CJoliStack from "../../components/CJoliStack";
 import { useCJoli } from "../../contexts/CJoliContext";
@@ -8,22 +14,22 @@ import { Match } from "../../models/Match";
 import moment from "moment";
 import "moment/dist/locale/fr";
 import { Phase } from "../../models/Phase";
-
-const MyRow = styled(Row)`
-  border: 0px solid black;
-  padding-bottom: 3px;
-`;
-
-const MyCol = styled(Col)`
-  border: 0px solid black;
-`;
+import TeamName from "../../components/TeamName";
+import LeftCenterDiv from "../../components/LeftCenterDiv";
+import useScreenSize from "../../hooks/useScreenSize";
+import { CheckCircle, XCircle } from "react-bootstrap-icons";
+import { useForm } from "react-hook-form";
+import * as cjoliService from "../../services/cjoliService";
 
 const MatchesStack = ({ phase }: { phase?: Phase }) => {
   const {
     state: { matches },
+    loadRanking,
     getSquad,
-    getTeamFromPosition,
   } = useCJoli();
+  const { isMobile } = useScreenSize();
+
+  const { register, getValues } = useForm();
 
   const datas = matches
     ?.filter((m) => m.phaseId == phase?.id)
@@ -36,23 +42,33 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
   keys.sort();
   moment.locale("fr");
 
+  const upperFirstLetter = (value: string) => {
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  };
+
+  const saveMatch = async (match: Match) => {
+    const { scoreA, scoreB } = getValues(`m${match.id}`) as {
+      scoreA: number;
+      scoreB: number;
+    };
+    const ranking = await cjoliService.saveMatch({ ...match, scoreA, scoreB });
+    loadRanking(ranking);
+  };
+
+  const clearMatch = async (match: Match) => {
+    const ranking = await cjoliService.clearMatch(match);
+    loadRanking(ranking);
+  };
+
   return (
     <CJoliStack gap={0} className="col-md-8 mx-auto mt-5">
       <div className="p-2">
         <CJoliCard>
           <Loading ready={!!matches}>
-            <MyRow className="justify-content-md-center pt-4">
-              <MyCol
-                xs={{ span: 6, offset: 3 }}
-                md={{ span: 6, offset: 0 }}
-                lg={{ span: 3, offset: 0 }}
-                className="text-center"
-              >
-                <div className="d-grid gap-2 pb-3">
-                  <Button variant="primary">Save</Button>
-                </div>
-              </MyCol>
-            </MyRow>
+            <div className="d-grid gap-2 py-3 m-auto w-25">
+              <Button variant="primary">Save</Button>
+            </div>
+
             <Accordion defaultActiveKey="0">
               {keys.map((key, index) => {
                 const datasOrder = datas ? datas[key] : [];
@@ -69,7 +85,7 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                 return (
                   <Accordion.Item key={index} eventKey={index.toString()}>
                     <Accordion.Header>
-                      {moment(key).format("dddd LL")}
+                      {upperFirstLetter(moment(key).format("dddd LL"))}
                     </Accordion.Header>
                     <Accordion.Body>
                       <Table
@@ -106,9 +122,17 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                                   )}
                                   <td>{getSquad(match.squadId)!.name}</td>
                                   <td>
-                                    {getTeamFromPosition(
-                                      match.positionA,
-                                      match.squadId
+                                    <LeftCenterDiv>
+                                      <TeamName
+                                        positionId={match.positionIdA}
+                                      />
+                                    </LeftCenterDiv>
+                                    {isMobile && (
+                                      <LeftCenterDiv>
+                                        <TeamName
+                                          positionId={match.positionIdB}
+                                        />
+                                      </LeftCenterDiv>
                                     )}
                                   </td>
                                   <td>
@@ -121,9 +145,11 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                                         >
                                           {match.scoreA}
                                         </Badge>
-                                        <Badge bg="light" text="black">
-                                          <b>-</b>
-                                        </Badge>
+                                        {!isMobile && (
+                                          <Badge bg="light" text="black">
+                                            <b>-</b>
+                                          </Badge>
+                                        )}
                                         <Badge
                                           bg={badgeB}
                                           text={textB}
@@ -131,6 +157,13 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                                         >
                                           {match.scoreB}
                                         </Badge>
+                                        <XCircle
+                                          color="red"
+                                          size={20}
+                                          className="mx-2"
+                                          role="button"
+                                          onClick={() => clearMatch(match)}
+                                        />
                                       </>
                                     )}
                                     {!match.done && (
@@ -140,25 +173,39 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                                           min="0"
                                           max="10"
                                           style={{ width: "50px" }}
+                                          {...register(`m${match.id}.scoreA`)}
                                         />
-                                        <Badge bg="light" text="black">
-                                          <b>-</b>
-                                        </Badge>
+                                        {!isMobile && (
+                                          <Badge bg="light" text="black">
+                                            <b>-</b>
+                                          </Badge>
+                                        )}
                                         <input
                                           type="number"
                                           min="0"
                                           max="100"
                                           style={{ width: "50px" }}
+                                          {...register(`m${match.id}.scoreB`)}
+                                        />
+                                        <CheckCircle
+                                          color="green"
+                                          size={20}
+                                          className="mx-2"
+                                          onClick={() => saveMatch(match)}
+                                          role="button"
                                         />
                                       </>
                                     )}
                                   </td>
-                                  <td>
-                                    {getTeamFromPosition(
-                                      match.positionB,
-                                      match.squadId
-                                    )}
-                                  </td>
+                                  {!isMobile && (
+                                    <td>
+                                      <LeftCenterDiv>
+                                        <TeamName
+                                          positionId={match.positionIdB}
+                                        />
+                                      </LeftCenterDiv>
+                                    </td>
+                                  )}
                                 </tr>
                               );
                             })
@@ -170,18 +217,9 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                 );
               })}
             </Accordion>
-            <MyRow className="justify-content-md-center pt-4">
-              <MyCol
-                xs={{ span: 6, offset: 3 }}
-                md={{ span: 6, offset: 0 }}
-                lg={{ span: 3, offset: 0 }}
-                className="text-center"
-              >
-                <div className="d-grid gap-2 pb-3">
-                  <Button variant="primary">Save</Button>
-                </div>
-              </MyCol>
-            </MyRow>
+            <div className="d-grid gap-2 py-3 m-auto w-25">
+              <Button variant="primary">Save</Button>
+            </div>
           </Loading>
         </CJoliCard>
       </div>

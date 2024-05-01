@@ -39,6 +39,12 @@ const App = () => {
           .progress {
             --bs-progress-bar-bg: #932829;
           }
+          .accordion-button {
+            --bs-accordion-active-bg: #932829;
+            &:not(collapsed) {
+              --bs-accordion-active-color: white;
+            }
+          }
         `}
       />
       <CJoliProvider>
