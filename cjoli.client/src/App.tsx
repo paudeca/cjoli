@@ -18,6 +18,11 @@ const router = createBrowserRouter([
     path: "/",
     element: <HomePage />,
   },
+  {
+    path: "/:uid",
+    element: <HomePage />,
+  },
+
 ]);
 
 const App = () => {
