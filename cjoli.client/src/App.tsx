@@ -5,6 +5,9 @@ import HomePage from "./pages/HomePage";
 import { CJoliProvider } from "./contexts/CJoliContext";
 import { ModalProvider } from "./contexts/ModalContext";
 import { UserProvider } from "./contexts/UserContext";
+import SelectPage from "./pages/SelectPage";
+import MainPage from "./pages/MainPage";
+import { ToastProvider } from "./contexts/ToastContext";
 
 const theme = {
   colors: {
@@ -16,7 +19,11 @@ const theme = {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <HomePage />,
+    element: <MainPage />,
+    children: [
+      { path: "", element: <SelectPage /> },
+      { path: ":uid", element: <HomePage /> }
+    ]
   },
   {
     path: "/:uid",
@@ -57,7 +64,9 @@ const App = () => {
       <CJoliProvider>
         <ModalProvider>
           <UserProvider>
-            <RouterProvider router={router} />
+            <ToastProvider>
+              <RouterProvider router={router} />
+            </ToastProvider>
           </UserProvider>
         </ModalProvider>
       </CJoliProvider>

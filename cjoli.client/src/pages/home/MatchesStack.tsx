@@ -21,6 +21,8 @@ import { useForm } from "react-hook-form";
 import * as cjoliService from "../../services/cjoliService";
 import styled from "@emotion/styled";
 import { useCJoli } from "../../hooks/useCJoli";
+import useUid from "../../hooks/useUid";
+import { useUser } from "../../hooks/useUser";
 
 const MyScoreDiv = styled("div")<{ isMobile: boolean }>`
   display: flex;
@@ -38,8 +40,9 @@ const MyScoreDiv = styled("div")<{ isMobile: boolean }>`
 const MatchesStack = ({ phase }: { phase?: Phase }) => {
   const { matches, loadRanking, getSquad } = useCJoli();
   const { isMobile } = useScreenSize();
-
+  const uid = useUid();
   const { register, getValues } = useForm();
+  const { isAdmin } = useUser();
 
   const datas = matches
     ?.filter((m) => m.phaseId == phase?.id)
@@ -65,12 +68,16 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
       scoreA = 0;
       scoreB = 0;
     }
-    const ranking = await cjoliService.saveMatch({ ...match, scoreA, scoreB });
+    const ranking = await cjoliService.saveMatch(uid, {
+      ...match,
+      scoreA,
+      scoreB,
+    });
     loadRanking(ranking);
   };
 
   const clearMatch = async (match: Match) => {
-    const ranking = await cjoliService.clearMatch(match);
+    const ranking = await cjoliService.clearMatch(uid, match);
     loadRanking(ranking);
   };
 
@@ -185,12 +192,14 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                                         >
                                           {match.scoreB}
                                         </Badge>
-                                        <XCircle
-                                          color="red"
-                                          size={24}
-                                          role="button"
-                                          onClick={() => clearMatch(match)}
-                                        />
+                                        {isAdmin && (
+                                          <XCircle
+                                            color="red"
+                                            size={24}
+                                            role="button"
+                                            onClick={() => clearMatch(match)}
+                                          />
+                                        )}
                                       </MyScoreDiv>
                                     )}
                                     {!match.done && (
@@ -205,25 +214,27 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                                             max="100"
                                             {...register(`m${match.id}.scoreA`)}
                                           />
-                                          <DropdownButton
-                                            variant="outline-secondary"
-                                            title=""
-                                          >
-                                            <Dropdown.Item
-                                              href="#"
-                                              onClick={() =>
-                                                saveMatch({
-                                                  ...match,
-                                                  forfeitA: true,
-                                                  forfeitB: false,
-                                                  scoreA: 0,
-                                                  scoreB: 0,
-                                                })
-                                              }
+                                          {isAdmin && (
+                                            <DropdownButton
+                                              variant="outline-secondary"
+                                              title=""
                                             >
-                                              Forfait
-                                            </Dropdown.Item>
-                                          </DropdownButton>
+                                              <Dropdown.Item
+                                                href="#"
+                                                onClick={() =>
+                                                  saveMatch({
+                                                    ...match,
+                                                    forfeitA: true,
+                                                    forfeitB: false,
+                                                    scoreA: 0,
+                                                    scoreB: 0,
+                                                  })
+                                                }
+                                              >
+                                                Forfait
+                                              </Dropdown.Item>
+                                            </DropdownButton>
+                                          )}
                                         </InputGroup>
                                         {!isMobile && (
                                           <Badge bg="light" text="black">
@@ -240,33 +251,37 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                                             max="100"
                                             {...register(`m${match.id}.scoreB`)}
                                           />
-                                          <DropdownButton
-                                            variant="outline-secondary"
-                                            title=""
-                                          >
-                                            <Dropdown.Item
-                                              href="#"
-                                              onClick={() =>
-                                                saveMatch({
-                                                  ...match,
-                                                  forfeitB: true,
-                                                  forfeitA: false,
-                                                  scoreA: 0,
-                                                  scoreB: 0,
-                                                })
-                                              }
+                                          {isAdmin && (
+                                            <DropdownButton
+                                              variant="outline-secondary"
+                                              title=""
                                             >
-                                              Forfait
-                                            </Dropdown.Item>
-                                          </DropdownButton>
+                                              <Dropdown.Item
+                                                href="#"
+                                                onClick={() =>
+                                                  saveMatch({
+                                                    ...match,
+                                                    forfeitB: true,
+                                                    forfeitA: false,
+                                                    scoreA: 0,
+                                                    scoreB: 0,
+                                                  })
+                                                }
+                                              >
+                                                Forfait
+                                              </Dropdown.Item>
+                                            </DropdownButton>
+                                          )}
                                         </InputGroup>
 
-                                        <CheckCircle
-                                          color="green"
-                                          size={24}
-                                          onClick={() => saveMatch(match)}
-                                          role="button"
-                                        />
+                                        {isAdmin && (
+                                          <CheckCircle
+                                            color="green"
+                                            size={24}
+                                            onClick={() => saveMatch(match)}
+                                            role="button"
+                                          />
+                                        )}
                                       </MyScoreDiv>
                                     )}
                                   </td>

@@ -13,6 +13,7 @@ import UpdateModal from "../modals/UpdateModal";
 import * as cjoliService from "../services/cjoliService";
 import { PersonSquare } from "react-bootstrap-icons";
 import { useUser } from "../hooks/useUser";
+import { useNavigate } from "react-router-dom";
 
 const MyImg = styled.img<{ width: string }>`
   width: ${(props) => props.width};
@@ -23,6 +24,7 @@ const MenuNav = () => {
   const { setShow: showLogin } = useModal("login");
   const { setShow: showRegister } = useModal("register");
   const { setShow: showUpdate } = useModal("update");
+  const navigate = useNavigate();
   const logout = () => {
     cjoliService.logout();
     loadUser(undefined);
@@ -30,7 +32,7 @@ const MenuNav = () => {
   return (
     <Navbar expand="sm" className="bg-body-tertiary mb-3" sticky="top">
       <Container fluid>
-        <Navbar.Brand href="#">
+        <Navbar.Brand onClick={() => navigate("/")}>
           <MyImg src="./logo.png" width="60px" className="mx-4" />
           CJoli - Ice Hockey Tournament - 1.0.0-beta
         </Navbar.Brand>

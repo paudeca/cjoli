@@ -8,6 +8,12 @@ namespace cjoli.Server.Services
 {
     public class CJoliService
     {
+
+        public List<Tourney> ListTourneys(CJoliContext context)
+        {
+            return context.Tourneys.OrderBy(t=>t.StartTime).ToList();
+        }
+
         public Tourney GetTourney(string tourneyUid, CJoliContext context)
         {
             Tourney? tourney = context.Tourneys

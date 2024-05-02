@@ -13,5 +13,10 @@ export const useUser = () => {
     []
   );
 
-  return { ...state, loadUser };
+  return {
+    ...state,
+    isConnected: state.user,
+    isAdmin: state.user?.role === "ADMIN",
+    loadUser,
+  };
 };

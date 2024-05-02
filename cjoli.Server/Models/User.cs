@@ -10,6 +10,7 @@ namespace cjoli.Server.Models
         public required string Login { get; set; }
         [Required]
         public required string Password { get; set; }
+        public string? Role { get; set; }
 
         public IList<Tourney> Tourneys { get; set; } = new List<Tourney>();
     }

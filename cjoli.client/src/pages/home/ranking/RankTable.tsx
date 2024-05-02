@@ -8,6 +8,7 @@ import TeamModal from "../../../modals/TeamModal";
 import { useModal } from "../../../contexts/ModalContext";
 import React from "react";
 import { useCJoli } from "../../../hooks/useCJoli";
+import { useUser } from "../../../hooks/useUser";
 
 const MyTh = styled("th")`
   background-color: ${(props) => props.theme.colors.secondary} !important;
@@ -24,6 +25,7 @@ const MyTd = styled("td")`
 const RankTable = ({ phase }: { phase: Phase }) => {
   const { ranking, getPosition, getTeam } = useCJoli();
   const { setShow: showTeam } = useModal("team");
+  const { isAdmin } = useUser();
   const [team, setTeam] = React.useState<Team | undefined>(undefined);
   return (
     <>
@@ -65,7 +67,7 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                       <td>
                         <LeftCenterDiv>
                           <TeamName positionId={score.positionId} />
-                          {team && (
+                          {team && isAdmin && (
                             <PencilSquare
                               role="button"
                               className="mx-2"

@@ -1,30 +1,39 @@
 import axios from "axios";
-import { Ranking, User, Match, Team } from "../models";
+import { Ranking, User, Match, Team, Tourney } from "../models";
 import Cookie from "universal-cookie";
 
-export const getRanking = async () => {
-  const { data } = await axios.get<Ranking>(
-    `${import.meta.env.VITE_API_URL}/cjoli/ranking/123`
-  );
+const url = import.meta.env.VITE_API_URL;
+const cookie = new Cookie();
+
+const setHeader = () => {
+  const token = cookie.get("CJOLI_AUTH_TOKEN");
+  axios.defaults.headers.common = {
+    Authorization: `Bearer ${token}`,
+  };
+};
+setHeader();
+
+export const getTourneys = async () => {
+  const { data } = await axios.get<Tourney[]>(`${url}/cjoli/tourneys`);
+  return data;
+};
+
+export const getRanking = async (uid: string) => {
+  const { data } = await axios.get<Ranking>(`${url}/cjoli/ranking/${uid}`);
   return data;
 };
 
 export const getUser = async () => {
-  const cookie = new Cookie();
-  const token = cookie.get("CJOLI_AUTH_TOKEN");
-  const { data } = await axios.get<User>(
-    `${import.meta.env.VITE_API_URL}/user`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+  const { data } = await axios.get<User>(`${url}/user`);
   return data;
 };
 
 export const login = async (user: User) => {
   return await axios
-    .post<string>(`${import.meta.env.VITE_API_URL}/user/login`, user)
+    .post<string>(`${url}/user/login`, user)
     .then(({ data }) => {
-      const cookie = new Cookie();
       cookie.set("CJOLI_AUTH_TOKEN", data, { path: "/", maxAge: 24 * 60 * 60 });
+      setHeader();
       return true;
     })
     .catch((error) => {
@@ -35,7 +44,7 @@ export const login = async (user: User) => {
 
 export const register = async (user: User) => {
   return await axios
-    .post<User>(`${import.meta.env.VITE_API_URL}/user/register`, user)
+    .post<User>(`${url}/user/register`, user)
     .then(async () => {
       await login(user);
       return true;
@@ -47,12 +56,8 @@ export const register = async (user: User) => {
 };
 
 export const update = async (user: User) => {
-  const cookie = new Cookie();
-  const token = cookie.get("CJOLI_AUTH_TOKEN");
   return await axios
-    .post<boolean>(`${import.meta.env.VITE_API_URL}/user/update`, user, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    .post<boolean>(`${url}/user/update`, user)
     .then(async ({ data }) => {
       return data;
     })
@@ -62,17 +67,9 @@ export const update = async (user: User) => {
     });
 };
 
-export const updateTeam = async (team: Team) => {
-  const cookie = new Cookie();
-  const token = cookie.get("CJOLI_AUTH_TOKEN");
+export const updateTeam = async (uid: string, team: Team) => {
   return await axios
-    .post<boolean>(
-      `${import.meta.env.VITE_API_URL}/cjoli/updateTeam/123`,
-      team,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    )
+    .post<boolean>(`${url}/cjoli/updateTeam/${uid}`, team)
     .then(async ({ data }) => {
       return data;
     })
@@ -83,32 +80,15 @@ export const updateTeam = async (team: Team) => {
 };
 
 export const logout = () => {
-  const cookie = new Cookie();
   cookie.remove("CJOLI_AUTH_TOKEN");
 };
 
-export const saveMatch = async (match: Match) => {
-  const cookie = new Cookie();
-  const token = cookie.get("CJOLI_AUTH_TOKEN");
-  const { data } = await axios.post(
-    `${import.meta.env.VITE_API_URL}/cjoli/saveMatch/123`,
-    match,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
+export const saveMatch = async (uid: string, match: Match) => {
+  const { data } = await axios.post(`${url}/cjoli/saveMatch/${uid}`, match);
   return data;
 };
 
-export const clearMatch = async (match: Match) => {
-  const cookie = new Cookie();
-  const token = cookie.get("CJOLI_AUTH_TOKEN");
-  const { data } = await axios.post(
-    `${import.meta.env.VITE_API_URL}/cjoli/clearMatch/123`,
-    match,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
+export const clearMatch = async (uid: string, match: Match) => {
+  const { data } = await axios.post(`${url}/cjoli/clearMatch/${uid}`, match);
   return data;
 };

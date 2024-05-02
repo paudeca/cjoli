@@ -25,6 +25,14 @@ namespace cjoli.Server.Controllers
         }
 
         [HttpGet]
+        [Route("Tourneys")]
+        public List<TourneyDto> ListTourneys()
+        {
+            return _service.ListTourneys(_context).Select(t=>_mapper.Map<TourneyDto>(t)).ToList();
+        }
+
+
+        [HttpGet]
         [Route("Ranking/{uuid}")]
         public RankingDto GetRanking(string uuid)
         {
