@@ -1,10 +1,5 @@
 import React, { Dispatch } from "react";
-import { Ranking } from "../models/Ranking";
-import { Team } from "../models/Team";
-import { Position } from "../models/Position";
-import { Phase } from "../models/Phase";
-import { Squad } from "../models/Squad";
-import { Match } from "../models";
+import { Match, Phase, Position, Ranking, Squad, Team } from "../models";
 
 interface CJoliState {
   ranking?: Ranking;

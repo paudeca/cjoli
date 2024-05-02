@@ -1,6 +1,6 @@
 import CJoliModal, { Field } from "../components/CJoliModal";
 import { useToast } from "../contexts/ToastContext";
-import { User } from "../models/User";
+import { User } from "../models";
 import * as cjoliService from "../services/cjoliService";
 
 type UserUpdate = User & { passwordConfirm: string };

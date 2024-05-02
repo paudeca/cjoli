@@ -1,5 +1,5 @@
 import React, { Dispatch } from "react";
-import { User } from "../models/User";
+import { User } from "../models";
 
 interface UserState {
   user?: User;

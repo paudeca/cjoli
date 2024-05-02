@@ -1,6 +1,6 @@
 import React from "react";
 import { UserContext, UserActions } from "../contexts/UserContext";
-import { User } from "../models/User";
+import { User } from "../models";
 
 export const useUser = () => {
   const ctx = React.useContext(UserContext);

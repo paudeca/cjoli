@@ -1,6 +1,6 @@
 import React from "react";
 import { CJoliContext, CJoliActions } from "../contexts/CJoliContext";
-import { Ranking } from "../models/Ranking";
+import { Ranking } from "../models";
 
 export const useCJoli = () => {
   const ctx = React.useContext(CJoliContext);

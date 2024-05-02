@@ -1,6 +1,6 @@
 import CJoliModal, { Field } from "../components/CJoliModal";
 import { useToast } from "../contexts/ToastContext";
-import { Team } from "../models/Team";
+import { Team } from "../models";
 import * as cjoliService from "../services/cjoliService";
 
 const TeamModal = ({ team }: { team?: Team }) => {

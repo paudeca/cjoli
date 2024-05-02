@@ -1,10 +1,6 @@
 import axios from "axios";
-import { Ranking } from "../models/Ranking";
-import { User } from "../models/User";
+import { Ranking, User, Match, Team } from "../models";
 import Cookie from "universal-cookie";
-import { Score } from "../models/Score";
-import { Match } from "../models/Match";
-import { Team } from "../models/Team";
 
 export const getRanking = async () => {
   const { data } = await axios.get<Ranking>(

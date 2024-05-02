@@ -1,7 +1,7 @@
 import CJoliModal, { Field } from "../components/CJoliModal";
 import { useToast } from "../contexts/ToastContext";
 import { useUser } from "../hooks/useUser";
-import { User } from "../models/User";
+import { User } from "../models";
 import * as cjoliService from "../services/cjoliService";
 
 const LoginModal = () => {

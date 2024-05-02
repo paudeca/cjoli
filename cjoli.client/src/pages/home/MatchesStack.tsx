@@ -10,10 +10,9 @@ import {
 import CJoliCard from "../../components/CJoliCard";
 import CJoliStack from "../../components/CJoliStack";
 import Loading from "../../components/Loading";
-import { Match } from "../../models/Match";
+import { Match, Phase } from "../../models";
 import moment from "moment";
 import "moment/dist/locale/fr";
-import { Phase } from "../../models/Phase";
 import TeamName from "../../components/TeamName";
 import LeftCenterDiv from "../../components/LeftCenterDiv";
 import useScreenSize from "../../hooks/useScreenSize";

@@ -3,7 +3,7 @@ import CJoliCard from "../../components/CJoliCard";
 import CJoliStack from "../../components/CJoliStack";
 import RankTable from "./ranking/RankTable";
 import Loading from "../../components/Loading";
-import { Phase } from "../../models/Phase";
+import { Phase } from "../../models";
 import { useCJoli } from "../../hooks/useCJoli";
 
 const RankingStack = ({ phase }: { phase?: Phase }) => {

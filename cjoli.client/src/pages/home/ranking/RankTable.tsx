@@ -1,13 +1,12 @@
 import styled from "@emotion/styled";
 import { Card, Table } from "react-bootstrap";
-import { Phase } from "../../../models/Phase";
+import { Phase, Team } from "../../../models";
 import TeamName from "../../../components/TeamName";
 import LeftCenterDiv from "../../../components/LeftCenterDiv";
 import { PencilSquare } from "react-bootstrap-icons";
 import TeamModal from "../../../modals/TeamModal";
 import { useModal } from "../../../contexts/ModalContext";
 import React from "react";
-import { Team } from "../../../models/Team";
 import { useCJoli } from "../../../hooks/useCJoli";
 
 const MyTh = styled("th")`
