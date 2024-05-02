@@ -1,19 +1,14 @@
 import {
-  Button,
   Badge,
   Table,
   Accordion,
-  Popover,
-  OverlayTrigger,
   Form,
   InputGroup,
   Dropdown,
-  SplitButton,
   DropdownButton,
 } from "react-bootstrap";
 import CJoliCard from "../../components/CJoliCard";
 import CJoliStack from "../../components/CJoliStack";
-import { useCJoli } from "../../contexts/CJoliContext";
 import Loading from "../../components/Loading";
 import { Match } from "../../models/Match";
 import moment from "moment";
@@ -26,6 +21,7 @@ import { CheckCircle, XCircle } from "react-bootstrap-icons";
 import { useForm } from "react-hook-form";
 import * as cjoliService from "../../services/cjoliService";
 import styled from "@emotion/styled";
+import { useCJoli } from "../../hooks/useCJoli";
 
 const MyScoreDiv = styled("div")<{ isMobile: boolean }>`
   display: flex;
@@ -41,11 +37,7 @@ const MyScoreDiv = styled("div")<{ isMobile: boolean }>`
 `;
 
 const MatchesStack = ({ phase }: { phase?: Phase }) => {
-  const {
-    state: { matches },
-    loadRanking,
-    getSquad,
-  } = useCJoli();
+  const { matches, loadRanking, getSquad } = useCJoli();
   const { isMobile } = useScreenSize();
 
   const { register, getValues } = useForm();

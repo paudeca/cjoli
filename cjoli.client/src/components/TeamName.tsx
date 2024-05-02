@@ -1,5 +1,4 @@
-import { Form } from "react-bootstrap";
-import { useCJoli } from "../contexts/CJoliContext";
+import { useCJoli } from "../hooks/useCJoli";
 
 const TeamName = ({ positionId }: { positionId: number }) => {
   const { getTeamInfo } = useCJoli();

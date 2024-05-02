@@ -1,7 +1,6 @@
 import styled from "@emotion/styled";
 import { Card, Table } from "react-bootstrap";
 import { Phase } from "../../../models/Phase";
-import { useCJoli } from "../../../contexts/CJoliContext";
 import TeamName from "../../../components/TeamName";
 import LeftCenterDiv from "../../../components/LeftCenterDiv";
 import { PencilSquare } from "react-bootstrap-icons";
@@ -9,6 +8,7 @@ import TeamModal from "../../../modals/TeamModal";
 import { useModal } from "../../../contexts/ModalContext";
 import React from "react";
 import { Team } from "../../../models/Team";
+import { useCJoli } from "../../../hooks/useCJoli";
 
 const MyTh = styled("th")`
   background-color: ${(props) => props.theme.colors.secondary} !important;
@@ -23,11 +23,7 @@ const MyTd = styled("td")`
 `;
 
 const RankTable = ({ phase }: { phase: Phase }) => {
-  const {
-    state: { ranking },
-    getPosition,
-    getTeam,
-  } = useCJoli();
+  const { ranking, getPosition, getTeam } = useCJoli();
   const { setShow: showTeam } = useModal("team");
   const [team, setTeam] = React.useState<Team | undefined>(undefined);
   return (

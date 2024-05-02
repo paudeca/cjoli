@@ -1,11 +1,11 @@
 import CJoliModal, { Field } from "../components/CJoliModal";
-import { useCJoli } from "../contexts/CJoliContext";
 import { useToast } from "../contexts/ToastContext";
+import { useUser } from "../hooks/useUser";
 import { User } from "../models/User";
 import * as cjoliService from "../services/cjoliService";
 
 const LoginModal = () => {
-  const { loadUser } = useCJoli();
+  const { loadUser } = useUser();
   const { showToast } = useToast();
 
   const fields: Field<User>[] = [

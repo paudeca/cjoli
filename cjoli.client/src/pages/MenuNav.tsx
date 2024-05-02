@@ -5,24 +5,21 @@ import {
   Nav,
   NavDropdown,
 } from "react-bootstrap";
-import { ModalProvider, useModal } from "../contexts/ModalContext";
+import { useModal } from "../contexts/ModalContext";
 import styled from "@emotion/styled";
 import LoginModal from "../modals/LoginModal";
 import RegisterModal from "../modals/RegisterModal";
 import UpdateModal from "../modals/UpdateModal";
-import { useCJoli } from "../contexts/CJoliContext";
 import * as cjoliService from "../services/cjoliService";
 import { PersonSquare } from "react-bootstrap-icons";
+import { useUser } from "../hooks/useUser";
 
 const MyImg = styled.img<{ width: string }>`
   width: ${(props) => props.width};
 `;
 
 const MenuNav = () => {
-  const {
-    state: { user },
-    loadUser,
-  } = useCJoli();
+  const { user, loadUser } = useUser();
   const { setShow: showLogin } = useModal("login");
   const { setShow: showRegister } = useModal("register");
   const { setShow: showUpdate } = useModal("update");

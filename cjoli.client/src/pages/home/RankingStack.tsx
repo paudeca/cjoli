@@ -1,15 +1,13 @@
 import { Card, Nav } from "react-bootstrap";
 import CJoliCard from "../../components/CJoliCard";
 import CJoliStack from "../../components/CJoliStack";
-import { useCJoli } from "../../contexts/CJoliContext";
 import RankTable from "./ranking/RankTable";
 import Loading from "../../components/Loading";
 import { Phase } from "../../models/Phase";
+import { useCJoli } from "../../hooks/useCJoli";
 
 const RankingStack = ({ phase }: { phase?: Phase }) => {
-  const {
-    state: { phases },
-  } = useCJoli();
+  const { phases } = useCJoli();
   return (
     <CJoliStack gap={0} className="col-md-8 mx-auto mt-5">
       <div className="p-2">

@@ -3,19 +3,17 @@ import RankingStack from "./home/RankingStack";
 import MatchesStack from "./home/MatchesStack";
 import * as cjoliService from "../services/cjoliService";
 import React from "react";
-import { useCJoli } from "../contexts/CJoliContext";
 import { ToastProvider, useToast } from "../contexts/ToastContext";
 import MenuNav from "./MenuNav";
-import { ToastContainer, Toast, ProgressBar } from "react-bootstrap";
+import { ToastContainer, Toast } from "react-bootstrap";
 import Loading from "../components/Loading";
 import { useLocation } from "react-router-dom";
+import { useCJoli } from "../hooks/useCJoli";
+import { useUser } from "../hooks/useUser";
 
 const HomePage = () => {
-  const {
-    loadUser,
-    loadRanking,
-    state: { phases },
-  } = useCJoli();
+  const { loadRanking, phases } = useCJoli();
+  const { loadUser } = useUser();
   const {
     state: { show, type, message },
     hideToast,

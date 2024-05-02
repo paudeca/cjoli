@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import { CJoliProvider } from "./contexts/CJoliContext";
 import { ModalProvider } from "./contexts/ModalContext";
+import { UserProvider } from "./contexts/UserContext";
 
 const theme = {
   colors: {
@@ -50,7 +51,9 @@ const App = () => {
       />
       <CJoliProvider>
         <ModalProvider>
-          <RouterProvider router={router} />
+          <UserProvider>
+            <RouterProvider router={router} />
+          </UserProvider>
         </ModalProvider>
       </CJoliProvider>
     </ThemeProvider>
