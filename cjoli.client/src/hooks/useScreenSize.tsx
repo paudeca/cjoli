@@ -21,7 +21,10 @@ const useScreenSize = () => {
     };
   }, []);
 
-  return { ...screenSize, isMobile: screenSize.width < 1200 };
+  return {
+    ...screenSize,
+    isMobile: screenSize.width < 1200,
+  };
 };
 
 export default useScreenSize;

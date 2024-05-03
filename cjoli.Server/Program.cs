@@ -21,7 +21,7 @@ builder.Services.AddAuthentication(opt =>
     {
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtKey"])),
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = false,
@@ -83,7 +83,6 @@ if (app.Environment.IsDevelopment())
 
 
 // Configure the HTTP request pipeline.
-
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
@@ -93,9 +92,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
-
-using var scope = app.Services.CreateScope();
-var context = scope.ServiceProvider.GetRequiredService<CJoliContext>();
-context.Database.Migrate();
 
 app.Run();

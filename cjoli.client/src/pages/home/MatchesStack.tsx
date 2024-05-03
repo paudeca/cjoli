@@ -1,48 +1,20 @@
-import {
-  Badge,
-  Table,
-  Accordion,
-  Form,
-  InputGroup,
-  Dropdown,
-  DropdownButton,
-} from "react-bootstrap";
+import { Table, Accordion } from "react-bootstrap";
 import CJoliCard from "../../components/CJoliCard";
 import CJoliStack from "../../components/CJoliStack";
 import Loading from "../../components/Loading";
 import { Match, Phase } from "../../models";
 import moment from "moment";
 import "moment/dist/locale/fr";
-import TeamName from "../../components/TeamName";
-import LeftCenterDiv from "../../components/LeftCenterDiv";
-import useScreenSize from "../../hooks/useScreenSize";
-import { CheckCircle, XCircle } from "react-bootstrap-icons";
 import { useForm } from "react-hook-form";
 import * as cjoliService from "../../services/cjoliService";
-import styled from "@emotion/styled";
 import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
-import { useUser } from "../../hooks/useUser";
-
-const MyScoreDiv = styled("div")<{ isMobile: boolean }>`
-  display: flex;
-  align-items: ${(props) => (props.isMobile ? "flex-end" : "center")};
-  justify-content: center;
-  flex-direction: ${(props) => (props.isMobile ? "column" : "row")};
-  & svg {
-    ${(props) =>
-      props.isMobile
-        ? "margin-top: 0.5rem !important;"
-        : "margin-left: 0.5rem !important;"}
-  }
-`;
+import MatchRow from "./match/MatchRow";
 
 const MatchesStack = ({ phase }: { phase?: Phase }) => {
-  const { matches, loadRanking, getSquad } = useCJoli();
-  const { isMobile } = useScreenSize();
+  const { matches, loadRanking } = useCJoli();
   const uid = useUid();
   const { register, getValues } = useForm();
-  const { isAdmin } = useUser();
 
   const datas = matches
     ?.filter((m) => m.phaseId == phase?.id)
@@ -114,192 +86,16 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                         <tbody>
                           {Object.keys(map).map((k) =>
                             map[k].map((match, i) => {
-                              let badgeA =
-                                match.scoreA > match.scoreB
-                                  ? "success"
-                                  : match.scoreA === match.scoreB
-                                  ? "warning"
-                                  : "danger";
-                              let badgeB =
-                                match.scoreA < match.scoreB
-                                  ? "success"
-                                  : match.scoreA === match.scoreB
-                                  ? "warning"
-                                  : "danger";
-                              if (match.forfeitA) {
-                                badgeA = "danger";
-                                badgeB = "success";
-                              } else if (match.forfeitB) {
-                                badgeB = "danger";
-                                badgeA = "success";
-                              }
-                              const textA =
-                                badgeA == "warning" ? "black" : "white";
-                              const textB =
-                                badgeB == "warning" ? "black" : "white";
                               return (
-                                <tr key={match.id}>
-                                  {i == 0 && (
-                                    <td rowSpan={map[k].length}>
-                                      {moment(match.time).format("LT")}
-                                    </td>
-                                  )}
-                                  <td>{getSquad(match.squadId)!.name}</td>
-                                  <td>
-                                    <LeftCenterDiv>
-                                      <TeamName
-                                        positionId={match.positionIdA}
-                                      />
-                                      {match.forfeitA && (
-                                        <Badge bg="danger" className="mx-2">
-                                          Forfait
-                                        </Badge>
-                                      )}
-                                    </LeftCenterDiv>
-                                    {isMobile && (
-                                      <LeftCenterDiv>
-                                        <TeamName
-                                          positionId={match.positionIdB}
-                                        />
-                                        {match.forfeitB && (
-                                          <Badge bg="danger" className="mx-2">
-                                            Forfait
-                                          </Badge>
-                                        )}
-                                      </LeftCenterDiv>
-                                    )}
-                                  </td>
-                                  <td>
-                                    {match.done && (
-                                      <MyScoreDiv isMobile={isMobile}>
-                                        <Badge
-                                          bg={badgeA}
-                                          text={textA}
-                                          style={{ fontSize: "16px" }}
-                                          className="my-1"
-                                        >
-                                          {match.scoreA}
-                                        </Badge>
-                                        {!isMobile && (
-                                          <Badge bg="light" text="black">
-                                            <b>-</b>
-                                          </Badge>
-                                        )}
-                                        <Badge
-                                          bg={badgeB}
-                                          text={textB}
-                                          style={{ fontSize: "16px" }}
-                                        >
-                                          {match.scoreB}
-                                        </Badge>
-                                        {isAdmin && (
-                                          <XCircle
-                                            color="red"
-                                            size={24}
-                                            role="button"
-                                            onClick={() => clearMatch(match)}
-                                          />
-                                        )}
-                                      </MyScoreDiv>
-                                    )}
-                                    {!match.done && (
-                                      <MyScoreDiv isMobile={isMobile}>
-                                        <InputGroup
-                                          size="sm"
-                                          style={{ width: "80px" }}
-                                        >
-                                          <Form.Control
-                                            type="number"
-                                            min="0"
-                                            max="100"
-                                            {...register(`m${match.id}.scoreA`)}
-                                          />
-                                          {isAdmin && (
-                                            <DropdownButton
-                                              variant="outline-secondary"
-                                              title=""
-                                            >
-                                              <Dropdown.Item
-                                                href="#"
-                                                onClick={() =>
-                                                  saveMatch({
-                                                    ...match,
-                                                    forfeitA: true,
-                                                    forfeitB: false,
-                                                    scoreA: 0,
-                                                    scoreB: 0,
-                                                  })
-                                                }
-                                              >
-                                                Forfait
-                                              </Dropdown.Item>
-                                            </DropdownButton>
-                                          )}
-                                        </InputGroup>
-                                        {!isMobile && (
-                                          <Badge bg="light" text="black">
-                                            <b>-</b>
-                                          </Badge>
-                                        )}
-                                        <InputGroup
-                                          size="sm"
-                                          style={{ width: "80px" }}
-                                        >
-                                          <Form.Control
-                                            type="number"
-                                            min="0"
-                                            max="100"
-                                            {...register(`m${match.id}.scoreB`)}
-                                          />
-                                          {isAdmin && (
-                                            <DropdownButton
-                                              variant="outline-secondary"
-                                              title=""
-                                            >
-                                              <Dropdown.Item
-                                                href="#"
-                                                onClick={() =>
-                                                  saveMatch({
-                                                    ...match,
-                                                    forfeitB: true,
-                                                    forfeitA: false,
-                                                    scoreA: 0,
-                                                    scoreB: 0,
-                                                  })
-                                                }
-                                              >
-                                                Forfait
-                                              </Dropdown.Item>
-                                            </DropdownButton>
-                                          )}
-                                        </InputGroup>
-
-                                        {isAdmin && (
-                                          <CheckCircle
-                                            color="green"
-                                            size={24}
-                                            onClick={() => saveMatch(match)}
-                                            role="button"
-                                          />
-                                        )}
-                                      </MyScoreDiv>
-                                    )}
-                                  </td>
-                                  {!isMobile && (
-                                    <td>
-                                      <LeftCenterDiv>
-                                        <TeamName
-                                          positionId={match.positionIdB}
-                                        />
-                                        {match.forfeitB && (
-                                          <Badge bg="danger" className="mx-2">
-                                            Forfait
-                                          </Badge>
-                                        )}
-                                      </LeftCenterDiv>
-                                    </td>
-                                  )}
-                                </tr>
+                                <MatchRow
+                                  key={match.id}
+                                  index={i}
+                                  match={match}
+                                  rowSpan={map[k].length}
+                                  saveMatch={saveMatch}
+                                  clearMatch={clearMatch}
+                                  register={register}
+                                />
                               );
                             })
                           )}

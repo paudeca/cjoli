@@ -2,7 +2,7 @@ import { Card, Form } from "react-bootstrap";
 import CJoliCard from "../components/CJoliCard";
 import CJoliStack from "../components/CJoliStack";
 import * as cjoliService from "../services/cjoliService";
-import React, { SelectHTMLAttributes, SyntheticEvent } from "react";
+import React from "react";
 import { Tourney } from "../models";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";

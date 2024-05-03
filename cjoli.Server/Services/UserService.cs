@@ -59,10 +59,10 @@ namespace cjoli.Server.Services
             {
                 throw new InvalidLoginException(login);
             }
-            var key = _configuration["Jwt:Key"];
+            var key = _configuration["JwtKey"];
             if (key == null)
             {
-                throw new IllegalArgumentException("Jwt:Key not defined in configuration");
+                throw new IllegalArgumentException("JwtKey not defined in configuration");
             }
 
             var tokenDescriptor = new SecurityTokenDescriptor
