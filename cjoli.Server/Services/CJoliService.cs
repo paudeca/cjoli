@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace cjoli.Server.Services
 {
+
     public class CJoliService
     {
 
@@ -14,12 +15,12 @@ namespace cjoli.Server.Services
             return context.Tourneys.OrderBy(t=>t.StartTime).ToList();
         }
 
-        public Tourney GetTourney(string tourneyUid, CJoliContext context)
+        public Tourney GetTourney(string tourneyUid, User? user, CJoliContext context)
         {
             Tourney? tourney = context.Tourneys
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.Team)
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.ParentPosition)
-                .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches)
+                .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(m=>m.UserMatches.Where(u=>u.User==user))
                 .Include(t => t.Teams)
                 .FirstOrDefault(t => t.Uid == tourneyUid);
             if (tourney == null)
@@ -29,9 +30,10 @@ namespace cjoli.Server.Services
             return tourney;
         }
 
-        public Ranking GetRanking(string tourneyUid, CJoliContext context)
+        public Ranking GetRanking(string tourneyUid, string? login, CJoliContext context)
         {
-            var tourney = GetTourney(tourneyUid, context);
+            User? user = context.Users.SingleOrDefault(u => u.Login == login);
+            var tourney = GetTourney(tourneyUid, user, context);
             var scores = CalculateScores(tourney);
             return new Ranking() { Tourney = tourney, Scores = scores };
         }
@@ -45,27 +47,37 @@ namespace cjoli.Server.Services
                 {
 
                     Dictionary<int, Score> scores = squad.Positions.ToDictionary(p => p.Id, p => new Score() { PositionId = p.Id });
-                    squad.Matches.Where(m => m.Done).Aggregate(scores, (acc, m) =>
+                    squad.Matches.Aggregate(scores, (acc, m) =>
                     {
+                        var userMatch = m.UserMatches.FirstOrDefault();
+                        if(userMatch==null && !m.Done)
+                        {
+                            return acc;
+                        }
+                        IMatch? match = m.Done ? m :userMatch;
+                        if(match==null)
+                        {
+                            return acc;
+                        }
                         var scoreA = scores[m.PositionA.Id];
                         var scoreB = scores[m.PositionB.Id];
                         scoreA.Game++;
                         scoreB.Game++;
 
-                        if (m.ScoreA > m.ScoreB || m.ForfeitB)
+                        if (match.ScoreA > match.ScoreB || match.ForfeitB)
                         {
                             scoreA.Win++;
                             scoreB.Loss++;
 
                             scoreA.Total += 3;
-                            scoreB.Total += m.ForfeitB ? 0 : 1;
+                            scoreB.Total += match.ForfeitB ? 0 : 1;
                         }
-                        else if (m.ScoreA < m.ScoreB || m.ForfeitA)
+                        else if (match.ScoreA < match.ScoreB || match.ForfeitA)
                         {
                             scoreA.Loss++;
                             scoreB.Win++;
 
-                            scoreA.Total += m.ForfeitA ? 0 : 1;
+                            scoreA.Total += match.ForfeitA ? 0 : 1;
                             scoreB.Total += 3;
                         }
                         else
@@ -76,18 +88,17 @@ namespace cjoli.Server.Services
                             scoreA.Total += 2;
                             scoreB.Total += 2;
                         }
-                        scoreA.GoalFor += m.ScoreA;
-                        scoreA.GoalAgainst += m.ScoreB;
-                        scoreA.GoalDiff += m.ScoreA - m.ScoreB;
+                        scoreA.GoalFor += match.ScoreA;
+                        scoreA.GoalAgainst += match.ScoreB;
+                        scoreA.GoalDiff += match.ScoreA - match.ScoreB;
 
-                        scoreB.GoalFor += m.ScoreB;
-                        scoreB.GoalAgainst += m.ScoreA;
-                        scoreB.GoalDiff += m.ScoreB - m.ScoreA;
+                        scoreB.GoalFor += match.ScoreB;
+                        scoreB.GoalAgainst += match.ScoreA;
+                        scoreB.GoalDiff += match.ScoreB - match.ScoreA;
 
 
                         return scores;
                     });
-                    //var scoreSquad = new ScoreSquad() { SquadId = squad.Id, Scores = scores.Select(kv => kv.Value).OrderByDescending(x => x.Total).ToList() };
                     var listScores = scores.Select(kv => kv.Value).OrderByDescending(x => x.Total).ToList();
                     listScores.Sort((a, b) =>
                     {
@@ -98,15 +109,16 @@ namespace cjoli.Server.Services
                         }
                         var positionA = squad.Positions.Single(p => p.Id == a.PositionId);
                         var positionB = squad.Positions.Single(p => p.Id == b.PositionId);
-                        //var matchs = squad.Matches.Where(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB)).ToList();
                         var match = squad.Matches.SingleOrDefault(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB));
                         if ((match != null))
                         {
-                            if (match.ScoreA > match.ScoreB || match.ForfeitB)
+                            var userMatch = match.UserMatches.SingleOrDefault();
+                            IMatch m =  match.Done ? match : userMatch!=null ? userMatch:match;
+                            if (m.ScoreA > m.ScoreB || m.ForfeitB)
                             {
                                 return match.PositionA == positionA ? -1 : 1;
                             }
-                            else if (match.ScoreB > match.ScoreA || match.ForfeitA)
+                            else if (m.ScoreB > m.ScoreA || m.ForfeitA)
                             {
                                 return match.PositionB == positionA ? -1 : 1;
                             }
@@ -156,41 +168,80 @@ namespace cjoli.Server.Services
             }
         }
 
-        public void SaveMatch(MatchDto dto, CJoliContext context)
+        public void SaveMatch(MatchDto dto, string login, CJoliContext context)
         {
+            User? user = context.Users.SingleOrDefault(u => u.Login == login);
+            if(user==null)
+            {
+                throw new NotFoundException("User", login);
+            }
             Match? match = context.Match.SingleOrDefault(m => m.Id == dto.Id);
             if (match == null)
             {
                 throw new NotFoundException("Match", dto.Id);
             }
-            match.Done = true;
-            if (dto.ForfeitA || dto.ForfeitB)
+            if (user.Role=="ADMIN")
             {
-                match.ForfeitA = dto.ForfeitA;
-                match.ForfeitB = dto.ForfeitB;
-                match.ScoreA = 0;
-                match.ScoreB = 0;
-            }
-            else
+                match.Done = true;
+                if (dto.ForfeitA || dto.ForfeitB)
+                {
+                    match.ForfeitA = dto.ForfeitA;
+                    match.ForfeitB = dto.ForfeitB;
+                    match.ScoreA = 0;
+                    match.ScoreB = 0;
+                }
+                else
+                {
+                    match.ScoreA = dto.ScoreA;
+                    match.ScoreB = dto.ScoreB;
+                }
+            } else
             {
-                match.ScoreA = dto.ScoreA;
-                match.ScoreB = dto.ScoreB;
+                UserMatch? userMatch = match.UserMatches.SingleOrDefault(u=>u.User == user);
+                if (userMatch == null)
+                {
+                    userMatch = new UserMatch() { Match = match, User = user };
+                }
+                if(dto.ForfeitA || dto.ForfeitB)
+                {
+                    userMatch.ForfeitA = dto.ForfeitA;
+                    userMatch.ForfeitB = dto.ForfeitB;
+                    userMatch.ScoreA = 0;
+                    userMatch.ScoreB = 0;
+                }
+                userMatch.ScoreA = dto.ScoreA;
+                userMatch.ScoreB = dto.ScoreB;
+                match.UserMatches.Add(userMatch);
+
             }
             context.SaveChanges();
         }
 
-        public void ClearMatch(MatchDto dto, CJoliContext context)
+        public void ClearMatch(MatchDto dto, string login, CJoliContext context)
         {
-            Match? match = context.Match.SingleOrDefault(m => m.Id == dto.Id);
+            User? user = context.Users.SingleOrDefault(u => u.Login == login);
+            if (user == null)
+            {
+                throw new NotFoundException("User", login);
+            }
+            Match? match = context.Match.Include(m=>m.UserMatches.Where(u=>u.User==user)).SingleOrDefault(m => m.Id == dto.Id);
             if (match == null)
             {
                 throw new NotFoundException("Match", dto.Id);
             }
-            match.Done = false;
-            match.ScoreA = 0;
-            match.ScoreB = 0;
-            match.ForfeitA = false;
-            match.ForfeitB = false;
+            if(user.Role=="ADMIN")
+            {
+                match.Done = false;
+                match.ScoreA = 0;
+                match.ScoreB = 0;
+                match.ForfeitA = false;
+                match.ForfeitB = false;
+            }
+            UserMatch? userMatch = match.UserMatches.SingleOrDefault(u => u.User == user);
+            if(userMatch!=null)
+            {
+                context.Remove(userMatch);
+            }
             context.SaveChanges();
         }
 

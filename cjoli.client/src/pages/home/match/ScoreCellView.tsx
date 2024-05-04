@@ -10,7 +10,7 @@ const ScoreCellView = ({
   text: string;
 }) => {
   return (
-    <Badge bg={bg} text={text} style={{ fontSize: "16px" }} className="my-1">
+    <Badge bg={bg} text={text} style={{ fontSize: "18px" }} className="my-1">
       {score}
     </Badge>
   );

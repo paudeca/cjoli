@@ -32,10 +32,10 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
   };
 
   const saveMatch = async (match: Match) => {
-    let { scoreA, scoreB } = getValues(`m${match.id}`) as {
-      scoreA: number;
-      scoreB: number;
-    };
+    let { scoreA, scoreB } = getValues(`m${match.id}`);
+    if (scoreA == "") scoreA = 0;
+    if (scoreB == "") scoreB = 0;
+
     if (match.forfeitA || match.forfeitB) {
       scoreA = 0;
       scoreB = 0;

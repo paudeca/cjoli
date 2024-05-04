@@ -15,5 +15,6 @@
         public DateTime Time { get; set; }
         public int SquadId { get; set; }
         public int PhaseId { get; set; }
+        public UserMatchDto? UserMatch { get; set; }
     }
 }

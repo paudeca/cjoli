@@ -2,7 +2,9 @@
 using cjoli.Server.Datas;
 using cjoli.Server.Dtos;
 using cjoli.Server.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace cjoli.Server.Controllers
 {
@@ -24,6 +26,16 @@ namespace cjoli.Server.Controllers
             _context = context;
         }
 
+        private string? GetLogin()
+        {
+            if (User.Identity == null || !this.User.Identity.IsAuthenticated)
+            {
+                return null;
+            }
+            return User.Claims.First(i => i.Type == ClaimTypes.NameIdentifier).Value;
+        }
+
+
         [HttpGet]
         [Route("Tourneys")]
         public List<TourneyDto> ListTourneys()
@@ -36,7 +48,8 @@ namespace cjoli.Server.Controllers
         [Route("Ranking/{uuid}")]
         public RankingDto GetRanking(string uuid)
         {
-            var ranking = _mapper.Map<RankingDto>(_service.GetRanking(uuid, _context));
+            string? login = GetLogin();
+            var ranking = _mapper.Map<RankingDto>(_service.GetRanking(uuid, login, _context));
             _service.AffectationTeams(ranking);
             return ranking;
         }
@@ -45,7 +58,7 @@ namespace cjoli.Server.Controllers
         [Route("Export/{uuid}")]
         public TourneyDto Export(string uuid)
         {
-            return _mapper.Map<TourneyDto>(_service.GetTourney(uuid, _context));
+            return _mapper.Map<TourneyDto>(_service.GetTourney(uuid, null, _context));
         }
 
         [HttpPost]
@@ -57,20 +70,22 @@ namespace cjoli.Server.Controllers
         }
 
         [HttpPost]
-        //[Authorize]
+        [Authorize]
         [Route("SaveMatch/{uuid}")]
         public RankingDto SaveMatch([FromRoute] string uuid, [FromBody] MatchDto match)
         {
-            _service.SaveMatch(match, _context);
+            var login = GetLogin();
+            _service.SaveMatch(match, login!, _context);
             return GetRanking(uuid);
         }
 
         [HttpPost]
-        //[Authorize]
+        [Authorize]
         [Route("ClearMatch/{uuid}")]
         public RankingDto ClearMatch([FromRoute] string uuid, [FromBody] MatchDto match)
         {
-            _service.ClearMatch(match, _context);
+            var login = GetLogin();
+            _service.ClearMatch(match, login!, _context);
             return GetRanking(uuid);
         }
 

@@ -13,5 +13,6 @@ namespace cjoli.Server.Models
         public string? Role { get; set; }
 
         public IList<Tourney> Tourneys { get; set; } = new List<Tourney>();
+        public IList<UserMatch> UserMatches { get; set; } = new List<UserMatch>();
     }
 }

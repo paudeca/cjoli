@@ -17,21 +17,29 @@ import { PersonSquare } from "react-bootstrap-icons";
 import { useUser } from "../hooks/useUser";
 import { useNavigate } from "react-router-dom";
 import useScreenSize from "../hooks/useScreenSize";
+import { useCJoli } from "../hooks/useCJoli";
+import useUid from "../hooks/useUid";
 
 const MyImg = styled.img<{ width: string }>`
   width: ${(props) => props.width};
 `;
 
 const MenuNav = () => {
+  const { loadRanking } = useCJoli();
   const { user, loadUser } = useUser();
+  const uid = useUid();
   const { setShow: showLogin } = useModal("login");
   const { setShow: showRegister } = useModal("register");
   const { setShow: showUpdate } = useModal("update");
   const navigate = useNavigate();
   const { isMobile } = useScreenSize();
-  const logout = () => {
-    cjoliService.logout();
+  const logout = async () => {
+    await cjoliService.logout();
     loadUser(undefined);
+    if (uid) {
+      const ranking = await cjoliService.getRanking(uid);
+      loadRanking(ranking);
+    }
   };
   return (
     <Navbar expand="sm" className="bg-body-tertiary mb-3" sticky="top">

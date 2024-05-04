@@ -19,12 +19,12 @@ const ScoreCell = ({
   saveMatch,
   register,
 }: ScoreCellProps) => {
-  const { isAdmin } = useUser();
+  const { isConnected } = useUser();
 
   return (
-    <InputGroup size="sm" style={{ width: "65px" }}>
+    <InputGroup size="sm" style={{ width: "80px" }}>
       <Form.Control type="number" min="0" max="100" {...register(id)} />
-      {isAdmin && (
+      {isConnected && (
         <DropdownButton variant="outline-secondary" title="">
           <Dropdown.Item
             href="#"

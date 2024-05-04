@@ -1,23 +1,25 @@
 import { Row, Col, Badge } from "react-bootstrap";
 import useScreenSize from "../../../hooks/useScreenSize";
-import { Match } from "../../../models";
+import { IMatch, Match } from "../../../models";
 import moment from "moment";
 import { useCJoli } from "../../../hooks/useCJoli";
 import TeamCell from "./TeamCell";
 import ScoreCellInput from "./ScoreCellInput";
-import { CheckCircle, XCircle } from "react-bootstrap-icons";
+import { CheckCircle } from "react-bootstrap-icons";
 import { useUser } from "../../../hooks/useUser";
 import { FieldValues, UseFormRegister } from "react-hook-form";
 import ScoreCellView from "./ScoreCellView";
 import LeftCenterDiv from "../../../components/LeftCenterDiv";
 import styled from "@emotion/styled";
+import ButtonScore from "./ButtonScore";
 
 const MyScoreDiv = styled("div")<{ isMobile: boolean }>`
   display: flex;
   align-items: ${(props) => (props.isMobile ? "flex-end" : "center")};
   justify-content: center;
   flex-direction: ${(props) => (props.isMobile ? "column" : "row")};
-  & svg {
+  & svg,
+  & .spinner-grow {
     ${(props) =>
       props.isMobile
         ? "margin-top: 0.5rem !important;"
@@ -29,8 +31,8 @@ interface MatchRowProps {
   match: Match;
   rowSpan: number;
   index: number;
-  saveMatch: (match: Match) => void;
-  clearMatch: (match: Match) => void;
+  saveMatch: (match: Match) => Promise<void>;
+  clearMatch: (match: Match) => Promise<void>;
   register: UseFormRegister<FieldValues>;
 }
 
@@ -44,24 +46,31 @@ const MatchRow = ({
 }: MatchRowProps) => {
   const { getSquad } = useCJoli();
   const { isMobile } = useScreenSize();
-  const { isAdmin } = useUser();
+  const { isConnected } = useUser();
+
+  const imatch: IMatch = match.done
+    ? match
+    : match.userMatch
+    ? match.userMatch
+    : match;
+  const done = match.userMatch || match.done;
 
   let badgeA =
-    match.scoreA > match.scoreB
+    imatch.scoreA > imatch.scoreB
       ? "success"
-      : match.scoreA === match.scoreB
+      : imatch.scoreA === imatch.scoreB
       ? "warning"
       : "danger";
   let badgeB =
-    match.scoreA < match.scoreB
+    imatch.scoreA < imatch.scoreB
       ? "success"
-      : match.scoreA === match.scoreB
+      : imatch.scoreA === imatch.scoreB
       ? "warning"
       : "danger";
-  if (match.forfeitA) {
+  if (imatch.forfeitA) {
     badgeA = "danger";
     badgeB = "success";
-  } else if (match.forfeitB) {
+  } else if (imatch.forfeitB) {
     badgeB = "danger";
     badgeA = "success";
   }
@@ -88,7 +97,7 @@ const MatchRow = ({
               <Col style={{ textAlign: "left" }}>
                 <TeamCell
                   positionId={match.positionIdA}
-                  forfeit={match.forfeitA}
+                  forfeit={imatch.forfeitA}
                 />
               </Col>
             </Row>
@@ -96,50 +105,46 @@ const MatchRow = ({
               <Col style={{ textAlign: "left" }}>
                 <TeamCell
                   positionId={match.positionIdB}
-                  forfeit={match.forfeitB}
+                  forfeit={imatch.forfeitB}
                 />
               </Col>
             </Row>
           </td>
         )}
-        {isMobile && !match.done && (
+        {isMobile && !done && (
           <td>
             <MyScoreDiv isMobile={true}>
-              <ScoreCellInput
-                id={`m${match.id}.scoreA`}
-                match={match}
-                saveMatch={saveMatch}
-                register={register}
-                teamA
-              />
-              <ScoreCellInput
-                id={`m${match.id}.scoreB`}
-                match={match}
-                saveMatch={saveMatch}
-                register={register}
-                teamB
-              />
-              {isAdmin && (
-                <CheckCircle
-                  color="green"
-                  size={24}
-                  onClick={() => saveMatch(match)}
-                  role="button"
-                />
+              {isConnected && (
+                <>
+                  <ScoreCellInput
+                    id={`m${match.id}.scoreA`}
+                    match={match}
+                    saveMatch={saveMatch}
+                    register={register}
+                    teamA
+                  />
+                  <ScoreCellInput
+                    id={`m${match.id}.scoreB`}
+                    match={match}
+                    saveMatch={saveMatch}
+                    register={register}
+                    teamB
+                  />
+
+                  <ButtonScore action="save" onClick={() => saveMatch(match)} />
+                </>
               )}
             </MyScoreDiv>
           </td>
         )}
-        {isMobile && match.done && (
+        {isMobile && done && (
           <td>
             <MyScoreDiv isMobile={true}>
-              <ScoreCellView score={match.scoreA} bg={badgeA} text={textA} />
-              <ScoreCellView score={match.scoreB} bg={badgeB} text={textB} />
-              {isAdmin && (
-                <XCircle
-                  color="red"
-                  size={24}
-                  role="button"
+              <ScoreCellView score={imatch.scoreA} bg={badgeA} text={textA} />
+              <ScoreCellView score={imatch.scoreB} bg={badgeB} text={textB} />
+              {isConnected && (
+                <ButtonScore
+                  action="remove"
                   onClick={() => clearMatch(match)}
                 />
               )}
@@ -151,55 +156,64 @@ const MatchRow = ({
             <LeftCenterDiv isMobile={false}>
               <TeamCell
                 positionId={match.positionIdA}
-                forfeit={match.forfeitA}
+                forfeit={imatch.forfeitA}
               />
             </LeftCenterDiv>
           </td>
         )}
-        {!isMobile && !match.done && (
+        {!isMobile && !done && (
           <td>
             <MyScoreDiv isMobile={false}>
-              <ScoreCellInput
-                id={`m${match.id}.scoreA`}
-                match={match}
-                saveMatch={saveMatch}
-                register={register}
-                teamA
-              />
-              <Badge bg="light" text="black">
-                <b>-</b>
-              </Badge>
-              <ScoreCellInput
-                id={`m${match.id}.scoreB`}
-                match={match}
-                saveMatch={saveMatch}
-                register={register}
-                teamB
-              />
-              {isAdmin && (
-                <CheckCircle
-                  color="green"
-                  size={24}
-                  onClick={() => saveMatch(match)}
-                  role="button"
-                />
+              {isConnected && (
+                <>
+                  <ScoreCellInput
+                    id={`m${match.id}.scoreA`}
+                    match={match}
+                    saveMatch={saveMatch}
+                    register={register}
+                    teamA
+                  />
+                  <Badge
+                    bg="light"
+                    text="black"
+                    style={{ backgroundColor: "rgba(0,0,0,0)" }}
+                  >
+                    <b>-</b>
+                  </Badge>
+                  <ScoreCellInput
+                    id={`m${match.id}.scoreB`}
+                    match={match}
+                    saveMatch={saveMatch}
+                    register={register}
+                    teamB
+                  />
+
+                  <CheckCircle
+                    color="green"
+                    size={24}
+                    onClick={() => saveMatch(match)}
+                    role="button"
+                  />
+                </>
               )}
             </MyScoreDiv>
           </td>
         )}
-        {!isMobile && match.done && (
+        {!isMobile && done && (
           <td>
             <MyScoreDiv isMobile={false}>
-              <ScoreCellView score={match.scoreA} bg={badgeA} text={textA} />
-              <Badge bg="light" text="black">
+              <ScoreCellView score={imatch.scoreA} bg={badgeA} text={textA} />
+              <Badge
+                bg="light"
+                text="black"
+                style={{ backgroundColor: "rgba(0,0,0,0)" }}
+              >
                 <b>-</b>
               </Badge>
-              <ScoreCellView score={match.scoreB} bg={badgeB} text={textB} />
-              {isAdmin && (
-                <XCircle
-                  color="red"
-                  size={24}
-                  role="button"
+              <ScoreCellView score={imatch.scoreB} bg={badgeB} text={textB} />
+              {isConnected && (
+                <ButtonScore
+                  action="remove"
                   onClick={() => clearMatch(match)}
                 />
               )}
@@ -211,7 +225,7 @@ const MatchRow = ({
             <LeftCenterDiv isMobile={false}>
               <TeamCell
                 positionId={match.positionIdB}
-                forfeit={match.forfeitB}
+                forfeit={imatch.forfeitB}
               />
             </LeftCenterDiv>
           </td>

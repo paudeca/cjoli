@@ -1,3 +1,4 @@
+import { IMatch } from "./IMatch";
 import { Tourney } from "./Tourney";
 import { Match } from "./Match";
 import { Phase } from "./Phase";
@@ -8,8 +9,10 @@ import { ScoreSquad } from "./ScoreSquad";
 import { Squad } from "./Squad";
 import { Team } from "./Team";
 import { User } from "./User";
+import { UserMatch } from "./UserMatch";
 
 export type {
+  IMatch,
   Tourney,
   Match,
   Phase,
@@ -20,4 +23,5 @@ export type {
   Squad,
   Team,
   User,
+  UserMatch,
 };

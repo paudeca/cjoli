@@ -16,6 +16,15 @@ namespace cjoli.Server.Controllers
         private readonly IMapper _mapper;
         private readonly CJoliContext _context;
 
+        private string? GetLogin()
+        {
+            if (User.Identity == null || !this.User.Identity.IsAuthenticated)
+            {
+                return null;
+            }
+            return User.Claims.First(i => i.Type == ClaimTypes.NameIdentifier).Value;
+        }
+
         public UserController(UserService service, IMapper mapper, CJoliContext context)
         {
             _service = service;
@@ -26,11 +35,11 @@ namespace cjoli.Server.Controllers
         [HttpGet]
         public UserDto? Get()
         {
-            if (this.User.Identity == null || !this.User.Identity.IsAuthenticated)
+            var login = GetLogin();
+            if (login==null)
             {
                 return null;
             }
-            var login = this.User.Claims.First(i => i.Type == ClaimTypes.NameIdentifier).Value;
             return _mapper.Map<UserDto>(_context.Users.SingleOrDefault(u => u.Login == login));
         }
 
@@ -53,11 +62,11 @@ namespace cjoli.Server.Controllers
         [Route("Update")]
         public bool Update(UserUpdate user)
         {
-            if (this.User.Identity == null || !this.User.Identity.IsAuthenticated)
+            var login = GetLogin();
+            if (login==null)
             {
                 return false;
             }
-            var login = this.User.Claims.First(i => i.Type == ClaimTypes.NameIdentifier).Value;
             return _service.Update(login, user.Password, _context);
         }
 

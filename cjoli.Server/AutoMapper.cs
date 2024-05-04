@@ -27,7 +27,9 @@ namespace cjoli.Server
                 .ForMember(x => x.PositionB, opt => opt.MapFrom(a => a.PositionB.Value))
                 .ForMember(x => x.PositionIdB, opt => opt.MapFrom(a => a.PositionB.Id))
                 .ForMember(x => x.SquadId, opt => opt.MapFrom(a => a.Squad != null ? a.Squad.Id : 0))
-                .ForMember(x => x.PhaseId, opt => opt.MapFrom(a => a.Squad != null && a.Squad.Phase != null ? a.Squad.Phase.Id : 0));
+                .ForMember(x => x.PhaseId, opt => opt.MapFrom(a => a.Squad != null && a.Squad.Phase != null ? a.Squad.Phase.Id : 0))
+                .ForMember(x=>x.UserMatch, opt=>opt.MapFrom(u=>u.UserMatches.SingleOrDefault()));
+            CreateMap<UserMatch, UserMatchDto>();
 
             CreateMap<Team, TeamDto>();
 
