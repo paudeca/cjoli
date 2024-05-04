@@ -10,6 +10,9 @@ import React from "react";
 import { useCJoli } from "../../../hooks/useCJoli";
 import { useUser } from "../../../hooks/useUser";
 import useScreenSize from "../../../hooks/useScreenSize";
+import SimulationIcon from "../../../components/SimulationIcon";
+import * as cjoliService from "../../../services/cjoliService";
+import useUid from "../../../hooks/useUid";
 
 const MyTh = styled("th")`
   background-color: ${(props) => props.theme.colors.secondary} !important;
@@ -24,19 +27,37 @@ const MyTd = styled("td")`
 `;
 
 const RankTable = ({ phase }: { phase: Phase }) => {
-  const { ranking, getPosition, getTeam } = useCJoli();
+  const { ranking, getPosition, getTeam, loadRanking, getTeamInfo } =
+    useCJoli();
   const { setShow: showTeam } = useModal("team");
   const { isAdmin } = useUser();
   const [team, setTeam] = React.useState<Team | undefined>(undefined);
   const { isMobile } = useScreenSize();
+  const uid = useUid();
+
+  const handleRemove = (ids: number[]) => async () => {
+    const ranking = await cjoliService.clearSimulations(uid, ids);
+    loadRanking(ranking);
+  };
   return (
     <>
       {phase.squads.map((squad) => {
         const scores = ranking?.scores.find((s) => s.squadId == squad.id);
         const datas = scores ? scores.scores : [];
+        const userMatches = squad.matches
+          .filter((m) => m.userMatch)
+          .map((m) => m.userMatch!.id);
+        const hasSimulation = userMatches.length > 0;
         return (
           <Card.Body key={squad.id}>
-            <Card.Title>{squad.name}</Card.Title>
+            <Card.Title>
+              {squad.name}{" "}
+              <SimulationIcon
+                show={hasSimulation}
+                title={`Simulation - ${squad.name}`}
+                onRemove={handleRemove(userMatches)}
+              />
+            </Card.Title>
             <Table
               striped
               bordered
@@ -80,6 +101,16 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                   const team = getTeam(
                     getPosition(score.positionId)?.teamId || 0
                   );
+                  const userMatches = squad.matches
+                    .filter(
+                      (m) =>
+                        m.userMatch &&
+                        (m.positionIdA == score.positionId ||
+                          m.positionIdB == score.positionId)
+                    )
+                    .map((m) => m.userMatch!.id);
+                  const hasSimulation = userMatches.length > 0;
+                  const { label } = getTeamInfo(score.positionId);
                   return (
                     <React.Fragment key={index}>
                       <tr>
@@ -87,6 +118,11 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                         <td colSpan={isMobile ? 7 : 1}>
                           <LeftCenterDiv isMobile={false}>
                             <TeamName positionId={score.positionId} />
+                            <SimulationIcon
+                              show={hasSimulation}
+                              title={`Simulation - ${label}`}
+                              onRemove={handleRemove(userMatches)}
+                            />
                             {team && isAdmin && (
                               <PencilSquare
                                 role="button"

@@ -21,7 +21,7 @@ const HomePage = () => {
       setReady(true);
     };
     call();
-  }, [loadRanking, loadUser]);
+  }, [loadRanking, loadUser, uid]);
 
   const { hash } = useLocation();
   let phase = phases && phases.find((p) => `#${p.id}` == hash);

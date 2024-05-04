@@ -93,3 +93,11 @@ export const clearMatch = async (uid: string, match: Match) => {
   const { data } = await axios.post(`${url}/cjoli/clearMatch/${uid}`, match);
   return data;
 };
+
+export const clearSimulations = async (uid: string, ids: number[]) => {
+  const { data } = await axios.post(
+    `${url}/cjoli/clearSimulations/${uid}`,
+    ids
+  );
+  return data;
+};

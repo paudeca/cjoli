@@ -5,13 +5,13 @@ import moment from "moment";
 import { useCJoli } from "../../../hooks/useCJoli";
 import TeamCell from "./TeamCell";
 import ScoreCellInput from "./ScoreCellInput";
-import { CheckCircle } from "react-bootstrap-icons";
 import { useUser } from "../../../hooks/useUser";
 import { FieldValues, UseFormRegister } from "react-hook-form";
 import ScoreCellView from "./ScoreCellView";
 import LeftCenterDiv from "../../../components/LeftCenterDiv";
 import styled from "@emotion/styled";
 import ButtonScore from "./ButtonScore";
+import SimulationIcon from "../../../components/SimulationIcon";
 
 const MyScoreDiv = styled("div")<{ isMobile: boolean }>`
   display: flex;
@@ -46,7 +46,7 @@ const MatchRow = ({
 }: MatchRowProps) => {
   const { getSquad } = useCJoli();
   const { isMobile } = useScreenSize();
-  const { isConnected } = useUser();
+  const { isConnected, isAdmin } = useUser();
 
   const imatch: IMatch = match.done
     ? match
@@ -54,6 +54,7 @@ const MatchRow = ({
     ? match.userMatch
     : match;
   const done = match.userMatch || match.done;
+  const isSimulation = !!match.userMatch;
 
   let badgeA =
     imatch.scoreA > imatch.scoreB
@@ -83,6 +84,7 @@ const MatchRow = ({
         <tr>
           <td colSpan={2}>
             {moment(match.time).format("LT")} - {getSquad(match.squadId)!.name}
+            <SimulationIcon show={isSimulation} />
           </td>
         </tr>
       )}
@@ -90,7 +92,12 @@ const MatchRow = ({
         {index == 0 && !isMobile && (
           <td rowSpan={rowSpan}>{moment(match.time).format("LT")}</td>
         )}
-        {!isMobile && <td>{getSquad(match.squadId)!.name}</td>}
+        {!isMobile && (
+          <td>
+            {getSquad(match.squadId)!.name}
+            <SimulationIcon show={isSimulation} />
+          </td>
+        )}
         {isMobile && (
           <td>
             <Row>
@@ -142,7 +149,7 @@ const MatchRow = ({
             <MyScoreDiv isMobile={true}>
               <ScoreCellView score={imatch.scoreA} bg={badgeA} text={textA} />
               <ScoreCellView score={imatch.scoreB} bg={badgeB} text={textB} />
-              {isConnected && (
+              {(isAdmin || (isConnected && isSimulation)) && (
                 <ButtonScore
                   action="remove"
                   onClick={() => clearMatch(match)}
@@ -187,13 +194,7 @@ const MatchRow = ({
                     register={register}
                     teamB
                   />
-
-                  <CheckCircle
-                    color="green"
-                    size={24}
-                    onClick={() => saveMatch(match)}
-                    role="button"
-                  />
+                  <ButtonScore action="save" onClick={() => saveMatch(match)} />
                 </>
               )}
             </MyScoreDiv>
@@ -211,12 +212,13 @@ const MatchRow = ({
                 <b>-</b>
               </Badge>
               <ScoreCellView score={imatch.scoreB} bg={badgeB} text={textB} />
-              {isConnected && (
-                <ButtonScore
-                  action="remove"
-                  onClick={() => clearMatch(match)}
-                />
-              )}
+              {isAdmin ||
+                (isConnected && isSimulation && (
+                  <ButtonScore
+                    action="remove"
+                    onClick={() => clearMatch(match)}
+                  />
+                ))}
             </MyScoreDiv>
           </td>
         )}

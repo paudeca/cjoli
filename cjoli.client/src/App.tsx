@@ -22,14 +22,13 @@ const router = createBrowserRouter([
     element: <MainPage />,
     children: [
       { path: "", element: <SelectPage /> },
-      { path: ":uid", element: <HomePage /> }
-    ]
+      { path: ":uid", element: <HomePage /> },
+    ],
   },
   {
     path: "/:uid",
     element: <HomePage />,
   },
-
 ]);
 
 const App = () => {
@@ -58,6 +57,10 @@ const App = () => {
             &:not(collapsed) {
               --bs-accordion-active-color: white;
             }
+          }
+          .bg-secondary {
+            --bs-bg-opacity: 1;
+            --bs-secondary-rgb: 120, 129, 169;
           }
         `}
       />

@@ -89,6 +89,16 @@ namespace cjoli.Server.Controllers
             return GetRanking(uuid);
         }
 
+        [HttpPost]
+        [Authorize]
+        [Route("ClearSimulations/{uuid}")]
+        public RankingDto ClearSimulations([FromRoute] string uuid, [FromBody] int[] ids)
+        {
+            var login = GetLogin();
+            _service.ClearSimulations(ids, login!, _context);
+            return GetRanking(uuid);
+        }
+
 
         [HttpPost]
         [Route("UpdateTeam/{uuid}")]

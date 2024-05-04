@@ -245,6 +245,22 @@ namespace cjoli.Server.Services
             context.SaveChanges();
         }
 
+        public void ClearSimulations(int[] ids, string login, CJoliContext context)
+        {
+            User? user = context.Users.Include(u=>u.UserMatches).SingleOrDefault(u => u.Login == login);
+            if (user == null)
+            {
+                throw new NotFoundException("User", login);
+            }
+            var  userMatches = user.UserMatches.Where(u => ids.Contains(u.Id));
+            foreach(var userMatch in userMatches)
+            {
+                context.Remove(userMatch);
+            }
+            context.SaveChanges();
+        }
+
+
         public void UpdateTeam(string uuid, TeamDto teamDto, CJoliContext context)
         {
             Tourney? tourney = context.Tourneys.Include(t => t.Teams).SingleOrDefault(t => t.Uid == uuid);
