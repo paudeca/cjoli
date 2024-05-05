@@ -84,6 +84,7 @@ const MatchRow = ({
         <tr>
           <td colSpan={2}>
             {moment(match.time).format("LT")} - {getSquad(match.squadId)!.name}
+            {match.location && ` - ${match.location}`}
             <SimulationIcon show={isSimulation} />
           </td>
         </tr>
@@ -98,6 +99,7 @@ const MatchRow = ({
             <SimulationIcon show={isSimulation} />
           </td>
         )}
+        {!isMobile && match.location && <td>{match.location}</td>}
         {isMobile && (
           <td>
             <Row>

@@ -9,6 +9,7 @@ export interface Match extends IMatch {
   positionB: number;
   positionIdB: number;
   time: Date;
+  location?: string;
   squadId: number;
   phaseId: number;
   userMatch?: UserMatch;

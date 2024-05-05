@@ -193,6 +193,7 @@ namespace cjoli.Server.Services
                     match.ForfeitB = matchDto.ForfeitB;
                     match.Done = matchDto.Done;
                     match.Time = matchDto.Time;
+                    match.Location = matchDto.Location ?? match.Location;
                 }
             );
         }
