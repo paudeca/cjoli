@@ -53,15 +53,22 @@ namespace cjoli.Server.Services
             return Import(
                 dto: teamDto,
                 context: context,
-                select: () => tourney.Teams.SingleOrDefault(t => t.Id == teamDto.Id),
+                select: () => {
+                    Func<Team, bool> filter = teamDto.Id > 0 ? (t) => t.Id == teamDto.Id : (t) => t.Name == teamDto.Name;
+                    return context.Team.SingleOrDefault(filter); 
+                },
                 create: () =>
                 {
                     var team = new Team() { Name = "" };
-                    tourney.Teams.Add(team);
+                    context.Add(team);
                     return team;
                 },
                 update: (team) =>
                 {
+                    if(!team.Tourneys.Contains(tourney))
+                    {
+                        team.Tourneys.Add(tourney);
+                    }
                     team.Name = teamDto.Name ?? team.Name;
                     team.Logo = teamDto.Logo ?? team.Logo;
                     team.Youngest = teamDto.Youngest ?? team.Youngest;

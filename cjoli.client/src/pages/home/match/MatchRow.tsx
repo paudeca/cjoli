@@ -212,13 +212,12 @@ const MatchRow = ({
                 <b>-</b>
               </Badge>
               <ScoreCellView score={imatch.scoreB} bg={badgeB} text={textB} />
-              {isAdmin ||
-                (isConnected && isSimulation && (
-                  <ButtonScore
-                    action="remove"
-                    onClick={() => clearMatch(match)}
-                  />
-                ))}
+              {(isAdmin || (isConnected && isSimulation)) && (
+                <ButtonScore
+                  action="remove"
+                  onClick={() => clearMatch(match)}
+                />
+              )}
             </MyScoreDiv>
           </td>
         )}

@@ -45,112 +45,149 @@ namespace cjoli.Server.Services
             {
                 foreach (var squad in phase.Squads)
                 {
-
-                    Dictionary<int, Score> scores = squad.Positions.ToDictionary(p => p.Id, p => new Score() { PositionId = p.Id });
-                    squad.Matches.Aggregate(scores, (acc, m) =>
-                    {
-                        var userMatch = m.UserMatches.FirstOrDefault();
-                        if(userMatch==null && !m.Done)
-                        {
-                            return acc;
-                        }
-                        IMatch? match = m.Done ? m :userMatch;
-                        if(match==null)
-                        {
-                            return acc;
-                        }
-                        var scoreA = scores[m.PositionA.Id];
-                        var scoreB = scores[m.PositionB.Id];
-                        scoreA.Game++;
-                        scoreB.Game++;
-
-                        if (match.ScoreA > match.ScoreB || match.ForfeitB)
-                        {
-                            scoreA.Win++;
-                            scoreB.Loss++;
-
-                            scoreA.Total += 3;
-                            scoreB.Total += match.ForfeitB ? 0 : 1;
-                        }
-                        else if (match.ScoreA < match.ScoreB || match.ForfeitA)
-                        {
-                            scoreA.Loss++;
-                            scoreB.Win++;
-
-                            scoreA.Total += match.ForfeitA ? 0 : 1;
-                            scoreB.Total += 3;
-                        }
-                        else
-                        {
-                            scoreA.Neutral++;
-                            scoreB.Neutral++;
-
-                            scoreA.Total += 2;
-                            scoreB.Total += 2;
-                        }
-                        scoreA.GoalFor += match.ScoreA;
-                        scoreA.GoalAgainst += match.ScoreB;
-                        scoreA.GoalDiff += match.ScoreA - match.ScoreB;
-
-                        scoreB.GoalFor += match.ScoreB;
-                        scoreB.GoalAgainst += match.ScoreA;
-                        scoreB.GoalDiff += match.ScoreB - match.ScoreA;
-
-
-                        return scores;
-                    });
-                    var listScores = scores.Select(kv => kv.Value).OrderByDescending(x => x.Total).ToList();
-                    listScores.Sort((a, b) =>
-                    {
-                        var diff = a.Total.CompareTo(b.Total);
-                        if (diff != 0)
-                        {
-                            return -diff;
-                        }
-                        var positionA = squad.Positions.Single(p => p.Id == a.PositionId);
-                        var positionB = squad.Positions.Single(p => p.Id == b.PositionId);
-                        var match = squad.Matches.SingleOrDefault(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB));
-                        if ((match != null))
-                        {
-                            var userMatch = match.UserMatches.SingleOrDefault();
-                            IMatch m =  match.Done ? match : userMatch!=null ? userMatch:match;
-                            if (m.ScoreA > m.ScoreB || m.ForfeitB)
-                            {
-                                return match.PositionA == positionA ? -1 : 1;
-                            }
-                            else if (m.ScoreB > m.ScoreA || m.ForfeitA)
-                            {
-                                return match.PositionB == positionA ? -1 : 1;
-                            }
-                        }
-                        diff = a.GoalDiff.CompareTo(b.GoalDiff);
-                        if (diff != 0)
-                        {
-                            return -diff;
-                        }
-                        diff = a.GoalFor.CompareTo(b.GoalFor);
-                        if (diff != 0)
-                        {
-                            return -diff;
-                        }
-                        diff = a.GoalAgainst.CompareTo(b.GoalAgainst);
-                        if (diff != 0)
-                        {
-                            return diff;
-                        }
-                        var teamA = positionA.Team;
-                        var teamB = positionB.Team;
-                        if (teamA != null && teamB != null)
-                        {
-                            return -teamA.Youngest?.CompareTo(teamB.Youngest) ?? 0;
-                        }
-                        return 0;
-                    });
-                    var scoreSquad = new ScoreSquad() { SquadId = squad.Id, Scores = listScores };
+                    var scoreSquad = CalculateScoreSquad(squad);
                     scoreSquads.Add(scoreSquad);
                 }
             }
             return scoreSquads;
+        }
+
+        private ScoreSquad CalculateScoreSquad(Squad squad)
+        {
+            Dictionary<int, Score> scores = squad.Positions.ToDictionary(p => p.Id, p => new Score() { PositionId = p.Id });
+            squad.Matches.Aggregate(scores, (acc, m) =>
+            {
+                var userMatch = m.UserMatches.FirstOrDefault();
+                if (userMatch == null && !m.Done)
+                {
+                    return acc;
+                }
+                IMatch? match = m.Done ? m : userMatch;
+                if (match == null)
+                {
+                    return acc;
+                }
+                var scoreA = scores[m.PositionA.Id];
+                var scoreB = scores[m.PositionB.Id];
+                scoreA.Game++;
+                scoreB.Game++;
+
+                if (match.ScoreA > match.ScoreB || match.ForfeitB)
+                {
+                    scoreA.Win++;
+                    scoreB.Loss++;
+
+                    scoreA.Total += 3;
+                    scoreB.Total += match.ForfeitB ? 0 : 1;
+                }
+                else if (match.ScoreA < match.ScoreB || match.ForfeitA)
+                {
+                    scoreA.Loss++;
+                    scoreB.Win++;
+
+                    scoreA.Total += match.ForfeitA ? 0 : 1;
+                    scoreB.Total += 3;
+                }
+                else
+                {
+                    scoreA.Neutral++;
+                    scoreB.Neutral++;
+
+                    scoreA.Total += 2;
+                    scoreB.Total += 2;
+                }
+                scoreA.GoalFor += match.ScoreA;
+                scoreA.GoalAgainst += match.ScoreB;
+                scoreA.GoalDiff += match.ScoreA - match.ScoreB;
+
+                scoreB.GoalFor += match.ScoreB;
+                scoreB.GoalAgainst += match.ScoreA;
+                scoreB.GoalDiff += match.ScoreB - match.ScoreA;
+
+
+                return scores;
+            });
+            var listScores = scores.Select(kv => kv.Value).OrderByDescending(x => x.Total).ToList();
+            listScores.Sort((a, b) =>
+            {
+                var diff = a.Total.CompareTo(b.Total);
+                if (diff != 0)
+                {
+                    return -diff;
+                }
+                var positionA = squad.Positions.Single(p => p.Id == a.PositionId);
+                var positionB = squad.Positions.Single(p => p.Id == b.PositionId);
+                var match = squad.Matches.SingleOrDefault(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB));
+                if ((match != null))
+                {
+                    var userMatch = match.UserMatches.SingleOrDefault();
+                    IMatch m = match.Done ? match : userMatch != null ? userMatch : match;
+                    if (m.ScoreA > m.ScoreB || m.ForfeitB)
+                    {
+                        return match.PositionA == positionA ? -1 : 1;
+                    }
+                    else if (m.ScoreB > m.ScoreA || m.ForfeitA)
+                    {
+                        return match.PositionB == positionA ? -1 : 1;
+                    }
+                }
+                diff = a.GoalDiff.CompareTo(b.GoalDiff);
+                if (diff != 0)
+                {
+                    return -diff;
+                }
+                diff = a.GoalFor.CompareTo(b.GoalFor);
+                if (diff != 0)
+                {
+                    return -diff;
+                }
+                diff = a.GoalAgainst.CompareTo(b.GoalAgainst);
+                if (diff != 0)
+                {
+                    return diff;
+                }
+                var teamA = positionA.Team;
+                var teamB = positionB.Team;
+                if (teamA != null && teamB != null)
+                {
+                    return -teamA.Youngest?.CompareTo(teamB.Youngest) ?? 0;
+                }
+                return 0;
+            });
+            var scoreSquad = new ScoreSquad() { SquadId = squad.Id, Scores = listScores };
+            return scoreSquad;
+        }
+
+        public void Simulation(string uuid, string login, int squadId, CJoliContext context)
+        {
+            User? user = context.Users.SingleOrDefault(u => u.Login == login);
+            if (user == null)
+            {
+                throw new NotFoundException("User", login);
+            }
+            Squad? squad = context.Squad
+                .Include(s=>s.Matches).ThenInclude(m=>m.UserMatches.Where(u=>u.User==user))
+                .Include(s=>s.Positions).ThenInclude(p=>p.Team)
+                .SingleOrDefault(s => s.Id == squadId);
+            if(squad==null)
+            {
+                throw new NotFoundException("Squad", squadId);
+            }
+            Ranking ranking = GetRanking(uuid, null, context);
+
+            foreach(var match in squad.Matches.Where(m=>m.UserMatches.Count==0))
+            {
+                UserMatch userMatch = new UserMatch() { Match = match, User=user };
+                Position positionA = match.PositionA;
+                Position positionB = match.PositionB;
+                Team? teamA = positionA.Team;
+                Team? teamB = positionB.Team;
+
+
+
+                match.UserMatches.Add(userMatch);
+            }
+            context.SaveChanges();
         }
 
         public void AffectationTeams(RankingDto ranking)

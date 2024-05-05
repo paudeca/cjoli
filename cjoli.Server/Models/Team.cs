@@ -7,7 +7,7 @@ namespace cjoli.Server.Models
         [Key]
         public int Id { get; set; }
         public required string Name { get; set; }
-        public Tourney? Tourney { get; set; }
+        public IList<Tourney> Tourneys { get; set; } = new List<Tourney>();
         public IList<Position> Positions { get; set; } = new List<Position>();
         public string? Logo { get; set; }
         public DateOnly? Youngest { get; set; }
