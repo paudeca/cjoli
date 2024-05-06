@@ -16,7 +16,7 @@ import UpdateModal from "../modals/UpdateModal";
 import * as cjoliService from "../services/cjoliService";
 import { PersonSquare } from "react-bootstrap-icons";
 import { useUser } from "../hooks/useUser";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useScreenSize from "../hooks/useScreenSize";
 import { useCJoli } from "../hooks/useCJoli";
 import useUid from "../hooks/useUid";
@@ -27,13 +27,14 @@ const MyImg = styled.img<{ width: string }>`
 `;
 
 const MenuNav = () => {
-  const { loadRanking } = useCJoli();
-  const { user, loadUser, isAdmin } = useUser();
+  const { loadRanking, tourney } = useCJoli();
+  const { user, loadUser } = useUser();
   const uid = useUid();
   const { setShow: showLogin } = useModal("login");
   const { setShow: showRegister } = useModal("register");
   const { setShow: showUpdate } = useModal("update");
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { isMobile } = useScreenSize();
   const logout = async () => {
     await cjoliService.logout();
@@ -49,6 +50,7 @@ const MenuNav = () => {
     await cjoliService.updateSimulation(uid);
     setLoading(false);
   };
+  const tourneyLabel = pathname != "/" && tourney?.name;
   return (
     <Navbar expand="sm" className="bg-body-tertiary mb-3" sticky="top">
       <Container fluid>
@@ -57,8 +59,11 @@ const MenuNav = () => {
             <Col>
               <MyImg src="./logo.png" width="60px" className="mx-4" />
             </Col>
-            {isMobile && <Col>Ice Hockey</Col>}
-            {!isMobile && <Col>CJoli - Ice Hockey Tournament - 1.0.0</Col>}
+            {!tourneyLabel && isMobile && <Col>Ice Hockey</Col>}
+            {!tourneyLabel && !isMobile && (
+              <Col>CJoli - Ice Hockey Tournament - 1.0.0</Col>
+            )}
+            {tourneyLabel && <Col>{tourneyLabel}</Col>}
           </Row>
           <Row className="pt-2">
             {loading && <ProgressBar animated now={100} />}

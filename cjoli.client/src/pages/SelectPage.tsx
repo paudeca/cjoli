@@ -1,24 +1,16 @@
 import { Card, Form } from "react-bootstrap";
 import CJoliCard from "../components/CJoliCard";
 import CJoliStack from "../components/CJoliStack";
-import * as cjoliService from "../services/cjoliService";
 import React from "react";
-import { Tourney } from "../models";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useCJoli } from "../hooks/useCJoli";
 
 const SelectPage = () => {
-  const [tourneys, setTourneys] = React.useState<Tourney[]>([]);
   const navigate = useNavigate();
   const { register } = useForm();
+  const { tourneys, selectTourney } = useCJoli();
 
-  React.useEffect(() => {
-    const call = async () => {
-      const data = await cjoliService.getTourneys();
-      setTourneys(data);
-    };
-    call();
-  }, []);
   return (
     <CJoliStack gap={0} className="col-md-8 mx-auto mt-5">
       <div className="p-2">
@@ -29,12 +21,15 @@ const SelectPage = () => {
               size="lg"
               {...register("tourney", {
                 onChange: (e: React.FormEvent<HTMLInputElement>) => {
-                  navigate(e.currentTarget.value);
+                  const uid = e.currentTarget.value;
+                  const tourney = tourneys?.find((t) => t.uid == uid);
+                  selectTourney(tourney!);
+                  navigate(uid);
                 },
               })}
             >
               <option>Select a Tournament</option>
-              {tourneys.map((t) => (
+              {tourneys?.map((t) => (
                 <option key={t.id} value={t.uid}>
                   {t.name}
                 </option>

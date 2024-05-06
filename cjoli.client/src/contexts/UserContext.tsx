@@ -1,5 +1,6 @@
 import React, { Dispatch } from "react";
 import { User } from "../models";
+import { UserActions } from "./actions";
 
 interface UserState {
   user?: User;
@@ -11,10 +12,6 @@ export const UserContext = React.createContext<{
 } | null>(null);
 
 const initialState: UserState = {};
-
-export enum UserActions {
-  LOAD_USER = "LOAD_USER",
-}
 
 type Action = {
   type: UserActions.LOAD_USER;

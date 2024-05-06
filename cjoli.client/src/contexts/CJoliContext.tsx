@@ -1,7 +1,18 @@
 import React, { Dispatch } from "react";
-import { Match, Phase, Position, Ranking, Squad, Team } from "../models";
+import {
+  Match,
+  Phase,
+  Position,
+  Ranking,
+  Squad,
+  Team,
+  Tourney,
+} from "../models";
+import { CJoliActions } from "./actions";
 
 interface CJoliState {
+  tourneys?: Tourney[];
+  tourney?: Tourney;
   ranking?: Ranking;
   teams?: Team[];
   phases?: Phase[];
@@ -17,16 +28,27 @@ export const CJoliContext = React.createContext<{
 
 const initialState: CJoliState = {};
 
-export enum CJoliActions {
-  LOAD_RANKING = "LOAD_RANKING",
-}
-
-interface Action {
-  type: CJoliActions.LOAD_RANKING;
-  payload: Ranking;
-}
+type Action =
+  | {
+      type: CJoliActions.LOAD_TOURNEYS;
+      payload: Tourney[];
+    }
+  | {
+      type: CJoliActions.SELECT_TOURNEY;
+      payload: Tourney;
+    }
+  | {
+      type: CJoliActions.LOAD_RANKING;
+      payload: Ranking;
+    };
 const reducer = (state: CJoliState, action: Action) => {
   switch (action.type) {
+    case CJoliActions.LOAD_TOURNEYS: {
+      return { ...state, tourneys: action.payload };
+    }
+    case CJoliActions.SELECT_TOURNEY: {
+      return { ...state, tourney: action.payload };
+    }
     case CJoliActions.LOAD_RANKING:
       {
         const ranking = action.payload;

@@ -1,6 +1,7 @@
 import React from "react";
-import { CJoliContext, CJoliActions } from "../contexts/CJoliContext";
-import { Ranking } from "../models";
+import { CJoliContext } from "../contexts/CJoliContext";
+import { Ranking, Tourney } from "../models";
+import { CJoliActions } from "../contexts/actions";
 
 export const useCJoli = () => {
   const ctx = React.useContext(CJoliContext);
@@ -9,10 +10,20 @@ export const useCJoli = () => {
   }
 
   const { state, dispatch } = ctx;
+  const loadTourneys = React.useCallback(
+    (tourneys: Tourney[]) =>
+      dispatch({ type: CJoliActions.LOAD_TOURNEYS, payload: tourneys }),
+    [dispatch]
+  );
+  const selectTourney = React.useCallback(
+    (tourney: Tourney) =>
+      dispatch({ type: CJoliActions.SELECT_TOURNEY, payload: tourney }),
+    [dispatch]
+  );
   const loadRanking = React.useCallback(
     (ranking: Ranking) =>
       dispatch({ type: CJoliActions.LOAD_RANKING, payload: ranking }),
-    []
+    [dispatch]
   );
   const getSquad = React.useCallback(
     (squadId: number) => state.squads?.find((s) => s.id === squadId),
@@ -43,5 +54,14 @@ export const useCJoli = () => {
     [getPosition, getTeam]
   );
 
-  return { ...state, loadRanking, getSquad, getTeam, getPosition, getTeamInfo };
+  return {
+    ...state,
+    loadRanking,
+    loadTourneys,
+    selectTourney,
+    getSquad,
+    getTeam,
+    getPosition,
+    getTeamInfo,
+  };
 };
