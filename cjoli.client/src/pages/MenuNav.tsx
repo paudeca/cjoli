@@ -6,6 +6,7 @@ import {
   NavDropdown,
   Col,
   Row,
+  ProgressBar,
 } from "react-bootstrap";
 import { useModal } from "../contexts/ModalContext";
 import styled from "@emotion/styled";
@@ -19,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import useScreenSize from "../hooks/useScreenSize";
 import { useCJoli } from "../hooks/useCJoli";
 import useUid from "../hooks/useUid";
+import React from "react";
 
 const MyImg = styled.img<{ width: string }>`
   width: ${(props) => props.width};
@@ -26,7 +28,7 @@ const MyImg = styled.img<{ width: string }>`
 
 const MenuNav = () => {
   const { loadRanking } = useCJoli();
-  const { user, loadUser } = useUser();
+  const { user, loadUser, isAdmin } = useUser();
   const uid = useUid();
   const { setShow: showLogin } = useModal("login");
   const { setShow: showRegister } = useModal("register");
@@ -41,6 +43,12 @@ const MenuNav = () => {
       loadRanking(ranking);
     }
   };
+  const [loading, setLoading] = React.useState(false);
+  const handleUpdateSimulation = async () => {
+    setLoading(true);
+    await cjoliService.updateSimulation(uid);
+    setLoading(false);
+  };
   return (
     <Navbar expand="sm" className="bg-body-tertiary mb-3" sticky="top">
       <Container fluid>
@@ -51,6 +59,9 @@ const MenuNav = () => {
             </Col>
             {isMobile && <Col>Ice Hockey</Col>}
             {!isMobile && <Col>CJoli - Ice Hockey Tournament - 1.0.0</Col>}
+          </Row>
+          <Row className="pt-2">
+            {loading && <ProgressBar animated now={100} />}
           </Row>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="menu" />
@@ -86,6 +97,9 @@ const MenuNav = () => {
                   <>
                     <NavDropdown.Item onClick={() => showUpdate(true)}>
                       Update
+                    </NavDropdown.Item>
+                    <NavDropdown.Item onClick={handleUpdateSimulation}>
+                      Update Simulation
                     </NavDropdown.Item>
                     <NavDropdown.Divider />
                     <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>

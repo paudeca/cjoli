@@ -13,4 +13,5 @@ export interface Match extends IMatch {
   squadId: number;
   phaseId: number;
   userMatch?: UserMatch;
+  simulation?: { scoreA: number; scoreB: number };
 }

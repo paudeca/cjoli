@@ -11,5 +11,7 @@ namespace cjoli.Server.Models
         public IList<Position> Positions { get; set; } = new List<Position>();
         public string? Logo { get; set; }
         public DateOnly? Youngest { get; set; }
+
+        public IList<MatchResult> MatchResults { get; set; } = new List<MatchResult>();
     }
 }

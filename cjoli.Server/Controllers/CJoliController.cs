@@ -108,5 +108,14 @@ namespace cjoli.Server.Controllers
             return true;
         }
 
+        [HttpGet]
+        [Authorize]
+        [Route("UpdateSimulation/{uuid}")]
+        public void UpdateSimulation(string uuid)
+        {
+            var login = GetLogin();
+            _service.UpdateSimulation(uuid, login!,_context);
+        }
+
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using cjoli.Server.Datas;
 
@@ -11,9 +12,11 @@ using cjoli.Server.Datas;
 namespace cjoli.Server.Migrations
 {
     [DbContext(typeof(CJoliContext))]
-    partial class CJoliContextModelSnapshot : ModelSnapshot
+    [Migration("20240505172354_MatchSimulation")]
+    partial class MatchSimulation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -164,14 +167,10 @@ namespace cjoli.Server.Migrations
                     b.Property<int>("ScoreB")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("MatchId");
-
-                    b.HasIndex("UserId");
+                    b.HasIndex("MatchId")
+                        .IsUnique();
 
                     b.ToTable("MatchSimulation");
                 });
@@ -483,18 +482,12 @@ namespace cjoli.Server.Migrations
             modelBuilder.Entity("cjoli.Server.Models.MatchSimulation", b =>
                 {
                     b.HasOne("cjoli.Server.Models.Match", "Match")
-                        .WithMany("Simulations")
-                        .HasForeignKey("MatchId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithOne("Simulation")
+                        .HasForeignKey("cjoli.Server.Models.MatchSimulation", "MatchId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("cjoli.Server.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
                     b.Navigation("Match");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.ParentPosition", b =>
@@ -578,7 +571,7 @@ namespace cjoli.Server.Migrations
                 {
                     b.Navigation("MatchResults");
 
-                    b.Navigation("Simulations");
+                    b.Navigation("Simulation");
 
                     b.Navigation("UserMatches");
                 });

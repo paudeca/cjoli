@@ -14,7 +14,15 @@ import MatchRow from "./match/MatchRow";
 const MatchesStack = ({ phase }: { phase?: Phase }) => {
   const { matches, loadRanking } = useCJoli();
   const uid = useUid();
-  const { register, getValues } = useForm();
+  const values = matches?.reduce(
+    (acc, m) => ({ ...acc, [`m${m.id}`]: m.simulation }),
+    {}
+  );
+  const { register, getValues } = useForm<
+    Record<string, { scoreA: number | ""; scoreB: number | "" }>
+  >({
+    defaultValues: values,
+  });
 
   const datas = matches
     ?.filter((m) => m.phaseId == phase?.id)

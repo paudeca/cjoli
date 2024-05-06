@@ -12,6 +12,8 @@ namespace cjoli.Server.Datas
         public DbSet<User> Users { get; set; }
         public DbSet<Squad> Squad { get; set; }
         public DbSet<Match> Match { get; set; }
+        public DbSet<MatchResult> MatchResult { get; set; }
+        public DbSet<UserMatch> UserMatch { get; set; }
 
         private const string CRYPT_PURPOSE = "CJoliCryptPurpose";
 
@@ -36,9 +38,14 @@ namespace cjoli.Server.Datas
             modelBuilder.Entity<ParentPosition>().HasOne(p => p.Position).WithOne(p => p.ParentPosition).OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Match>().HasMany(m => m.UserMatches).WithOne(u => u.Match).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Match>().HasMany(m=>m.MatchResults).WithOne(m=>m.Match).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Match>().HasMany(m => m.Simulations).WithOne(s => s.Match).OnDelete(DeleteBehavior.Cascade);
 
+
+            modelBuilder.Entity<MatchSimulation>().HasOne(s => s.Match).WithMany(m => m.Simulations);
 
             modelBuilder.Entity<Team>().HasMany(t => t.Positions).WithOne(p => p.Team).OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Team>().HasMany(t => t.MatchResults).WithOne(m => m.Team).OnDelete(DeleteBehavior.Cascade);
 
             var provider = Database.GetService<IDataProtectionProvider>();
 

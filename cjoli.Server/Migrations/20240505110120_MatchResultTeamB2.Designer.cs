@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using cjoli.Server.Datas;
 
@@ -11,9 +12,11 @@ using cjoli.Server.Datas;
 namespace cjoli.Server.Migrations
 {
     [DbContext(typeof(CJoliContext))]
-    partial class CJoliContextModelSnapshot : ModelSnapshot
+    [Migration("20240505110120_MatchResultTeamB2")]
+    partial class MatchResultTeamB2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -127,7 +130,7 @@ namespace cjoli.Server.Migrations
                     b.Property<int>("Neutral")
                         .HasColumnType("int");
 
-                    b.Property<int>("TeamAgainstId")
+                    b.Property<int?>("TeamAgainstId")
                         .HasColumnType("int");
 
                     b.Property<int>("TeamId")
@@ -145,35 +148,6 @@ namespace cjoli.Server.Migrations
                     b.HasIndex("TeamId");
 
                     b.ToTable("MatchResult");
-                });
-
-            modelBuilder.Entity("cjoli.Server.Models.MatchSimulation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("MatchId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ScoreA")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ScoreB")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MatchId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("MatchSimulation");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.ParentPosition", b =>
@@ -463,9 +437,7 @@ namespace cjoli.Server.Migrations
 
                     b.HasOne("cjoli.Server.Models.Team", "TeamAgainst")
                         .WithMany()
-                        .HasForeignKey("TeamAgainstId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TeamAgainstId");
 
                     b.HasOne("cjoli.Server.Models.Team", "Team")
                         .WithMany("MatchResults")
@@ -478,23 +450,6 @@ namespace cjoli.Server.Migrations
                     b.Navigation("Team");
 
                     b.Navigation("TeamAgainst");
-                });
-
-            modelBuilder.Entity("cjoli.Server.Models.MatchSimulation", b =>
-                {
-                    b.HasOne("cjoli.Server.Models.Match", "Match")
-                        .WithMany("Simulations")
-                        .HasForeignKey("MatchId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("cjoli.Server.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Match");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.ParentPosition", b =>
@@ -577,8 +532,6 @@ namespace cjoli.Server.Migrations
             modelBuilder.Entity("cjoli.Server.Models.Match", b =>
                 {
                     b.Navigation("MatchResults");
-
-                    b.Navigation("Simulations");
 
                     b.Navigation("UserMatches");
                 });

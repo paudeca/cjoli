@@ -17,5 +17,6 @@
         public int SquadId { get; set; }
         public int PhaseId { get; set; }
         public UserMatchDto? UserMatch { get; set; }
+        public MatchSimulationDto? Simulation { get; set; }
     }
 }

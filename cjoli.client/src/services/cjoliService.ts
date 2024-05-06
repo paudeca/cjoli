@@ -101,3 +101,7 @@ export const clearSimulations = async (uid: string, ids: number[]) => {
   );
   return data;
 };
+
+export const updateSimulation = async (uid: string) => {
+  await axios.get(`${url}/cjoli/updateSimulation/${uid}`);
+};
