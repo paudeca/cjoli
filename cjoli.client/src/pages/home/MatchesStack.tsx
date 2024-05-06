@@ -1,4 +1,4 @@
-import { Table, Accordion } from "react-bootstrap";
+import { Table, Accordion, Alert, Button } from "react-bootstrap";
 import CJoliCard from "../../components/CJoliCard";
 import CJoliStack from "../../components/CJoliStack";
 import Loading from "../../components/Loading";
@@ -11,6 +11,8 @@ import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
 import MatchRow from "./match/MatchRow";
 import { useUser } from "../../hooks/useUser";
+import InfoModal from "../../components/InfoModal";
+import { useModal } from "../../contexts/ModalContext";
 
 const MatchesStack = ({ phase }: { phase?: Phase }) => {
   const { matches, loadRanking } = useCJoli();
@@ -28,6 +30,7 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
   const { register, getValues } = useForm<
     Record<string, { scoreA: number | ""; scoreB: number | "" }>
   >({ values });
+  const { setShow } = useModal("test");
 
   const datas = matches
     ?.filter((m) => m.phaseId == phase?.id)
@@ -52,6 +55,10 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
     if (match.forfeitA || match.forfeitB) {
       scoreA = 0;
       scoreB = 0;
+    }
+    if (match.shot && scoreA == scoreB) {
+      setShow(true);
+      return;
     }
     const ranking = await cjoliService.saveMatch(uid, {
       ...match,
@@ -122,6 +129,15 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
           </Loading>
         </CJoliCard>
       </div>
+      <InfoModal id="test" title="Save Score" variant="danger">
+        <p>
+          Impossible d'enregistrer le score.
+          <br />
+          Le match doit se terminer par une séance de tir aux buts.
+          <br />
+          Merci d'indiquer un vainqueur.
+        </p>
+      </InfoModal>
     </CJoliStack>
   );
 };

@@ -13,6 +13,7 @@ namespace cjoli.Server.Models
         public int ScoreB { get; set; }
         public bool ForfeitA { get; set; }
         public bool ForfeitB { get; set; }
+        public bool Shot { get; set; }
         public string? Location { get; set; }
         public DateTime Time { get; set; }
         public Squad? Squad { get; set; }

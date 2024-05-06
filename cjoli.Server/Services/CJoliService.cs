@@ -247,6 +247,16 @@ namespace cjoli.Server.Services
                         simul.User = user;
                         simul.ScoreA = (int)goalA;
                         simul.ScoreB = (int)goalB;
+                        if(match.Shot && simul.ScoreA==simul.ScoreB)
+                        {
+                            if(goalA>goalB)
+                            {
+                                simul.ScoreA++;
+                            } else
+                            {
+                                simul.ScoreB++;
+                            }
+                        }
                     }
                 }
             }

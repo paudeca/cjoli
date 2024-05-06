@@ -194,6 +194,7 @@ namespace cjoli.Server.Services
                     match.Done = matchDto.Done;
                     match.Time = matchDto.Time;
                     match.Location = matchDto.Location ?? match.Location;
+                    match.Shot = matchDto.Shot;
                 }
             );
         }
