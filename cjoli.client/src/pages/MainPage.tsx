@@ -9,6 +9,7 @@ import { useToast } from "../contexts/ToastContext";
 import * as cjoliService from "../services/cjoliService";
 import { useUser } from "../hooks/useUser";
 import { useCJoli } from "../hooks/useCJoli";
+import useUid from "../hooks/useUid";
 
 const MainPage = () => {
   const { loadUser } = useUser();
@@ -17,7 +18,8 @@ const MainPage = () => {
     state: { show, type, message },
     hideToast,
   } = useToast();
-  const { loadTourneys } = useCJoli();
+  const { loadTourneys, selectTourney } = useCJoli();
+  const uid = useUid();
 
   React.useEffect(() => {
     const call = async () => {
@@ -27,9 +29,10 @@ const MainPage = () => {
 
       const data = await cjoliService.getTourneys();
       loadTourneys(data);
+      uid && selectTourney(data.find((t) => t.uid === uid)!);
     };
     call();
-  }, [loadUser, loadTourneys]);
+  }, [loadUser, loadTourneys, selectTourney, uid]);
 
   return (
     <Loading ready={ready}>

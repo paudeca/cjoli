@@ -6,7 +6,10 @@ import {
   NavDropdown,
   Col,
   Row,
-  ProgressBar,
+  Form,
+  Button,
+  Stack,
+  Spinner,
 } from "react-bootstrap";
 import { useModal } from "../contexts/ModalContext";
 import styled from "@emotion/styled";
@@ -14,13 +17,15 @@ import LoginModal from "../modals/LoginModal";
 import RegisterModal from "../modals/RegisterModal";
 import UpdateModal from "../modals/UpdateModal";
 import * as cjoliService from "../services/cjoliService";
-import { PersonSquare } from "react-bootstrap-icons";
+import { Bezier2, PersonSquare } from "react-bootstrap-icons";
 import { useUser } from "../hooks/useUser";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useScreenSize from "../hooks/useScreenSize";
 import { useCJoli } from "../hooks/useCJoli";
 import useUid from "../hooks/useUid";
 import React from "react";
+import { useForm } from "react-hook-form";
+import { User, UserConfig } from "../models";
 
 const MyImg = styled.img<{ width: string }>`
   width: ${(props) => props.width};
@@ -28,13 +33,18 @@ const MyImg = styled.img<{ width: string }>`
 
 const MenuNav = () => {
   const { loadRanking, tourney } = useCJoli();
-  const { user, loadUser } = useUser();
+  const {
+    user,
+    userConfig,
+    userConfig: { activeSimulation },
+    isAdmin,
+    loadUser,
+  } = useUser();
   const uid = useUid();
   const { setShow: showLogin } = useModal("login");
   const { setShow: showRegister } = useModal("register");
   const { setShow: showUpdate } = useModal("update");
   const navigate = useNavigate();
-  const { pathname } = useLocation();
   const { isMobile } = useScreenSize();
   const logout = async () => {
     await cjoliService.logout();
@@ -45,19 +55,46 @@ const MenuNav = () => {
     }
   };
   const [loading, setLoading] = React.useState(false);
+
+  const { register } = useForm<UserConfig>({
+    values: userConfig,
+  });
+
   const handleUpdateSimulation = async () => {
     setLoading(true);
-    await cjoliService.updateSimulation(uid);
+    const ranking = await cjoliService.updateSimulation(uid);
+    loadRanking(ranking);
+    handleSaveUserConfig({ ...userConfig, useCustomSimulation: true });
     setLoading(false);
   };
-  const tourneyLabel = pathname != "/" && tourney?.name;
+  const handleSaveUserConfig = async (userConfig: UserConfig) => {
+    const ranking = await cjoliService.saveUserConfig(uid, userConfig);
+    loadRanking(ranking);
+    const configs =
+      user?.configs?.map((c) =>
+        c.tourneyId == userConfig.tourneyId ? userConfig : c
+      ) || [];
+    loadUser({ ...user, configs } as User);
+  };
+  const tourneyLabel = uid && tourney?.name;
   return (
-    <Navbar expand="sm" className="bg-body-tertiary mb-3" sticky="top">
+    <Navbar
+      expand="sm"
+      className="bg-body-tertiary mb-3"
+      sticky="top"
+      style={{ color: "black" }}
+    >
       <Container fluid>
-        <Navbar.Brand onClick={() => navigate("/")}>
+        <Navbar.Brand>
           <Row>
             <Col>
-              <MyImg src="./logo.png" width="60px" className="mx-4" />
+              <MyImg
+                src="./logo.png"
+                width="60px"
+                className="mx-4"
+                onClick={() => navigate("/")}
+                role="button"
+              />
             </Col>
             {!tourneyLabel && isMobile && <Col>Ice Hockey</Col>}
             {!tourneyLabel && !isMobile && (
@@ -65,10 +102,53 @@ const MenuNav = () => {
             )}
             {tourneyLabel && <Col>{tourneyLabel}</Col>}
           </Row>
-          <Row className="pt-2">
-            {loading && <ProgressBar animated now={100} />}
-          </Row>
         </Navbar.Brand>
+        {user && tourneyLabel && (
+          <Stack direction="horizontal" gap={3}>
+            <Form.Check
+              type="switch"
+              role="button"
+              label={
+                <>
+                  Active Simulation
+                  <Bezier2 className="mx-2" />
+                </>
+              }
+              {...register("activeSimulation", {
+                onChange: (e: React.FormEvent<HTMLInputElement>) =>
+                  handleSaveUserConfig({
+                    ...userConfig,
+                    activeSimulation: e.currentTarget.checked,
+                  }),
+              })}
+            />
+            {activeSimulation && (
+              <>
+                <Button onClick={handleUpdateSimulation} disabled={loading}>
+                  Refresh simulations
+                  {!loading && <Bezier2 className="mx-2" size={20} />}
+                  {loading && (
+                    <Spinner animation="grow" className="mx-2" size="sm" />
+                  )}
+                </Button>
+                {!isAdmin && (
+                  <Form.Check
+                    type="switch"
+                    label="Use Custom"
+                    role="button"
+                    {...register("useCustomSimulation", {
+                      onChange: (e: React.FormEvent<HTMLInputElement>) =>
+                        handleSaveUserConfig({
+                          ...userConfig,
+                          useCustomSimulation: e.currentTarget.checked,
+                        }),
+                    })}
+                  />
+                )}
+              </>
+            )}
+          </Stack>
+        )}
         <Navbar.Toggle aria-controls="menu" />
         <Navbar.Offcanvas id="menu" aria-labelledby="menu" placement="end">
           <Offcanvas.Header closeButton>
@@ -102,9 +182,6 @@ const MenuNav = () => {
                   <>
                     <NavDropdown.Item onClick={() => showUpdate(true)}>
                       Update
-                    </NavDropdown.Item>
-                    <NavDropdown.Item onClick={handleUpdateSimulation}>
-                      Update Simulation
                     </NavDropdown.Item>
                     <NavDropdown.Divider />
                     <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>

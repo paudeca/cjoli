@@ -2,6 +2,7 @@
 using cjoli.Server.Dtos;
 using cjoli.Server.Exceptions;
 using cjoli.Server.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -43,6 +44,17 @@ namespace cjoli.Server.Services
             }
             return user;
         }
+
+        public User GetUserDetail(string login, CJoliContext context)
+        {
+            User? user = context.Users.Include(u => u.Configs).ThenInclude(s => s.Tourney).SingleOrDefault(u => u.Login == login);
+            if (user == null)
+            {
+                throw new NotFoundException("User", login);
+            }
+            return user;
+        }
+
 
         public bool Update(string login, string password, CJoliContext context)
         {

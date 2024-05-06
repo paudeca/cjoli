@@ -10,19 +10,24 @@ import * as cjoliService from "../../services/cjoliService";
 import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
 import MatchRow from "./match/MatchRow";
+import { useUser } from "../../hooks/useUser";
 
 const MatchesStack = ({ phase }: { phase?: Phase }) => {
   const { matches, loadRanking } = useCJoli();
+  const { userConfig } = useUser();
   const uid = useUid();
   const values = matches?.reduce(
-    (acc, m) => ({ ...acc, [`m${m.id}`]: m.simulation }),
+    (acc, m) => ({
+      ...acc,
+      [`m${m.id}`]: userConfig.activeSimulation
+        ? m.simulation
+        : { scoreA: "", scoreB: "" },
+    }),
     {}
   );
   const { register, getValues } = useForm<
     Record<string, { scoreA: number | ""; scoreB: number | "" }>
-  >({
-    defaultValues: values,
-  });
+  >({ values });
 
   const datas = matches
     ?.filter((m) => m.phaseId == phase?.id)

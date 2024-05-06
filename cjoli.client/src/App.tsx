@@ -62,6 +62,10 @@ const App = () => {
             --bs-bg-opacity: 1;
             --bs-secondary-rgb: 120, 129, 169;
           }
+          .form-check-input:checked {
+            background-color: #313f69;
+            border-color: #313f69;
+          }
         `}
       />
       <CJoliProvider>

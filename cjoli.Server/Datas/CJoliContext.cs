@@ -14,6 +14,7 @@ namespace cjoli.Server.Datas
         public DbSet<Match> Match { get; set; }
         public DbSet<MatchResult> MatchResult { get; set; }
         public DbSet<UserMatch> UserMatch { get; set; }
+        public DbSet<MatchSimulation> MatchSimulation { get; set; }
 
         private const string CRYPT_PURPOSE = "CJoliCryptPurpose";
 
@@ -25,7 +26,6 @@ namespace cjoli.Server.Datas
             modelBuilder.Entity<Tourney>().HasIndex(t => t.Uid).IsUnique();
             modelBuilder.Entity<Tourney>().HasMany(t => t.Phases).WithOne(p => p.Tourney).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Tourney>().HasMany(t => t.Teams).WithMany(t => t.Tourneys);
-            modelBuilder.Entity<Tourney>().HasMany(t => t.Users).WithMany(u => u.Tourneys);
 
             modelBuilder.Entity<Phase>().HasMany(p => p.Squads).WithOne(s => s.Phase).OnDelete(DeleteBehavior.Cascade);
 

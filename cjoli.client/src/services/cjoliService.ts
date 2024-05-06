@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Ranking, User, Match, Team, Tourney } from "../models";
+import { Ranking, User, Match, Team, Tourney, UserConfig } from "../models";
 import Cookie from "universal-cookie";
 
 const url = import.meta.env.VITE_API_URL;
@@ -19,7 +19,7 @@ export const getTourneys = async () => {
 };
 
 export const getRanking = async (uid: string) => {
-  const { data } = await axios.get<Ranking>(`${url}/cjoli/ranking/${uid}`);
+  const { data } = await axios.get<Ranking>(`${url}/cjoli/${uid}/ranking`);
   return data;
 };
 
@@ -69,7 +69,7 @@ export const update = async (user: User) => {
 
 export const updateTeam = async (uid: string, team: Team) => {
   return await axios
-    .post<boolean>(`${url}/cjoli/updateTeam/${uid}`, team)
+    .post<boolean>(`${url}/cjoli/${uid}/updateTeam`, team)
     .then(async ({ data }) => {
       return data;
     })
@@ -85,23 +85,32 @@ export const logout = () => {
 };
 
 export const saveMatch = async (uid: string, match: Match) => {
-  const { data } = await axios.post(`${url}/cjoli/saveMatch/${uid}`, match);
+  const { data } = await axios.post(`${url}/cjoli/${uid}/saveMatch`, match);
   return data;
 };
 
 export const clearMatch = async (uid: string, match: Match) => {
-  const { data } = await axios.post(`${url}/cjoli/clearMatch/${uid}`, match);
+  const { data } = await axios.post(`${url}/cjoli/${uid}/clearMatch`, match);
   return data;
 };
 
 export const clearSimulations = async (uid: string, ids: number[]) => {
   const { data } = await axios.post(
-    `${url}/cjoli/clearSimulations/${uid}`,
+    `${url}/cjoli/${uid}/clearSimulations`,
     ids
   );
   return data;
 };
 
 export const updateSimulation = async (uid: string) => {
-  await axios.get(`${url}/cjoli/updateSimulation/${uid}`);
+  const { data } = await axios.get(`${url}/cjoli/${uid}/updateSimulation`);
+  return data;
+};
+
+export const saveUserConfig = async (uid: string, userConfig: UserConfig) => {
+  const { data } = await axios.post(
+    `${url}/cjoli/${uid}/saveUserConfig`,
+    userConfig
+  );
+  return data;
 };

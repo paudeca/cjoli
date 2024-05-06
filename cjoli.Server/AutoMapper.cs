@@ -40,6 +40,7 @@ namespace cjoli.Server
             CreateMap<Score, Score>();
 
             CreateMap<User, UserDto>().ForMember(x => x.Password, opt => opt.Ignore());
+            CreateMap<UserConfig, UserConfigDto>().ForMember(x=>x.TourneyId, opt=>opt.MapFrom(u=>u.Tourney.Id));
         }
     }
 }

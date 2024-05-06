@@ -20,6 +20,7 @@ export const useCJoli = () => {
       dispatch({ type: CJoliActions.SELECT_TOURNEY, payload: tourney }),
     [dispatch]
   );
+
   const loadRanking = React.useCallback(
     (ranking: Ranking) =>
       dispatch({ type: CJoliActions.LOAD_RANKING, payload: ranking }),

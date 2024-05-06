@@ -9,6 +9,7 @@ import { ScoreSquad } from "./ScoreSquad";
 import { Squad } from "./Squad";
 import { Team } from "./Team";
 import { User } from "./User";
+import { UserConfig } from "./UserConfig";
 import { UserMatch } from "./UserMatch";
 
 export type {
@@ -23,5 +24,6 @@ export type {
   Squad,
   Team,
   User,
+  UserConfig,
   UserMatch,
 };

@@ -3,6 +3,7 @@ using cjoli.Server.Datas;
 using cjoli.Server.Dtos;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace cjoli.Server.Controllers
@@ -40,7 +41,7 @@ namespace cjoli.Server.Controllers
             {
                 return null;
             }
-            return _mapper.Map<UserDto>(_context.Users.SingleOrDefault(u => u.Login == login));
+            return _mapper.Map<UserDto>(_service.GetUserDetail(login, _context));
         }
 
         [HttpPost]
@@ -69,8 +70,6 @@ namespace cjoli.Server.Controllers
             }
             return _service.Update(login, user.Password, _context);
         }
-
-
 
     }
 

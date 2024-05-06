@@ -45,7 +45,7 @@ namespace cjoli.Server.Controllers
 
 
         [HttpGet]
-        [Route("Ranking/{uuid}")]
+        [Route("{uuid}/Ranking")]
         public RankingDto GetRanking(string uuid)
         {
             string? login = GetLogin();
@@ -55,7 +55,7 @@ namespace cjoli.Server.Controllers
         }
 
         [HttpGet]
-        [Route("Export/{uuid}")]
+        [Route("{uuid}/Export")]
         public TourneyDto Export(string uuid)
         {
             return _mapper.Map<TourneyDto>(_service.GetTourney(uuid, null, _context));
@@ -71,7 +71,7 @@ namespace cjoli.Server.Controllers
 
         [HttpPost]
         [Authorize]
-        [Route("SaveMatch/{uuid}")]
+        [Route("{uuid}/SaveMatch")]
         public RankingDto SaveMatch([FromRoute] string uuid, [FromBody] MatchDto match)
         {
             var login = GetLogin();
@@ -81,7 +81,7 @@ namespace cjoli.Server.Controllers
 
         [HttpPost]
         [Authorize]
-        [Route("ClearMatch/{uuid}")]
+        [Route("{uuid}/ClearMatch")]
         public RankingDto ClearMatch([FromRoute] string uuid, [FromBody] MatchDto match)
         {
             var login = GetLogin();
@@ -91,7 +91,7 @@ namespace cjoli.Server.Controllers
 
         [HttpPost]
         [Authorize]
-        [Route("ClearSimulations/{uuid}")]
+        [Route("{uuid}/ClearSimulations")]
         public RankingDto ClearSimulations([FromRoute] string uuid, [FromBody] int[] ids)
         {
             var login = GetLogin();
@@ -101,7 +101,7 @@ namespace cjoli.Server.Controllers
 
 
         [HttpPost]
-        [Route("UpdateTeam/{uuid}")]
+        [Route("{uuid}/UpdateTeam")]
         public bool UpdateTeam([FromRoute] string uuid, [FromBody] TeamDto teamDto)
         {
             _service.UpdateTeam(uuid, teamDto, _context);
@@ -110,12 +110,24 @@ namespace cjoli.Server.Controllers
 
         [HttpGet]
         [Authorize]
-        [Route("UpdateSimulation/{uuid}")]
-        public void UpdateSimulation(string uuid)
+        [Route("{uuid}/UpdateSimulation")]
+        public RankingDto UpdateSimulation(string uuid)
         {
             var login = GetLogin();
             _service.UpdateSimulation(uuid, login!,_context);
+            return GetRanking(uuid);
         }
+
+        [HttpPost]
+        [Authorize]
+        [Route("{uuid}/SaveUserConfig")]
+        public RankingDto SaveUserConfig(string uuid, UserConfigDto config)
+        {
+            var login = GetLogin();
+            _service.SaveUserConfig(uuid, login, config, _context);
+            return GetRanking(uuid);
+        }
+
 
     }
 }

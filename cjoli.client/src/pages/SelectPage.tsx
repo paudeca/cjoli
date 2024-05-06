@@ -17,7 +17,6 @@ const SelectPage = () => {
         <CJoliCard>
           <Card.Body>
             <Form.Select
-              aria-label="Default select example"
               size="lg"
               {...register("tourney", {
                 onChange: (e: React.FormEvent<HTMLInputElement>) => {
