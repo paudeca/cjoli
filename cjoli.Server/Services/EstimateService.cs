@@ -1,4 +1,5 @@
 ﻿using cjoli.Server.Datas;
+using cjoli.Server.Extensions;
 using cjoli.Server.Models;
 
 namespace cjoli.Server.Services
@@ -162,7 +163,8 @@ namespace cjoli.Server.Services
                 estimate = new MatchEstimate() { Match = match };
                 match.Estimates.Add(estimate);
             }
-            estimate.User = user?.Role == "ADMIN" ? null : user;
+            
+            estimate.User = user.IsAdmin() ? null : user;
             estimate.ScoreA = (int)Math.Round(goalA);
             estimate.ScoreB = (int)Math.Round(goalB);
 
@@ -194,12 +196,6 @@ namespace cjoli.Server.Services
 
         public void CalculateEstimates(Tourney tourney, List<ScoreSquad> scores, User? user, CJoliContext context)
         {
-            foreach(var a in context.MatchEstimate)
-            {
-                context.Remove(a);
-            }
-            context.SaveChanges();
-
             var userMatches = context.UserMatch.Where(u => u.User == user).ToList();
 
             var scoreUserA = userMatches.Select(u => CreateScore(u.Match.PositionA, u.Match.PositionB, u.ScoreA, u.ScoreB, u.Match, scores));

@@ -67,7 +67,9 @@ const MenuNav = () => {
     setLoading(true);
     const ranking = await cjoliService.updateEstimate(uid);
     loadRanking(ranking);
-    handleSaveUserConfig({ ...userConfig, useCustomEstimate: true });
+    if (!isAdmin) {
+      handleSaveUserConfig({ ...userConfig, useCustomEstimate: true });
+    }
     setLoading(false);
     showToast("success", "Estimate calculated");
   };
@@ -135,20 +137,18 @@ const MenuNav = () => {
                     <Spinner animation="grow" className="mx-2" size="sm" />
                   )}
                 </Button>
-                {!isAdmin && (
-                  <Form.Check
-                    type="switch"
-                    label={isMobile ? "Custom" : "Use custom"}
-                    role="button"
-                    {...register("useCustomEstimate", {
-                      onChange: (e: React.FormEvent<HTMLInputElement>) =>
-                        handleSaveUserConfig({
-                          ...userConfig,
-                          useCustomEstimate: e.currentTarget.checked,
-                        }),
-                    })}
-                  />
-                )}
+                <Form.Check
+                  type="switch"
+                  label={isMobile ? "Custom" : "Use custom"}
+                  role="button"
+                  {...register("useCustomEstimate", {
+                    onChange: (e: React.FormEvent<HTMLInputElement>) =>
+                      handleSaveUserConfig({
+                        ...userConfig,
+                        useCustomEstimate: e.currentTarget.checked,
+                      }),
+                  })}
+                />
               </>
             )}
           </Stack>

@@ -1,8 +1,11 @@
 ﻿using cjoli.Server.Datas;
 using cjoli.Server.Dtos;
 using cjoli.Server.Exceptions;
+using cjoli.Server.Extensions;
 using cjoli.Server.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using System.Linq.Expressions;
 
 namespace cjoli.Server.Services
 {
@@ -20,7 +23,7 @@ namespace cjoli.Server.Services
             return context.Tourneys.OrderBy(t => t.StartTime).ToList();
         }
 
-        private User GetUser(string login, CJoliContext context)
+        private User GetUserWithConfigMatch(string login, CJoliContext context)
         {
             User? user = context.Users.Include(u=>u.Configs).Include(u=>u.UserMatches).SingleOrDefault(u => u.Login == login);
             if (user == null)
@@ -30,29 +33,34 @@ namespace cjoli.Server.Services
             return user;
         }
 
+        private User? GetUserWithConfig(string? login, string tourneyUid, CJoliContext context)
+        {
+            return  context.Users.Include(u=>u.Configs.Where(c=>c.Tourney.Uid==tourneyUid)).SingleOrDefault(u => u.Login == login);            
+        }
+
         public Tourney GetTourney(string tourneyUid, User? user, CJoliContext context)
         {
             Tourney? tourney = context.Tourneys
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.Team)
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.ParentPosition)
-                .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(m => m.UserMatches.Where(u => u.User == user))
+                .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(m => m.UserMatches.Where(u => user!=null && !user.IsAdmin() && u.User == user))
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(
-                    m => m.Estimates.Where(s=>s.User==user && s.User!.Configs.Any(c=>c.Tourney.Uid==tourneyUid && c.UseCustomEstimate) || s.User == null)
+                    m => m.Estimates.Where(s=>user!=null && user.HasCustomEstimate()?s.User==user:s.User==null)
                  )
                 .Include(t => t.Teams)
-                .Include(t=>t.Ranks.OrderBy(r=>r.Order))
                 .FirstOrDefault(t => t.Uid == tourneyUid);
             if (tourney == null)
             {
                 throw new NotFoundException("Tourney", tourneyUid);
             }
+            tourney.Ranks = context.Tourneys.Include(t => t.Ranks.OrderBy(r => r.Order)).First(t => t.Uid == tourneyUid).Ranks;
 
             return tourney;
         }
 
         public Ranking GetRanking(string tourneyUid, string? login, CJoliContext context)
         {
-            User? user = context.Users.Include(u=>u.Configs).ThenInclude(u=>u.Tourney).SingleOrDefault(u => u.Login == login);
+            User? user = GetUserWithConfig(login, tourneyUid, context);
             var tourney = GetTourney(tourneyUid, user, context);
             var scores = CalculateScores(tourney);
             return new Ranking() { Tourney = tourney, Scores = scores};
@@ -61,8 +69,9 @@ namespace cjoli.Server.Services
 
         public void UpdateEstimate(string uuid, string login, CJoliContext context)
         {
-            User? user = context.Users.Single(u => u.Login == login);
-            if(user.Role=="Admin")
+            User? user = GetUserWithConfig(login, uuid, context);
+            
+            if(user.IsAdmin())
             {
                 user = null;
             }
@@ -209,7 +218,7 @@ namespace cjoli.Server.Services
 
         public void SaveMatch(MatchDto dto, string login, CJoliContext context)
         {
-            User user = GetUser(login, context);
+            User user = GetUserWithConfigMatch(login, context);
             Match? match = context.Match
                 .Include(m => m.PositionA).ThenInclude(p=>p.Team).ThenInclude(t=>t.MatchResults)
                 .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t=>t.MatchResults)
@@ -218,7 +227,7 @@ namespace cjoli.Server.Services
             {
                 throw new NotFoundException("Match", dto.Id);
             }
-            if (user.Role=="ADMIN")
+            if (user.IsAdmin())
             {
                 match.Done = true;
                 if (dto.ForfeitA || dto.ForfeitB)
@@ -263,7 +272,7 @@ namespace cjoli.Server.Services
 
         public void ClearMatch(MatchDto dto, string login, CJoliContext context)
         {
-            User user = GetUser(login, context);
+            User user = GetUserWithConfigMatch(login, context);
             Match? match = context.Match
                 .Include(m=>m.UserMatches.Where(u=>u.User==user))
                 .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t.MatchResults)
@@ -273,7 +282,7 @@ namespace cjoli.Server.Services
             {
                 throw new NotFoundException("Match", dto.Id);
             }
-            if(user.Role=="ADMIN")
+            if(user.IsAdmin())
             {
                 match.Done = false;
                 match.ScoreA = 0;
@@ -321,7 +330,7 @@ namespace cjoli.Server.Services
 
         public void ClearSimulations(int[] ids, string login, CJoliContext context)
         {
-            User user = GetUser(login, context);
+            User user = GetUserWithConfigMatch(login, context);
             var  userMatches = user.UserMatches.Where(u => ids.Contains(u.Id));
             foreach(var userMatch in userMatches)
             {
@@ -356,7 +365,7 @@ namespace cjoli.Server.Services
             {
                 throw new NotFoundException("Touney", tourneyUid);
             }
-            User user = GetUser(login, context);
+            User user = GetUserWithConfig(login, tourneyUid, context);
             UserConfig? config = user.Configs.SingleOrDefault(c => c.Id == dto.Id);
             if(config==null)
             {
@@ -374,7 +383,6 @@ namespace cjoli.Server.Services
     {
         public required Tourney Tourney { get; set; }
         public required List<ScoreSquad> Scores { get; set; }
-        //public required List<Simulation> Simulations { get; set; }
     }
 
     public class ScoreSquad

@@ -39,13 +39,13 @@ export const useCJoli = () => {
     [state.positions]
   );
   const getTeamInfo = React.useCallback(
-    (positionId: number) => {
+    (positionId: number, defaultName?: string) => {
       const position = getPosition(positionId);
       if (!position)
         throw new Error(`position not found with id:${positionId}`);
       const team = getTeam(position.teamId);
       if (!team) {
-        return { label: position.name || "noname" };
+        return { label: (defaultName ?? position.name) || "noname" };
       }
       const label = position.name
         ? `${team?.name} - ${position.short}`

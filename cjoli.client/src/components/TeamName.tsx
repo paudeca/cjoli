@@ -1,8 +1,14 @@
 import { useCJoli } from "../hooks/useCJoli";
 
-const TeamName = ({ positionId }: { positionId: number }) => {
+const TeamName = ({
+  positionId,
+  defaultName,
+}: {
+  positionId: number;
+  defaultName?: string;
+}) => {
   const { getTeamInfo } = useCJoli();
-  const { label, logo } = getTeamInfo(positionId);
+  const { label, logo } = getTeamInfo(positionId, defaultName);
   return (
     <>
       <img src={logo} style={{ width: "30px" }} className="mx-2" />
