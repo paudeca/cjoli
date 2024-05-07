@@ -40,6 +40,7 @@ namespace cjoli.Server.Services
             };
         }
 
+
         private Score CreateScore(Position positionA, Position positionB, int scoreA, int scoreB,Match match, List<ScoreSquad> scores)
         {
             Team? teamA = FindTeam(positionA, scores);
@@ -63,9 +64,10 @@ namespace cjoli.Server.Services
         private Func<Match,Team,Team,bool,Score> CalculateScore(
             Dictionary<int,Score> mapAllTeam,
             Dictionary<int, Score> mapCurrentTeam,
+            Dictionary<MyKv, Score> mapDirects,
+            Dictionary<Team, List<int>> mapOtherTeams,
             List<Score> scoreUsers,
-            Score scoreTotal,
-            CJoliContext context)
+            Score scoreTotal)
         {
             return (Match match, Team teamA, Team teamB, bool inverse) => {
                 Score scoreAllTeam = mapAllTeam.GetValueOrDefault(teamA.Id) ?? new Score();
@@ -73,12 +75,17 @@ namespace cjoli.Server.Services
 
                 List<Score> userScore = scoreUsers.Where(s => s.TeamId == teamA.Id && s.TeamAgainstId == teamB.Id).ToList();
 
-                Score scoreDirect = context.MatchResult.Where(m => m.Team == teamA && m.TeamAgainst == teamB).GroupBy(r => 1).Select(SelectScore<int>(10000)).SingleOrDefault() ?? new Score();
+                Score scoreDirect = mapDirects.SingleOrDefault(kv => kv.Key.TeamA == teamA.Id && kv.Key.TeamB == teamB.Id).Value ?? new Score();
                 userScore.ForEach(scoreDirect.Merge);
 
-                var list = context.MatchResult.Where(m => m.Team == teamB).Select(m => m.TeamAgainst).ToList();
-                Score scoreIndirect = context.MatchResult.Where(m => m.Team == teamA && list.Contains(m.TeamAgainst)).GroupBy(r => 1).Select(SelectScore<int>(1000)).SingleOrDefault() ?? new Score();
-                var listUser = scoreUsers.Where(s => s.TeamId == teamA.Id && list.Select(t => t.Id).Contains(s.TeamAgainstId));
+                var otherTeams = mapOtherTeams.SingleOrDefault(m => m.Key.Id == teamB.Id).Value ?? new List<int>();
+                var listScoreIndirects = mapDirects.Where(kv => kv.Key.TeamA == teamA.Id && otherTeams.Contains(kv.Key.TeamB));
+                var scoreIndirect = listScoreIndirects.Aggregate(new Score() { Coefficient = 1000 }, (acc, item) =>
+                {
+                    acc.Merge(item.Value);
+                    return acc;
+                });
+                var listUser = scoreUsers.Where(s => s.TeamId == teamA.Id && otherTeams.Contains(s.TeamAgainstId));
                 foreach (var u in listUser)
                 {
                     scoreIndirect.Merge(u);
@@ -208,6 +215,8 @@ namespace cjoli.Server.Services
 
             var mapAllTeam = context.MatchResult.GroupBy(r => r.Team.Id).ToDictionary(kv => kv.Key, kv => SelectScore<int>(10)(kv)) ?? new Dictionary<int, Score>();
             var mapCurrentTeam = context.MatchResult.Where(r => r.Match.Squad!.Phase.Tourney == tourney).GroupBy(r => r.Team.Id).ToDictionary(kv => kv.Key, kv => SelectScore<int>(1000)(kv)) ?? new Dictionary<int, Score>();
+            var mapDirects = context.MatchResult.Where(r=>r.TeamAgainst!=null).GroupBy(r => new MyKv{ TeamA=r.Team.Id, TeamB=r.TeamAgainst.Id}).ToDictionary(kv=>kv.Key,kv=>SelectScore<MyKv>(10000)(kv));
+            var mapOtherTeams = context.MatchResult.GroupBy(r => r.Team).ToDictionary(kv => kv.Key, kv => kv.Where(r=>r.TeamAgainst!=null).Select(r=>r.TeamAgainst.Id).ToList());
 
             scoreUsers.GroupBy(s => s.TeamId).ToList().ForEach(scores =>
             {
@@ -235,7 +244,7 @@ namespace cjoli.Server.Services
                 }
             });
 
-            var funcScore = CalculateScore(mapAllTeam, mapCurrentTeam, scoreUsers, scoreTotal, context);
+            var funcScore = CalculateScore(mapAllTeam, mapCurrentTeam, mapDirects, mapOtherTeams, scoreUsers, scoreTotal);
 
             foreach (var phase in tourney.Phases)
             {
@@ -251,5 +260,11 @@ namespace cjoli.Server.Services
             context.SaveChanges();
         }
 
+    }
+
+    public class MyKv
+    {
+        public int TeamA;
+        public int TeamB;
     }
 }
