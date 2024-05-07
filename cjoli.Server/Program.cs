@@ -61,6 +61,7 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddSingleton<CJoliService>();
 builder.Services.AddSingleton<ImportService>();
 builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<EstimateService>();
 
 builder.Services.AddDbContextPool<CJoliContext>(options =>
 {

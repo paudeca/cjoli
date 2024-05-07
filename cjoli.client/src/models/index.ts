@@ -3,6 +3,7 @@ import { Tourney } from "./Tourney";
 import { Match } from "./Match";
 import { Phase } from "./Phase";
 import { Position } from "./Position";
+import { Rank } from "./Rank";
 import { Ranking } from "./Ranking";
 import { Score } from "./Score";
 import { ScoreSquad } from "./ScoreSquad";
@@ -18,6 +19,7 @@ export type {
   Match,
   Phase,
   Position,
+  Rank,
   Ranking,
   Score,
   ScoreSquad,

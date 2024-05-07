@@ -1,6 +1,6 @@
 import React from "react";
 import { CJoliContext } from "../contexts/CJoliContext";
-import { Ranking, Tourney } from "../models";
+import { Rank, Ranking, Tourney } from "../models";
 import { CJoliActions } from "../contexts/actions";
 
 export const useCJoli = () => {
@@ -55,6 +55,17 @@ export const useCJoli = () => {
     [getPosition, getTeam]
   );
 
+  const getRankPosition = React.useCallback(
+    (rank: Rank) => {
+      const scoreSquad = state.ranking?.scores.find(
+        (s) => s.squadId == rank.squadId
+      );
+      const score = scoreSquad?.scores[rank.value - 1];
+      return score?.positionId;
+    },
+    [state.ranking]
+  );
+
   return {
     ...state,
     loadRanking,
@@ -64,5 +75,6 @@ export const useCJoli = () => {
     getTeam,
     getPosition,
     getTeamInfo,
+    getRankPosition,
   };
 };

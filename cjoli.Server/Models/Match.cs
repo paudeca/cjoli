@@ -18,7 +18,7 @@ namespace cjoli.Server.Models
         public DateTime Time { get; set; }
         public Squad? Squad { get; set; }
 
-        public IList<MatchSimulation> Simulations { get; set; } = new List<MatchSimulation>();
+        public IList<MatchEstimate> Estimates { get; set; } = new List<MatchEstimate>();
         public IList<UserMatch> UserMatches { get; set; } = new List<UserMatch>();
         public IList<MatchResult> MatchResults { get; set; } = new List<MatchResult>();
     }

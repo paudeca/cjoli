@@ -116,7 +116,7 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                       <tr>
                         <td rowSpan={isMobile ? 2 : 1}>{index + 1}</td>
                         <td colSpan={isMobile ? 7 : 1}>
-                          <LeftCenterDiv isMobile={false}>
+                          <LeftCenterDiv>
                             <TeamName positionId={score.positionId} />
                             <SimulationIcon
                               show={hasSimulation}

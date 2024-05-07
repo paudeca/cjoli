@@ -17,7 +17,7 @@ import LoginModal from "../modals/LoginModal";
 import RegisterModal from "../modals/RegisterModal";
 import UpdateModal from "../modals/UpdateModal";
 import * as cjoliService from "../services/cjoliService";
-import { Bezier2, PersonSquare } from "react-bootstrap-icons";
+import { Bezier2, House, ListOl, PersonSquare } from "react-bootstrap-icons";
 import { useUser } from "../hooks/useUser";
 import { useNavigate } from "react-router-dom";
 import useScreenSize from "../hooks/useScreenSize";
@@ -26,6 +26,7 @@ import useUid from "../hooks/useUid";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { User, UserConfig } from "../models";
+import { useToast } from "../contexts/ToastContext";
 
 const MyImg = styled.img<{ width: string }>`
   width: ${(props) => props.width};
@@ -36,7 +37,7 @@ const MenuNav = () => {
   const {
     user,
     userConfig,
-    userConfig: { activeSimulation },
+    userConfig: { activeEstimate },
     isAdmin,
     loadUser,
   } = useUser();
@@ -46,6 +47,8 @@ const MenuNav = () => {
   const { setShow: showUpdate } = useModal("update");
   const navigate = useNavigate();
   const { isMobile } = useScreenSize();
+  const { showToast } = useToast();
+
   const logout = async () => {
     await cjoliService.logout();
     loadUser(undefined);
@@ -60,12 +63,13 @@ const MenuNav = () => {
     values: userConfig,
   });
 
-  const handleUpdateSimulation = async () => {
+  const handleUpdateEstimate = async () => {
     setLoading(true);
-    const ranking = await cjoliService.updateSimulation(uid);
+    const ranking = await cjoliService.updateEstimate(uid);
     loadRanking(ranking);
-    handleSaveUserConfig({ ...userConfig, useCustomSimulation: true });
+    handleSaveUserConfig({ ...userConfig, useCustomEstimate: true });
     setLoading(false);
+    showToast("success", "Estimate calculated");
   };
   const handleSaveUserConfig = async (userConfig: UserConfig) => {
     const ranking = await cjoliService.saveUserConfig(uid, userConfig);
@@ -81,7 +85,7 @@ const MenuNav = () => {
     <Navbar
       expand="sm"
       className="bg-body-tertiary mb-3"
-      sticky="top"
+      sticky={isMobile ? undefined : "top"}
       style={{ color: "black" }}
     >
       <Container fluid>
@@ -110,22 +114,22 @@ const MenuNav = () => {
               role="button"
               label={
                 <>
-                  Active Simulation
-                  <Bezier2 className="mx-2" />
+                  Active
+                  {!isMobile && <Bezier2 className="mx-2" />}
                 </>
               }
-              {...register("activeSimulation", {
+              {...register("activeEstimate", {
                 onChange: (e: React.FormEvent<HTMLInputElement>) =>
                   handleSaveUserConfig({
                     ...userConfig,
-                    activeSimulation: e.currentTarget.checked,
+                    activeEstimate: e.currentTarget.checked,
                   }),
               })}
             />
-            {activeSimulation && (
+            {activeEstimate && (
               <>
-                <Button onClick={handleUpdateSimulation} disabled={loading}>
-                  Refresh simulations
+                <Button onClick={handleUpdateEstimate} disabled={loading}>
+                  {isMobile ? "Refresh" : "Refresh estimate"}
                   {!loading && <Bezier2 className="mx-2" size={20} />}
                   {loading && (
                     <Spinner animation="grow" className="mx-2" size="sm" />
@@ -134,13 +138,13 @@ const MenuNav = () => {
                 {!isAdmin && (
                   <Form.Check
                     type="switch"
-                    label="Use Custom"
+                    label={isMobile ? "Custom" : "Use custom"}
                     role="button"
-                    {...register("useCustomSimulation", {
+                    {...register("useCustomEstimate", {
                       onChange: (e: React.FormEvent<HTMLInputElement>) =>
                         handleSaveUserConfig({
                           ...userConfig,
-                          useCustomSimulation: e.currentTarget.checked,
+                          useCustomEstimate: e.currentTarget.checked,
                         }),
                     })}
                   />
@@ -156,6 +160,19 @@ const MenuNav = () => {
           </Offcanvas.Header>
           <Offcanvas.Body>
             <Nav className="justify-content-end flex-grow-1 pe-3">
+              <Nav.Link
+                href="#"
+                onClick={() => {
+                  navigate(`${uid}`);
+                }}
+              >
+                <House size={30} className="mx-2" />
+                Home
+              </Nav.Link>
+              <Nav.Link href="#" onClick={() => navigate(`${uid}/ranking`)}>
+                <ListOl size={30} className="mx-2" />
+                Classement
+              </Nav.Link>
               <NavDropdown
                 title={
                   <>

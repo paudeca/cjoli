@@ -2,13 +2,14 @@
 
 namespace cjoli.Server.Models
 {
-    public class UserConfig
+    public class Rank
     {
         [Key]
         public int Id { get; set; }
-        public required User User { get; set; }
+        public int Order { get; set; }
         public required Tourney Tourney { get; set; }
-        public bool ActiveEstimate { get; set; }
-        public bool UseCustomEstimate { get; set; }
+        public required Squad Squad { get; set; }
+        public int Value {  get; set; }
+        public string? Name { get; set; }
     }
 }

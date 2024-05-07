@@ -30,6 +30,7 @@ namespace cjoli.Server.Services
                     .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.ParentPosition)
                     .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches)
                     .Include(t => t.Teams)
+                    .Include(t=>t.Ranks)
                     .SingleOrDefault(t => t.Uid == tourneyDto.Uid),
                 create: () =>
                 {
@@ -43,7 +44,8 @@ namespace cjoli.Server.Services
                 },
                 children: [
                     (tourney) => (tourneyDto.Teams??[]).ForEach(t => ImportTeam(t,tourney,context)),
-                    (tourney) => (tourneyDto.Phases??[]).ForEach(p=>ImportPhase(p,tourney,context))
+                    (tourney) => (tourneyDto.Phases??[]).ForEach(p=>ImportPhase(p,tourney,context)),
+                    (tourney)=>(tourneyDto.Ranks??[]).ForEach(r=>ImportRank(r,tourney,context))
                 ]
             );
         }
@@ -198,6 +200,31 @@ namespace cjoli.Server.Services
                 }
             );
         }
+
+        private Rank ImportRank(RankDto rankDto, Tourney tourney, CJoliContext context)
+        {
+            return Import(
+                dto: rankDto,
+                context: context,
+                select: () => tourney.Ranks.SingleOrDefault(r=>r.Order==rankDto.Order),
+                create: () =>
+                {
+                    Squad squad = tourney.Phases.Single(s => s.Name == rankDto.Phase).Squads.Single(s => s.Name == rankDto.Squad);
+                    var rank = new Rank() { Tourney=tourney, Squad=squad, Order=rankDto.Order };
+                    tourney.Ranks.Add(rank);
+                    return rank;
+                },
+                update: (rank) =>
+                {
+                    Squad squad = tourney.Phases.Single(s => s.Name == rankDto.Phase).Squads.Single(s => s.Name == rankDto.Squad);
+                    rank.Order = rankDto.Order;
+                    rank.Squad = squad;
+                    rank.Value = rankDto.Value;
+                    rank.Name = rankDto.Name ?? rank.Name;
+                }
+            );
+        }
+
 
     }
 }

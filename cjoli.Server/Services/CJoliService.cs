@@ -9,6 +9,11 @@ namespace cjoli.Server.Services
 
     public class CJoliService
     {
+        private readonly EstimateService _estimateService;
+
+        public CJoliService(EstimateService estimateService) {
+            _estimateService = estimateService;
+        }
 
         public List<Tourney> ListTourneys(CJoliContext context)
         {
@@ -17,7 +22,7 @@ namespace cjoli.Server.Services
 
         private User GetUser(string login, CJoliContext context)
         {
-            User? user = context.Users.Include(u=>u.Configs).SingleOrDefault(u => u.Login == login);
+            User? user = context.Users.Include(u=>u.Configs).Include(u=>u.UserMatches).SingleOrDefault(u => u.Login == login);
             if (user == null)
             {
                 throw new NotFoundException("User", login);
@@ -31,9 +36,11 @@ namespace cjoli.Server.Services
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.Team)
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.ParentPosition)
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(m => m.UserMatches.Where(u => u.User == user))
-                .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(m => m.Simulations
-                    .Where(s=>s.User==user && s.User!.Configs.Any(c=>c.Tourney.Uid==tourneyUid && c.UseCustomSimulation) || s.User == null))
+                .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(
+                    m => m.Estimates.Where(s=>s.User==user && s.User!.Configs.Any(c=>c.Tourney.Uid==tourneyUid && c.UseCustomEstimate) || s.User == null)
+                 )
                 .Include(t => t.Teams)
+                .Include(t=>t.Ranks.OrderBy(r=>r.Order))
                 .FirstOrDefault(t => t.Uid == tourneyUid);
             if (tourney == null)
             {
@@ -48,29 +55,11 @@ namespace cjoli.Server.Services
             User? user = context.Users.Include(u=>u.Configs).ThenInclude(u=>u.Tourney).SingleOrDefault(u => u.Login == login);
             var tourney = GetTourney(tourneyUid, user, context);
             var scores = CalculateScores(tourney);
-            //var simulations = CalculateSimulations(tourney, context);
             return new Ranking() { Tourney = tourney, Scores = scores};
         }
 
-        private Func<IGrouping<T, MatchResult>, Score> SelectScore<T>(int coefficient) {
-            return (IGrouping<T, MatchResult> o) =>
-            {
-                return new Score
-                {
-                    Game = o.Count(),
-                    Win = o.Sum(m => m.Win),
-                    Neutral = o.Sum(m => m.Neutral),
-                    Loss = o.Sum(m => m.Loss),
-                    GoalFor = o.Sum(m => m.GoalFor),
-                    GoalAgainst = o.Sum(m => m.GoalAgainst),
-                    GoalDiff = o.Sum(m => m.GoalDiff),
-                    Coefficient = coefficient
-                };
-            };
-        }
 
-
-        public void UpdateSimulation(string uuid, string login, CJoliContext context)
+        public void UpdateEstimate(string uuid, string login, CJoliContext context)
         {
             User? user = context.Users.Single(u => u.Login == login);
             if(user.Role=="Admin")
@@ -79,191 +68,8 @@ namespace cjoli.Server.Services
             }
             Tourney tourney = GetTourney(uuid, user, context);
             var scores = CalculateScores(tourney);
-            CalculateSimulations(tourney, scores, user, context);
+            _estimateService.CalculateEstimates(tourney, scores, user, context);
         }
-
-        private void CalculateSimulations(Tourney tourney, List<ScoreSquad> scores, User? user, CJoliContext context)
-        {
-            var userMatches = context.UserMatch.Where(u => u.User == user);
-            var scoreUserA = userMatches.Select(u => new Score() { 
-                TeamId=u.Match.PositionA.Team!.Id,
-                TeamAgainstId = u.Match.PositionB.Team!.Id,
-                MatchId=u.Match.Id,
-                PositionId=u.Match.PositionA.Id, 
-                Game = 1, 
-                Win = u.ScoreA > u.ScoreB ? 1 : 0, 
-                Neutral = u.ScoreA == u.ScoreB ? 1 : 0, 
-                Loss = u.ScoreA < u.ScoreB ? 1 : 0, 
-                GoalFor = u.ScoreA, 
-                GoalAgainst = u.ScoreB, 
-                GoalDiff = u.ScoreA - u.ScoreB
-            });
-            var scoreUserB = userMatches.Select(u => new Score() { 
-                TeamId=u.Match.PositionB.Team!.Id,
-                TeamAgainstId=u.Match.PositionA.Team!.Id,
-                MatchId=u.Match.Id,
-                PositionId=u.Match.PositionB.Id,
-                Game = 1, 
-                Win = u.ScoreB > u.ScoreA ? 1 : 0, 
-                Neutral = u.ScoreB == u.ScoreA ? 1 : 0, 
-                Loss = u.ScoreB < u.ScoreA ? 1 : 0, 
-                GoalFor = u.ScoreB, 
-                GoalAgainst = u.ScoreA, 
-                GoalDiff = u.ScoreB - u.ScoreA
-            });
-            var scoreUsers = scoreUserA.Concat(scoreUserB).ToList();
-
-            Score scoreTotal = context.MatchResult.GroupBy(r => 1).Select(SelectScore<int>(1)).SingleOrDefault() ?? new Score();
-            scoreUsers.ForEach(scoreTotal.Merge);
-
-
-            var mapAllTeam = context.MatchResult.GroupBy(r => r.Team.Id).ToDictionary(kv=>kv.Key, kv=>SelectScore<int>(10)(kv)) ?? new Dictionary<int, Score>();
-            var mapCurrentTeam = context.MatchResult.Where(r=>r.Match.Squad!.Phase.Tourney==tourney).GroupBy(r => r.Team.Id).ToDictionary(kv => kv.Key, kv => SelectScore<int>(1000)(kv)) ?? new Dictionary<int, Score>();
-
-            scoreUsers.GroupBy(s => s.TeamId).ToList().ForEach(s =>
-            {
-                foreach(var score in s)
-                {
-                    if(mapAllTeam.ContainsKey(s.Key))
-                    {
-                        mapAllTeam[s.Key].Merge(score);
-                    } else
-                    {
-                        score.Coefficient = 1;
-                        mapAllTeam.Add(s.Key, score);
-                    }
-                    if(mapCurrentTeam.ContainsKey(s.Key))
-                    {
-                        mapCurrentTeam[s.Key].Merge(score);
-                    } else
-                    {
-                        score.Coefficient = 100;
-                        mapCurrentTeam.Add(s.Key, score);
-                    }
-                }
-            });
-
-            var CalculateScore = (Match match, Team teamA, Team teamB,bool inverse) =>
-            {
-                Score scoreAllTeam = mapAllTeam.GetValueOrDefault(teamA.Id) ?? new Score();
-                Score scoreTeam = mapCurrentTeam.GetValueOrDefault(teamA.Id) ?? new Score();
-
-                Score? userScore = scoreUsers.SingleOrDefault(s => s.TeamId == teamA.Id && s.TeamAgainstId==teamB.Id);
-
-                Score scoreDirect = context.MatchResult.Where(m => m.Team == teamA && m.TeamAgainst == teamB).GroupBy(r => 1).Select(SelectScore<int>(10000)).SingleOrDefault() ?? new Score();
-                if(userScore!=null)
-                {
-                    scoreDirect.Merge(userScore);
-                }
-
-                var list = context.MatchResult.Where(m => m.Team == teamB).Select(m => m.TeamAgainst).ToList();
-                Score scoreIndirect = context.MatchResult.Where(m => m.Team == teamA && list.Contains(m.TeamAgainst)).GroupBy(r => 1).Select(SelectScore<int>(1000)).SingleOrDefault() ?? new Score();
-                var listUser = scoreUsers.Where(s => s.TeamId == teamA.Id && list.Select(t => t.Id).Contains(s.TeamAgainstId));
-                foreach(var u in listUser)
-                {
-                    scoreIndirect.Merge(u);
-                }
-
-                Score?[] scores = { scoreDirect, scoreIndirect, scoreTeam, scoreAllTeam, scoreTotal };
-                Score scoreFinal = scores.Aggregate(new Score(), (acc, score) =>
-                {
-                    if (score == null)
-                    {
-                        return acc;
-                    }
-                    acc.Game += score.Game * score.Coefficient;
-                    acc.Win += score.Win * score.Coefficient;
-                    acc.Neutral += score.Neutral * score.Coefficient;
-                    acc.Loss += score.Loss * score.Coefficient;
-                    acc.GoalFor += score.GoalFor * score.Coefficient;
-                    acc.GoalAgainst += score.GoalAgainst * score.Coefficient;
-                    acc.GoalDiff += score.GoalDiff * score.Coefficient;
-                    return acc;
-                });
-                return scoreFinal;
-            };
-
-            foreach (var phase in tourney.Phases)
-            {
-                foreach(var squad in phase.Squads)
-                {
-                    Func<Match, bool> filter = (Match m) => user == null ? !m.Done : !m.Done || m.UserMatches.Count>0;
-                    foreach(var match in squad.Matches.Where(filter))
-                    {
-                        Position positionA = match.PositionA;
-                        int i = 0;
-                        while(i<5 && positionA.Team==null && positionA.ParentPosition!=null)
-                        {
-                            i++;
-                            var squadParent = positionA.ParentPosition.Squad;
-                            var val = positionA.ParentPosition.Value;
-                            var scoreParent = scores.Single(s => s.SquadId == squadParent.Id).Scores![val - 1];
-                            if(scoreParent.Game==0)
-                            {
-                                break;
-                            }
-                            positionA = squadParent.Positions.Single(s=>s.Id==scoreParent.PositionId);
-                        }
-                        Position positionB = match.PositionB;
-                        i = 0;
-                        while (i<5 && positionB.Team == null && positionB.ParentPosition != null)
-                        {
-                            i++;
-                            var squadParent = positionB.ParentPosition.Squad;
-                            var val = positionB.ParentPosition.Value;
-                            var scoreParent = scores.Single(s => s.SquadId == squadParent.Id).Scores![val-1];
-                            if (scoreParent.Game == 0)
-                            {
-                                break;
-                            }
-                            positionB = squadParent.Positions.Single(s => s.Id == scoreParent.PositionId);
-                        }
-                        Team? teamA = positionA.Team;
-                        Team? teamB = positionB.Team;
-                        if(teamA == null || teamB==null)
-                        {
-                            continue;
-                        }
-                        Score scoreA = CalculateScore(match, teamA, teamB, false);
-                        Score scoreB = CalculateScore(match, teamB, teamA, true);
-
-                        var goalForA = (double)scoreA.GoalFor / scoreA.Game;
-                        var goalAgainstA = (double)scoreA.GoalAgainst / scoreA.Game;
-                        var goalDiffA = (double)scoreA.GoalDiff / scoreA.Game;
-
-                        var goalForB = (double)scoreB.GoalFor / scoreB.Game;
-                        var goalAgainstB = (double)scoreB.GoalAgainst / scoreB.Game;
-                        var goalDiffB = (double)scoreB.GoalDiff / scoreB.Game;
-
-                        var goalA = (goalForA + goalAgainstB) / 2;
-                        var goalB = (goalForB + goalAgainstA) / 2;
-
-                        MatchSimulation? simul = match.Simulations.FirstOrDefault(s=>s.User==user);
-                        if(simul==null)
-                        {
-                            simul = new MatchSimulation() { Match = match };
-                            match.Simulations.Add(simul);
-                        }
-                        simul.User = user;
-                        simul.ScoreA = (int)goalA;
-                        simul.ScoreB = (int)goalB;
-                        if(match.Shot && simul.ScoreA==simul.ScoreB)
-                        {
-                            if(goalA>goalB)
-                            {
-                                simul.ScoreA++;
-                            } else
-                            {
-                                simul.ScoreB++;
-                            }
-                        }
-                    }
-                }
-            }
-            context.SaveChanges();
-        }
-
-
 
         private List<ScoreSquad> CalculateScores(Tourney tourney)
         {
@@ -385,35 +191,6 @@ namespace cjoli.Server.Services
             return scoreSquad;
         }
 
-        /*public void Simulation(string uuid, string login, int squadId, CJoliContext context)
-        {
-            User? user = context.Users.SingleOrDefault(u => u.Login == login);
-            if (user == null)
-            {
-                throw new NotFoundException("User", login);
-            }
-            Squad? squad = context.Squad
-                .Include(s=>s.Matches).ThenInclude(m=>m.UserMatches.Where(u=>u.User==user))
-                .Include(s=>s.Positions).ThenInclude(p=>p.Team)
-                .SingleOrDefault(s => s.Id == squadId);
-            if(squad==null)
-            {
-                throw new NotFoundException("Squad", squadId);
-            }
-
-            foreach(var match in squad.Matches.Where(m=>m.UserMatches.Count==0))
-            {
-                UserMatch userMatch = new UserMatch() { Match = match, User=user };
-                Position positionA = match.PositionA;
-                Position positionB = match.PositionB;
-                Team? teamA = positionA.Team;
-                Team? teamB = positionB.Team;
-
-
-                match.UserMatches.Add(userMatch);
-            }
-            context.SaveChanges();
-        }*/
 
         public void AffectationTeams(RankingDto ranking)
         {
@@ -559,7 +336,7 @@ namespace cjoli.Server.Services
             Tourney? tourney = context.Tourneys.Include(t => t.Teams).SingleOrDefault(t => t.Uid == uuid);
             if (tourney == null)
             {
-                throw new NotFoundException("Tourney", uuid);
+                throw new NotFoundException("Tou    rney", uuid);
             }
             Team? team = tourney.Teams.SingleOrDefault(t => t.Id == teamDto.Id);
             if (team == null)
@@ -586,8 +363,8 @@ namespace cjoli.Server.Services
                 config = new UserConfig() { User = user, Tourney = tourney };
                 user.Configs.Add(config);
             }
-            config.ActiveSimulation = dto.ActiveSimulation;
-            config.UseCustomSimulation = dto.UseCustomSimulation;
+            config.ActiveEstimate = dto.ActiveEstimate;
+            config.UseCustomEstimate = dto.UseCustomEstimate;
             context.SaveChanges();
         }
 
@@ -633,12 +410,5 @@ namespace cjoli.Server.Services
             GoalAgainst += score.GoalAgainst;
             GoalDiff += score.GoalDiff;
         }
-    }
-
-    public class Simulation
-    {
-        public int MatchId { get; set; }
-        public int ScoreA { get; set; }
-        public int ScoreB { get; set; }
     }
 }

@@ -29,13 +29,19 @@ namespace cjoli.Server
                 .ForMember(x => x.SquadId, opt => opt.MapFrom(a => a.Squad != null ? a.Squad.Id : 0))
                 .ForMember(x => x.PhaseId, opt => opt.MapFrom(a => a.Squad != null && a.Squad.Phase != null ? a.Squad.Phase.Id : 0))
                 .ForMember(x=>x.UserMatch, opt=>opt.MapFrom(u=>u.UserMatches.SingleOrDefault()))
-                .ForMember(x=>x.Simulation, opt=>opt.MapFrom(a=>a.Simulations.OrderByDescending(s=>s.User).FirstOrDefault()));
+                .ForMember(x=>x.Estimate, opt=>opt.MapFrom(a=>a.Estimates.OrderByDescending(s=>s.User).FirstOrDefault()));
             CreateMap<UserMatch, UserMatchDto>();
-            CreateMap<MatchSimulation, MatchSimulationDto>();
+            CreateMap<MatchEstimate, MatchEstimateDto>();
 
             CreateMap<Team, TeamDto>();
 
             CreateMap<Ranking, RankingDto>();
+            CreateMap<Rank, RankDto>()
+                .ForMember(x=>x.PhaseId, opt=>opt.MapFrom(r=>r.Squad.Phase.Id))
+                .ForMember(x=>x.SquadId,opt=>opt.MapFrom(r=>r.Squad.Id))
+                .ForMember(x=>x.Phase, opt=>opt.MapFrom(r=>r.Squad.Phase.Name))
+                .ForMember(x=>x.Squad, opt=>opt.MapFrom(r=>r.Squad.Name));
+
             CreateMap<ScoreSquad, ScoreSquad>();
             CreateMap<Score, Score>();
 

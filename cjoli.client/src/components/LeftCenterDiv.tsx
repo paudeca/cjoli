@@ -1,9 +1,9 @@
 import styled from "@emotion/styled";
 
-const LeftCenterDiv = styled("div")<{ isMobile: boolean; isSmall?: boolean }>`
+const LeftCenterDiv = styled("div")`
   display: inline-flex;
   text-align: left;
-  min-width: ${(props) => (props.isMobile ? "200px" : "200px")};
+  min-width: 200px;
   align-items: center;
 `;
 

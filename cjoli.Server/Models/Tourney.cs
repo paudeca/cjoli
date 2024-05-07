@@ -14,5 +14,6 @@ namespace cjoli.Server.Models
 
         public IList<Team> Teams { get; set; } = new List<Team>();
         public IList<Phase> Phases { get; set; } = new List<Phase>();
+        public IList<Rank> Ranks { get; set; } = new List<Rank>();
     }
 }

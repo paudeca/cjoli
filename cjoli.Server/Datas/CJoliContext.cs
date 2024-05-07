@@ -14,7 +14,7 @@ namespace cjoli.Server.Datas
         public DbSet<Match> Match { get; set; }
         public DbSet<MatchResult> MatchResult { get; set; }
         public DbSet<UserMatch> UserMatch { get; set; }
-        public DbSet<MatchSimulation> MatchSimulation { get; set; }
+        public DbSet<MatchEstimate> MatchEstimate { get; set; }
 
         private const string CRYPT_PURPOSE = "CJoliCryptPurpose";
 
@@ -39,10 +39,10 @@ namespace cjoli.Server.Datas
 
             modelBuilder.Entity<Match>().HasMany(m => m.UserMatches).WithOne(u => u.Match).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Match>().HasMany(m=>m.MatchResults).WithOne(m=>m.Match).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Match>().HasMany(m => m.Simulations).WithOne(s => s.Match).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Match>().HasMany(m => m.Estimates).WithOne(e => e.Match).OnDelete(DeleteBehavior.Cascade);
 
 
-            modelBuilder.Entity<MatchSimulation>().HasOne(s => s.Match).WithMany(m => m.Simulations);
+            modelBuilder.Entity<MatchEstimate>().HasOne(s => s.Match).WithMany(m => m.Estimates);
 
             modelBuilder.Entity<Team>().HasMany(t => t.Positions).WithOne(p => p.Team).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<Team>().HasMany(t => t.MatchResults).WithOne(m => m.Team).OnDelete(DeleteBehavior.Cascade);

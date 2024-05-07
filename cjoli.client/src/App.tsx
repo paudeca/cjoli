@@ -8,6 +8,7 @@ import { UserProvider } from "./contexts/UserContext";
 import SelectPage from "./pages/SelectPage";
 import MainPage from "./pages/MainPage";
 import { ToastProvider } from "./contexts/ToastContext";
+import RankPage from "./pages/RankPage";
 
 const theme = {
   colors: {
@@ -22,12 +23,13 @@ const router = createBrowserRouter([
     element: <MainPage />,
     children: [
       { path: "", element: <SelectPage /> },
-      { path: ":uid", element: <HomePage /> },
+      {
+        index: true,
+        path: ":uid",
+        element: <HomePage />,
+      },
+      { path: ":uid/ranking", element: <RankPage /> },
     ],
-  },
-  {
-    path: "/:uid",
-    element: <HomePage />,
   },
 ]);
 

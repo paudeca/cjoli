@@ -1,4 +1,4 @@
-import { Table, Accordion, Alert, Button } from "react-bootstrap";
+import { Table, Accordion } from "react-bootstrap";
 import CJoliCard from "../../components/CJoliCard";
 import CJoliStack from "../../components/CJoliStack";
 import Loading from "../../components/Loading";
@@ -21,8 +21,8 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
   const values = matches?.reduce(
     (acc, m) => ({
       ...acc,
-      [`m${m.id}`]: userConfig.activeSimulation
-        ? m.simulation
+      [`m${m.id}`]: userConfig.activeEstimate
+        ? m.estimate
         : { scoreA: "", scoreB: "" },
     }),
     {}
@@ -30,7 +30,7 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
   const { register, getValues } = useForm<
     Record<string, { scoreA: number | ""; scoreB: number | "" }>
   >({ values });
-  const { setShow } = useModal("test");
+  const { setShow } = useModal("blockShot");
 
   const datas = matches
     ?.filter((m) => m.phaseId == phase?.id)
@@ -129,7 +129,7 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
           </Loading>
         </CJoliCard>
       </div>
-      <InfoModal id="test" title="Save Score" variant="danger">
+      <InfoModal id="blockShot" title="Save Score" variant="danger">
         <p>
           Impossible d'enregistrer le score.
           <br />

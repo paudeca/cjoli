@@ -1,4 +1,5 @@
 import { Phase } from "./Phase";
+import { Rank } from "./Rank";
 import { Team } from "./Team";
 
 export interface Tourney {
@@ -7,4 +8,5 @@ export interface Tourney {
   name: string;
   phases: Phase[];
   teams: Team[];
+  ranks: Rank[];
 }

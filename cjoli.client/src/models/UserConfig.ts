@@ -1,5 +1,5 @@
 export interface UserConfig {
   tourneyId: number;
-  activeSimulation: boolean;
-  useCustomSimulation: boolean;
+  activeEstimate: boolean;
+  useCustomEstimate: boolean;
 }

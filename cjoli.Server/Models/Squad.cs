@@ -11,5 +11,6 @@ namespace cjoli.Server.Models
         public IList<Match> Matches { get; set; } = new List<Match>();
         public required Phase Phase { get; set; }
         public IList<ParentPosition>? ParentPositions { get; set; }
+        public IList<Rank> Ranks { get; set; } = new List<Rank>();
     }
 }

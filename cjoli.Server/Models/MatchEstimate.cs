@@ -2,7 +2,7 @@
 
 namespace cjoli.Server.Models
 {
-    public class MatchSimulation
+    public class MatchEstimate
     {
         [Key]
         public int Id { get; set; }

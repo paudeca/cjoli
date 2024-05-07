@@ -110,11 +110,11 @@ namespace cjoli.Server.Controllers
 
         [HttpGet]
         [Authorize]
-        [Route("{uuid}/UpdateSimulation")]
-        public RankingDto UpdateSimulation(string uuid)
+        [Route("{uuid}/UpdateEstimate")]
+        public RankingDto UpdateEstimate(string uuid)
         {
             var login = GetLogin();
-            _service.UpdateSimulation(uuid, login!,_context);
+            _service.UpdateEstimate(uuid, login!,_context);
             return GetRanking(uuid);
         }
 

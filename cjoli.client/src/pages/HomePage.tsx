@@ -5,12 +5,10 @@ import React from "react";
 import Loading from "../components/Loading";
 import { useLocation } from "react-router-dom";
 import { useCJoli } from "../hooks/useCJoli";
-import { useUser } from "../hooks/useUser";
 import useUid from "../hooks/useUid";
 
 const HomePage = () => {
   const { loadRanking, phases } = useCJoli();
-  const { loadUser } = useUser();
   const [ready, setReady] = React.useState(false);
   const uid = useUid();
 
@@ -21,7 +19,7 @@ const HomePage = () => {
       setReady(true);
     };
     call();
-  }, [loadRanking, loadUser, uid]);
+  }, [loadRanking, uid]);
 
   const { hash } = useLocation();
   let phase = phases && phases.find((p) => `#${p.id}` == hash);

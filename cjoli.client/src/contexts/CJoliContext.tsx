@@ -52,8 +52,9 @@ const reducer = (state: CJoliState, action: Action) => {
     case CJoliActions.LOAD_RANKING:
       {
         const ranking = action.payload;
-        const teams = ranking.tourney.teams;
-        const phases = ranking.tourney.phases;
+        const tourney = ranking.tourney;
+        const teams = tourney.teams;
+        const phases = tourney.phases;
         const squads = phases.reduce<Squad[]>(
           (acc, phase) => [...acc, ...phase.squads],
           []
@@ -66,7 +67,16 @@ const reducer = (state: CJoliState, action: Action) => {
           (acc, squad) => [...acc, ...squad.matches],
           []
         );
-        return { ...state, ranking, teams, phases, squads, positions, matches };
+        return {
+          ...state,
+          ranking,
+          tourney,
+          teams,
+          phases,
+          squads,
+          positions,
+          matches,
+        };
       }
       return state;
   }

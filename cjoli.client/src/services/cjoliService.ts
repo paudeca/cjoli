@@ -102,8 +102,8 @@ export const clearSimulations = async (uid: string, ids: number[]) => {
   return data;
 };
 
-export const updateSimulation = async (uid: string) => {
-  const { data } = await axios.get(`${url}/cjoli/${uid}/updateSimulation`);
+export const updateEstimate = async (uid: string) => {
+  const { data } = await axios.get(`${url}/cjoli/${uid}/updateEstimate`);
   return data;
 };
 
