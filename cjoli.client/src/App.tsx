@@ -30,6 +30,8 @@ const router = createBrowserRouter([
       { path: ":uid/ranking", element: <RankPage /> },
       { path: ":uid/phase/:phaseId", element: <HomePage /> },
       { path: ":uid/phase/:phaseId/squad/:squadId", element: <HomePage /> },
+      { path: ":uid/team/:teamId", element: <HomePage /> },
+      { path: ":uid/team/:teamId/phase/:phaseId", element: <HomePage /> },
     ],
   },
 ]);

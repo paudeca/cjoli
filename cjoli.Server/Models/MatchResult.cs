@@ -17,6 +17,7 @@ namespace cjoli.Server.Models
         public int GoalFor { get; set; }
         public int GoalAgainst { get; set; }
         public int GoalDiff { get; set; }
+        public int ShutOut { get; set; }
 
     }
 }

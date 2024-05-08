@@ -8,4 +8,5 @@ export interface Score {
   goalFor: number;
   goalAgainst: number;
   goalDiff: number;
+  shutOut: number;
 }

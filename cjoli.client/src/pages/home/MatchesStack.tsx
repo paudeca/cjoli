@@ -17,7 +17,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 
 const MatchesStack = ({ phase }: { phase?: Phase }) => {
-  const { matches, loadRanking } = useCJoli();
+  const { matches, loadRanking, isTeamInMatch } = useCJoli();
   const { userConfig } = useUser();
   const uid = useUid();
   const values = matches?.reduce(
@@ -33,15 +33,17 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
     Record<string, { scoreA: number | ""; scoreB: number | "" }>
   >({ values });
   const { setShow } = useModal("blockShot");
-  const { squadId } = useParams();
+  const { squadId, teamId } = useParams();
   const [eventKey, setEventKey] = React.useState("0");
 
+  const filter = teamId
+    ? (match: Match) => isTeamInMatch(parseInt(teamId), match)
+    : (match: Match) =>
+        match.phaseId == phase?.id &&
+        (!squadId || parseInt(squadId) == match.squadId);
+
   const datas = matches
-    ?.filter((m) => {
-      return (
-        m.phaseId == phase?.id && (!squadId || parseInt(squadId) == m.squadId)
-      );
-    })
+    ?.filter(filter)
     .reduce<Record<string, Match[]>>((acc, m) => {
       const time = moment(m.time);
       const date = time.format("yyyy-MM-DD");

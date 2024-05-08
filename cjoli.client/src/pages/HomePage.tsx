@@ -6,12 +6,13 @@ import Loading from "../components/Loading";
 import { useParams } from "react-router-dom";
 import { useCJoli } from "../hooks/useCJoli";
 import useUid from "../hooks/useUid";
+import TeamStack from "./home/TeamStack";
 
 const HomePage = () => {
   const { loadRanking, phases } = useCJoli();
   const [ready, setReady] = React.useState(false);
   const uid = useUid();
-  const { phaseId } = useParams();
+  const { phaseId, teamId } = useParams();
 
   React.useEffect(() => {
     const call = async () => {
@@ -30,6 +31,7 @@ const HomePage = () => {
 
   return (
     <Loading ready={ready}>
+      {teamId && <TeamStack />}
       <RankingStack phase={phase} />
       <MatchesStack phase={phase} />
     </Loading>

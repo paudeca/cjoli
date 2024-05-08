@@ -27,13 +27,13 @@ interface CJoliModalProps<T extends FieldValues> {
   values?: T;
 }
 
-function CJoliModal<T extends FieldValues>({
+const CJoliModal = <T extends FieldValues>({
   id,
   title,
   fields,
   onSubmit,
   values,
-}: CJoliModalProps<T>) {
+}: CJoliModalProps<T>) => {
   const { show, setShow } = useModal(id);
 
   const {
@@ -118,6 +118,6 @@ function CJoliModal<T extends FieldValues>({
       </Form>
     </Modal>
   );
-}
+};
 
 export default CJoliModal;

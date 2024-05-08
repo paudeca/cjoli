@@ -184,13 +184,13 @@ const MenuNav = () => {
                 }}
               >
                 <ListOl size={30} className="mx-2" />
-                Classement
+                Ranking
               </Nav.Link>
               <NavDropdown
                 title={
                   <>
                     <PersonSquare size={30} className="mx-2" />
-                    <span>{user?.login || "Visitor"}</span>
+                    <span>{user?.login || "Guest"}</span>
                   </>
                 }
                 className="px-0"

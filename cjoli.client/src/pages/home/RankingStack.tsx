@@ -9,10 +9,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import useUid from "../../hooks/useUid";
 
 const RankingStack = ({ phase }: { phase?: Phase }) => {
-  const { phases } = useCJoli();
+  const { phases, isTeamInPhase } = useCJoli();
   const uid = useUid();
   const navigate = useNavigate();
-  const { phaseId, squadId } = useParams();
+  const { phaseId, squadId, teamId } = useParams();
+
+  const filter = teamId
+    ? (phase: Phase) => isTeamInPhase(parseInt(teamId), phase)
+    : (phase: Phase) => !squadId || !phaseId || parseInt(phaseId) == phase.id;
+  const datas = phases?.filter(filter) || [];
 
   return (
     <CJoliStack gap={0} className="col-md-8 mx-auto mt-5">
@@ -21,19 +26,21 @@ const RankingStack = ({ phase }: { phase?: Phase }) => {
           <Loading ready={!!phases && !!phase}>
             <Card.Header>
               <Nav variant="underline" defaultActiveKey={`${phase?.id}`}>
-                {phases
-                  ?.filter(
-                    (p) => !squadId || !phaseId || parseInt(phaseId) == p.id
-                  )
-                  .map((phase) => (
-                    <Nav.Item key={phase.id}>
-                      <Nav.Link
-                        onClick={() => navigate(`/${uid}/phase/${phase.id}`)}
-                      >
-                        {phase.name}
-                      </Nav.Link>
-                    </Nav.Item>
-                  ))}
+                {datas.map((phase) => (
+                  <Nav.Item key={phase.id}>
+                    <Nav.Link
+                      onClick={() =>
+                        navigate(
+                          teamId
+                            ? `/${uid}/team/${teamId}/phase/${phase.id}`
+                            : `/${uid}/phase/${phase.id}`
+                        )
+                      }
+                    >
+                      {phase.name}
+                    </Nav.Link>
+                  </Nav.Item>
+                ))}
               </Nav>
             </Card.Header>
             {phase && <RankTable phase={phase} />}

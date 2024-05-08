@@ -114,6 +114,7 @@ namespace cjoli.Server.Services
                 scoreA.Game++;
                 scoreB.Game++;
 
+                bool isForfeit = match.ForfeitA || match.ForfeitB;
                 if (match.ScoreA > match.ScoreB || match.ForfeitB)
                 {
                     scoreA.Win++;
@@ -141,10 +142,12 @@ namespace cjoli.Server.Services
                 scoreA.GoalFor += match.ScoreA;
                 scoreA.GoalAgainst += match.ScoreB;
                 scoreA.GoalDiff += match.ScoreA - match.ScoreB;
+                scoreA.ShutOut += !isForfeit && match.ScoreB == 0 ? 1 : 0;
 
                 scoreB.GoalFor += match.ScoreB;
                 scoreB.GoalAgainst += match.ScoreA;
                 scoreB.GoalDiff += match.ScoreB - match.ScoreA;
+                scoreB.ShutOut += !isForfeit && match.ScoreA == 0 ? 1 : 0;
 
 
                 return scores;
@@ -324,6 +327,7 @@ namespace cjoli.Server.Services
             matchResult.GoalFor = scoreA;
             matchResult.GoalAgainst = scoreB;
             matchResult.GoalDiff = scoreA - scoreB;
+            matchResult.ShutOut = scoreB == 0 ? 1 : 0;
         }
 
 
@@ -407,6 +411,7 @@ namespace cjoli.Server.Services
         public int GoalAgainst { get; set; }
         public int GoalDiff { get; set; }
         public int Coefficient { get; set; }
+        public int ShutOut { get; set; }
 
         public void Merge(Score score)
         {
@@ -417,6 +422,7 @@ namespace cjoli.Server.Services
             GoalFor += score.GoalFor;
             GoalAgainst += score.GoalAgainst;
             GoalDiff += score.GoalDiff;
+            ShutOut += score.ShutOut;
         }
     }
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import { CJoliContext } from "../contexts/CJoliContext";
-import { Rank, Ranking, Tourney } from "../models";
+import { Match, Phase, Rank, Ranking, Squad, Tourney } from "../models";
 import { CJoliActions } from "../contexts/actions";
 
 export const useCJoli = () => {
@@ -65,6 +65,23 @@ export const useCJoli = () => {
     },
     [state.ranking]
   );
+  const isTeamInPhase = React.useCallback((teamId: number, phase: Phase) => {
+    return phase.squads.some((squad) =>
+      squad.positions.some((position) => position.teamId == teamId)
+    );
+  }, []);
+  const isTeamInSquad = React.useCallback((teamId: number, squad: Squad) => {
+    return squad.positions.some((position) => position.teamId == teamId);
+  }, []);
+  const isTeamInMatch = React.useCallback(
+    (teamId: number, match: Match) => {
+      return (
+        getPosition(match.positionIdA)?.teamId == teamId ||
+        getPosition(match.positionIdB)?.teamId == teamId
+      );
+    },
+    [getPosition]
+  );
 
   return {
     ...state,
@@ -76,5 +93,8 @@ export const useCJoli = () => {
     getPosition,
     getTeamInfo,
     getRankPosition,
+    isTeamInPhase,
+    isTeamInSquad,
+    isTeamInMatch,
   };
 };
