@@ -115,7 +115,9 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                   <th colSpan={isMobile ? 8 : 1} className="w-50">
                     Team
                   </th>
-                  <MyTh rowSpan={isMobile ? 2 : 1}>PTS</MyTh>
+                  <MyTh rowSpan={isMobile ? 2 : 1}>
+                    <CJoliTooltip info="Points">PTS</CJoliTooltip>
+                  </MyTh>
                   {!isMobile && (
                     <>
                       <th>

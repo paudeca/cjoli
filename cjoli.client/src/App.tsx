@@ -44,6 +44,7 @@ const App = () => {
           body {
             background-color: #202644;
             color: white;
+            user-select: none;
           }
           .btn-primary {
             --bs-btn-bg: #313f69;

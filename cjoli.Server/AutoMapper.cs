@@ -33,7 +33,8 @@ namespace cjoli.Server
             CreateMap<UserMatch, UserMatchDto>();
             CreateMap<MatchEstimate, MatchEstimateDto>();
 
-            CreateMap<Team, TeamDto>();
+            CreateMap<Team, TeamDto>().ForMember(x => x.Datas, opt=>opt.MapFrom(t=>t.TeamDatas.SingleOrDefault()));
+            CreateMap<TeamData, TeamDataDto>();
 
             CreateMap<Ranking, RankingDto>();
             CreateMap<Rank, RankDto>()

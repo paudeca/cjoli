@@ -54,6 +54,7 @@ const reducer = (state: CJoliState, action: Action) => {
         const ranking = action.payload;
         const tourney = ranking.tourney;
         const teams = tourney.teams;
+        teams.sort((a, b) => (a.name > b.name ? 1 : -1));
         const phases = tourney.phases;
         const squads = phases.reduce<Squad[]>(
           (acc, phase) => [...acc, ...phase.squads],

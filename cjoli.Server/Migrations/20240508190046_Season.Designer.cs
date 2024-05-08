@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using cjoli.Server.Datas;
 
@@ -11,9 +12,11 @@ using cjoli.Server.Datas;
 namespace cjoli.Server.Migrations
 {
     [DbContext(typeof(CJoliContext))]
-    partial class CJoliContextModelSnapshot : ModelSnapshot
+    [Migration("20240508190046_Season")]
+    partial class Season
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -331,32 +334,6 @@ namespace cjoli.Server.Migrations
                     b.ToTable("Team");
                 });
 
-            modelBuilder.Entity("cjoli.Server.Models.TeamData", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Penalty")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TeamId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TourneyId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TeamId");
-
-                    b.HasIndex("TourneyId");
-
-                    b.ToTable("TeamData");
-                });
-
             modelBuilder.Entity("cjoli.Server.Models.Tourney", b =>
                 {
                     b.Property<int>("Id")
@@ -646,25 +623,6 @@ namespace cjoli.Server.Migrations
                     b.Navigation("Phase");
                 });
 
-            modelBuilder.Entity("cjoli.Server.Models.TeamData", b =>
-                {
-                    b.HasOne("cjoli.Server.Models.Team", "Team")
-                        .WithMany("TeamDatas")
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("cjoli.Server.Models.Tourney", "Tourney")
-                        .WithMany("TeamDatas")
-                        .HasForeignKey("TourneyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Team");
-
-                    b.Navigation("Tourney");
-                });
-
             modelBuilder.Entity("cjoli.Server.Models.UserConfig", b =>
                 {
                     b.HasOne("cjoli.Server.Models.Tourney", "Tourney")
@@ -738,8 +696,6 @@ namespace cjoli.Server.Migrations
                     b.Navigation("MatchResults");
 
                     b.Navigation("Positions");
-
-                    b.Navigation("TeamDatas");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Tourney", b =>
@@ -747,8 +703,6 @@ namespace cjoli.Server.Migrations
                     b.Navigation("Phases");
 
                     b.Navigation("Ranks");
-
-                    b.Navigation("TeamDatas");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.User", b =>

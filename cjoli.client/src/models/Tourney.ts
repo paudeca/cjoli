@@ -6,6 +6,8 @@ export interface Tourney {
   id: number;
   uid: string;
   name: string;
+  season: string;
+  category: string;
   phases: Phase[];
   teams: Team[];
   ranks: Rank[];

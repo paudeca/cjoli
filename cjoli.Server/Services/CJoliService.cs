@@ -47,7 +47,7 @@ namespace cjoli.Server.Services
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(
                     m => m.Estimates.Where(s=>user!=null && user.HasCustomEstimate()?s.User==user:s.User==null)
                  )
-                .Include(t => t.Teams)
+                .Include(t => t.Teams).ThenInclude(t=>t.TeamDatas.Where(d=>d.Tourney.Uid==tourneyUid))
                 .FirstOrDefault(t => t.Uid == tourneyUid);
             if (tourney == null)
             {

@@ -41,6 +41,8 @@ namespace cjoli.Server.Services
                 update: (Tourney tourney) =>
                 {
                     tourney.Name = tourneyDto.Name ?? tourney.Name;
+                    tourney.Season = tourneyDto.Season ?? tourney.Season;
+                    tourney.Category = tourneyDto.Category ?? tourney.Category;
                 },
                 children: [
                     (tourney) => (tourneyDto.Teams??[]).ForEach(t => ImportTeam(t,tourney,context)),
@@ -74,6 +76,7 @@ namespace cjoli.Server.Services
                     team.Name = teamDto.Name ?? team.Name;
                     team.Logo = teamDto.Logo ?? team.Logo;
                     team.Youngest = teamDto.Youngest ?? team.Youngest;
+                    team.ShortName = teamDto.ShortName ?? team.ShortName;
                 }
             );
         }
