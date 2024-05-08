@@ -24,11 +24,12 @@ const router = createBrowserRouter([
     children: [
       { path: "", element: <SelectPage /> },
       {
-        index: true,
         path: ":uid",
         element: <HomePage />,
       },
       { path: ":uid/ranking", element: <RankPage /> },
+      { path: ":uid/phase/:phaseId", element: <HomePage /> },
+      { path: ":uid/phase/:phaseId/squad/:squadId", element: <HomePage /> },
     ],
   },
 ]);

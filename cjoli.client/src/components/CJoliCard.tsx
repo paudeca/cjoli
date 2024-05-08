@@ -8,7 +8,7 @@ const CJoliCard = styled(Card)`
     background-color: #e7e9ee;
   }
   & .card-title {
-    color: #65383a;
+    color: #932829;
   }
 `;
 

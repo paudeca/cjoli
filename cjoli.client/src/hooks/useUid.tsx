@@ -1,9 +1,8 @@
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const useUid = () => {
-  const { pathname } = useLocation();
-  const match = pathname.match(/\/([^/]+)\/?/);
-  return match ? match[1] : "";
+  const { uid } = useParams();
+  return uid!;
 };
 
 export default useUid;

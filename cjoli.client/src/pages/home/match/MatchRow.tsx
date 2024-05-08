@@ -162,7 +162,7 @@ const MatchRow = ({
         )}
         {!isMobile && (
           <td>
-            <LeftCenterDiv isMobile={false}>
+            <LeftCenterDiv>
               <TeamCell
                 positionId={match.positionIdA}
                 forfeit={imatch.forfeitA}
@@ -225,7 +225,7 @@ const MatchRow = ({
         )}
         {!isMobile && (
           <td>
-            <LeftCenterDiv isMobile={false}>
+            <LeftCenterDiv>
               <TeamCell
                 positionId={match.positionIdB}
                 forfeit={imatch.forfeitB}

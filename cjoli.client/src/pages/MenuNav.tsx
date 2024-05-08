@@ -52,12 +52,14 @@ const MenuNav = () => {
   const logout = async () => {
     await cjoliService.logout();
     loadUser(undefined);
+    setShow(false);
     if (uid) {
       const ranking = await cjoliService.getRanking(uid);
       loadRanking(ranking);
     }
   };
   const [loading, setLoading] = React.useState(false);
+  const [show, setShow] = React.useState(false);
 
   const { register } = useForm<UserConfig>({
     values: userConfig,
@@ -95,7 +97,7 @@ const MenuNav = () => {
           <Row>
             <Col>
               <MyImg
-                src="./logo.png"
+                src="/logo.png"
                 width="60px"
                 className="mx-4"
                 onClick={() => navigate("/")}
@@ -153,23 +155,34 @@ const MenuNav = () => {
             )}
           </Stack>
         )}
-        <Navbar.Toggle aria-controls="menu" />
-        <Navbar.Offcanvas id="menu" aria-labelledby="menu" placement="end">
-          <Offcanvas.Header closeButton>
+        <Navbar.Toggle aria-controls="menu" onClick={() => setShow(true)} />
+        <Navbar.Offcanvas
+          id="menu"
+          aria-labelledby="menu"
+          placement="end"
+          show={show}
+          onShow={() => setShow(true)}
+        >
+          <Offcanvas.Header closeButton onClick={() => setShow(false)}>
             <Offcanvas.Title>Menu</Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body>
             <Nav className="justify-content-end flex-grow-1 pe-3">
               <Nav.Link
-                href="#"
                 onClick={() => {
                   navigate(`${uid}`);
+                  setShow(false);
                 }}
               >
                 <House size={30} className="mx-2" />
                 Home
               </Nav.Link>
-              <Nav.Link href="#" onClick={() => navigate(`${uid}/ranking`)}>
+              <Nav.Link
+                onClick={() => {
+                  navigate(`${uid}/ranking`);
+                  setShow(false);
+                }}
+              >
                 <ListOl size={30} className="mx-2" />
                 Classement
               </Nav.Link>

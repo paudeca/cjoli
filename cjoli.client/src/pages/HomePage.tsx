@@ -3,7 +3,7 @@ import MatchesStack from "./home/MatchesStack";
 import * as cjoliService from "../services/cjoliService";
 import React from "react";
 import Loading from "../components/Loading";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useCJoli } from "../hooks/useCJoli";
 import useUid from "../hooks/useUid";
 
@@ -11,6 +11,7 @@ const HomePage = () => {
   const { loadRanking, phases } = useCJoli();
   const [ready, setReady] = React.useState(false);
   const uid = useUid();
+  const { phaseId } = useParams();
 
   React.useEffect(() => {
     const call = async () => {
@@ -21,8 +22,8 @@ const HomePage = () => {
     call();
   }, [loadRanking, uid]);
 
-  const { hash } = useLocation();
-  let phase = phases && phases.find((p) => `#${p.id}` == hash);
+  let phase =
+    phases && phases.find((p) => phaseId && p.id == parseInt(phaseId));
   if (!phase && phases && phases?.length > 0) {
     phase = phases[0];
   }

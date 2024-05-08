@@ -13,6 +13,8 @@ import MatchRow from "./match/MatchRow";
 import { useUser } from "../../hooks/useUser";
 import InfoModal from "../../components/InfoModal";
 import { useModal } from "../../contexts/ModalContext";
+import React from "react";
+import { useParams } from "react-router-dom";
 
 const MatchesStack = ({ phase }: { phase?: Phase }) => {
   const { matches, loadRanking } = useCJoli();
@@ -31,13 +33,23 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
     Record<string, { scoreA: number | ""; scoreB: number | "" }>
   >({ values });
   const { setShow } = useModal("blockShot");
+  const { squadId } = useParams();
+  const [eventKey, setEventKey] = React.useState("0");
 
   const datas = matches
-    ?.filter((m) => m.phaseId == phase?.id)
+    ?.filter((m) => {
+      return (
+        m.phaseId == phase?.id && (!squadId || parseInt(squadId) == m.squadId)
+      );
+    })
     .reduce<Record<string, Match[]>>((acc, m) => {
       const time = moment(m.time);
       const date = time.format("yyyy-MM-DD");
-      return { ...acc, [date]: [...(acc[date] || []), m] };
+      const list = [...(acc[date] || []), m];
+      list.sort((a, b) => {
+        return a.location && b.location && a.location > b.location ? 1 : -1;
+      });
+      return { ...acc, [date]: list };
     }, {});
   const keys = Object.keys(datas || {});
   keys.sort();
@@ -78,7 +90,10 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
       <div className="p-2">
         <CJoliCard>
           <Loading ready={!!matches}>
-            <Accordion defaultActiveKey="0">
+            <Accordion
+              activeKey={eventKey}
+              onSelect={(e) => setEventKey(e as string)}
+            >
               {keys.map((key, index) => {
                 const datasOrder = datas ? datas[key] : [];
                 datasOrder.sort((a, b) =>
