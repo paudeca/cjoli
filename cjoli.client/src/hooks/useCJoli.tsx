@@ -54,12 +54,12 @@ export const useCJoli = () => {
         throw new Error(`position not found with id:${positionId}`);
       const team = getTeam(position.teamId);
       if (!team) {
-        return { label: (defaultName ?? position.name) || "noname" };
+        return { name: (defaultName ?? position.name) || "noname" };
       }
-      const label = position.name
+      const name = position.name
         ? `${team?.name} - ${position.short}`
         : team?.name || "noname";
-      return { label, logo: team?.logo };
+      return { name, logo: team?.logo };
     },
     [getPosition, getTeam]
   );
@@ -86,7 +86,7 @@ export const useCJoli = () => {
           return rank;
         }
       }
-      return null;
+      return undefined;
     },
     [getPosition, getRankPosition, state.tourney?.ranks]
   );

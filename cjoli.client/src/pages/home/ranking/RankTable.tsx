@@ -162,7 +162,7 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                     )
                     .map((m) => m.userMatch!.id);
                   const hasSimulation = userMatches.length > 0;
-                  const { label } = getTeamInfo(score.positionId);
+                  const { name } = getTeamInfo(score.positionId);
                   return (
                     <React.Fragment key={index}>
                       <tr>
@@ -172,7 +172,7 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                             <TeamName positionId={score.positionId} />
                             <SimulationIcon
                               show={hasSimulation}
-                              title={`Simulation - ${label}`}
+                              title={`Simulation - ${name}`}
                               onRemove={handleRemove(userMatches)}
                             />
                             {team && (

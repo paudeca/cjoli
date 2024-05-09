@@ -15,11 +15,14 @@ import { useCJoli } from "../../hooks/useCJoli";
 import moment from "moment";
 import { useForm } from "react-hook-form";
 import React from "react";
-import { Team } from "../../models";
-import { ArrowDownCircleFill, ArrowUpCircleFill } from "react-bootstrap-icons";
+import { Rank, Score, Team } from "../../models";
+import { CaretDownFill, CaretUpFill, PauseFill } from "react-bootstrap-icons";
+import useScreenSize from "../../hooks/useScreenSize";
+import TeamName from "../../components/TeamName";
+import LeftCenterDiv from "../../components/LeftCenterDiv";
 
 type CellIconProps<T> = {
-  value: T;
+  value?: T;
   valueB?: T;
   call: (a: T) => number | undefined;
   up?: boolean;
@@ -36,18 +39,23 @@ const CellIcon = <T,>({
   const calcul = up
     ? (a: number, b: number) => (a > b ? 1 : a == b ? 0 : -1)
     : (a: number, b: number) => (a < b ? 1 : a == b ? 0 : -1);
-  const val = call(value);
+  const val = value && call(value);
   const valB = valueB && call(valueB);
   const result = !val || !valueB || valB == undefined ? 0 : calcul(val, valB);
   return (
-    <td style={{ paddingRight: !active || result == 0 ? 25 : 0 }}>
-      {val === undefined ? "-" : val}
-      {active && result == 1 && (
-        <ArrowUpCircleFill color="rgb(25, 135, 84)" className="mx-1" />
-      )}
-      {active && result == -1 && (
-        <ArrowDownCircleFill color="rgb(220, 53, 69)" className="mx-1" />
-      )}
+    <td>
+      <LeftCenterDiv width={40}>
+        {val === undefined ? "-" : val}
+        {active && result == 1 && (
+          <CaretUpFill color="rgb(25, 135, 84)" className="mx-1" />
+        )}
+        {active && result == -1 && (
+          <CaretDownFill color="rgb(220, 53, 69)" className="mx-1" />
+        )}
+        {active && result == 0 && (
+          <PauseFill style={{ transform: "rotate(90deg)" }} color="#ffc107" />
+        )}
+      </LeftCenterDiv>
     </td>
   );
 };
@@ -56,6 +64,7 @@ const TeamStack = () => {
   const { teams, getTeam, getTeamRank, getAllScoreForTeam } = useCJoli();
   const { teamId } = useParams();
   const { register } = useForm();
+  const { isMobile } = useScreenSize();
   const [teamB, setTeamB] = React.useState<Team | undefined>(undefined);
 
   const team = getTeam(parseInt(teamId!));
@@ -70,6 +79,34 @@ const TeamStack = () => {
   if (teamB && rankB && scoreB) {
     datas = [...datas, { team: teamB, rank: rankB, score: scoreB }];
   }
+
+  const columns = [
+    {
+      label: "Rang",
+      callRank: (r: Rank) => r.order || 0,
+      up: false,
+      active: true,
+    },
+    { label: "PTS", callScore: (s: Score) => s.total, up: true, active: true },
+    { label: "PJ", callScore: (s: Score) => s.game, up: true, active: false },
+    { label: "V", callScore: (s: Score) => s.win, up: true, active: true },
+    { label: "N", callScore: (s: Score) => s.neutral, up: true, active: false },
+    { label: "D", callScore: (s: Score) => s.loss, up: false, active: true },
+    { label: "BP", callScore: (s: Score) => s.goalFor, up: true, active: true },
+    {
+      label: "BC",
+      callScore: (s: Score) => s.goalAgainst,
+      up: false,
+      active: true,
+    },
+    { label: "BL", callScore: (s: Score) => s.shutOut, up: true, active: true },
+    {
+      label: "GA",
+      callScore: (s: Score) => s.goalDiff,
+      up: true,
+      active: true,
+    },
+  ];
   return (
     <CJoliStack gap={0} className="col-md-8 mx-auto mt-5">
       <div className="p-2">
@@ -137,97 +174,104 @@ const TeamStack = () => {
                 </Form>
               </Stack>
               <Stack>
-                <Table
-                  striped
-                  bordered
-                  size="sm"
-                  style={{ textAlign: "center" }}
-                >
-                  <thead>
-                    <tr>
-                      <th />
-                      <th>Rang</th>
-                      <th>PTS</th>
-                      <th>PJ</th>
-                      <th>V</th>
-                      <th>N</th>
-                      <th>D</th>
-                      <th>BP</th>
-                      <th>BC</th>
-                      <th>BL</th>
-                      <th>GA</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {datas.map(({ team, rank, score }, i) => (
-                      <tr key={team.id}>
-                        <td>
-                          {team?.logo ? (
-                            <img src={team?.logo} width={24} />
-                          ) : (
-                            team.shortName
-                          )}
-                        </td>
-                        <CellIcon
-                          value={rank}
-                          valueB={rankB}
-                          call={(r) => r?.order}
-                          key="order"
-                          active={i == 0}
-                        />
-                        <CellIcon
-                          value={score}
-                          valueB={scoreB}
-                          call={(s) => s.total}
-                          up
-                          active={i == 0}
-                        />
-                        <td>{score.game}</td>
-                        <CellIcon
-                          value={score}
-                          valueB={scoreB}
-                          call={(s) => s.win}
-                          up
-                          active={i == 0}
-                        />
-                        <td>{score.neutral}</td>
-                        <CellIcon
-                          value={score}
-                          valueB={scoreB}
-                          call={(s) => s.loss}
-                          active={i == 0}
-                        />
-                        <CellIcon
-                          value={score}
-                          valueB={scoreB}
-                          call={(s) => s.goalFor}
-                          up
-                          active={i == 0}
-                        />
-                        <CellIcon
-                          value={score}
-                          valueB={scoreB}
-                          call={(s) => s.goalAgainst}
-                          active={i == 0}
-                        />
-                        <CellIcon
-                          value={score}
-                          valueB={scoreB}
-                          call={(s) => s.shutOut}
-                          up
-                          active={i == 0}
-                        />
-                        <CellIcon
-                          value={score}
-                          valueB={scoreB}
-                          call={(s) => s.goalDiff}
-                          up
-                          active={i == 0}
-                        />
+                {!isMobile && (
+                  <Table
+                    striped
+                    bordered
+                    size="sm"
+                    style={{ textAlign: "center" }}
+                  >
+                    <thead>
+                      <tr>
+                        <th />
+                        {columns.map((c, i) => (
+                          <th key={i}>
+                            <LeftCenterDiv width={40}>{c.label}</LeftCenterDiv>
+                          </th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </Table>
+                    </thead>
+                    <tbody>
+                      {datas.map(({ team, rank, score }, i) => (
+                        <tr key={team.id}>
+                          <td>
+                            <LeftCenterDiv>
+                              <TeamName teamId={team.id} />
+                            </LeftCenterDiv>
+                          </td>
+                          {columns.map((c, j) =>
+                            c.callRank ? (
+                              <CellIcon
+                                key={j}
+                                value={rank}
+                                valueB={rankB}
+                                call={c.callRank}
+                                active={c.active && i == 0}
+                                up={c.up}
+                              />
+                            ) : (
+                              <CellIcon
+                                key={j}
+                                value={score}
+                                valueB={scoreB}
+                                call={c.callScore!}
+                                active={c.active && i == 0}
+                                up={c.up}
+                              />
+                            )
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                )}
+                {isMobile && (
+                  <Table
+                    striped
+                    bordered
+                    size="sm"
+                    style={{ textAlign: "center" }}
+                  >
+                    <thead>
+                      <tr>
+                        <th />
+                        {datas.map(({ team }) => (
+                          <th key={team.id}>
+                            <TeamName teamId={team.id} />
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {columns.map((c, i) => (
+                        <tr key={i}>
+                          <td>{c.label}</td>
+                          {datas.map(({ rank, score }, j) => (
+                            <React.Fragment key={j}>
+                              {c.callRank ? (
+                                <CellIcon
+                                  value={rank}
+                                  valueB={rankB}
+                                  call={c.callRank}
+                                  active={c.active && j == 0}
+                                  up={c.up}
+                                />
+                              ) : (
+                                <CellIcon
+                                  value={score}
+                                  valueB={scoreB}
+                                  call={c.callScore!}
+                                  active={c.active && j == 0}
+                                  up={c.up}
+                                />
+                              )}
+                            </React.Fragment>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                )}
               </Stack>
             </Card>
             <div className="d-grid gap-3 w-25 ms-auto pt-2">
