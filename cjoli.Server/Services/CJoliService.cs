@@ -80,7 +80,7 @@ namespace cjoli.Server.Services
             _estimateService.CalculateEstimates(tourney, scores, user, context);
         }
 
-        private List<ScoreSquad> CalculateScores(Tourney tourney)
+        private Scores CalculateScores(Tourney tourney)
         {
             var scoreSquads = new List<ScoreSquad>();
             foreach (var phase in tourney.Phases)
@@ -91,7 +91,21 @@ namespace cjoli.Server.Services
                     scoreSquads.Add(scoreSquad);
                 }
             }
-            return scoreSquads;
+            var scoreTeams = scoreSquads.Aggregate(new Dictionary<int, Score>(), (acc, scoreSquad) =>
+            {
+                return scoreSquad.TeamScores?.Aggregate(acc, (acc, kv) =>
+                {
+                    Score? score = acc.GetValueOrDefault(kv.Key);
+                    if(score==null)
+                    {
+                        score = new Score();
+                        acc.Add(kv.Key, score);
+                    }
+                    score.Merge(kv.Value);
+                    return acc;
+                }) ?? acc;
+            });
+            return new Scores { ScoreSquads = scoreSquads, ScoreTeams = scoreTeams };
         }
 
         private ScoreSquad CalculateScoreSquad(Squad squad)
@@ -199,7 +213,14 @@ namespace cjoli.Server.Services
                 }
                 return 0;
             });
-            var scoreSquad = new ScoreSquad() { SquadId = squad.Id, Scores = listScores };
+
+            var teamScores = scores.Where(kv =>
+            {
+                var position = squad.Positions.Single(p => p.Id == kv.Key);
+                return position.Team != null;
+            }).ToDictionary(kv=>kv.Key, kv=>kv.Value);
+
+            var scoreSquad = new ScoreSquad() { SquadId = squad.Id, Scores = listScores, TeamScores = teamScores };
             return scoreSquad;
         }
 
@@ -209,7 +230,7 @@ namespace cjoli.Server.Services
             var positions = (ranking.Tourney.Phases ?? []).SelectMany(p => p.Squads ?? []).SelectMany(s => s.Positions ?? []);
             foreach (var position in positions.Where(p => p.ParentPosition != null))
             {
-                var scoreSquad = ranking.Scores.Find(s => s.SquadId == (position.ParentPosition?.SquadId ?? 0));
+                var scoreSquad = ranking.Scores.ScoreSquads.Find(s => s.SquadId == (position.ParentPosition?.SquadId ?? 0));
                 var score = (scoreSquad?.Scores ?? [])[(position.ParentPosition?.Value ?? 1) - 1];
                 if (score.Game > 0)
                 {
@@ -386,13 +407,20 @@ namespace cjoli.Server.Services
     public class Ranking
     {
         public required Tourney Tourney { get; set; }
-        public required List<ScoreSquad> Scores { get; set; }
+        public required Scores Scores { get; set; }
+    }
+
+    public class Scores
+    {
+        public List<ScoreSquad> ScoreSquads { get; set; } = new List<ScoreSquad>();
+        public Dictionary<int, Score>? ScoreTeams { get; set; }
     }
 
     public class ScoreSquad
     {
         public int SquadId { get; set; }
         public List<Score>? Scores { get; set; }
+        public Dictionary<int, Score>? TeamScores { get; set; }
 
     }
 
@@ -415,6 +443,7 @@ namespace cjoli.Server.Services
 
         public void Merge(Score score)
         {
+            Total += score.Total;
             Game += score.Game;
             Win += score.Win;
             Neutral += score.Neutral;

@@ -52,7 +52,7 @@ const CellIcon = <T,>({
         {active && result == -1 && (
           <CaretDownFill color="rgb(220, 53, 69)" className="mx-1" />
         )}
-        {active && result == 0 && (
+        {active && valB && result == 0 && (
           <PauseFill style={{ transform: "rotate(90deg)" }} color="#ffc107" />
         )}
       </LeftCenterDiv>
@@ -61,7 +61,7 @@ const CellIcon = <T,>({
 };
 
 const TeamStack = () => {
-  const { teams, getTeam, getTeamRank, getAllScoreForTeam } = useCJoli();
+  const { teams, getTeam, getTeamRank, getScoreForTeam } = useCJoli();
   const { teamId } = useParams();
   const { register } = useForm();
   const { isMobile } = useScreenSize();
@@ -73,8 +73,8 @@ const TeamStack = () => {
   }
   const rank = getTeamRank(team);
   const rankB = teamB && getTeamRank(teamB);
-  const score = getAllScoreForTeam(team);
-  const scoreB = teamB && getAllScoreForTeam(teamB);
+  const score = getScoreForTeam(team);
+  const scoreB = teamB && getScoreForTeam(teamB);
   let datas = [{ team, rank, score }];
   if (teamB && rankB && scoreB) {
     datas = [...datas, { team: teamB, rank: rankB, score: scoreB }];

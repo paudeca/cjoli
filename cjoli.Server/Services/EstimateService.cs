@@ -7,7 +7,7 @@ namespace cjoli.Server.Services
     public class EstimateService
     {
 
-        private Team? FindTeam(Position position, List<ScoreSquad> scores)
+        private Team? FindTeam(Position position, IList<ScoreSquad> scores)
         {
             while (position.Team == null && position.ParentPosition != null && position.ParentPosition.Squad != null)
             {
@@ -41,7 +41,7 @@ namespace cjoli.Server.Services
         }
 
 
-        private Score CreateScore(Position positionA, Position positionB, int scoreA, int scoreB,Match match, List<ScoreSquad> scores)
+        private Score CreateScore(Position positionA, Position positionB, int scoreA, int scoreB,Match match, IList<ScoreSquad> scores)
         {
             Team? teamA = FindTeam(positionA, scores);
             Team? teamB = FindTeam(positionB, scores);
@@ -111,7 +111,7 @@ namespace cjoli.Server.Services
             };
         }
 
-        private void CaculateEstimate(Match match, List<ScoreSquad> scores, User? user, Func<Match, Team, Team, bool, Score> calculateScore)
+        private void CaculateEstimate(Match match, IList<ScoreSquad> scores, User? user, Func<Match, Team, Team, bool, Score> calculateScore)
         {
             Position positionA = match.PositionA;
             int i = 0;
@@ -201,12 +201,12 @@ namespace cjoli.Server.Services
             }
         }
 
-        public void CalculateEstimates(Tourney tourney, List<ScoreSquad> scores, User? user, CJoliContext context)
+        public void CalculateEstimates(Tourney tourney, Scores scores, User? user, CJoliContext context)
         {
             var userMatches = context.UserMatch.Where(u => u.User == user).ToList();
 
-            var scoreUserA = userMatches.Select(u => CreateScore(u.Match.PositionA, u.Match.PositionB, u.ScoreA, u.ScoreB, u.Match, scores));
-            var scoreUserB = userMatches.Select(u => CreateScore(u.Match.PositionB, u.Match.PositionA, u.ScoreB, u.ScoreA, u.Match, scores));
+            var scoreUserA = userMatches.Select(u => CreateScore(u.Match.PositionA, u.Match.PositionB, u.ScoreA, u.ScoreB, u.Match, scores.ScoreSquads));
+            var scoreUserB = userMatches.Select(u => CreateScore(u.Match.PositionB, u.Match.PositionA, u.ScoreB, u.ScoreA, u.Match, scores.ScoreSquads));
             var scoreUsers = scoreUserA.Concat(scoreUserB).ToList();
 
             Score scoreTotal = context.MatchResult.GroupBy(r => 1).Select(SelectScore<int>(1)).SingleOrDefault() ?? new Score();
@@ -253,7 +253,7 @@ namespace cjoli.Server.Services
                     Func<Match, bool> filter = (Match m) => user == null ? !m.Done : !m.Done || m.UserMatches.Count > 0;
                     foreach (var match in squad.Matches.Where(filter))
                     {
-                        CaculateEstimate(match, scores, user, funcScore);
+                        CaculateEstimate(match, scores.ScoreSquads, user, funcScore);
                     }
                 }
             }

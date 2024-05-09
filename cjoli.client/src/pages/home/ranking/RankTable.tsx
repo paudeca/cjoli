@@ -68,7 +68,9 @@ const RankTable = ({ phase }: { phase: Phase }) => {
   return (
     <>
       {squads.map((squad) => {
-        const scores = ranking?.scores.find((s) => s.squadId == squad.id);
+        const scores = ranking?.scores.scoreSquads.find(
+          (s) => s.squadId == squad.id
+        );
         const datas = scores ? scores.scores : [];
         const userMatches = squad.matches
           .filter((m) => m.userMatch)

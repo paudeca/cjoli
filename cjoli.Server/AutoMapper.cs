@@ -43,6 +43,7 @@ namespace cjoli.Server
                 .ForMember(x=>x.Phase, opt=>opt.MapFrom(r=>r.Squad.Phase.Name))
                 .ForMember(x=>x.Squad, opt=>opt.MapFrom(r=>r.Squad.Name));
 
+            CreateMap<Scores, Scores>();
             CreateMap<ScoreSquad, ScoreSquad>();
             CreateMap<Score, Score>();
 

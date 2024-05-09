@@ -1,15 +1,6 @@
 import React from "react";
 import { CJoliContext } from "../contexts/CJoliContext";
-import {
-  Match,
-  Phase,
-  Rank,
-  Ranking,
-  Score,
-  Squad,
-  Team,
-  Tourney,
-} from "../models";
+import { Match, Phase, Rank, Ranking, Squad, Team, Tourney } from "../models";
 import { CJoliActions } from "../contexts/actions";
 
 export const useCJoli = () => {
@@ -66,7 +57,7 @@ export const useCJoli = () => {
 
   const getRankPosition = React.useCallback(
     (rank: Rank) => {
-      const scoreSquad = state.ranking?.scores.find(
+      const scoreSquad = state.ranking?.scores.scoreSquads.find(
         (s) => s.squadId == rank.squadId
       );
       const score = scoreSquad?.scores[rank.value - 1];
@@ -109,50 +100,11 @@ export const useCJoli = () => {
     [getPosition]
   );
 
-  const getAllScoreForTeam = React.useCallback(
+  const getScoreForTeam = React.useCallback(
     (team: Team) => {
-      const squads =
-        state.squads?.filter((s) =>
-          s.positions.some((p) => p.teamId == team.id)
-        ) || [];
-      const positions = squads.map(
-        (s) => s.positions.find((p) => p.teamId == team.id)!
-      );
-      const scores = (state.ranking?.scores || [])
-        .filter((s) => squads.map((s) => s.id).includes(s.squadId))
-        .map(
-          (s) =>
-            s.scores.find((s) =>
-              positions.map((p) => p.id).includes(s.positionId)
-            )!
-        );
-      return scores.reduce<Score>(
-        (acc, score) => {
-          acc.total += score.total;
-          acc.game += score.game;
-          acc.win += score.win;
-          acc.neutral += score.neutral;
-          acc.loss += score.loss;
-          acc.goalFor += score.goalFor;
-          acc.goalAgainst += score.goalAgainst;
-          acc.goalDiff += score.goalDiff;
-          acc.shutOut += score.shutOut;
-          return acc;
-        },
-        {
-          total: 0,
-          game: 0,
-          win: 0,
-          neutral: 0,
-          loss: 0,
-          goalFor: 0,
-          goalAgainst: 0,
-          goalDiff: 0,
-          shutOut: 0,
-        } as Score
-      );
+      return state.ranking?.scores.scoreTeams[team.id];
     },
-    [state.squads, state.ranking?.scores]
+    [state.ranking?.scores.scoreTeams]
   );
 
   return {
@@ -169,6 +121,6 @@ export const useCJoli = () => {
     isTeamInPhase,
     isTeamInSquad,
     isTeamInMatch,
-    getAllScoreForTeam,
+    getScoreForTeam,
   };
 };

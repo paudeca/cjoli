@@ -1,7 +1,7 @@
-import { ScoreSquad } from "./ScoreSquad";
+import { Scores } from "./Scores";
 import { Tourney } from "./Tourney";
 
 export interface Ranking {
   tourney: Tourney;
-  scores: ScoreSquad[];
+  scores: Scores;
 }
