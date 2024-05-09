@@ -168,6 +168,14 @@ namespace cjoli.Server.Services
                 return scores;
             });
             var listScores = scores.Select(kv => kv.Value).OrderByDescending(x => x.Total).ToList();
+            listScores = listScores.Select(s =>
+            {
+                Position position = squad.Positions.Single(p => p.Id == s.PositionId);
+                s.Total -= position.Penalty;
+                s.Penalty = position.Penalty;
+                return s;
+            }).ToList();
+
             listScores.Sort((a, b) =>
             {
                 var diff = a.Total.CompareTo(b.Total);
@@ -365,10 +373,16 @@ namespace cjoli.Server.Services
             context.SaveChanges();
         }
 
-
-        public void UpdateTeam(string uuid, TeamDto teamDto, CJoliContext context)
+        public void UpdatePosition(string uuid, PositionDto positionDto, CJoliContext context)
         {
-            Tourney? tourney = context.Tourneys.Include(t => t.Teams).SingleOrDefault(t => t.Uid == uuid);
+            Position position = context.Position.Single(p => p.Id == positionDto.Id);
+            position.Penalty = positionDto.Penalty;
+            context.SaveChanges();
+        }
+
+        public Team UpdateTeam(string uuid, TeamDto teamDto, CJoliContext context)
+        {
+            Tourney? tourney = context.Tourneys.Include(t => t.Teams).ThenInclude(t=>t.TeamDatas.Where(d=>d.Tourney.Uid==uuid)).SingleOrDefault(t => t.Uid == uuid);
             if (tourney == null)
             {
                 throw new NotFoundException("Tou    rney", uuid);
@@ -380,8 +394,16 @@ namespace cjoli.Server.Services
             }
             team.Logo = teamDto.Logo ?? team.Logo;
             team.Youngest = teamDto.Youngest ?? team.Youngest;
-            context.SaveChanges();
 
+            TeamData? data = team.TeamDatas.SingleOrDefault();
+            if (data == null)
+            {
+                data = new TeamData() { Team = team, Tourney = tourney };
+                team.TeamDatas.Add(data);
+            }
+            data.Penalty = teamDto.Datas?.Penalty ?? data.Penalty;
+            context.SaveChanges();
+            return team;
         }
 
         public void SaveUserConfig(string tourneyUid, string login, UserConfigDto dto, CJoliContext context)
@@ -441,6 +463,7 @@ namespace cjoli.Server.Services
         public int GoalDiff { get; set; }
         public int Coefficient { get; set; }
         public int ShutOut { get; set; }
+        public int Penalty { get; set; }
 
         public void Merge(Score score)
         {
@@ -453,6 +476,7 @@ namespace cjoli.Server.Services
             GoalAgainst += score.GoalAgainst;
             GoalDiff += score.GoalDiff;
             ShutOut += score.ShutOut;
+            Penalty += score.Penalty;
         }
     }
 }

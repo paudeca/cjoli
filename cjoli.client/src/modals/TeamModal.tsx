@@ -3,21 +3,25 @@ import { useToast } from "../contexts/ToastContext";
 import { Team } from "../models";
 import * as cjoliService from "../services/cjoliService";
 import useUid from "../hooks/useUid";
+import { useCJoli } from "../hooks/useCJoli";
 
 const TeamModal = ({ team }: { team?: Team }) => {
+  const { loadRanking } = useCJoli();
   const { showToast } = useToast();
   const uid = useUid();
 
   const fields: Field<Team>[] = [
     { id: "logo", label: "Logo", type: "text", autoFocus: true },
     { id: "youngest", label: "Youngest (date)", type: "date" },
+    { id: "datas.penalty", label: "Penalty", type: "number" },
   ];
   const onSubmit = async (team: Team) => {
-    const result = await cjoliService.updateTeam(uid, team);
-    if (!result) {
+    const ranking = await cjoliService.updateTeam(uid, team);
+    if (!ranking) {
       showToast("danger", "Unable to update Team");
       return false;
     } else {
+      loadRanking(ranking);
       return true;
     }
   };

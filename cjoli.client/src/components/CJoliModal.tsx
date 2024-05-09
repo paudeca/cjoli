@@ -13,7 +13,7 @@ import React from "react";
 export interface Field<T extends FieldValues> {
   id: Path<T>;
   label: string;
-  type: "text" | "password" | "date";
+  type: "text" | "password" | "date" | "number";
   required?: boolean;
   validate?: Path<T>;
   autoFocus?: boolean;

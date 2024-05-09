@@ -102,12 +102,25 @@ namespace cjoli.Server.Controllers
 
 
         [HttpPost]
+        [Authorize]
         [Route("{uuid}/UpdateTeam")]
-        public bool UpdateTeam([FromRoute] string uuid, [FromBody] TeamDto teamDto)
+        public RankingDto UpdateTeam([FromRoute] string uuid, [FromBody] TeamDto teamDto)
         {
+            var login = GetLogin();
             _service.UpdateTeam(uuid, teamDto, _context);
-            return true;
+            return GetRanking(uuid);
         }
+
+        [HttpPost]
+        [Authorize]
+        [Route("{uuid}/UpdatePosition")]
+        public RankingDto UpdatePosition([FromRoute] string uuid, [FromBody] PositionDto positionDto)
+        {
+            var login = GetLogin();
+            _service.UpdatePosition(uuid, positionDto, _context);
+            return GetRanking(uuid);
+        }
+
 
         [HttpGet]
         [Authorize]

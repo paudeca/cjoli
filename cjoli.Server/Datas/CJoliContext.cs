@@ -15,6 +15,7 @@ namespace cjoli.Server.Datas
         public DbSet<MatchResult> MatchResult { get; set; }
         public DbSet<UserMatch> UserMatch { get; set; }
         public DbSet<MatchEstimate> MatchEstimate { get; set; }
+        public DbSet<Position> Position { get; set; }
 
         private const string CRYPT_PURPOSE = "CJoliCryptPurpose";
 

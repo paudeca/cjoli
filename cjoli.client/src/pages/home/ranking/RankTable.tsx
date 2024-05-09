@@ -1,19 +1,15 @@
 import styled from "@emotion/styled";
 import { Card, Table } from "react-bootstrap";
-import { Phase, Squad, Team } from "../../../models";
+import { Phase, Squad } from "../../../models";
 import TeamName from "../../../components/TeamName";
 import LeftCenterDiv from "../../../components/LeftCenterDiv";
 import {
   ArrowLeftSquareFill,
   ArrowRightSquareFill,
-  PencilSquare,
   CaretRight,
 } from "react-bootstrap-icons";
-import TeamModal from "../../../modals/TeamModal";
-import { useModal } from "../../../contexts/ModalContext";
 import React from "react";
 import { useCJoli } from "../../../hooks/useCJoli";
-import { useUser } from "../../../hooks/useUser";
 import useScreenSize from "../../../hooks/useScreenSize";
 import SimulationIcon from "../../../components/SimulationIcon";
 import * as cjoliService from "../../../services/cjoliService";
@@ -21,6 +17,7 @@ import useUid from "../../../hooks/useUid";
 import { useNavigate, useParams } from "react-router-dom";
 import { zoomIcon, bgSecondary } from "../../../styles";
 import CJoliTooltip from "../../../components/CJoliTooltip";
+import PenaltyIcon from "../../../components/PenaltyIcon";
 
 const MyTh = styled("th")`
   ${bgSecondary}
@@ -47,9 +44,6 @@ const RankTable = ({ phase }: { phase: Phase }) => {
     getTeamInfo,
     isTeamInSquad,
   } = useCJoli();
-  const { setShow: showTeam } = useModal("team");
-  const { isAdmin } = useUser();
-  const [team, setTeam] = React.useState<Team | undefined>(undefined);
   const { isMobile } = useScreenSize();
   const uid = useUid();
   const navigate = useNavigate();
@@ -177,6 +171,7 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                               title={`Simulation - ${name}`}
                               onRemove={handleRemove(userMatches)}
                             />
+                            <PenaltyIcon positionId={score.positionId} />
                             {team && (
                               <MyCaretRight
                                 role="button"
@@ -184,16 +179,6 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                                 onClick={() =>
                                   navigate(`/${uid}/team/${team.id}`)
                                 }
-                              />
-                            )}
-                            {team && false && isAdmin && (
-                              <PencilSquare
-                                role="button"
-                                className="mx-2"
-                                onClick={() => {
-                                  setTeam(team);
-                                  showTeam(true);
-                                }}
                               />
                             )}
                           </LeftCenterDiv>
@@ -264,7 +249,6 @@ const RankTable = ({ phase }: { phase: Phase }) => {
           </Card.Body>
         );
       })}
-      <TeamModal team={team} />
     </>
   );
 };

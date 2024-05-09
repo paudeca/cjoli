@@ -1,5 +1,13 @@
 import axios from "axios";
-import { Ranking, User, Match, Team, Tourney, UserConfig } from "../models";
+import {
+  Ranking,
+  User,
+  Match,
+  Team,
+  Tourney,
+  UserConfig,
+  Position,
+} from "../models";
 import Cookie from "universal-cookie";
 
 const url = import.meta.env.VITE_API_URL;
@@ -67,15 +75,23 @@ export const update = async (user: User) => {
     });
 };
 
+export const updatePosition = async (uid: string, position: Position) => {
+  const { data } = await axios.post<Ranking>(
+    `${url}/cjoli/${uid}/updatePosition`,
+    position
+  );
+  return data;
+};
+
 export const updateTeam = async (uid: string, team: Team) => {
   return await axios
-    .post<boolean>(`${url}/cjoli/${uid}/updateTeam`, team)
+    .post<Ranking>(`${url}/cjoli/${uid}/updateTeam`, team)
     .then(async ({ data }) => {
       return data;
     })
     .catch((error) => {
       console.log("Unable to update", error);
-      return false;
+      return undefined;
     });
 };
 

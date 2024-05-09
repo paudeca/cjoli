@@ -5,4 +5,5 @@ export interface Position {
   short?: string;
   teamId: number;
   squadId: number;
+  penalty: number;
 }
