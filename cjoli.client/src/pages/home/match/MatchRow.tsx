@@ -46,15 +46,17 @@ const MatchRow = ({
 }: MatchRowProps) => {
   const { getSquad } = useCJoli();
   const { isMobile } = useScreenSize();
-  const { isConnected, isAdmin } = useUser();
+  const { isConnected, isAdmin, userConfig } = useUser();
 
+  const hasUserMatch =
+    match.userMatch && (!isAdmin || (isAdmin && userConfig.useCustomEstimate));
   const imatch: IMatch = match.done
     ? match
-    : match.userMatch
+    : match.userMatch && hasUserMatch
     ? match.userMatch
     : match;
-  const done = match.userMatch || match.done;
-  const isSimulation = !!match.userMatch;
+  const done = hasUserMatch || match.done;
+  const isSimulation = !!hasUserMatch;
 
   let badgeA =
     imatch.scoreA > imatch.scoreB

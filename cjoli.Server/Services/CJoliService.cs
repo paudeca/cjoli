@@ -40,6 +40,7 @@ namespace cjoli.Server.Services
 
         public Tourney GetTourney(string tourneyUid, User? user, CJoliContext context)
         {
+            bool isAdmin = user.IsAdmin();
             Tourney? tourney = context.Tourneys
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.Team)
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.ParentPosition)
