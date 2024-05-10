@@ -10,6 +10,7 @@ import * as cjoliService from "../services/cjoliService";
 import { useUser } from "../hooks/useUser";
 import { useCJoli } from "../hooks/useCJoli";
 import useUid from "../hooks/useUid";
+import ChatButton from "./home/ChatButton";
 
 const MainPage = () => {
   const { loadUser } = useUser();
@@ -38,6 +39,7 @@ const MainPage = () => {
     <Loading ready={ready}>
       <MenuNav />
       <Outlet />
+      <ChatButton />
       <ToastContainer position="top-end">
         <Toast onClose={hideToast} show={show} delay={5000} autohide bg={type}>
           <Toast.Header>

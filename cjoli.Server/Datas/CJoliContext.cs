@@ -39,7 +39,7 @@ namespace cjoli.Server.Datas
             modelBuilder.Entity<ParentPosition>().HasOne(p => p.Position).WithOne(p => p.ParentPosition).OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Match>().HasMany(m => m.UserMatches).WithOne(u => u.Match).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Match>().HasMany(m=>m.MatchResults).WithOne(m=>m.Match).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Match>().HasMany(m => m.MatchResults).WithOne(m => m.Match).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Match>().HasMany(m => m.Estimates).WithOne(e => e.Match).OnDelete(DeleteBehavior.Cascade);
 
 
@@ -52,7 +52,7 @@ namespace cjoli.Server.Datas
 
             modelBuilder.Entity<User>().Property(u => u.Password).HasConversion(u => provider.CreateProtector(CRYPT_PURPOSE).Protect(u), u => provider.CreateProtector(CRYPT_PURPOSE).Unprotect(u));
             modelBuilder.Entity<User>().HasIndex(t => t.Login).IsUnique();
-            modelBuilder.Entity<User>().HasMany(u=>u.UserMatches).WithOne(u=>u.User).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<User>().HasMany(u => u.UserMatches).WithOne(u => u.User).OnDelete(DeleteBehavior.Cascade);
         }
 
     }

@@ -7,13 +7,13 @@ namespace cjoli.Server.Extensions
         public static bool IsAdmin(this User? user)
         {
             var config = user?.Configs.FirstOrDefault();
-            return user?.Role == "ADMIN" && (config==null || !config.UseCustomEstimate);
+            return user?.Role == "ADMIN" && (config == null || !config.UseCustomEstimate);
         }
 
         public static bool HasCustomEstimate(this User? user)
         {
             var config = user?.Configs.FirstOrDefault();
-            return user !=null && config!=null && config.UseCustomEstimate;
+            return user != null && config != null && config.UseCustomEstimate;
         }
     }
 }

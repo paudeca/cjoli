@@ -18,7 +18,6 @@ import React from "react";
 import { Rank, Score, Team } from "../../models";
 import {
   ArrowLeft,
-  ArrowLeftShort,
   CaretDownFill,
   CaretUpFill,
   PauseFill,
@@ -30,8 +29,8 @@ import TeamModal from "../../modals/TeamModal";
 import { useModal } from "../../contexts/ModalContext";
 import { useUser } from "../../hooks/useUser";
 import CJoliTooltip from "../../components/CJoliTooltip";
-import { cp } from "fs";
 import useUid from "../../hooks/useUid";
+import TeamRadar from "./team/TeamRadar";
 
 type CellIconProps<T> = {
   value?: T;
@@ -239,113 +238,62 @@ const TeamStack = () => {
                   </Row>
                 </Form>
               </Stack>
-              <Stack>
-                {!isMobile && (
-                  <Table
-                    striped
-                    bordered
-                    size="sm"
-                    style={{ textAlign: "center" }}
-                  >
-                    <thead>
-                      <tr>
-                        <th />
-                        {columns.map((c, i) => (
-                          <th key={i}>
-                            <LeftCenterDiv width={40}>
-                              <CJoliTooltip info={c.description}>
-                                {c.label}
-                              </CJoliTooltip>
-                            </LeftCenterDiv>
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {datas.map(({ team, rank, score }, i) => (
-                        <tr key={team.id}>
-                          <td>
-                            <LeftCenterDiv>
-                              <TeamName teamId={team.id} />
-                            </LeftCenterDiv>
-                          </td>
-                          {columns.map((c, j) =>
-                            c.callRank ? (
+              <Stack direction={isMobile ? "vertical" : "horizontal"}>
+                <TeamRadar
+                  teamA={{ team, rank: rank!, score: score! }}
+                  teamB={{ team: teamB, rank: rankB, score: scoreB }}
+                  direction={isMobile ? "vertical" : "horizontal"}
+                />
+
+                <Table
+                  striped
+                  bordered
+                  size="sm"
+                  style={{ textAlign: "center" }}
+                >
+                  <thead>
+                    <tr>
+                      <th />
+                      {datas.map(({ team }) => (
+                        <th key={team.id}>
+                          <TeamName teamId={team.id} />
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {columns.map((c, i) => (
+                      <tr key={i}>
+                        <td>
+                          <CJoliTooltip info={c.description}>
+                            {c.label}
+                          </CJoliTooltip>
+                        </td>
+                        {datas.map(({ rank, score }, j) => (
+                          <React.Fragment key={j}>
+                            {c.callRank ? (
                               <CellIcon
-                                key={j}
                                 value={rank}
                                 valueB={rankB}
                                 call={c.callRank}
-                                active={c.active && i == 0}
+                                active={c.active && j == 0}
                                 up={c.up}
                               />
                             ) : (
                               <CellIcon
-                                key={j}
                                 value={score}
                                 valueB={scoreB}
                                 call={c.callScore!}
-                                active={c.active && i == 0}
+                                active={c.active && j == 0}
                                 up={c.up}
                               />
-                            )
-                          )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                )}
-                {isMobile && (
-                  <Table
-                    striped
-                    bordered
-                    size="sm"
-                    style={{ textAlign: "center" }}
-                  >
-                    <thead>
-                      <tr>
-                        <th />
-                        {datas.map(({ team }) => (
-                          <th key={team.id}>
-                            <TeamName teamId={team.id} />
-                          </th>
+                            )}
+                          </React.Fragment>
                         ))}
                       </tr>
-                    </thead>
-                    <tbody>
-                      {columns.map((c, i) => (
-                        <tr key={i}>
-                          <td>
-                            <CJoliTooltip info={c.description}>
-                              {c.label}
-                            </CJoliTooltip>
-                          </td>
-                          {datas.map(({ rank, score }, j) => (
-                            <React.Fragment key={j}>
-                              {c.callRank ? (
-                                <CellIcon
-                                  value={rank}
-                                  valueB={rankB}
-                                  call={c.callRank}
-                                  active={c.active && j == 0}
-                                  up={c.up}
-                                />
-                              ) : (
-                                <CellIcon
-                                  value={score}
-                                  valueB={scoreB}
-                                  call={c.callScore!}
-                                  active={c.active && j == 0}
-                                  up={c.up}
-                                />
-                              )}
-                            </React.Fragment>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                )}
+                    ))}
+                  </tbody>
+                </Table>
               </Stack>
             </Card>
             <Stack direction="horizontal" className="p-3">

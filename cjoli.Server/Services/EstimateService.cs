@@ -1,7 +1,6 @@
 ﻿using cjoli.Server.Datas;
 using cjoli.Server.Extensions;
 using cjoli.Server.Models;
-using Microsoft.AspNetCore.Identity;
 
 namespace cjoli.Server.Services
 {
@@ -42,7 +41,7 @@ namespace cjoli.Server.Services
         }
 
 
-        private Score CreateScore(Position positionA, Position positionB, int scoreA, int scoreB,Match match, IList<ScoreSquad> scores)
+        private Score CreateScore(Position positionA, Position positionB, int scoreA, int scoreB, Match match, IList<ScoreSquad> scores)
         {
             Team? teamA = FindTeam(positionA, scores);
             Team? teamB = FindTeam(positionB, scores);
@@ -64,7 +63,8 @@ namespace cjoli.Server.Services
 
         private Func<Match, Team, Team, bool, Score> CalculateScore(List<Func<Team, Team, Score>> scoreList)
         {
-            return (Match match, Team teamA, Team teamB, bool inverse) => {
+            return (Match match, Team teamA, Team teamB, bool inverse) =>
+            {
                 List<Score> scores = scoreList.Select(func => func(teamA, teamB)).ToList();
                 Score scoreFinal = scores.Aggregate(new Score(), (acc, score) =>
                 {
@@ -144,18 +144,19 @@ namespace cjoli.Server.Services
                 estimate = new MatchEstimate() { Match = match };
                 match.Estimates.Add(estimate);
             }
-            
+
             estimate.User = user.IsAdmin() ? null : user;
             estimate.ScoreA = (int)Math.Round(goalA);
             estimate.ScoreB = (int)Math.Round(goalB);
 
-            if(estimate.ScoreA==estimate.ScoreB)
+            if (estimate.ScoreA == estimate.ScoreB)
             {
-                if(winA>winB)
+                if (winA > winB)
                 {
                     var delta = goalDiffA - goalDiffB;
-                    estimate.ScoreA = (int)Math.Round(goalA+delta);
-                } else
+                    estimate.ScoreA = (int)Math.Round(goalA + delta);
+                }
+                else
                 {
                     var delta = goalDiffB - goalDiffA;
                     estimate.ScoreB = (int)Math.Round(goalB + delta);
@@ -199,18 +200,19 @@ namespace cjoli.Server.Services
 
             var mapCurrentTeam = queryMatch.Where(r => r.Match.Squad!.Phase.Tourney == tourney).GroupBy(r => r.Team.Id).ToDictionary(kv => kv.Key, kv => SelectScore<int>(1000)(kv)) ?? new Dictionary<int, Score>();
 
-            var mapDirects = queryMatch.Where(r=>r.TeamAgainst!=null).GroupBy(r => new MyKv{ TeamA=r.Team.Id, TeamB=r.TeamAgainst.Id}).ToDictionary(kv=>kv.Key,kv=>SelectScore<MyKv>(100)(kv));
+            var mapDirects = queryMatch.Where(r => r.TeamAgainst != null).GroupBy(r => new MyKv { TeamA = r.Team.Id, TeamB = r.TeamAgainst.Id }).ToDictionary(kv => kv.Key, kv => SelectScore<MyKv>(100)(kv));
             var mapDirectSeasons = queryMatchSeason.Where(r => r.TeamAgainst != null).GroupBy(r => new MyKv { TeamA = r.Team.Id, TeamB = r.TeamAgainst.Id }).ToDictionary(kv => kv.Key, kv => SelectScore<MyKv>(10000)(kv));
 
-            var mapOtherTeams = queryMatch.GroupBy(r => r.Team).ToDictionary(kv => kv.Key, kv => kv.Where(r=>r.TeamAgainst!=null).Select(r=>r.TeamAgainst.Id).ToList());
+            var mapOtherTeams = queryMatch.GroupBy(r => r.Team).ToDictionary(kv => kv.Key, kv => kv.Where(r => r.TeamAgainst != null).Select(r => r.TeamAgainst.Id).ToList());
             var mapOtherTeamSeasons = queryMatchSeason.GroupBy(r => r.Team).ToDictionary(kv => kv.Key, kv => kv.Where(r => r.TeamAgainst != null).Select(r => r.TeamAgainst.Id).ToList());
 
             var MergeScore = (Dictionary<int, Score> map, int key, Score score, int coefficient) =>
             {
-                if(map.ContainsKey(key))
+                if (map.ContainsKey(key))
                 {
                     map[key].Merge(score);
-                } else
+                }
+                else
                 {
                     score.Coefficient = coefficient;
                     map.Add(key, score);
@@ -228,7 +230,7 @@ namespace cjoli.Server.Services
                 }
             });
 
-            List<Func<Team,Team,Score>> scoreList = [
+            List<Func<Team, Team, Score>> scoreList = [
                 (Team teamA, Team teamB)=>scoreTotal,
                 (Team teamA, Team teamB)=>scoreTotalSeason,
                 (Team teamA, Team teamB)=>mapAllTeam.GetValueOrDefault(teamA.Id)?? new Score(),

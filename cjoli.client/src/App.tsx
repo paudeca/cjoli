@@ -9,6 +9,7 @@ import SelectPage from "./pages/SelectPage";
 import MainPage from "./pages/MainPage";
 import { ToastProvider } from "./contexts/ToastContext";
 import RankPage from "./pages/RankPage";
+import ChatPage from "./pages/ChatPage";
 
 const theme = {
   colors: {
@@ -32,6 +33,7 @@ const router = createBrowserRouter([
       { path: ":uid/phase/:phaseId/squad/:squadId", element: <HomePage /> },
       { path: ":uid/team/:teamId", element: <HomePage /> },
       { path: ":uid/team/:teamId/phase/:phaseId", element: <HomePage /> },
+      { path: ":uid/chat", element: <ChatPage /> },
     ],
   },
 ]);
@@ -44,7 +46,7 @@ const App = () => {
           body {
             background-color: #202644;
             color: white;
-            user-select: none;
+            uuser-select: none;
           }
           .btn-primary {
             --bs-btn-bg: #313f69;
@@ -71,6 +73,28 @@ const App = () => {
           .form-check-input:checked {
             background-color: #313f69;
             border-color: #313f69;
+          }
+
+          .chat-messages {
+            display: flex;
+            flex-direction: column;
+            max-height: 800px;
+            overflow-y: scroll;
+          }
+
+          .chat-message-left,
+          .chat-message-right {
+            display: flex;
+            flex-shrink: 0;
+          }
+
+          .chat-message-left {
+            margin-right: auto;
+          }
+
+          .chat-message-right {
+            flex-direction: row-reverse;
+            margin-left: auto;
           }
         `}
       />

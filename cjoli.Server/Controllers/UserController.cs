@@ -3,7 +3,6 @@ using cjoli.Server.Datas;
 using cjoli.Server.Dtos;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace cjoli.Server.Controllers
@@ -37,7 +36,7 @@ namespace cjoli.Server.Controllers
         public UserDto? Get()
         {
             var login = GetLogin();
-            if (login==null)
+            if (login == null)
             {
                 return null;
             }
@@ -64,7 +63,7 @@ namespace cjoli.Server.Controllers
         public bool Update(UserUpdate user)
         {
             var login = GetLogin();
-            if (login==null)
+            if (login == null)
             {
                 return false;
             }

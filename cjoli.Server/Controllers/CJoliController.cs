@@ -40,7 +40,7 @@ namespace cjoli.Server.Controllers
         [Route("Tourneys")]
         public List<TourneyDto> ListTourneys()
         {
-            return _service.ListTourneys(_context).Select(t=>_mapper.Map<TourneyDto>(t)).ToList();
+            return _service.ListTourneys(_context).Select(t => _mapper.Map<TourneyDto>(t)).ToList();
         }
 
 
@@ -128,7 +128,7 @@ namespace cjoli.Server.Controllers
         public RankingDto UpdateEstimate(string uuid)
         {
             var login = GetLogin();
-            _service.UpdateEstimate(uuid, login!,_context);
+            _service.UpdateEstimate(uuid, login!, _context);
             return GetRanking(uuid);
         }
 

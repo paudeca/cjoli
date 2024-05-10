@@ -62,6 +62,7 @@ builder.Services.AddSingleton<CJoliService>();
 builder.Services.AddSingleton<ImportService>();
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<EstimateService>();
+builder.Services.AddSingleton<AIService>();
 
 builder.Services.AddDbContextPool<CJoliContext>(options =>
 {
@@ -76,6 +77,7 @@ var app = builder.Build();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseCors();
+//app.UseWebSockets();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

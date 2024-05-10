@@ -28,27 +28,27 @@ namespace cjoli.Server
                 .ForMember(x => x.PositionIdB, opt => opt.MapFrom(a => a.PositionB.Id))
                 .ForMember(x => x.SquadId, opt => opt.MapFrom(a => a.Squad != null ? a.Squad.Id : 0))
                 .ForMember(x => x.PhaseId, opt => opt.MapFrom(a => a.Squad != null && a.Squad.Phase != null ? a.Squad.Phase.Id : 0))
-                .ForMember(x=>x.UserMatch, opt=>opt.MapFrom(u=>u.UserMatches.SingleOrDefault()))
-                .ForMember(x=>x.Estimate, opt=>opt.MapFrom(a=>a.Estimates.OrderByDescending(s=>s.User).FirstOrDefault()));
+                .ForMember(x => x.UserMatch, opt => opt.MapFrom(u => u.UserMatches.SingleOrDefault()))
+                .ForMember(x => x.Estimate, opt => opt.MapFrom(a => a.Estimates.OrderByDescending(s => s.User).FirstOrDefault()));
             CreateMap<UserMatch, UserMatchDto>();
             CreateMap<MatchEstimate, MatchEstimateDto>();
 
-            CreateMap<Team, TeamDto>().ForMember(x => x.Datas, opt=>opt.MapFrom(t=>t.TeamDatas.SingleOrDefault()));
+            CreateMap<Team, TeamDto>().ForMember(x => x.Datas, opt => opt.MapFrom(t => t.TeamDatas.SingleOrDefault()));
             CreateMap<TeamData, TeamDataDto>();
 
             CreateMap<Ranking, RankingDto>();
             CreateMap<Rank, RankDto>()
-                .ForMember(x=>x.PhaseId, opt=>opt.MapFrom(r=>r.Squad.Phase.Id))
-                .ForMember(x=>x.SquadId,opt=>opt.MapFrom(r=>r.Squad.Id))
-                .ForMember(x=>x.Phase, opt=>opt.MapFrom(r=>r.Squad.Phase.Name))
-                .ForMember(x=>x.Squad, opt=>opt.MapFrom(r=>r.Squad.Name));
+                .ForMember(x => x.PhaseId, opt => opt.MapFrom(r => r.Squad.Phase.Id))
+                .ForMember(x => x.SquadId, opt => opt.MapFrom(r => r.Squad.Id))
+                .ForMember(x => x.Phase, opt => opt.MapFrom(r => r.Squad.Phase.Name))
+                .ForMember(x => x.Squad, opt => opt.MapFrom(r => r.Squad.Name));
 
             CreateMap<Scores, Scores>();
             CreateMap<ScoreSquad, ScoreSquad>();
             CreateMap<Score, Score>();
 
             CreateMap<User, UserDto>().ForMember(x => x.Password, opt => opt.Ignore());
-            CreateMap<UserConfig, UserConfigDto>().ForMember(x=>x.TourneyId, opt=>opt.MapFrom(u=>u.Tourney.Id));
+            CreateMap<UserConfig, UserConfigDto>().ForMember(x => x.TourneyId, opt => opt.MapFrom(u => u.Tourney.Id));
         }
     }
 }

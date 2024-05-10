@@ -30,7 +30,7 @@ namespace cjoli.Server.Services
                     .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.ParentPosition)
                     .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches)
                     .Include(t => t.Teams)
-                    .Include(t=>t.Ranks)
+                    .Include(t => t.Ranks)
                     .SingleOrDefault(t => t.Uid == tourneyDto.Uid),
                 create: () =>
                 {
@@ -57,9 +57,10 @@ namespace cjoli.Server.Services
             return Import(
                 dto: teamDto,
                 context: context,
-                select: () => {
+                select: () =>
+                {
                     Func<Team, bool> filter = teamDto.Id > 0 ? (t) => t.Id == teamDto.Id : (t) => t.Name == teamDto.Name;
-                    return context.Team.SingleOrDefault(filter); 
+                    return context.Team.SingleOrDefault(filter);
                 },
                 create: () =>
                 {
@@ -69,7 +70,7 @@ namespace cjoli.Server.Services
                 },
                 update: (team) =>
                 {
-                    if(!team.Tourneys.Contains(tourney))
+                    if (!team.Tourneys.Contains(tourney))
                     {
                         team.Tourneys.Add(tourney);
                     }
@@ -199,7 +200,6 @@ namespace cjoli.Server.Services
                     match.Done = matchDto.Done;
                     match.Time = matchDto.Time;
                     match.Location = matchDto.Location ?? match.Location;
-                    match.Shot = matchDto.Shot;
                 }
             );
         }
@@ -209,11 +209,11 @@ namespace cjoli.Server.Services
             return Import(
                 dto: rankDto,
                 context: context,
-                select: () => tourney.Ranks.SingleOrDefault(r=>r.Order==rankDto.Order),
+                select: () => tourney.Ranks.SingleOrDefault(r => r.Order == rankDto.Order),
                 create: () =>
                 {
                     Squad squad = tourney.Phases.Single(s => s.Name == rankDto.Phase).Squads.Single(s => s.Name == rankDto.Squad);
-                    var rank = new Rank() { Tourney=tourney, Squad=squad, Order=rankDto.Order };
+                    var rank = new Rank() { Tourney = tourney, Squad = squad, Order = rankDto.Order };
                     tourney.Ranks.Add(rank);
                     return rank;
                 },
