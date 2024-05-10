@@ -1,7 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import { ToastContainer, Toast } from "react-bootstrap";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Loading from "../components/Loading";
 import MenuNav from "./MenuNav";
 import React from "react";
@@ -21,6 +21,8 @@ const MainPage = () => {
   } = useToast();
   const { loadTourneys, selectTourney } = useCJoli();
   const uid = useUid();
+  const { pathname } = useLocation();
+  const isOnChat = pathname.endsWith("chat");
 
   React.useEffect(() => {
     const call = async () => {
@@ -39,7 +41,7 @@ const MainPage = () => {
     <Loading ready={ready}>
       <MenuNav />
       <Outlet />
-      <ChatButton />
+      {!isOnChat && <ChatButton />}
       <ToastContainer position="top-end">
         <Toast onClose={hideToast} show={show} delay={5000} autohide bg={type}>
           <Toast.Header>

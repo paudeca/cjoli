@@ -77,7 +77,7 @@ var app = builder.Build();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseCors();
-//app.UseWebSockets();
+app.UseWebSockets();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

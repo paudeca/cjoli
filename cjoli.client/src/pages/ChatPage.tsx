@@ -7,10 +7,49 @@ import {
   InputGroup,
   FormControl,
   Button,
+  Form,
+  Stack,
 } from "react-bootstrap";
-import { Person, Robot } from "react-bootstrap-icons";
+import { ArrowLeft, Person, Robot, Send } from "react-bootstrap-icons";
+import { useForm } from "react-hook-form";
+import useWebSocket, { ReadyState } from "react-use-websocket";
+import moment from "moment";
+import useUid from "../hooks/useUid";
+import { useNavigate } from "react-router-dom";
+
+interface Message {
+  message: string;
+  author: "bot" | "user";
+  time: Date;
+}
 
 const ChatPage = () => {
+  const [messages, setMessages] = React.useState<Message[]>([]);
+  const { sendMessage, lastMessage, readyState } = useWebSocket<{
+    message: string;
+  }>("ws://localhost:5002/chat/ws");
+  React.useEffect(() => {
+    if (lastMessage != null) {
+      setMessages((messages) => [
+        ...messages,
+        { message: lastMessage.data, author: "bot", time: new Date() },
+      ]);
+      window.setTimeout(() => {
+        ref.current?.scroll(0, ref.current?.scrollHeight);
+      }, 100);
+    }
+  }, [lastMessage, setMessages]);
+  const { register, handleSubmit, resetField } = useForm<Message>();
+  const ref = React.useRef<HTMLDivElement>(null);
+  const uid = useUid();
+  const navigate = useNavigate();
+
+  const submit = (message: Message) => {
+    const msg: Message = { ...message, author: "user", time: new Date() };
+    setMessages([...messages, msg]);
+    resetField("message");
+    sendMessage(msg.message);
+  };
   return (
     <Container>
       <Card>
@@ -23,49 +62,81 @@ const ChatPage = () => {
                 </div>
                 <div className="flex-grow-1 pl-3">
                   <strong>Bot</strong>
-                  <div className="text-muted small">
-                    <em>Typing...</em>
-                  </div>
                 </div>
               </div>
             </div>
             <div className="position-relative">
-              <div className="chat-messages p-4" style={{ maxHeight: 600 }}>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+              <div
+                className="chat-messages p-4"
+                style={{ maxHeight: 600 }}
+                ref={ref}
+              >
+                {messages.map((m, i) => (
                   <React.Fragment key={i}>
-                    <div className="chat-message-right pb-4">
-                      <div>
-                        <Person style={{ fontSize: 40 }} className="mx-2" />
-                        <div className="text-muted small text-nowrap mt-2">
-                          2:33 am
+                    {m.author == "user" && (
+                      <div className="chat-message-right pt-1">
+                        <div>
+                          <Person style={{ fontSize: 20 }} className="mx-2" />
+                          <div
+                            className="text-muted small text-nowrap mt-1"
+                            style={{ fontSize: "11px" }}
+                          >
+                            {moment(m.time).format("LT")}
+                          </div>
+                        </div>
+                        <div
+                          className="flex-shrink-1 bg-light rounded px-3 mr-3"
+                          style={{ fontSize: "12px" }}
+                        >
+                          {m.message}
                         </div>
                       </div>
-                      <div className="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
-                        Lorem ipsum dolor sit amet, vis erat denique in, dicunt
-                        prodesset te vix.
-                      </div>
-                    </div>
-                    <div className="chat-message-left pb-4">
-                      <div>
-                        <Robot style={{ fontSize: 40 }} className="mx-2" />
-                        <div className="text-muted small text-nowrap mt-2">
-                          2:34 am
+                    )}
+                    {m.author == "bot" && (
+                      <div className="chat-message-left pt-1">
+                        <div>
+                          <Robot style={{ fontSize: 20 }} className="mx-2" />
+                          <div
+                            className="text-muted small text-nowrap mt-1"
+                            style={{ fontSize: "11px" }}
+                          >
+                            {moment(m.time).format("LT")}
+                          </div>
+                        </div>
+                        <div
+                          className="flex-shrink-1 bg-light rounded px-3 ml-3"
+                          style={{ fontSize: "12px" }}
+                        >
+                          {m.message}
                         </div>
                       </div>
-                      <div className="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
-                        Sit meis deleniti eu, pri vidit meliore docendi ut, an
-                        eum erat animal commodo.
-                      </div>
-                    </div>
+                    )}
                   </React.Fragment>
                 ))}
               </div>
             </div>
             <div className="flex-grow-0 py-3 px-4 border-top">
-              <InputGroup>
-                <FormControl />
-                <Button variant="primary">Send</Button>
-              </InputGroup>
+              <Form onSubmit={handleSubmit(submit)}>
+                <InputGroup>
+                  <FormControl
+                    {...register("message")}
+                    style={{ fontSize: "12px" }}
+                  />
+                  <Button
+                    variant="primary"
+                    disabled={readyState != ReadyState.OPEN}
+                    className="px-3"
+                  >
+                    Send <Send className="mx-2" />
+                  </Button>
+                  <Button
+                    variant="outline-danger"
+                    onClick={() => navigate(`/${uid}`)}
+                  >
+                    Close
+                  </Button>
+                </InputGroup>
+              </Form>
             </div>
           </Col>
         </Row>

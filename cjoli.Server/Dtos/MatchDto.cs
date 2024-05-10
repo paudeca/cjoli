@@ -4,6 +4,8 @@
     {
         public int Id { get; set; }
         public bool Done { get; set; }
+        public int TeamA { get; set; }
+        public int TeamB { get; set; }
         public int PositionA { get; set; }
         public int PositionIdA { get; set; }
         public int PositionB { get; set; }

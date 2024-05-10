@@ -24,6 +24,7 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.51.3",
     "react-router-dom": "^6.23.0",
+    "react-use-websocket": "^4.8.1",
     "universal-cookie": "^7.1.4"
   },
   "devDependencies": {

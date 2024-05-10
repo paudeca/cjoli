@@ -67,6 +67,15 @@ namespace cjoli.Server.Services
             return new Ranking() { Tourney = tourney, Scores = scores };
         }
 
+        public Ranking GetShortRanking(string tourneyUid, CJoliContext context)
+        {
+            var tourney = context.Tourneys
+                .Include(t=>t.Teams)
+                .Single(t => t.Uid == tourneyUid);
+            var scores = CalculateScores(tourney);
+            return new Ranking() { Tourney = tourney, Scores = scores };
+        }
+
 
         public void UpdateEstimate(string uuid, string login, CJoliContext context)
         {

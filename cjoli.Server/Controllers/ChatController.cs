@@ -1,17 +1,35 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using cjoli.Server.Datas;
+using cjoli.Server.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Caching.Memory;
+using System;
 using System.Net.WebSockets;
+using System.Text;
 
 namespace cjoli.Server.Controllers
 {
+    [ApiController]
+    [Route("[controller]")]
     public class ChatController : ControllerBase
     {
-        [Route("/ws")]
+        private readonly AIService _service;
+        private readonly CJoliContext _context;
+
+        public ChatController(AIService service, CJoliContext context)
+        {
+            _service = service;
+            _context = context;
+        }
+
+        [HttpGet]
+        [Route("ws")]
         public async Task Get()
         {
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                await Echo(webSocket);
+                await Bot(webSocket);
             }
             else
             {
@@ -19,19 +37,24 @@ namespace cjoli.Server.Controllers
             }
         }
 
-        private async Task Echo(WebSocket webSocket)
+        private async Task Bot(WebSocket webSocket)
         {
+            var session = _service.CreateSession(_context);
+            session.OnReply += async (sender, e) => { await SendMessage(e.Message, webSocket); };
+            await _service.PromptMessage(session, _context);
+
+            //await SendMessage(welcome, webSocket);
+
             var buffer = new byte[1024 * 4];
             var receiveResult = await webSocket.ReceiveAsync(
                 new ArraySegment<byte>(buffer), CancellationToken.None);
 
             while (!receiveResult.CloseStatus.HasValue)
             {
-                await webSocket.SendAsync(
-                    new ArraySegment<byte>(buffer, 0, receiveResult.Count),
-                    receiveResult.MessageType,
-                    receiveResult.EndOfMessage,
-                    CancellationToken.None);
+                string message = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
+                session.AddUserMessage(message);
+
+                await _service.PromptMessage(session, _context);
 
                 receiveResult = await webSocket.ReceiveAsync(
                     new ArraySegment<byte>(buffer), CancellationToken.None);
@@ -42,5 +65,17 @@ namespace cjoli.Server.Controllers
                 receiveResult.CloseStatusDescription,
                 CancellationToken.None);
         }
+
+        private async Task SendMessage(string message, WebSocket webSocket)
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes(message);
+            await webSocket.SendAsync(
+                new ArraySegment<byte>(buffer, 0, buffer.Length),
+                WebSocketMessageType.Text,
+                true,
+                CancellationToken.None);
+
+        }
     }
+
 }
