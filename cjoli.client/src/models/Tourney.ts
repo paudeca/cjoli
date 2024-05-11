@@ -8,6 +8,8 @@ export interface Tourney {
   name: string;
   season: string;
   category: string;
+  startTime: Date;
+  endTime: Date;
   phases: Phase[];
   teams: Team[];
   ranks: Rank[];

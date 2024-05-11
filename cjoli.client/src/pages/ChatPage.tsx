@@ -10,12 +10,13 @@ import {
   Form,
   Stack,
 } from "react-bootstrap";
-import { ArrowLeft, Person, Robot, Send } from "react-bootstrap-icons";
+import { Person, Robot, Send } from "react-bootstrap-icons";
 import { useForm } from "react-hook-form";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import moment from "moment";
 import useUid from "../hooks/useUid";
 import { useNavigate } from "react-router-dom";
+import useScreenSize from "../hooks/useScreenSize";
 
 interface Message {
   message: string;
@@ -23,11 +24,13 @@ interface Message {
   time: Date;
 }
 
+const server = import.meta.env.VITE_API_WS;
+
 const ChatPage = () => {
   const [messages, setMessages] = React.useState<Message[]>([]);
   const { sendMessage, lastMessage, readyState } = useWebSocket<{
     message: string;
-  }>("ws://localhost:5002/chat/ws");
+  }>(`${server}/chat/ws`);
   React.useEffect(() => {
     if (lastMessage != null) {
       setMessages((messages) => [
@@ -43,6 +46,7 @@ const ChatPage = () => {
   const ref = React.useRef<HTMLDivElement>(null);
   const uid = useUid();
   const navigate = useNavigate();
+  const { height, isMobile } = useScreenSize();
 
   const submit = (message: Message) => {
     const msg: Message = { ...message, author: "user", time: new Date() };
@@ -68,7 +72,7 @@ const ChatPage = () => {
             <div className="position-relative">
               <div
                 className="chat-messages p-4"
-                style={{ maxHeight: 600 }}
+                style={{ maxHeight: height - (isMobile ? 220 : 240) }}
                 ref={ref}
               >
                 {messages.map((m, i) => (
@@ -117,25 +121,52 @@ const ChatPage = () => {
             </div>
             <div className="flex-grow-0 py-3 px-4 border-top">
               <Form onSubmit={handleSubmit(submit)}>
-                <InputGroup>
-                  <FormControl
-                    {...register("message")}
-                    style={{ fontSize: "12px" }}
-                  />
-                  <Button
-                    variant="primary"
-                    disabled={readyState != ReadyState.OPEN}
-                    className="px-3"
-                  >
-                    Send <Send className="mx-2" />
-                  </Button>
-                  <Button
-                    variant="outline-danger"
-                    onClick={() => navigate(`/${uid}`)}
-                  >
-                    Close
-                  </Button>
-                </InputGroup>
+                {!isMobile && (
+                  <InputGroup>
+                    <FormControl
+                      {...register("message")}
+                      style={{ fontSize: "12px" }}
+                    />
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      disabled={readyState != ReadyState.OPEN}
+                      className="px-3"
+                    >
+                      Send <Send className="mx-2" />
+                    </Button>
+                    <Button
+                      variant="outline-danger"
+                      onClick={() => navigate(`/${uid}`)}
+                    >
+                      Close
+                    </Button>
+                  </InputGroup>
+                )}
+                {isMobile && (
+                  <Stack>
+                    <FormControl
+                      {...register("message")}
+                      style={{ fontSize: "12px" }}
+                    />
+                    <Stack direction="horizontal" className="pt-2">
+                      <Button
+                        variant="outline-danger"
+                        onClick={() => navigate(`/${uid}`)}
+                      >
+                        Close
+                      </Button>
+                      <Button
+                        type="submit"
+                        variant="primary"
+                        disabled={readyState != ReadyState.OPEN}
+                        className="px-3 ms-auto"
+                      >
+                        Send <Send className="mx-2" />
+                      </Button>
+                    </Stack>
+                  </Stack>
+                )}
               </Form>
             </div>
           </Col>
