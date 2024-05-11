@@ -159,7 +159,7 @@ const TeamStack = () => {
       callScore: (s: Score) => s.win,
       getInfo: (s: Score) => percent(s.win, s.game),
       up: true,
-      active: true,
+      active: !!teamB,
       needTeam: false,
     },
     {
