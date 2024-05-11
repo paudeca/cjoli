@@ -33,19 +33,26 @@ import useUid from "../../hooks/useUid";
 import TeamRadar from "./team/TeamRadar";
 
 type CellIconProps<T> = {
+  label: string;
   value?: T;
   valueB?: T;
   call: (a: T) => number | undefined;
+  getLabel?: (a: T) => string | undefined;
+  getInfo?: (a: T) => string;
   up?: boolean;
   active: boolean;
+  display: boolean;
 };
 
 const CellIcon = <T,>({
   value,
   valueB,
   call,
+  getLabel,
+  getInfo,
   up,
   active,
+  display,
 }: CellIconProps<T>) => {
   const calcul = up
     ? (a: number, b: number) => (a > b ? 1 : a == b ? 0 : -1)
@@ -57,7 +64,11 @@ const CellIcon = <T,>({
   return (
     <td>
       <LeftCenterDiv width={40}>
-        {val === undefined ? "-" : val}
+        {val === undefined || !display
+          ? "-"
+          : value && getLabel
+          ? getLabel(value)
+          : val}
         {active && result == 1 && (
           <CaretUpFill color="rgb(25, 135, 84)" className="mx-1" />
         )}
@@ -67,13 +78,23 @@ const CellIcon = <T,>({
         {active && !!valB && result == 0 && (
           <PauseFill style={{ transform: "rotate(90deg)" }} color="#ffc107" />
         )}
+        <span className="mx-1" style={{ fontSize: 11, color: "grey" }}>
+          {getInfo && value && display && getInfo(value)}
+        </span>
       </LeftCenterDiv>
     </td>
   );
 };
 
+const percent = (value: number, total: number) =>
+  total == 0 ? "" : `${Math.round((value / total) * 100)}%`;
+
+const average = (value: number, total: number) =>
+  total == 0 ? "" : `avg: ${(value / total).toFixed(1)}`;
+
 const TeamStack = () => {
-  const { teams, getTeam, getTeamRank, getScoreForTeam } = useCJoli();
+  const { teams, tourney, getTeam, getTeamRank, getScoreForTeam, ranking } =
+    useCJoli();
   const { teamId } = useParams();
   const { register } = useForm();
   const { isMobile } = useScreenSize();
@@ -85,15 +106,24 @@ const TeamStack = () => {
 
   const team = getTeam(parseInt(teamId!));
   if (!team) {
-    return <>No tema found</>;
+    return <>No team found</>;
   }
   const rank = getTeamRank(team);
   const rankB = teamB && getTeamRank(teamB);
   const score = getScoreForTeam(team);
-  const scoreB = teamB && getScoreForTeam(teamB);
-  let datas = [{ team, rank, score }];
+  let scoreB = teamB && getScoreForTeam(teamB);
+  let datas: { team?: Team; rank?: Rank; score?: Score }[] = [
+    { team, rank, score },
+  ];
   if (teamB) {
     datas = [...datas, { team: teamB, rank: rankB, score: scoreB }];
+  } else {
+    const scoreTourney = ranking?.scores.scoreTourney;
+    scoreB = scoreTourney;
+    datas = [
+      ...datas,
+      { team: undefined, rank: undefined, score: scoreTourney },
+    ];
   }
 
   const columns = [
@@ -101,15 +131,19 @@ const TeamStack = () => {
       label: "Rang",
       description: "Classement",
       callRank: (r: Rank) => r.order || 0,
+      getLabel: (r: Rank) => (r.order == 1 ? "1er" : `${r.order}ème`),
       up: false,
       active: true,
+      needTeam: true,
     },
     {
       label: "PTS",
       description: "Points",
       callScore: (s: Score) => s.total,
+      getInfo: (s: Score) => percent(s.total, 3 * s.game),
       up: true,
-      active: true,
+      active: !!teamB,
+      needTeam: true,
     },
     {
       label: "PJ",
@@ -117,55 +151,86 @@ const TeamStack = () => {
       callScore: (s: Score) => s.game,
       up: true,
       active: false,
+      needTeam: false,
     },
     {
       label: "V",
       description: "Victoires",
       callScore: (s: Score) => s.win,
+      getInfo: (s: Score) => percent(s.win, s.game),
       up: true,
       active: true,
+      needTeam: false,
     },
     {
       label: "N",
       description: "Parties nulles",
       callScore: (s: Score) => s.neutral,
+      getInfo: (s: Score) => percent(s.neutral, s.game),
       up: true,
       active: false,
+      needTeam: false,
     },
     {
       label: "D",
       description: "Défaites",
       callScore: (s: Score) => s.loss,
+      getInfo: (s: Score) => percent(s.loss, s.game),
       up: false,
-      active: true,
+      active: !!teamB,
+      needTeam: true,
     },
     {
       label: "BP",
       description: "Buts pour",
-      callScore: (s: Score) => s.goalFor,
+      callScore: (s: Score) => {
+        if (!teamB) return s.goalFor / s.game;
+        return s.goalFor;
+      },
+      getLabel: (s: Score) => s.goalFor,
+      getInfo: (s: Score) => average(s.goalFor, s.game),
       up: true,
       active: true,
+      needTeam: false,
     },
     {
       label: "BC",
       description: "Buts contre",
-      callScore: (s: Score) => s.goalAgainst,
+      callScore: (s: Score) => {
+        if (!teamB) return s.goalAgainst / s.game;
+        return s.goalAgainst;
+      },
+      getLabel: (s: Score) => s.goalAgainst,
+      getInfo: (s: Score) => average(s.goalAgainst, s.game),
       up: false,
       active: true,
+      needTeam: false,
     },
     {
       label: "BL",
       description: "Blanchissages",
-      callScore: (s: Score) => s.shutOut,
+      callScore: (s: Score) => {
+        if (!teamB) return s.shutOut / s.game;
+        return s.shutOut;
+      },
+      getLabel: (s: Score) => s.shutOut,
+      getInfo: (s: Score) => percent(s.shutOut, s.game),
       up: true,
       active: true,
+      needTeam: false,
     },
     {
       label: "+/-",
       description: "Goal average",
-      callScore: (s: Score) => s.goalDiff,
+      callScore: (s: Score) => {
+        if (!teamB) return s.goalDiff / s.game;
+        return s.goalDiff;
+      },
+      getLabel: (s: Score) => s.goalDiff,
+      getInfo: (s: Score) => average(s.goalDiff, s.game),
       up: true,
       active: true,
+      needTeam: false,
     },
     {
       label: "PEN",
@@ -173,6 +238,7 @@ const TeamStack = () => {
       callScore: (s: Score) => s.penalty,
       up: false,
       active: true,
+      needTeam: false,
     },
   ];
   return (
@@ -223,18 +289,18 @@ const TeamStack = () => {
                           ))}
                       </Form.Select>
                     </Col>
-                    {/*<Col xs="auto">
+                    <Col xs="auto">
                       <Stack
                         direction="horizontal"
                         className="align-items-center"
                       >
                         <Form.Select aria-label="Default select example">
-                          <option value="1">Scooby 2024</option>
-                          <option value="2">Saison 2023/2024</option>
-                          <option value="3">Tous les tournois</option>
+                          <option value="1">{tourney?.name}</option>
+                          <option value="2">{tourney?.season}</option>
+                          <option value="3">{tourney?.category}</option>
                         </Form.Select>
                       </Stack>
-                        </Col>*/}
+                    </Col>
                   </Row>
                 </Form>
               </Stack>
@@ -244,7 +310,6 @@ const TeamStack = () => {
                   teamB={{ team: teamB, rank: rankB, score: scoreB }}
                   direction={isMobile ? "vertical" : "horizontal"}
                 />
-
                 <Table
                   striped
                   bordered
@@ -255,8 +320,8 @@ const TeamStack = () => {
                     <tr>
                       <th />
                       {datas.map(({ team }) => (
-                        <th key={team.id}>
-                          <TeamName teamId={team.id} />
+                        <th key={team?.id || 0}>
+                          {team ? <TeamName teamId={team.id} /> : tourney?.name}
                         </th>
                       ))}
                     </tr>
@@ -269,23 +334,31 @@ const TeamStack = () => {
                             {c.label}
                           </CJoliTooltip>
                         </td>
-                        {datas.map(({ rank, score }, j) => (
+                        {datas.map(({ team, rank, score }, j) => (
                           <React.Fragment key={j}>
                             {c.callRank ? (
                               <CellIcon
+                                label={c.label}
                                 value={rank}
                                 valueB={rankB}
                                 call={c.callRank}
+                                getLabel={c.getLabel}
+                                getInfo={c.getInfo}
                                 active={c.active && j == 0}
                                 up={c.up}
+                                display={!c.needTeam || !!team}
                               />
                             ) : (
                               <CellIcon
+                                label={c.label}
                                 value={score}
                                 valueB={scoreB}
                                 call={c.callScore!}
+                                getLabel={c.getLabel}
+                                getInfo={c.getInfo}
                                 active={c.active && j == 0}
                                 up={c.up}
+                                display={!c.needTeam || !!team}
                               />
                             )}
                           </React.Fragment>

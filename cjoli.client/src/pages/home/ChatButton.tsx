@@ -10,7 +10,7 @@ const ChatButton = () => {
   return (
     <div className="my-3 mx-5 position-fixed ffixed-bottom bottom-0 end-0">
       <Button onClick={() => navigate(`${uid}/chat`)}>
-        Chat with Bot <ChatLeftDots className="mx-1" />
+        Chat with BotAI <ChatLeftDots className="mx-1" />
       </Button>
     </div>
   );

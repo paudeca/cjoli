@@ -65,7 +65,7 @@ const ChatPage = () => {
                   <Robot style={{ fontSize: 40 }} className="mx-2" />
                 </div>
                 <div className="flex-grow-1 pl-3">
-                  <strong>Bot</strong>
+                  <strong>BotAI</strong>
                 </div>
               </div>
             </div>

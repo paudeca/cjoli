@@ -67,16 +67,6 @@ namespace cjoli.Server.Services
             return new Ranking() { Tourney = tourney, Scores = scores };
         }
 
-        public Ranking GetShortRanking(string tourneyUid, CJoliContext context)
-        {
-            var tourney = context.Tourneys
-                .Include(t=>t.Teams)
-                .Single(t => t.Uid == tourneyUid);
-            var scores = CalculateScores(tourney);
-            return new Ranking() { Tourney = tourney, Scores = scores };
-        }
-
-
         public void UpdateEstimate(string uuid, string login, CJoliContext context)
         {
             User? user = GetUserWithConfig(login, uuid, context);
@@ -92,12 +82,13 @@ namespace cjoli.Server.Services
 
         private Scores CalculateScores(Tourney tourney)
         {
+            var scoreTourney = new Score();
             var scoreSquads = new List<ScoreSquad>();
             foreach (var phase in tourney.Phases)
             {
                 foreach (var squad in phase.Squads)
                 {
-                    var scoreSquad = CalculateScoreSquad(squad);
+                    var scoreSquad = CalculateScoreSquad(squad,scoreTourney);
                     scoreSquads.Add(scoreSquad);
                 }
             }
@@ -115,10 +106,10 @@ namespace cjoli.Server.Services
                     return acc;
                 }) ?? acc;
             });
-            return new Scores { ScoreSquads = scoreSquads, ScoreTeams = scoreTeams };
+            return new Scores { ScoreSquads = scoreSquads, ScoreTeams = scoreTeams, ScoreTourney=scoreTourney };
         }
 
-        private ScoreSquad CalculateScoreSquad(Squad squad)
+        private ScoreSquad CalculateScoreSquad(Squad squad,Score scoreTourney)
         {
             Dictionary<int, Score> scores = squad.Positions.ToDictionary(p => p.Id, p => new Score() { PositionId = p.Id, TeamId = p.Team?.Id ?? 0 });
             squad.Matches.Aggregate(scores, (acc, m) =>
@@ -137,6 +128,7 @@ namespace cjoli.Server.Services
                 var scoreB = scores[m.PositionB.Id];
                 scoreA.Game++;
                 scoreB.Game++;
+                scoreTourney.Game++;
 
                 bool isForfeit = match.ForfeitA || match.ForfeitB;
                 if (match.ScoreA > match.ScoreB || match.ForfeitB)
@@ -146,6 +138,12 @@ namespace cjoli.Server.Services
 
                     scoreA.Total += 3;
                     scoreB.Total += match.ForfeitB ? 0 : 1;
+
+                    scoreTourney.Win++;
+                    scoreTourney.GoalFor += match.ScoreA;
+                    scoreTourney.GoalAgainst += match.ScoreB;
+                    scoreTourney.GoalDiff += match.ScoreA - match.ScoreB;
+                    scoreTourney.ShutOut += !isForfeit && match.ScoreB == 0 ? 1 : 0;
                 }
                 else if (match.ScoreA < match.ScoreB || match.ForfeitA)
                 {
@@ -154,6 +152,12 @@ namespace cjoli.Server.Services
 
                     scoreA.Total += match.ForfeitA ? 0 : 1;
                     scoreB.Total += 3;
+
+                    scoreTourney.Win++;
+
+                    scoreTourney.GoalFor += match.ScoreB;
+                    scoreTourney.GoalAgainst += match.ScoreA;
+                    scoreTourney.ShutOut += !isForfeit && match.ScoreA == 0 ? 1 : 0;
                 }
                 else
                 {
@@ -162,6 +166,12 @@ namespace cjoli.Server.Services
 
                     scoreA.Total += 2;
                     scoreB.Total += 2;
+
+                    scoreTourney.Neutral++;
+
+                    scoreTourney.GoalFor += match.ScoreA;
+                    scoreTourney.GoalAgainst += match.ScoreB;
+                    scoreTourney.ShutOut += !isForfeit && match.ScoreA == 0 ? 1 : 0;
                 }
                 scoreA.GoalFor += match.ScoreA;
                 scoreA.GoalAgainst += match.ScoreB;
@@ -172,7 +182,6 @@ namespace cjoli.Server.Services
                 scoreB.GoalAgainst += match.ScoreA;
                 scoreB.GoalDiff += match.ScoreB - match.ScoreA;
                 scoreB.ShutOut += !isForfeit && match.ScoreA == 0 ? 1 : 0;
-
 
                 return scores;
             });
@@ -447,6 +456,7 @@ namespace cjoli.Server.Services
     {
         public List<ScoreSquad> ScoreSquads { get; set; } = new List<ScoreSquad>();
         public Dictionary<int, Score>? ScoreTeams { get; set; }
+        public required Score ScoreTourney { get; set; }
     }
 
     public class ScoreSquad

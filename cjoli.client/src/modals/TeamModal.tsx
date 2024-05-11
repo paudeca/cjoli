@@ -13,7 +13,6 @@ const TeamModal = ({ team }: { team?: Team }) => {
   const fields: Field<Team>[] = [
     { id: "logo", label: "Logo", type: "text", autoFocus: true },
     { id: "youngest", label: "Youngest (date)", type: "date" },
-    { id: "datas.penalty", label: "Penalty", type: "number" },
   ];
   const onSubmit = async (team: Team) => {
     const ranking = await cjoliService.updateTeam(uid, team);

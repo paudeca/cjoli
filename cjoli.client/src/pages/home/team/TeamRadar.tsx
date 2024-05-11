@@ -63,15 +63,8 @@ interface TeamRadarProps {
 const TeamRadar = ({ teamA, teamB, direction }: TeamRadarProps) => {
   const options = {
     responsive: true,
-    plugins: {
-      title: {
-        display: true,
-        text: "Chart.js Radar Chart",
-      },
-    },
   };
   const { team, rank, score } = teamA;
-  console.log("TeamRadar", team, rank, score);
   if (!team || !score) {
     return <></>;
   }
@@ -126,7 +119,12 @@ const TeamRadar = ({ teamA, teamB, direction }: TeamRadarProps) => {
   }
 
   return (
-    <div style={{ width: direction == "horizontal" ? "100%" : "100%" }}>
+    <div
+      style={{
+        width: direction == "horizontal" ? "100%" : "100%",
+        maxHeight: 450,
+      }}
+    >
       <Radar
         data={data}
         options={{ ...options, scales: { r: { beginAtZero: true } } }}

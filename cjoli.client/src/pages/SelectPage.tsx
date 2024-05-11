@@ -8,6 +8,7 @@ import { useTools } from "../hooks/useTools";
 import { Clock, ClockHistory } from "react-bootstrap-icons";
 import { Tourney } from "../models";
 import React from "react";
+import styled from "@emotion/styled";
 
 const Title = ({ title, icon }: { title: string; icon: React.ReactNode }) => {
   return (
@@ -17,6 +18,13 @@ const Title = ({ title, icon }: { title: string; icon: React.ReactNode }) => {
     </h4>
   );
 };
+
+const MyCard = styled(Card)`
+  transition: transform 0.1s;
+  &:hover {
+    transform: scale(1.02);
+  }
+`;
 
 const SelectPage = () => {
   const navigate = useNavigate();
@@ -83,7 +91,7 @@ const SelectPage = () => {
                             navigate(uid);
                           }}
                         >
-                          <Card className="shadow">
+                          <MyCard className="shadow">
                             <Card.Title className="p-2">{t.name}</Card.Title>
                             <Card.Subtitle className="ms-auto mx-2 fw-normal">
                               {t.category}
@@ -115,7 +123,7 @@ const SelectPage = () => {
                                 </Row>
                               )}
                             </Card.Body>
-                          </Card>
+                          </MyCard>
                         </Col>
                       ))}
                     </Row>

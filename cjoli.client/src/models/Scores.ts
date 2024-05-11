@@ -4,4 +4,5 @@ import { ScoreSquad } from "./ScoreSquad";
 export interface Scores {
   scoreSquads: ScoreSquad[];
   scoreTeams: Record<number, Score>;
+  scoreTourney: Score;
 }

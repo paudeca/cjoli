@@ -37,9 +37,6 @@ namespace cjoli.Server
             CreateMap<TeamData, TeamDataDto>();
 
             CreateMap<Ranking, RankingDto>();
-            CreateMap<Ranking, RankingShortDto>()
-                .ForMember(x=>x.Tourney,opt=>opt.Ignore())
-                .ForMember(x=>x.Scores,opt=>opt.Ignore());
 
             CreateMap<Rank, RankDto>()
                 .ForMember(x => x.PhaseId, opt => opt.MapFrom(r => r.Squad.Phase.Id))
