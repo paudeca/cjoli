@@ -84,7 +84,7 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
       score.goalAgainst / score.game,
       score.shutOut,
       score.goalDiff / score.goalDiff,
-      score.penalty,
+      //score.penalty,
     ];
   }, []);
 
@@ -93,7 +93,7 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
   }
 
   const data = {
-    labels: ["Rang", "PTS", "PJ", "V", "N", "D", "BP", "BC", "BL", "GA", "PEN"],
+    labels: ["Rang", "PTS", "PJ", "V", "N", "D", "BP", "BC", "BL", "GA"],
     datasets: [
       {
         label: team.name,

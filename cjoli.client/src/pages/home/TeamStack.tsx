@@ -15,8 +15,6 @@ import { useUser } from "../../hooks/useUser";
 import useUid from "../../hooks/useUid";
 import TeamRadar from "./team/TeamRadar";
 import TeamTable from "./team/TeamTable";
-import TeamTime from "./team/TeamTime";
-import TeamBar from "./team/TeamBar";
 
 const TeamStack = () => {
   const { teams, getTeam, getTeamRank } = useCJoli();
@@ -59,7 +57,7 @@ const TeamStack = () => {
               <Stack className="py-3">
                 <TeamBar team={team} teamB={teamB} />
               </Stack>
-            </Card>
+  </Card>
             <Card className="p-2">
               <Stack className="py-3">
                 <TeamTime />

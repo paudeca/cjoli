@@ -78,12 +78,12 @@ const TeamBar = ({ team, teamB }: { team: Team; teamB?: Team }) => {
       score.goalAgainst / score.game,
       score.shutOut,
       score.goalDiff / score.game,
-      score.penalty,
+      //score.penalty,
     ];
   }, []);
 
   const data = {
-    labels: ["Rang", "PTS", "PJ", "V", "N", "D", "BP", "BC", "BL", "GA", "PEN"],
+    labels: ["Rang", "PTS", "PJ", "V", "N", "D", "BP", "BC", "BL", "GA"],
     datasets: [
       {
         label: team.name,

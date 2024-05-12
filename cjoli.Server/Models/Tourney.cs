@@ -13,6 +13,7 @@ namespace cjoli.Server.Models
         public DateTime EndTime { get; set; }
         public string? Season { get; set; }
         public string? Category { get; set; }
+        public string? Rule { get; set; }
 
         public IList<Team> Teams { get; set; } = new List<Team>();
         public IList<Phase> Phases { get; set; } = new List<Phase>();

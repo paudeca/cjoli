@@ -140,8 +140,6 @@ const TeamTime = () => {
     })),
   };
 
-  const options = {};
-
   return (
     <div
       style={{
@@ -152,7 +150,11 @@ const TeamTime = () => {
       <Line
         data={data}
         options={{
-          ...options,
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
           scales: {
             x: {
               type: "time",
@@ -160,7 +162,7 @@ const TeamTime = () => {
               ticks: {
                 callback: (value, index, ticks) => {
                   const v = Math.round(ticks.length / 15);
-                  if (index % v == 0) return moment(value).format("LLL");
+                  if (index % v == 0) return moment(value).format("LT");
                 },
                 source: "auto",
               },
