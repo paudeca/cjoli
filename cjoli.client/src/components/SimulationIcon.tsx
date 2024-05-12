@@ -45,7 +45,12 @@ const SimulationIcon = ({ show, title, onRemove }: SimulationIconProps) => {
           >
             <Alt />
           </Badge>
-          <Overlay target={target.current} show={open}>
+          <Overlay
+            target={target.current}
+            show={open}
+            rootClose
+            onHide={() => setOpen(false)}
+          >
             {(props) => (
               <Popover {...props}>
                 <Popover.Header style={{ color: "black" }}>

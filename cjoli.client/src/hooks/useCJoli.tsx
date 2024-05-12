@@ -34,6 +34,16 @@ export const useCJoli = () => {
     (teamId: number) => state.teams?.find((t) => t.id === teamId),
     [state.teams]
   );
+  const findTeam = React.useCallback(
+    ({ positionId }: { positionId?: number }) => {
+      if (positionId) {
+        const position = getPosition(positionId);
+        return position && getTeam(position.teamId);
+      }
+      return undefined;
+    },
+    []
+  );
   const getPosition = React.useCallback(
     (positionId: number) => state.positions?.find((p) => p.id === positionId),
     [state.positions]
@@ -114,6 +124,7 @@ export const useCJoli = () => {
     selectTourney,
     getSquad,
     getTeam,
+    findTeam,
     getPosition,
     getTeamInfo,
     getRankPosition,

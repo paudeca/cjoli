@@ -176,9 +176,10 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                               <MyCaretRight
                                 role="button"
                                 className="mx-2"
-                                onClick={() =>
-                                  navigate(`/${uid}/team/${team.id}`)
-                                }
+                                onClick={() => {
+                                  navigate(`/${uid}/team/${team.id}`);
+                                  window.scrollTo(0, 0);
+                                }}
                               />
                             )}
                           </LeftCenterDiv>

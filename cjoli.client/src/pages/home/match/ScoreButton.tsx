@@ -2,7 +2,7 @@ import React from "react";
 import { Spinner } from "react-bootstrap";
 import { CheckCircle, XCircle } from "react-bootstrap-icons";
 
-const ButtonScore = ({
+const ScoreButton = ({
   action,
   onClick,
 }: {
@@ -43,4 +43,4 @@ const ButtonScore = ({
   );
 };
 
-export default ButtonScore;
+export default ScoreButton;

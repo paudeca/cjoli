@@ -9,6 +9,8 @@ using System.Text;
 using AutoMapper;
 using cjoli.Server.Dtos;
 using System.Text.Json.Serialization;
+using cjoli.Server.Models;
+using cjoli.Server.Exceptions;
 
 namespace cjoli.Server.Services
 {
@@ -74,14 +76,20 @@ The query should be returned in plain text, not in JSON."
         }
 
 
-        public ChatSession CreateSession(CJoliContext context)
+        public ChatSession CreateSession(string uuid, CJoliContext context)
         {
+            Tourney? tourney = context.Tourneys.SingleOrDefault(t => t.Uid == uuid);
+            if(tourney== null)
+            {
+                throw new NotFoundException("Tourney", uuid);
+            }
             ChatSession session = new ();
             session.Messages.Add(new ChatRequestSystemMessage(""+
-@"Tu es assistant durant le tournois d'Hockey sur glace 'Scooby Ice 2024', tu réponds en Français avec parfois des emoticones.
-Ton premier message doit indiquer que tu es dans une phase de Beta, et que les réponses ne sont pas fiables."));
+@"Tu es assistant durant le tournois d'Hockey sur glace '"+tourney.Name+@"', tu réponds en Français avec parfois des emoticones.
+Ton premier message doit indiquer que tu es dans une phase de Beta, et que les réponses ne sont pas fiables.
+Ton équipe préféré est les Lions de Wasquehal."));
 
-            Ranking ranking = _cjoliService.GetRanking("scooby2024", null, context);
+            Ranking ranking = _cjoliService.GetRanking(uuid, null, context);
             var dto = _mapper.Map<RankingDto>(ranking);
 
             Dictionary<int, int> mapTeams = new Dictionary<int, int>();

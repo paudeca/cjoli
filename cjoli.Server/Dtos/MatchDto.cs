@@ -1,6 +1,8 @@
-﻿namespace cjoli.Server.Dtos
+﻿using cjoli.Server.Models;
+
+namespace cjoli.Server.Dtos
 {
-    public class MatchDto
+    public class MatchDto : IMatch
     {
         public int Id { get; set; }
         public bool Done { get; set; }

@@ -10,8 +10,9 @@ import { FieldValues, UseFormRegister } from "react-hook-form";
 import ScoreCellView from "./ScoreCellView";
 import LeftCenterDiv from "../../../components/LeftCenterDiv";
 import styled from "@emotion/styled";
-import ButtonScore from "./ButtonScore";
+import ScoreButton from "./ScoreButton";
 import SimulationIcon from "../../../components/SimulationIcon";
+import CompareButton from "./CompareButton";
 
 const MyScoreDiv = styled("div")<{ isMobile: boolean }>`
   display: flex;
@@ -44,7 +45,7 @@ const MatchRow = ({
   clearMatch,
   register,
 }: MatchRowProps) => {
-  const { getSquad } = useCJoli();
+  const { getSquad, findTeam } = useCJoli();
   const { isMobile } = useScreenSize();
   const { isConnected, isAdmin, userConfig } = useUser();
 
@@ -57,6 +58,8 @@ const MatchRow = ({
     : match;
   const done = hasUserMatch || match.done;
   const isSimulation = !!hasUserMatch;
+  const teamA = findTeam({ positionId: match.positionIdA });
+  const teamB = findTeam({ positionId: match.positionIdB });
 
   let badgeA =
     imatch.scoreA > imatch.scoreB
@@ -85,6 +88,7 @@ const MatchRow = ({
       {isMobile && (
         <tr>
           <td colSpan={2}>
+            {teamA && teamB && <CompareButton team={teamA} teamB={teamB} />}
             {moment(match.time).format("LT")} - {getSquad(match.squadId)!.name}
             {match.location && ` - ${match.location}`}
             <SimulationIcon show={isSimulation} />
@@ -142,7 +146,7 @@ const MatchRow = ({
                     teamB
                   />
 
-                  <ButtonScore action="save" onClick={() => saveMatch(match)} />
+                  <ScoreButton action="save" onClick={() => saveMatch(match)} />
                 </>
               )}
             </MyScoreDiv>
@@ -154,7 +158,7 @@ const MatchRow = ({
               <ScoreCellView score={imatch.scoreA} bg={badgeA} text={textA} />
               <ScoreCellView score={imatch.scoreB} bg={badgeB} text={textB} />
               {(isAdmin || (isConnected && isSimulation)) && (
-                <ButtonScore
+                <ScoreButton
                   action="remove"
                   onClick={() => clearMatch(match)}
                 />
@@ -175,6 +179,7 @@ const MatchRow = ({
         {!isMobile && !done && (
           <td>
             <MyScoreDiv isMobile={false}>
+              {teamA && teamB && <CompareButton team={teamA} teamB={teamB} />}
               {isConnected && (
                 <>
                   <ScoreCellInput
@@ -198,7 +203,7 @@ const MatchRow = ({
                     register={register}
                     teamB
                   />
-                  <ButtonScore action="save" onClick={() => saveMatch(match)} />
+                  <ScoreButton action="save" onClick={() => saveMatch(match)} />
                 </>
               )}
             </MyScoreDiv>
@@ -207,6 +212,8 @@ const MatchRow = ({
         {!isMobile && done && (
           <td>
             <MyScoreDiv isMobile={false}>
+              {teamA && teamB && <CompareButton team={teamA} teamB={teamB} />}
+
               <ScoreCellView score={imatch.scoreA} bg={badgeA} text={textA} />
               <Badge
                 bg="light"
@@ -217,7 +224,7 @@ const MatchRow = ({
               </Badge>
               <ScoreCellView score={imatch.scoreB} bg={badgeB} text={textB} />
               {(isAdmin || (isConnected && isSimulation)) && (
-                <ButtonScore
+                <ScoreButton
                   action="remove"
                   onClick={() => clearMatch(match)}
                 />

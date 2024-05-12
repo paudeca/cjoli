@@ -1,4 +1,6 @@
-import { Radar } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
+
+import "chartjs-adapter-moment";
 
 import {
   Chart as ChartJS,
@@ -26,8 +28,8 @@ import {
   TimeScale,
   TimeSeriesScale,
 } from "chart.js";
-import { Rank, Score, Team } from "../../../models";
 import { useCJoli } from "../../../hooks/useCJoli";
+import { Rank, Score, Team } from "../../../models";
 import React from "react";
 
 ChartJS.register(
@@ -56,16 +58,8 @@ ChartJS.register(
   TimeSeriesScale
 );
 
-interface TeamRadarProps {
-  team: Team;
-  teamB?: Team;
-}
-
-const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
+const TeamBar = ({ team, teamB }: { team: Team; teamB?: Team }) => {
   const { getTeamRank, getScoreForTeam } = useCJoli();
-  const options = {
-    responsive: true,
-  };
   const rank = getTeamRank(team);
   const rankB = teamB && getTeamRank(teamB);
 
@@ -83,21 +77,17 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
       score.goalFor / score.game,
       score.goalAgainst / score.game,
       score.shutOut,
-      score.goalDiff / score.goalDiff,
+      score.goalDiff / score.game,
       score.penalty,
     ];
   }, []);
-
-  if (!team || !score) {
-    return <></>;
-  }
 
   const data = {
     labels: ["Rang", "PTS", "PJ", "V", "N", "D", "BP", "BC", "BL", "GA", "PEN"],
     datasets: [
       {
         label: team.name,
-        data: getData(score, rank),
+        data: getData(score!, rank),
         borderWidth: 1,
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132,0.5)",
@@ -124,17 +114,14 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
         maxHeight: 450,
       }}
     >
-      <Radar
+      <Bar
         data={data}
         options={{
-          ...options,
-          scales: {
-            r: { beginAtZero: true, display: true },
-          },
+          indexAxis: "y",
         }}
       />
     </div>
   );
 };
 
-export default TeamRadar;
+export default TeamBar;

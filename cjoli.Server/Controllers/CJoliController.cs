@@ -51,6 +51,7 @@ namespace cjoli.Server.Controllers
             string? login = GetLogin();
             var ranking = _mapper.Map<RankingDto>(_service.GetRanking(uuid, login, _context));
             _service.AffectationTeams(ranking);
+            _service.CalculateHistory(ranking);
             return ranking;
         }
 

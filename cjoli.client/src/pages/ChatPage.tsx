@@ -28,9 +28,10 @@ const server = import.meta.env.VITE_API_WS;
 
 const ChatPage = () => {
   const [messages, setMessages] = React.useState<Message[]>([]);
+  const uid = useUid();
   const { sendMessage, lastMessage, readyState } = useWebSocket<{
     message: string;
-  }>(`${server}/chat/ws`);
+  }>(`${server}/chat/${uid}/ws`);
   React.useEffect(() => {
     if (lastMessage != null) {
       setMessages((messages) => [
@@ -44,7 +45,6 @@ const ChatPage = () => {
   }, [lastMessage, setMessages]);
   const { register, handleSubmit, resetField } = useForm<Message>();
   const ref = React.useRef<HTMLDivElement>(null);
-  const uid = useUid();
   const navigate = useNavigate();
   const { height, isMobile } = useScreenSize();
 

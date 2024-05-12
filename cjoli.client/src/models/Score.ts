@@ -10,4 +10,5 @@ export interface Score {
   goalDiff: number;
   shutOut: number;
   penalty: number;
+  time: Date;
 }

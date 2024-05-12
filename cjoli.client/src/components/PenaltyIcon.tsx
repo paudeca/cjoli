@@ -81,7 +81,12 @@ const PenaltyIcon = ({ positionId }: { positionId: number }) => {
           >
             {position.penalty}P
           </MyBadge>
-          <Overlay target={target.current} show={open}>
+          <Overlay
+            target={target.current}
+            show={open}
+            rootClose
+            onHide={() => setOpen(false)}
+          >
             {(props) => (
               <Popover {...props}>
                 <Popover.Body>

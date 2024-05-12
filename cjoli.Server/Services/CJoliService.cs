@@ -106,6 +106,7 @@ namespace cjoli.Server.Services
                     return acc;
                 }) ?? acc;
             });
+
             return new Scores { ScoreSquads = scoreSquads, ScoreTeams = scoreTeams, ScoreTourney=scoreTourney };
         }
 
@@ -245,7 +246,11 @@ namespace cjoli.Server.Services
             {
                 var position = squad.Positions.Single(p => p.Id == kv.Key);
                 return position.Team != null;
-            }).ToDictionary(kv => kv.Key, kv => kv.Value);
+            }).ToDictionary(kv =>
+            {
+                var position = squad.Positions.Single(p => p.Id == kv.Key);
+                return position.Team!.Id;
+            }, kv => kv.Value);
 
             var scoreSquad = new ScoreSquad() { SquadId = squad.Id, Scores = listScores, TeamScores = teamScores };
             return scoreSquad;
@@ -266,6 +271,109 @@ namespace cjoli.Server.Services
                 }
             }
         }
+
+        public void CalculateHistory(RankingDto ranking)
+        {
+
+            var mapTeams = ranking.Tourney.Teams!.ToDictionary(t => t.Id, t => new List<Score>());
+
+            var teams = ranking.Tourney.Teams;
+            var positions = ranking.Tourney.Phases!.SelectMany(p => p.Squads!).SelectMany(s => s.Positions);
+            var matches = ranking.Tourney.Phases!.SelectMany(p => p.Squads!).SelectMany(s => s.Matches!).Where(m => m.Done || m.UserMatch !=null).OrderBy(m => m.Time);
+            matches.Aggregate(mapTeams, (acc, m) =>
+            {
+                var positionA = positions.SingleOrDefault(p=>p.Id==m.PositionIdA);
+                var positionB = positions.SingleOrDefault(p => p.Id == m.PositionIdB);
+
+                var teamA = teams!.SingleOrDefault(t => t.Id == positionA!.TeamId);
+                var teamB = teams!.SingleOrDefault(t => t.Id == positionB!.TeamId);
+
+                var listA = acc[teamA.Id];
+                var listB = acc[teamB.Id];
+                var scoreA = new Score();
+                var scoreB = new Score();
+
+                IMatch? match = m.Done ? m : m.UserMatch;
+
+                UpdateScore(scoreA, scoreB, m, match);
+
+                if (listA.Count > 0)
+                {
+                    scoreA.Merge(listA.Last());
+                }
+                if (listB.Count > 0)
+                {
+                    scoreB.Merge(listB.Last());
+                }
+                listA.Add(scoreA);
+                listB.Add(scoreB);
+                return acc;
+            });
+            ranking.History = mapTeams;
+        }
+
+        private void UpdateScore(Score scoreA, Score scoreB, MatchDto dto, IMatch match)
+        {
+            scoreA.Time = dto.Time;
+            scoreB.Time = dto.Time;
+
+            scoreA.Game++;
+            scoreB.Game++;
+            //scoreTourney.Game++;
+
+            bool isForfeit = match.ForfeitA || match.ForfeitB;
+            if (match.ScoreA > match.ScoreB || match.ForfeitB)
+            {
+                scoreA.Win++;
+                scoreB.Loss++;
+
+                scoreA.Total += 3;
+                scoreB.Total += match.ForfeitB ? 0 : 1;
+
+                /*scoreTourney.Win++;
+                scoreTourney.GoalFor += match.ScoreA;
+                scoreTourney.GoalAgainst += match.ScoreB;
+                scoreTourney.GoalDiff += match.ScoreA - match.ScoreB;
+                scoreTourney.ShutOut += !isForfeit && match.ScoreB == 0 ? 1 : 0;*/
+            }
+            else if (match.ScoreA < match.ScoreB || match.ForfeitA)
+            {
+                scoreA.Loss++;
+                scoreB.Win++;
+
+                scoreA.Total += match.ForfeitA ? 0 : 1;
+                scoreB.Total += 3;
+
+                /*scoreTourney.Win++;
+                scoreTourney.GoalFor += match.ScoreB;
+                scoreTourney.GoalAgainst += match.ScoreA;
+                scoreTourney.ShutOut += !isForfeit && match.ScoreA == 0 ? 1 : 0;*/
+            }
+            else
+            {
+                scoreA.Neutral++;
+                scoreB.Neutral++;
+
+                scoreA.Total += 2;
+                scoreB.Total += 2;
+
+                /*scoreTourney.Neutral++;
+                scoreTourney.GoalFor += match.ScoreA;
+                scoreTourney.GoalAgainst += match.ScoreB;
+                scoreTourney.ShutOut += !isForfeit && match.ScoreA == 0 ? 1 : 0;*/
+            }
+            scoreA.GoalFor += match.ScoreA;
+            scoreA.GoalAgainst += match.ScoreB;
+            scoreA.GoalDiff += match.ScoreA - match.ScoreB;
+            scoreA.ShutOut += !isForfeit && match.ScoreB == 0 ? 1 : 0;
+
+            scoreB.GoalFor += match.ScoreB;
+            scoreB.GoalAgainst += match.ScoreA;
+            scoreB.GoalDiff += match.ScoreB - match.ScoreA;
+            scoreB.ShutOut += !isForfeit && match.ScoreA == 0 ? 1 : 0;
+
+        }
+
 
         public void SaveMatch(MatchDto dto, string login, CJoliContext context)
         {
@@ -484,6 +592,7 @@ namespace cjoli.Server.Services
         public int Coefficient { get; set; }
         public int ShutOut { get; set; }
         public int Penalty { get; set; }
+        public DateTime Time { get; set; }
 
         public void Merge(Score score)
         {

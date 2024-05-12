@@ -6,5 +6,6 @@ namespace cjoli.Server.Dtos
     {
         public required TourneyDto Tourney { get; set; }
         public required Scores Scores { get; set; }
+        public Dictionary<int, List<Score>>? History { get;set; }
     }
 }
