@@ -77,7 +77,7 @@ namespace cjoli.Server.Controllers
         public RankingDto SaveMatch([FromRoute] string uuid, [FromBody] MatchDto match)
         {
             var login = GetLogin();
-            _service.SaveMatch(match, login!, _context);
+            _service.SaveMatch(match, login!, uuid, _context);
             return GetRanking(uuid);
         }
 
@@ -87,7 +87,7 @@ namespace cjoli.Server.Controllers
         public RankingDto ClearMatch([FromRoute] string uuid, [FromBody] MatchDto match)
         {
             var login = GetLogin();
-            _service.ClearMatch(match, login!, _context);
+            _service.ClearMatch(match, login!, uuid, _context);
             return GetRanking(uuid);
         }
 
@@ -97,7 +97,7 @@ namespace cjoli.Server.Controllers
         public RankingDto ClearSimulations([FromRoute] string uuid, [FromBody] int[] ids)
         {
             var login = GetLogin();
-            _service.ClearSimulations(ids, login!, _context);
+            _service.ClearSimulations(ids, login!, uuid, _context);
             return GetRanking(uuid);
         }
 

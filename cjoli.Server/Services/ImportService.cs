@@ -43,6 +43,9 @@ namespace cjoli.Server.Services
                     tourney.Name = tourneyDto.Name ?? tourney.Name;
                     tourney.Season = tourneyDto.Season ?? tourney.Season;
                     tourney.Category = tourneyDto.Category ?? tourney.Category;
+                    tourney.StartTime = tourneyDto.StartTime!=DateTime.MinValue? tourneyDto.StartTime: tourney.StartTime;
+                    tourney.EndTime = tourneyDto.EndTime != DateTime.MinValue ? tourneyDto.EndTime : tourney.EndTime;
+
                 },
                 children: [
                     (tourney) => (tourneyDto.Teams??[]).ForEach(t => ImportTeam(t,tourney,context)),
@@ -78,6 +81,7 @@ namespace cjoli.Server.Services
                     team.Logo = teamDto.Logo ?? team.Logo;
                     team.Youngest = teamDto.Youngest ?? team.Youngest;
                     team.ShortName = teamDto.ShortName ?? team.ShortName;
+                    team.Alias = context.Team.SingleOrDefault(t => t.Name == teamDto.Alias);
                 }
             );
         }

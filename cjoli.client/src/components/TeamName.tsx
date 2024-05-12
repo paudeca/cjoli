@@ -15,7 +15,11 @@ const TeamName = ({
     : getTeam(teamId!) || { name: defaultName };
   return (
     <>
-      <img src={logo} style={{ width: "30px" }} className="mx-2" />
+      <img
+        src={logo}
+        style={{ maxWidth: "30px", maxHeight: "30px" }}
+        className="mx-2"
+      />
       {name}
     </>
   );

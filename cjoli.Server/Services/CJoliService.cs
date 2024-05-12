@@ -22,9 +22,9 @@ namespace cjoli.Server.Services
             return context.Tourneys.OrderBy(t => t.StartTime).ToList();
         }
 
-        private User GetUserWithConfigMatch(string login, CJoliContext context)
+        private User GetUserWithConfigMatch(string login, string tourneyUid, CJoliContext context)
         {
-            User? user = context.Users.Include(u => u.Configs).Include(u => u.UserMatches).SingleOrDefault(u => u.Login == login);
+            User? user = context.Users.Include(u => u.Configs.Where(c=>c.Tourney.Uid==tourneyUid)).Include(u => u.UserMatches).SingleOrDefault(u => u.Login == login);
             if (user == null)
             {
                 throw new NotFoundException("User", login);
@@ -49,6 +49,7 @@ namespace cjoli.Server.Services
                     m => m.Estimates.Where(s => user != null && user.HasCustomEstimate() ? s.User == user : s.User == null)
                  )
                 .Include(t => t.Teams).ThenInclude(t => t.TeamDatas.Where(d => d.Tourney.Uid == tourneyUid))
+                .Include(t=>t.Teams).ThenInclude(t=>t.Alias)
                 .FirstOrDefault(t => t.Uid == tourneyUid);
             if (tourney == null)
             {
@@ -127,6 +128,24 @@ namespace cjoli.Server.Services
                 }
                 var scoreA = scores[m.PositionA.Id];
                 var scoreB = scores[m.PositionB.Id];
+
+                UpdateScore(scoreA, scoreB, scoreTourney, match);
+                return scores;
+            });
+            /*squad.Matches.Aggregate(scores, (acc, m) =>
+            {
+                var userMatch = m.UserMatches.FirstOrDefault();
+                if (userMatch == null && !m.Done)
+                {
+                    return acc;
+                }
+                IMatch? match = m.Done ? m : userMatch;
+                if (match == null)
+                {
+                    return acc;
+                }
+                var scoreA = scores[m.PositionA.Id];
+                var scoreB = scores[m.PositionB.Id];
                 scoreA.Game++;
                 scoreB.Game++;
                 scoreTourney.Game++;
@@ -185,7 +204,7 @@ namespace cjoli.Server.Services
                 scoreB.ShutOut += !isForfeit && match.ScoreA == 0 ? 1 : 0;
 
                 return scores;
-            });
+            });*/
             var listScores = scores.Select(kv => kv.Value).OrderByDescending(x => x.Total).ToList();
             listScores = listScores.Select(s =>
             {
@@ -295,7 +314,7 @@ namespace cjoli.Server.Services
 
                 IMatch? match = m.Done ? m : m.UserMatch;
 
-                UpdateScore(scoreA, scoreB, m, match);
+                UpdateScore(scoreA, scoreB, null, match);
 
                 if (listA.Count > 0)
                 {
@@ -312,15 +331,18 @@ namespace cjoli.Server.Services
             ranking.History = mapTeams;
         }
 
-        private void UpdateScore(Score scoreA, Score scoreB, MatchDto dto, IMatch match)
+        private void UpdateScore(Score scoreA, Score scoreB, Score? scoreTourney, IMatch match)
         {
-            scoreA.Time = dto.Time;
-            scoreB.Time = dto.Time;
+            scoreA.Time = match.Time;
+            scoreB.Time = match.Time;
 
             scoreA.Game++;
             scoreB.Game++;
-            //scoreTourney.Game++;
-
+            if(scoreTourney!=null)
+            {
+                scoreTourney.Game++;
+            }
+            
             bool isForfeit = match.ForfeitA || match.ForfeitB;
             if (match.ScoreA > match.ScoreB || match.ForfeitB)
             {
@@ -330,11 +352,14 @@ namespace cjoli.Server.Services
                 scoreA.Total += 3;
                 scoreB.Total += match.ForfeitB ? 0 : 1;
 
-                /*scoreTourney.Win++;
-                scoreTourney.GoalFor += match.ScoreA;
-                scoreTourney.GoalAgainst += match.ScoreB;
-                scoreTourney.GoalDiff += match.ScoreA - match.ScoreB;
-                scoreTourney.ShutOut += !isForfeit && match.ScoreB == 0 ? 1 : 0;*/
+                if(scoreTourney!=null)
+                {
+                    scoreTourney.Win++;
+                    scoreTourney.GoalFor += match.ScoreA;
+                    scoreTourney.GoalAgainst += match.ScoreB;
+                    scoreTourney.GoalDiff += match.ScoreA - match.ScoreB;
+                    scoreTourney.ShutOut += !isForfeit && match.ScoreB == 0 ? 1 : 0;
+                }
             }
             else if (match.ScoreA < match.ScoreB || match.ForfeitA)
             {
@@ -344,10 +369,13 @@ namespace cjoli.Server.Services
                 scoreA.Total += match.ForfeitA ? 0 : 1;
                 scoreB.Total += 3;
 
-                /*scoreTourney.Win++;
-                scoreTourney.GoalFor += match.ScoreB;
-                scoreTourney.GoalAgainst += match.ScoreA;
-                scoreTourney.ShutOut += !isForfeit && match.ScoreA == 0 ? 1 : 0;*/
+                if(scoreTourney!=null)
+                {
+                    scoreTourney.Win++;
+                    scoreTourney.GoalFor += match.ScoreB;
+                    scoreTourney.GoalAgainst += match.ScoreA;
+                    scoreTourney.ShutOut += !isForfeit && match.ScoreA == 0 ? 1 : 0;
+                }
             }
             else
             {
@@ -357,10 +385,13 @@ namespace cjoli.Server.Services
                 scoreA.Total += 2;
                 scoreB.Total += 2;
 
-                /*scoreTourney.Neutral++;
-                scoreTourney.GoalFor += match.ScoreA;
-                scoreTourney.GoalAgainst += match.ScoreB;
-                scoreTourney.ShutOut += !isForfeit && match.ScoreA == 0 ? 1 : 0;*/
+                if(scoreTourney!=null)
+                {
+                    scoreTourney.Neutral++;
+                    scoreTourney.GoalFor += match.ScoreA;
+                    scoreTourney.GoalAgainst += match.ScoreB;
+                    scoreTourney.ShutOut += !isForfeit && match.ScoreA == 0 ? 1 : 0;
+                }
             }
             scoreA.GoalFor += match.ScoreA;
             scoreA.GoalAgainst += match.ScoreB;
@@ -375,9 +406,9 @@ namespace cjoli.Server.Services
         }
 
 
-        public void SaveMatch(MatchDto dto, string login, CJoliContext context)
+        public void SaveMatch(MatchDto dto, string login, string uuid, CJoliContext context)
         {
-            User user = GetUserWithConfigMatch(login, context);
+            User user = GetUserWithConfigMatch(login, uuid, context);
             Match? match = context.Match
                 .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t.MatchResults)
                 .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t.MatchResults)
@@ -430,9 +461,9 @@ namespace cjoli.Server.Services
             context.SaveChanges();
         }
 
-        public void ClearMatch(MatchDto dto, string login, CJoliContext context)
+        public void ClearMatch(MatchDto dto, string login, string uuid, CJoliContext context)
         {
-            User user = GetUserWithConfigMatch(login, context);
+            User user = GetUserWithConfigMatch(login, uuid, context);
             Match? match = context.Match
                 .Include(m => m.UserMatches.Where(u => u.User == user))
                 .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t.MatchResults)
@@ -489,9 +520,9 @@ namespace cjoli.Server.Services
 
 
 
-        public void ClearSimulations(int[] ids, string login, CJoliContext context)
+        public void ClearSimulations(int[] ids, string login, string uuid, CJoliContext context)
         {
-            User user = GetUserWithConfigMatch(login, context);
+            User user = GetUserWithConfigMatch(login, uuid, context);
             var userMatches = user.UserMatches.Where(u => ids.Contains(u.Id));
             foreach (var userMatch in userMatches)
             {
@@ -540,7 +571,11 @@ namespace cjoli.Server.Services
             {
                 throw new NotFoundException("Touney", tourneyUid);
             }
-            User user = GetUserWithConfig(login, tourneyUid, context);
+            User? user = GetUserWithConfig(login, tourneyUid, context);
+            if(user==null)
+            {
+                throw new NotFoundException("User", login);
+            }
             UserConfig? config = user.Configs.SingleOrDefault(c => c.Id == dto.Id);
             if (config == null)
             {

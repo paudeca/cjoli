@@ -47,6 +47,7 @@ namespace cjoli.Server.Datas
 
             modelBuilder.Entity<Team>().HasMany(t => t.Positions).WithOne(p => p.Team).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<Team>().HasMany(t => t.MatchResults).WithOne(m => m.Team).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Team>().HasOne(t=>t.Alias).WithMany(t=>t.Children).OnDelete(DeleteBehavior.SetNull);
 
             var provider = Database.GetService<IDataProtectionProvider>();
 

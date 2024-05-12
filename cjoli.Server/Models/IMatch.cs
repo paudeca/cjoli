@@ -6,5 +6,6 @@
         public int ScoreB { get; set; }
         public bool ForfeitA { get; set; }
         public bool ForfeitB { get; set; }
+        public DateTime Time { get; }
     }
 }

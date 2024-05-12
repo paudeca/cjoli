@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using cjoli.Server.Datas;
 
@@ -11,9 +12,11 @@ using cjoli.Server.Datas;
 namespace cjoli.Server.Migrations
 {
     [DbContext(typeof(CJoliContext))]
-    partial class CJoliContextModelSnapshot : ModelSnapshot
+    [Migration("20240512151618_TeamAlias2")]
+    partial class TeamAlias2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +37,7 @@ namespace cjoli.Server.Migrations
 
                     b.HasIndex("TourneysId");
 
-                    b.ToTable("TeamTourney", (string)null);
+                    b.ToTable("TeamTourney");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Match", b =>
@@ -86,7 +89,7 @@ namespace cjoli.Server.Migrations
 
                     b.HasIndex("SquadId");
 
-                    b.ToTable("Match", (string)null);
+                    b.ToTable("Match");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.MatchEstimate", b =>
@@ -115,7 +118,7 @@ namespace cjoli.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("MatchEstimate", (string)null);
+                    b.ToTable("MatchEstimate");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.MatchResult", b =>
@@ -164,7 +167,7 @@ namespace cjoli.Server.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("MatchResult", (string)null);
+                    b.ToTable("MatchResult");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.ParentPosition", b =>
@@ -191,7 +194,7 @@ namespace cjoli.Server.Migrations
 
                     b.HasIndex("SquadId");
 
-                    b.ToTable("ParentPosition", (string)null);
+                    b.ToTable("ParentPosition");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Phase", b =>
@@ -216,7 +219,7 @@ namespace cjoli.Server.Migrations
 
                     b.HasIndex("TourneyId");
 
-                    b.ToTable("Phase", (string)null);
+                    b.ToTable("Phase");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Position", b =>
@@ -251,7 +254,7 @@ namespace cjoli.Server.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("Position", (string)null);
+                    b.ToTable("Position");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Rank", b =>
@@ -283,7 +286,7 @@ namespace cjoli.Server.Migrations
 
                     b.HasIndex("TourneyId");
 
-                    b.ToTable("Rank", (string)null);
+                    b.ToTable("Rank");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Squad", b =>
@@ -305,7 +308,7 @@ namespace cjoli.Server.Migrations
 
                     b.HasIndex("PhaseId");
 
-                    b.ToTable("Squad", (string)null);
+                    b.ToTable("Squad");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Team", b =>
@@ -336,7 +339,7 @@ namespace cjoli.Server.Migrations
 
                     b.HasIndex("AliasId");
 
-                    b.ToTable("Team", (string)null);
+                    b.ToTable("Team");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.TeamData", b =>
@@ -362,7 +365,7 @@ namespace cjoli.Server.Migrations
 
                     b.HasIndex("TourneyId");
 
-                    b.ToTable("TeamData", (string)null);
+                    b.ToTable("TeamData");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Tourney", b =>
@@ -398,7 +401,7 @@ namespace cjoli.Server.Migrations
                     b.HasIndex("Uid")
                         .IsUnique();
 
-                    b.ToTable("Tourneys", (string)null);
+                    b.ToTable("Tourneys");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.User", b =>
@@ -425,7 +428,7 @@ namespace cjoli.Server.Migrations
                     b.HasIndex("Login")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.UserConfig", b =>
@@ -454,7 +457,7 @@ namespace cjoli.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserConfig", (string)null);
+                    b.ToTable("UserConfig");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.UserMatch", b =>
@@ -489,7 +492,7 @@ namespace cjoli.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserMatch", (string)null);
+                    b.ToTable("UserMatch");
                 });
 
             modelBuilder.Entity("TeamTourney", b =>

@@ -7,6 +7,7 @@
         public string? Logo { get; set; }
         public DateOnly? Youngest { get; set; }
         public string? ShortName { get; set; }
+        public string? Alias { get; set; }
         public TeamDataDto? Datas { get; set; }
 
     }
