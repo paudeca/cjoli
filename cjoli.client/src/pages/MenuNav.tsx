@@ -25,8 +25,8 @@ import { useCJoli } from "../hooks/useCJoli";
 import useUid from "../hooks/useUid";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { User, UserConfig } from "../models";
-import { useToast } from "../contexts/ToastContext";
+import { useEstimate } from "../hooks/useEstimate";
+import { UserConfig } from "../models";
 
 const MyImg = styled.img<{ width: string }>`
   width: ${(props) => props.width};
@@ -38,8 +38,8 @@ const MenuNav = () => {
     user,
     userConfig,
     userConfig: { activeEstimate },
-    isAdmin,
     loadUser,
+    handleSaveUserConfig,
   } = useUser();
   const uid = useUid();
   const { setShow: showLogin } = useModal("login");
@@ -47,7 +47,7 @@ const MenuNav = () => {
   const { setShow: showUpdate } = useModal("update");
   const navigate = useNavigate();
   const { isMobile } = useScreenSize();
-  const { showToast } = useToast();
+  const { loading, handleUpdateEstimate } = useEstimate();
 
   const logout = async () => {
     await cjoliService.logout();
@@ -58,32 +58,12 @@ const MenuNav = () => {
       loadRanking(ranking);
     }
   };
-  const [loading, setLoading] = React.useState(false);
   const [show, setShow] = React.useState(false);
 
   const { register } = useForm<UserConfig>({
     values: userConfig,
   });
 
-  const handleUpdateEstimate = async () => {
-    setLoading(true);
-    const ranking = await cjoliService.updateEstimate(uid);
-    loadRanking(ranking);
-    if (!isAdmin) {
-      handleSaveUserConfig({ ...userConfig, useCustomEstimate: true });
-    }
-    setLoading(false);
-    showToast("success", "Estimate calculated");
-  };
-  const handleSaveUserConfig = async (userConfig: UserConfig) => {
-    const ranking = await cjoliService.saveUserConfig(uid, userConfig);
-    loadRanking(ranking);
-    const configs =
-      user?.configs?.map((c) =>
-        c.tourneyId == userConfig.tourneyId ? userConfig : c
-      ) || [];
-    loadUser({ ...user, configs } as User);
-  };
   const tourneyLabel = uid && tourney?.name;
   return (
     <Navbar

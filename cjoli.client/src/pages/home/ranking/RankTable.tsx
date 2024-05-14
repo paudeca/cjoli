@@ -108,7 +108,7 @@ const RankTable = ({ phase }: { phase: Phase }) => {
               <thead>
                 <tr>
                   <th rowSpan={isMobile ? 2 : 1}>#</th>
-                  <th colSpan={isMobile ? 8 : 1} className="w-50">
+                  <th colSpan={isMobile ? 7 : 1} className="w-50">
                     Team
                   </th>
                   <MyTh rowSpan={isMobile ? 2 : 1}>
@@ -163,7 +163,7 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                     <React.Fragment key={index}>
                       <tr>
                         <td rowSpan={isMobile ? 2 : 1}>{index + 1}</td>
-                        <td colSpan={isMobile ? 8 : 1}>
+                        <td colSpan={isMobile ? 7 : 1}>
                           <LeftCenterDiv>
                             <TeamName positionId={score.positionId} />
                             <SimulationIcon
@@ -228,11 +228,6 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                           <td className="w-25">
                             <CJoliTooltip info="Buts contre">
                               BC:{score.goalAgainst}
-                            </CJoliTooltip>
-                          </td>
-                          <td className="w-25">
-                            <CJoliTooltip info="Blanchissage">
-                              BL:{score.shutOut}
                             </CJoliTooltip>
                           </td>
                           <td className="w-25">

@@ -195,8 +195,8 @@ namespace cjoli.Server.Services
             var queryMatch = context.MatchResult.Where(r => r.Match.Squad!.Phase.Tourney.Category == tourney.Category);
             var queryMatchSeason = queryMatch.Where(r => r.Match.Squad!.Phase.Tourney.Season == tourney.Season);
 
-            Dictionary<string, int> coef = new Dictionary<string, int> { 
-                { "total", 1 }, 
+            Dictionary<string, int> coef = new Dictionary<string, int> {
+                { "total", 1 },
                 { "totalSeason", 10 },
                 { "allTeam",10 },
                 {"allTeamSeason",100 },
@@ -217,24 +217,44 @@ namespace cjoli.Server.Services
             coef["indirect"] = 10;//^2
             coef["indirectSeason"] = 100;//^3
 
+            var func = (string type,IQueryable<MatchResult> query) => {
+                Score score = query.GroupBy(r=>1).Select(SelectScore<int>(coef[type])).SingleOrDefault() ?? new Score();
+                scoreUsers.ForEach(score.Merge);
+                return score;
+            };
 
-            Score scoreTotal = queryMatch.GroupBy(r => 1).Select(SelectScore<int>(coef["total"])).SingleOrDefault() ?? new Score();
-            scoreUsers.ForEach(scoreTotal.Merge);
+            Score scoreTotal = func("total", queryMatch);
+            Score scoreTotalSeason = func("totalSeason", queryMatchSeason);
 
-            Score scoreTotalSeason = queryMatchSeason.GroupBy(r => 1).Select(SelectScore<int>(coef["totalSeason"])).SingleOrDefault() ?? new Score();
-            scoreUsers.ForEach(scoreTotalSeason.Merge);
+            var getTeamId = (Team? team) => team?.Alias != null ? team.Alias.Id : team!=null?team.Id:0;
 
+            var funcMap = (string type, IQueryable<MatchResult> query) =>
+            {
+                var mapScore = query.Where(r=>r.Match.Squad!.Phase.Tourney!=tourney).GroupBy(r => r.Team.Alias!=null?r.Team.Alias.Id:r.Team.Id).ToDictionary(kv => kv.Key, kv => SelectScore<int>(coef[type])(kv)) ?? new Dictionary<int, Score>();
+                return mapScore;
+            };
+            var mapAllTeam = funcMap("allTeam", queryMatch);
+            var mapAllTeamSeason = funcMap("allTeamSeason", queryMatchSeason);
 
-            var mapAllTeam = queryMatch.GroupBy(r => r.Team.Id).ToDictionary(kv => kv.Key, kv => SelectScore<int>(coef["allTeam"])(kv)) ?? new Dictionary<int, Score>();
-            var mapAllTeamSeason = queryMatchSeason.GroupBy(r => r.Team.Id).ToDictionary(kv => kv.Key, kv => SelectScore<int>(coef["allTeamSeason"])(kv)) ?? new Dictionary<int, Score>();
 
             var mapCurrentTeam = queryMatch.Where(r => r.Match.Squad!.Phase.Tourney == tourney).GroupBy(r => r.Team.Id).ToDictionary(kv => kv.Key, kv => SelectScore<int>(coef["team"])(kv)) ?? new Dictionary<int, Score>();
 
-            var mapDirects = queryMatch.Where(r => r.TeamAgainst != null).GroupBy(r => new MyKv { TeamA = r.Team.Id, TeamB = r.TeamAgainst.Id }).ToDictionary(kv => kv.Key, kv => SelectScore<MyKv>(coef["direct"])(kv));
-            var mapDirectSeasons = queryMatchSeason.Where(r => r.TeamAgainst != null).GroupBy(r => new MyKv { TeamA = r.Team.Id, TeamB = r.TeamAgainst.Id }).ToDictionary(kv => kv.Key, kv => SelectScore<MyKv>(coef["directSeason"])(kv));
+            var funcDirect = (string type, IQueryable<MatchResult> query) =>
+            {
+                var mapScore = query.Where(r => r.Match.Squad!.Phase.Tourney != tourney && r.TeamAgainst != null)
+                    .GroupBy(r => new MyKv { TeamA = r.Team.Alias!=null?r.Team.Alias.Id:r.Team.Id, TeamB = r.TeamAgainst.Alias!=null?r.TeamAgainst.Alias.Id:r.TeamAgainst.Id })
+                    .ToDictionary(kv => kv.Key, kv => SelectScore<MyKv>(coef[type])(kv));
+                return mapScore;
+            };
+            var mapDirects = funcDirect("direct", queryMatch);
+            var mapDirectSeasons = funcDirect("directSeason", queryMatchSeason);
 
-            var mapOtherTeams = queryMatch.GroupBy(r => r.Team).ToDictionary(kv => kv.Key, kv => kv.Where(r => r.TeamAgainst != null).Select(r => r.TeamAgainst.Id).ToList());
-            var mapOtherTeamSeasons = queryMatchSeason.GroupBy(r => r.Team).ToDictionary(kv => kv.Key, kv => kv.Where(r => r.TeamAgainst != null).Select(r => r.TeamAgainst.Id).ToList());
+            var funcOther = (IQueryable<MatchResult> query) =>
+            {
+                return query.GroupBy(r => r.Team).ToDictionary(kv => kv.Key, kv => kv.Where(r => r.TeamAgainst != null).Select(r => r.TeamAgainst.Id).ToList());
+            };
+            var mapOtherTeams = funcOther(queryMatch);
+            var mapOtherTeamSeasons = funcOther(queryMatchSeason);
 
             var MergeScore = (Dictionary<int, Score> map, int key, Score score, int coefficient) =>
             {
@@ -254,8 +274,8 @@ namespace cjoli.Server.Services
                 int key = scores.Key;
                 foreach (var score in scores)
                 {
-                    MergeScore(mapAllTeam, key, score, 10);
-                    MergeScore(mapAllTeamSeason, key, score, 100);
+                    //MergeScore(mapAllTeam, getTeamId(context.Team.SingleOrDefault(t=>t.Id==key)), score, 10);
+                    //MergeScore(mapAllTeamSeason, getTeamId(context.Team.SingleOrDefault(t => t.Id == key)), score, 100);
                     MergeScore(mapCurrentTeam, key, score, 1000);
                 }
             });
@@ -263,17 +283,17 @@ namespace cjoli.Server.Services
             List<Func<Team, Team, Score>> scoreList = [
                 (Team teamA, Team teamB)=>scoreTotal,
                 (Team teamA, Team teamB)=>scoreTotalSeason,
-                (Team teamA, Team teamB)=>mapAllTeam.GetValueOrDefault(teamA.Id)?? new Score(),
-                (Team teamA, Team teamB)=>mapAllTeamSeason.GetValueOrDefault(teamA.Id)?? new Score(),
+                (Team teamA, Team teamB)=>mapAllTeam.GetValueOrDefault(getTeamId(teamA))?? new Score(),
+                (Team teamA, Team teamB)=>mapAllTeamSeason.GetValueOrDefault(getTeamId(teamA))?? new Score(),
                 (Team teamA, Team teamB)=>mapCurrentTeam.GetValueOrDefault(teamA.Id)?? new Score(),
                 (Team teamA, Team teamB)=>{
-                    var score = mapDirects.SingleOrDefault(kv => kv.Key.TeamA == teamA.Id && kv.Key.TeamB == teamB.Id).Value ?? new Score();
+                    var score = mapDirects.SingleOrDefault(kv => kv.Key.TeamA == getTeamId(teamA) && kv.Key.TeamB == getTeamId(teamB)).Value ?? new Score();
                     List<Score> userScore = scoreUsers.Where(s => s.TeamId == teamA.Id && s.TeamAgainstId == teamB.Id).ToList();
                     userScore.ForEach(score.Merge);
                     return score;
                 },
                 (Team teamA, Team teamB)=>{
-                    var score = mapDirectSeasons.SingleOrDefault(kv => kv.Key.TeamA == teamA.Id && kv.Key.TeamB == teamB.Id).Value ?? new Score();
+                    var score = mapDirectSeasons.SingleOrDefault(kv => kv.Key.TeamA == getTeamId(teamA) && kv.Key.TeamB == getTeamId(teamB)).Value ?? new Score();
                     List<Score> userScore = scoreUsers.Where(s => s.TeamId == teamA.Id && s.TeamAgainstId == teamB.Id).ToList();
                     userScore.ForEach(score.Merge);
                     return score;

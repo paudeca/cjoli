@@ -1,8 +1,10 @@
 import React from "react";
 import { UserContext } from "../contexts/UserContext";
-import { User } from "../models";
+import { User, UserConfig } from "../models";
 import { UserActions } from "../contexts/actions";
 import { useCJoli } from "./useCJoli";
+import * as cjoliService from "../services/cjoliService";
+import useUid from "./useUid";
 
 export const useUser = () => {
   const ctx = React.useContext(UserContext);
@@ -15,6 +17,22 @@ export const useUser = () => {
     [dispatch]
   );
 
+  const { loadRanking } = useCJoli();
+  const uid = useUid();
+
+  const handleSaveUserConfig = React.useCallback(
+    async (userConfig: UserConfig) => {
+      const ranking = await cjoliService.saveUserConfig(uid, userConfig);
+      loadRanking(ranking);
+      const configs =
+        state.user?.configs?.map((c) =>
+          c.tourneyId == userConfig.tourneyId ? userConfig : c
+        ) || [];
+      loadUser({ ...state.user, configs } as User);
+    },
+    [loadRanking, loadUser, uid, state.user]
+  );
+
   const { tourney } = useCJoli();
 
   return {
@@ -25,5 +43,6 @@ export const useUser = () => {
       (c) => c.tourneyId == tourney?.id
     ) || { tourneyId: 0, activeEstimate: false, useCustomEstimate: false },
     loadUser,
+    handleSaveUserConfig,
   };
 };

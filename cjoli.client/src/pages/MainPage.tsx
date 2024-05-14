@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import { ToastContainer, Toast } from "react-bootstrap";
+import { ToastContainer, Toast, Stack } from "react-bootstrap";
 import { Outlet, useLocation } from "react-router-dom";
 import Loading from "../components/Loading";
 import MenuNav from "./MenuNav";
@@ -11,9 +11,16 @@ import { useUser } from "../hooks/useUser";
 import { useCJoli } from "../hooks/useCJoli";
 import useUid from "../hooks/useUid";
 import ChatButton from "./home/ChatButton";
+import EstimateButton from "./home/EstimateButton";
+import ButtonFixed from "./home/ButtonFixed";
+import useScreenSize from "../hooks/useScreenSize";
 
 const MainPage = () => {
-  const { loadUser } = useUser();
+  const {
+    loadUser,
+    isConnected,
+    userConfig: { activeEstimate },
+  } = useUser();
   const [ready, setReady] = React.useState(false);
   const {
     state: { show, type, message },
@@ -22,6 +29,7 @@ const MainPage = () => {
   const { loadTourneys, selectTourney } = useCJoli();
   const uid = useUid();
   const { pathname } = useLocation();
+  const { isMobile } = useScreenSize();
   const isOnChat = pathname.endsWith("chat");
 
   React.useEffect(() => {
@@ -41,7 +49,14 @@ const MainPage = () => {
     <Loading ready={ready}>
       <MenuNav />
       <Outlet />
-      {!isOnChat && <ChatButton />}
+      <ButtonFixed>
+        <Stack gap={1}>
+          {uid && activeEstimate && !isOnChat && isMobile && isConnected && (
+            <EstimateButton />
+          )}
+          {!isOnChat && <ChatButton />}
+        </Stack>
+      </ButtonFixed>
       <ToastContainer position="top-end">
         <Toast onClose={hideToast} show={show} delay={5000} autohide bg={type}>
           <Toast.Header>
