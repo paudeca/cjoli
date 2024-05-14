@@ -32,6 +32,7 @@ import {
 import { useCJoli } from "../../../hooks/useCJoli";
 import { useParams } from "react-router-dom";
 import { Score } from "../../../models";
+import useScreenSize from "../../../hooks/useScreenSize";
 
 ChartJS.register(
   CategoryScale,
@@ -74,6 +75,7 @@ const CHART_COLORS = {
 const TeamTime = () => {
   const { ranking } = useCJoli();
   const { teamId } = useParams();
+  const { isMobile } = useScreenSize();
 
   const defintions = [
     {
@@ -124,13 +126,16 @@ const TeamTime = () => {
   ];
 
   const data: {
-    datasets: { label: string; data: { x: Date; y: number }[] }[];
+    datasets: {
+      label: string;
+      data: { x: number | Date; y: Date | number }[];
+    }[];
   } = {
     datasets: defintions.map((def) => ({
       label: def.label,
       data: (ranking?.history || {})[parseInt(teamId!)].map((s) => ({
-        x: s.time,
-        y: def.value(s),
+        x: !isMobile ? s.time : def.value(s),
+        y: !isMobile ? def.value(s) : s.time,
       })),
       borderWidth: 1,
       borderColor: `rgb(${def.color})`,
@@ -144,20 +149,24 @@ const TeamTime = () => {
     <div
       style={{
         width: "100%",
-        maxHeight: 450,
+        height: 450,
       }}
     >
       <Line
         data={data}
         options={{
+          responsive: true,
+          maintainAspectRatio: false,
           plugins: {
             legend: {
-              display: false,
+              display: true,
             },
           },
+          indexAxis: !isMobile ? "x" : "y",
           scales: {
-            x: {
+            [!isMobile ? "x" : "y"]: {
               type: "time",
+              reverse: isMobile,
               time: { unit: "hour", displayFormats: { hour: "LLL" } },
               ticks: {
                 callback: (value, index, ticks) => {

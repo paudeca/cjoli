@@ -1,4 +1,13 @@
-import { Badge, Card, Stack, Form, Col, Button, Row } from "react-bootstrap";
+import {
+  Badge,
+  Card,
+  Stack,
+  Form,
+  Col,
+  Button,
+  Row,
+  Nav,
+} from "react-bootstrap";
 import CJoliCard from "../../components/CJoliCard";
 import CJoliStack from "../../components/CJoliStack";
 import { useNavigate, useParams } from "react-router-dom";
@@ -15,6 +24,7 @@ import { useUser } from "../../hooks/useUser";
 import useUid from "../../hooks/useUid";
 import TeamRadar from "./team/TeamRadar";
 import TeamTable from "./team/TeamTable";
+import TeamTime from "./team/TeamTime";
 
 const TeamStack = () => {
   const { teams, getTeam, getTeamRank } = useCJoli();
@@ -26,6 +36,7 @@ const TeamStack = () => {
   const { isAdmin } = useUser();
   const navigate = useNavigate();
   const uid = useUid();
+  const [activeKey, setActiveKey] = React.useState("general");
 
   const team = getTeam(parseInt(teamId!));
   if (!team) {
@@ -53,45 +64,63 @@ const TeamStack = () => {
             </Stack>
           </Card.Header>
           <Card.Body>
+            <Nav variant="underline" defaultActiveKey={activeKey}>
+              <Nav.Item>
+                <Nav.Link
+                  eventKey="general"
+                  onClick={() => setActiveKey("general")}
+                >
+                  General
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link
+                  eventKey="timeline"
+                  onClick={() => setActiveKey("timeline")}
+                >
+                  Timeline
+                </Nav.Link>
+              </Nav.Item>
+            </Nav>
             {/*<Card className="p-2">
               <Stack className="py-3">
                 <TeamBar team={team} teamB={teamB} />
               </Stack>
-  </Card>
-            <Card className="p-2">
-              <Stack className="py-3">
-                <TeamTime />
-              </Stack>
   </Card>*/}
-            <Card className="p-2">
-              <Stack className="py-3">
-                <Form className="mx-auto">
-                  <Row className="align-items-center">
-                    <Col xs="auto">
-                      <Form.Label as="h4">{team?.name}</Form.Label>
-                    </Col>
-                    <Col xs="auto">
-                      <Badge bg="secondary">VS</Badge>
-                    </Col>
-                    <Col xs="auto">
-                      <Form.Select
-                        {...register("teamVS", {
-                          onChange: (e: React.FormEvent<HTMLInputElement>) => {
-                            setTeamB(getTeam(parseInt(e.currentTarget.value)));
-                          },
-                        })}
-                      >
-                        <option>Select Team</option>
-                        {teams
-                          ?.filter((t) => t.id != team.id)
-                          .map((t) => (
-                            <option key={t.id} value={t.id}>
-                              {t.name}
-                            </option>
-                          ))}
-                      </Form.Select>
-                    </Col>
-                    {/*<Col xs="auto">
+            {activeKey == "general" && (
+              <Card className="p-2">
+                <Stack className="py-3">
+                  <Form className="mx-auto">
+                    <Row className="align-items-center">
+                      <Col xs="auto">
+                        <Form.Label as="h4">{team?.name}</Form.Label>
+                      </Col>
+                      <Col xs="auto">
+                        <Badge bg="secondary">VS</Badge>
+                      </Col>
+                      <Col xs="auto">
+                        <Form.Select
+                          {...register("teamVS", {
+                            onChange: (
+                              e: React.FormEvent<HTMLInputElement>
+                            ) => {
+                              setTeamB(
+                                getTeam(parseInt(e.currentTarget.value))
+                              );
+                            },
+                          })}
+                        >
+                          <option>Select Team</option>
+                          {teams
+                            ?.filter((t) => t.id != team.id)
+                            .map((t) => (
+                              <option key={t.id} value={t.id}>
+                                {t.name}
+                              </option>
+                            ))}
+                        </Form.Select>
+                      </Col>
+                      {/*<Col xs="auto">
                       <Stack
                         direction="horizontal"
                         className="align-items-center"
@@ -103,14 +132,23 @@ const TeamStack = () => {
                         </Form.Select>
                       </Stack>
                         </Col>*/}
-                  </Row>
-                </Form>
-              </Stack>
-              <Stack direction={isMobile ? "vertical" : "horizontal"}>
-                <TeamRadar team={team} teamB={teamB} />
-                <TeamTable team={team} teamB={teamB} />
-              </Stack>
-            </Card>
+                    </Row>
+                  </Form>
+                </Stack>
+                <Stack direction={isMobile ? "vertical" : "horizontal"}>
+                  <TeamRadar team={team} teamB={teamB} />
+                  <TeamTable team={team} teamB={teamB} />
+                </Stack>
+              </Card>
+            )}
+            {activeKey == "timeline" && (
+              <Card className="p-2">
+                <Stack className="py-3">
+                  <TeamTime />
+                </Stack>
+              </Card>
+            )}
+
             <Stack direction="horizontal" className="p-3">
               <Button variant="primary" onClick={() => navigate(`/${uid}`)}>
                 <ArrowLeft /> Back

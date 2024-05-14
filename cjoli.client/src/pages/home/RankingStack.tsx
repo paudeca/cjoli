@@ -25,7 +25,7 @@ const RankingStack = ({ phase }: { phase?: Phase }) => {
         <CJoliCard>
           <Loading ready={!!phases && !!phase}>
             <Card.Header>
-              <Nav variant="underline" defaultActiveKey={`${phase?.id}`}>
+              <Nav variant="underline" activeKey={`${phase?.id || "1"}`}>
                 {datas.map((phase) => (
                   <Nav.Item key={phase.id}>
                     <Nav.Link
