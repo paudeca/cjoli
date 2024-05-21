@@ -148,24 +148,28 @@ const MenuNav = () => {
           </Offcanvas.Header>
           <Offcanvas.Body>
             <Nav className="justify-content-end flex-grow-1 pe-3">
-              <Nav.Link
-                onClick={() => {
-                  navigate(`${uid}`);
-                  setShow(false);
-                }}
-              >
-                <House size={30} className="mx-2" />
-                Home
-              </Nav.Link>
-              <Nav.Link
-                onClick={() => {
-                  navigate(`${uid}/ranking`);
-                  setShow(false);
-                }}
-              >
-                <ListOl size={30} className="mx-2" />
-                Ranking
-              </Nav.Link>
+              {uid && (
+                <>
+                  <Nav.Link
+                    onClick={() => {
+                      navigate(`${uid}`);
+                      setShow(false);
+                    }}
+                  >
+                    <House size={30} className="mx-2" />
+                    Home
+                  </Nav.Link>
+                  <Nav.Link
+                    onClick={() => {
+                      navigate(`${uid}/ranking`);
+                      setShow(false);
+                    }}
+                  >
+                    <ListOl size={30} className="mx-2" />
+                    Ranking
+                  </Nav.Link>
+                </>
+              )}
               <NavDropdown
                 title={
                   <>
