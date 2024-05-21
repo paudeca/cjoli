@@ -19,12 +19,12 @@ import { Team } from "../../models";
 import { ArrowLeft } from "react-bootstrap-icons";
 import useScreenSize from "../../hooks/useScreenSize";
 import TeamModal from "../../modals/TeamModal";
-import { useModal } from "../../contexts/ModalContext";
 import { useUser } from "../../hooks/useUser";
 import useUid from "../../hooks/useUid";
 import TeamRadar from "./team/TeamRadar";
 import TeamTable from "./team/TeamTable";
 import TeamTime from "./team/TeamTime";
+import { useModal } from "../../hooks/useModal";
 
 const TeamStack = () => {
   const { teams, getTeam, getTeamRank } = useCJoli();

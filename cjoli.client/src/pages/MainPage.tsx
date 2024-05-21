@@ -5,7 +5,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import Loading from "../components/Loading";
 import MenuNav from "./MenuNav";
 import React from "react";
-import { useToast } from "../contexts/ToastContext";
 import * as cjoliService from "../services/cjoliService";
 import { useUser } from "../hooks/useUser";
 import { useCJoli } from "../hooks/useCJoli";
@@ -14,6 +13,7 @@ import ChatButton from "./home/ChatButton";
 import EstimateButton from "./home/EstimateButton";
 import ButtonFixed from "./home/ButtonFixed";
 import useScreenSize from "../hooks/useScreenSize";
+import { useToast } from "../hooks/useToast";
 
 const MainPage = () => {
   const {

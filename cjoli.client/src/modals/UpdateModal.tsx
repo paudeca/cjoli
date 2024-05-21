@@ -1,5 +1,5 @@
 import CJoliModal, { Field } from "../components/CJoliModal";
-import { useToast } from "../contexts/ToastContext";
+import { useToast } from "../hooks/useToast";
 import { User } from "../models";
 import * as cjoliService from "../services/cjoliService";
 

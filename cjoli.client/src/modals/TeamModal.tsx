@@ -1,9 +1,9 @@
 import CJoliModal, { Field } from "../components/CJoliModal";
-import { useToast } from "../contexts/ToastContext";
 import { Team } from "../models";
 import * as cjoliService from "../services/cjoliService";
 import useUid from "../hooks/useUid";
 import { useCJoli } from "../hooks/useCJoli";
+import { useToast } from "../hooks/useToast";
 
 const TeamModal = ({ team }: { team?: Team }) => {
   const { loadRanking } = useCJoli();

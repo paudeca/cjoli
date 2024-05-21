@@ -1,10 +1,6 @@
 import React from "react";
 import moment from "moment";
 
-/*const upperFirstLetter = (value: string) => {
-  return value.charAt(0).toUpperCase() + value.slice(1);
-};*/
-
 export const useTools = () => {
   const upperFirstLetter = React.useCallback((value: string) => {
     return value.charAt(0).toUpperCase() + value.slice(1);

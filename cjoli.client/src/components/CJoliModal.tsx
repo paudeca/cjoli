@@ -7,8 +7,8 @@ import {
   Spinner,
 } from "react-bootstrap";
 import { useForm, SubmitHandler, FieldValues, Path } from "react-hook-form";
-import { useModal } from "../contexts/ModalContext";
 import React from "react";
+import { useModal } from "../hooks/useModal";
 
 export interface Field<T extends FieldValues> {
   id: Path<T>;

@@ -11,7 +11,6 @@ import {
   Stack,
   Spinner,
 } from "react-bootstrap";
-import { useModal } from "../contexts/ModalContext";
 import styled from "@emotion/styled";
 import LoginModal from "../modals/LoginModal";
 import RegisterModal from "../modals/RegisterModal";
@@ -27,6 +26,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { useEstimate } from "../hooks/useEstimate";
 import { UserConfig } from "../models";
+import { useModal } from "../hooks/useModal";
 
 const MyImg = styled.img<{ width: string }>`
   width: ${(props) => props.width};
