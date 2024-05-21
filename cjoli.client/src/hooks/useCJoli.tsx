@@ -34,6 +34,10 @@ export const useCJoli = () => {
     (teamId: number) => state.teams?.find((t) => t.id === teamId),
     [state.teams]
   );
+  const getPosition = React.useCallback(
+    (positionId: number) => state.positions?.find((p) => p.id === positionId),
+    [state.positions]
+  );
   const findTeam = React.useCallback(
     ({ positionId }: { positionId?: number }) => {
       if (positionId) {
@@ -42,11 +46,7 @@ export const useCJoli = () => {
       }
       return undefined;
     },
-    []
-  );
-  const getPosition = React.useCallback(
-    (positionId: number) => state.positions?.find((p) => p.id === positionId),
-    [state.positions]
+    [getPosition, getTeam]
   );
   const getTeamInfo = React.useCallback(
     (positionId: number, defaultName?: string) => {
@@ -117,6 +117,11 @@ export const useCJoli = () => {
     [state.ranking?.scores.scoreTeams]
   );
 
+  const selectDay = React.useCallback(
+    (day: string) => dispatch({ type: CJoliActions.SELECT_DAY, payload: day }),
+    [dispatch]
+  );
+
   return {
     ...state,
     loadRanking,
@@ -133,5 +138,6 @@ export const useCJoli = () => {
     isTeamInSquad,
     isTeamInMatch,
     getScoreForTeam,
+    selectDay,
   };
 };
