@@ -10,7 +10,6 @@ import * as cjoliService from "../../services/cjoliService";
 import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
 import MatchRow from "./match/MatchRow";
-import { useUser } from "../../hooks/useUser";
 import InfoModal from "../../components/InfoModal";
 import { useParams } from "react-router-dom";
 import { useModal } from "../../hooks/useModal";
@@ -18,23 +17,11 @@ import { useModal } from "../../hooks/useModal";
 const MatchesStack = ({ phase }: { phase?: Phase }) => {
   const { matches, loadRanking, isTeamInMatch, daySelected, selectDay } =
     useCJoli();
-  const { userConfig } = useUser();
   const uid = useUid();
-  const values = matches?.reduce(
-    (acc, m) => ({
-      ...acc,
-      [`m${m.id}`]: userConfig.activeEstimate
-        ? m.estimate
-        : { scoreA: "", scoreB: "" },
-    }),
-    {}
-  );
-  const { register, getValues } = useForm<
-    Record<string, { scoreA: number | ""; scoreB: number | "" }>
-  >({ values });
+  const { register, getValues } =
+    useForm<Record<string, { scoreA: number | ""; scoreB: number | "" }>>();
   const { setShow } = useModal("blockShot");
   const { squadId, teamId } = useParams();
-  //const [eventKey, setEventKey] = React.useState("0");
 
   const filter = teamId
     ? (match: Match) => isTeamInMatch(parseInt(teamId), match)

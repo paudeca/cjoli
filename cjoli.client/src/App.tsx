@@ -48,6 +48,9 @@ const App = () => {
             color: white;
             uuser-select: none;
           }
+          input::placeholder {
+            opacity: 0.5 !important;
+          }
           .btn-primary {
             --bs-btn-bg: #313f69;
             --bs-btn-border-color: #313f69;
