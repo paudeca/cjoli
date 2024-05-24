@@ -219,8 +219,8 @@ namespace cjoli.Server.Services
 
                 var listA = acc[teamA.Id];
                 var listB = acc[teamB.Id];
-                var scoreA = new Score();
-                var scoreB = new Score();
+                var scoreA = new Score() { TeamId=teamA.Id};
+                var scoreB = new Score() { TeamId = teamB.Id };
 
                 IMatch? match = m.Done ? m : m.UserMatch;
 
@@ -239,7 +239,7 @@ namespace cjoli.Server.Services
                 listB.Add(scoreB);
                 return acc;
             });
-            var scoreTeams = mapTeams.ToDictionary(kv => kv.Key, kv => kv.Value.LastOrDefault()??new Score());
+            var scoreTeams = mapTeams.ToDictionary(kv => kv.Key, kv => kv.Value.LastOrDefault()??new Score() { TeamId=kv.Key});
             ranking.History = mapTeams;
             ranking.Scores.ScoreTeams = scoreTeams;
         }

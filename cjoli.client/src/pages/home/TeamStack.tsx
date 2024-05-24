@@ -82,11 +82,6 @@ const TeamStack = () => {
                 </Nav.Link>
               </Nav.Item>
             </Nav>
-            {/*<Card className="p-2">
-              <Stack className="py-3">
-                <TeamBar team={team} teamB={teamB} />
-              </Stack>
-  </Card>*/}
             {activeKey == "general" && (
               <Card className="p-2">
                 <Stack className="py-3">
@@ -120,18 +115,6 @@ const TeamStack = () => {
                             ))}
                         </Form.Select>
                       </Col>
-                      {/*<Col xs="auto">
-                      <Stack
-                        direction="horizontal"
-                        className="align-items-center"
-                      >
-                        <Form.Select aria-label="Default select example">
-                          <option value="1">{tourney?.name}</option>
-                          <option value="2">{tourney?.season}</option>
-                          <option value="3">{tourney?.category}</option>
-                        </Form.Select>
-                      </Stack>
-                        </Col>*/}
                     </Row>
                   </Form>
                 </Stack>
