@@ -1,5 +1,6 @@
 import { IMatch } from "./IMatch";
 import { Tourney } from "./Tourney";
+import { TourneyConfig } from "./TourneyConfig";
 import { Match } from "./Match";
 import { Phase } from "./Phase";
 import { Position } from "./Position";
@@ -18,6 +19,7 @@ import { UserMatch } from "./UserMatch";
 export type {
   IMatch,
   Tourney,
+  TourneyConfig,
   Match,
   Phase,
   Position,

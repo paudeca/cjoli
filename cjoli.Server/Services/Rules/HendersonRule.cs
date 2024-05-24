@@ -17,6 +17,8 @@ namespace cjoli.Server.Services.Rules
 
         public int Forfeit => 0;
 
+        public bool HasPenalty => false;
+
         public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads)
         {
             var mapPositions = squad.Positions.Where(p=>p.ParentPosition!=null).ToDictionary(p=>p.Id, p =>

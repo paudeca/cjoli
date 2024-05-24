@@ -51,7 +51,7 @@ const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
     }
   };
 
-  const columns = [
+  let columns = [
     {
       label: "Rang",
       description: "Classement",
@@ -162,15 +162,21 @@ const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
       active: true,
       needTeam: false,
     },
-    {
-      label: "PEN",
-      description: "Pénalités",
-      callScore: (s: Score) => s.penalty,
-      up: false,
-      active: true,
-      needTeam: false,
-    },
   ];
+
+  if (tourney?.config.hasPenalty) {
+    columns = [
+      ...columns,
+      {
+        label: "PEN",
+        description: "Pénalités",
+        callScore: (s: Score) => s.penalty,
+        up: false,
+        active: true,
+        needTeam: false,
+      },
+    ];
+  }
 
   return (
     <Table striped bordered size="sm" style={{ textAlign: "center" }}>

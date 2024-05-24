@@ -10,6 +10,7 @@
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public string? Rule { get; set; }
+        public TourneyConfigDto? Config { get; set; }
 
 
         public List<PhaseDto>? Phases { get; set; }
