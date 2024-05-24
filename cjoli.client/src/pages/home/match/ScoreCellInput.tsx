@@ -19,11 +19,21 @@ const ScoreCell = ({
   saveMatch,
   register,
 }: ScoreCellProps) => {
-  const { isConnected } = useUser();
-
+  const { isConnected, userConfig } = useUser();
+  const placeholder = userConfig.activeEstimate
+    ? teamA
+      ? match.estimate?.scoreA.toString()
+      : match.estimate?.scoreB.toString()
+    : undefined;
   return (
     <InputGroup size="sm" style={{ width: "80px" }}>
-      <Form.Control type="number" min="0" max="100" {...register(id)} />
+      <Form.Control
+        type="number"
+        min="0"
+        max="100"
+        {...register(id)}
+        placeholder={placeholder}
+      />
       {isConnected && (
         <DropdownButton variant="outline-secondary" title="">
           <Dropdown.Item
