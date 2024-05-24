@@ -244,6 +244,12 @@ namespace cjoli.Server.Services
             ranking.Scores.ScoreTeams = scoreTeams;
         }
 
+        public void SetConfig(RankingDto ranking)
+        {
+            IRule rule = _rules[ranking.Tourney.Rule ?? "scooby"];
+            ranking.Tourney.Config = new TourneyConfigDto { HasPenalty=rule.HasPenalty};
+        }
+
         public void UpdateScore(Score scoreA, Score scoreB, Score? scoreTourney, IMatch match, IRule rule)
         {
             scoreA.Time = match.Time;

@@ -38,6 +38,7 @@ const MyArrowLeftSquareFill =
 const RankTable = ({ phase }: { phase: Phase }) => {
   const {
     ranking,
+    tourney,
     getPosition,
     getTeam,
     loadRanking,
@@ -171,7 +172,9 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                               title={`Simulation - ${name}`}
                               onRemove={handleRemove(userMatches)}
                             />
-                            <PenaltyIcon positionId={score.positionId} />
+                            {tourney?.config.hasPenalty && (
+                              <PenaltyIcon positionId={score.positionId} />
+                            )}
                             {team && (
                               <MyCaretRight
                                 role="button"

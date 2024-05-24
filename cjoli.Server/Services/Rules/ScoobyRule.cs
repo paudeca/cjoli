@@ -14,6 +14,8 @@ namespace cjoli.Server.Services.Rules
 
         public int Forfeit => 0;
 
+        public bool HasPenalty => true;
+
         public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads)
         {
             return squad.Positions.ToDictionary(p => p.Id, p => new Score() { PositionId = p.Id, TeamId = p.Team?.Id ?? 0 });
