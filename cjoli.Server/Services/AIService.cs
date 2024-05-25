@@ -11,6 +11,7 @@ using cjoli.Server.Dtos;
 using System.Text.Json.Serialization;
 using cjoli.Server.Models;
 using cjoli.Server.Exceptions;
+using cjoli.Server.Models.AI;
 
 namespace cjoli.Server.Services
 {
@@ -92,49 +93,41 @@ Ton équipe préféré est les Lions de Wasquehal."));
             Ranking ranking = _cjoliService.GetRanking(uuid, null, context);
             var dto = _mapper.Map<RankingDto>(ranking);
 
-            Dictionary<int, int> mapTeams = new Dictionary<int, int>();
-            
-            dto.Tourney.Phases = dto.Tourney.Phases!.Select(p =>
+            _cjoliService.AffectationTeams(dto);
+            _cjoliService.CalculateHistory(dto);
+
+            var tourneyAI = _mapper.Map<TourneyAI>(dto.Tourney);
+            tourneyAI.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Matches).ToList().ForEach(m =>
             {
-                p.Squads = p.Squads!.Select(s =>
-                {
-                    s.TeamId = s.Positions!.Select(p =>
-                    {
-                        int teamId = p.TeamId;
-                        if(p.TeamId == 0)
-                        {
-                            var scores = dto.Scores.ScoreSquads.Single(s => s.SquadId == p.ParentPosition!.SquadId);
-                            var score = scores.Scores![p.ParentPosition!.Value - 1];
-                            teamId = score.TeamId;
-                        }
-                        if(!mapTeams.ContainsKey(p.Id))
-                        {
-                            mapTeams.Add(p.Id, teamId);
-                        }
-                        return teamId;
-                    }).ToList();
-                    s.Positions = new List<PositionDto>();
-                    s.Matches = s.Matches!.Select(m =>
-                    {
-                        m.Estimate = null;
-                        m.TeamA = mapTeams[m.PositionIdA];
-                        m.TeamB = mapTeams[m.PositionIdB];
-                        m.PositionA = 0;
-                        m.PositionIdA = 0;
-                        m.PositionB = 0;
-                        m.PositionIdB = 0;
-                        return m;
-                    }).ToList();
-                    return s;
-                }).ToList();
-                return p;
-            }).ToList();
+                m.TeamA = tourneyAI.Teams.Single(t => t.Id == m.TeamIdA).Name;
+                m.TeamB = tourneyAI.Teams.Single(t => t.Id == m.TeamIdB).Name;
+            });
+            tourneyAI.Ranks.ForEach(r =>
+            {
+                r.Team = tourneyAI.Teams.Single(t => t.Id == r.TeamId).Name;
+            });
+            dto.Scores.ScoreTeams.ToList().ForEach(kv =>
+            {
+                var score = new ScoreAI();
+                score.Merge(kv.Value);
+                score.Team = tourneyAI.Teams.Single(t => t.Id == kv.Key).Name;
+                tourneyAI.Scores.Add(score);
+            });
 
-            dto.Scores.ScoreSquads = null;
-
-            string json = JsonSerializer.Serialize(dto, new JsonSerializerOptions() { 
+            string json = JsonSerializer.Serialize(tourneyAI, new JsonSerializerOptions() { 
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase, 
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull });
+
+
+            /*session.Messages.Add(new ChatRequestSystemMessage(""+
+@"Description du modèle:
+- Le json suivant décrit le tournoi(tourney) avec la catégorie(category), la saison(season), et la date de début(startTime) et de fin(endTime).
+- Le tournoi contient une liste d'équipes(team) et des phases(phase).
+- Une phase contient une liste de groupes(squad).
+- Un groupe(squad) contient une liste de positions et une liste de match.
+- Une position représente une équipe dans un squad, elle peut être affecté à une équipe(team) ou sinon dipose d'un nom.
+- Un match est entre 2 positions (positionA et positionB).
+- Une équipe(team) dispose d'un nom, logo et un alias"));*/
 
             session.Messages.Add(new ChatRequestSystemMessage("Utilise le json suivant pour donner des informations.\n" + json));
 

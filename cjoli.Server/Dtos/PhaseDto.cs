@@ -4,6 +4,6 @@
     {
         public int Id { get; set; }
         public required string Name { get; set; }
-        public List<SquadDto>? Squads { get; set; }
+        public List<SquadDto> Squads { get; set; } = new List<SquadDto>();
     }
 }

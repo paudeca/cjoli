@@ -6,8 +6,8 @@ namespace cjoli.Server.Dtos
     {
         public int Id { get; set; }
         public bool Done { get; set; }
-        public int TeamA { get; set; }
-        public int TeamB { get; set; }
+        public int TeamIdA { get; set; }
+        public int TeamIdB { get; set; }
         public int PositionA { get; set; }
         public int PositionIdA { get; set; }
         public int PositionB { get; set; }

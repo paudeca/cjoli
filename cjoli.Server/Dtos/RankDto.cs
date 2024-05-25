@@ -10,5 +10,6 @@
         public string? Phase { get; set; }
         public string? Squad { get; set; }
         public string? Name { get; set; }
+        public int TeamId { get; set; }
     }
 }

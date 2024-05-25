@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using cjoli.Server.Dtos;
 using cjoli.Server.Models;
+using cjoli.Server.Models.AI;
 using cjoli.Server.Services;
 
 namespace cjoli.Server
@@ -53,6 +54,14 @@ namespace cjoli.Server
 
             CreateMap<User, UserDto>().ForMember(x => x.Password, opt => opt.Ignore());
             CreateMap<UserConfig, UserConfigDto>().ForMember(x => x.TourneyId, opt => opt.MapFrom(u => u.Tourney.Id));
+
+            CreateMap<TourneyDto, TourneyAI>();
+            CreateMap<PhaseDto, PhaseAI>();
+            CreateMap<SquadDto, SquadAI>().ForMember(x=>x.Matches, opt => opt.MapFrom(s => s.Matches!.Where(m => m.Done)));
+            CreateMap<MatchDto, MatchAI>();
+            CreateMap<PositionDto, PositionAI>();
+            CreateMap<TeamDto, TeamAI>();
+            CreateMap<RankDto, RankAI>();
         }
     }
 }

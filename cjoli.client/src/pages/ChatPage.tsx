@@ -36,7 +36,11 @@ const ChatPage = () => {
     if (lastMessage != null) {
       setMessages((messages) => [
         ...messages,
-        { message: lastMessage.data, author: "bot", time: new Date() },
+        {
+          message: lastMessage.data.replaceAll("\n", "<br/>"),
+          author: "bot",
+          time: new Date(),
+        },
       ]);
       window.setTimeout(() => {
         ref.current?.scroll(0, ref.current?.scrollHeight);
@@ -91,9 +95,10 @@ const ChatPage = () => {
                         <div
                           className="flex-shrink-1 bg-light rounded px-3 mr-3"
                           style={{ fontSize: "12px" }}
-                        >
-                          {m.message}
-                        </div>
+                          dangerouslySetInnerHTML={{
+                            __html: m.message,
+                          }}
+                        ></div>
                       </div>
                     )}
                     {m.author == "bot" && (
@@ -110,9 +115,10 @@ const ChatPage = () => {
                         <div
                           className="flex-shrink-1 bg-light rounded px-3 ml-3"
                           style={{ fontSize: "12px" }}
-                        >
-                          {m.message}
-                        </div>
+                          dangerouslySetInnerHTML={{
+                            __html: m.message,
+                          }}
+                        ></div>
                       </div>
                     )}
                   </React.Fragment>
