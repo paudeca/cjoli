@@ -4,8 +4,8 @@
     {
         public int Id { get; set; }
         public required string Name { get; set; }
-        public List<PositionDto>? Positions { get; set; }
-        public List<MatchDto>? Matches { get; set; }
+        public List<PositionDto> Positions { get; set; } = new List<PositionDto>();
+        public List<MatchDto> Matches { get; set; } = new List<MatchDto>();
         public List<int>? TeamId { get; set; }
 
     }

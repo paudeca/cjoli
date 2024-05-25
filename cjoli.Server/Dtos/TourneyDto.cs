@@ -13,9 +13,9 @@
         public TourneyConfigDto? Config { get; set; }
 
 
-        public List<PhaseDto>? Phases { get; set; }
-        public List<TeamDto>? Teams { get; set; }
-        public List<RankDto>? Ranks { get; set; }
+        public List<PhaseDto> Phases { get; set; } = new List<PhaseDto>();
+        public List<TeamDto> Teams { get; set; } = new List<TeamDto>();
+        public List<RankDto> Ranks { get; set; } = new List<RankDto>();
 
 
     }

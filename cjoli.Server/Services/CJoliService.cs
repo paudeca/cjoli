@@ -184,16 +184,28 @@ namespace cjoli.Server.Services
 
         public void AffectationTeams(RankingDto ranking)
         {
-            var positions = (ranking.Tourney.Phases ?? []).SelectMany(p => p.Squads ?? []).SelectMany(s => s.Positions ?? []);
+            var positions = ranking.Tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Positions);
             foreach (var position in positions.Where(p => p.ParentPosition != null))
             {
                 var scoreSquad = ranking.Scores.ScoreSquads.Find(s => s.SquadId == (position.ParentPosition?.SquadId ?? 0));
-                var score = (scoreSquad?.Scores ?? [])[(position.ParentPosition?.Value ?? 1) - 1];
-                if (score.Game > 0)
+                var score = scoreSquad?.Scores[(position.ParentPosition?.Value ?? 1) - 1];
+                if (score!=null && score.Game > 0)
                 {
                     var positionParent = positions.Single(p => p.Id == score.PositionId);
                     position.TeamId = positionParent.TeamId;
                 }
+            }
+            var matches = ranking.Tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Matches);
+            foreach(var match in matches)
+            {
+                match.TeamIdA = positions.Single(p => p.Id == match.PositionIdA).TeamId;
+                match.TeamIdB = positions.Single(p => p.Id == match.PositionIdB).TeamId;
+            }
+            foreach(var rank in ranking.Tourney.Ranks)
+            {
+                var scoreSquad = ranking.Scores.ScoreSquads.Single(s => s.SquadId == rank.SquadId);
+                var score = scoreSquad.Scores[rank.Value - 1];
+                rank.TeamId = positions.Single(p=>p.Id==score.PositionId).TeamId;
             }
         }
 
@@ -517,14 +529,14 @@ namespace cjoli.Server.Services
     public class Scores
     {
         public List<ScoreSquad> ScoreSquads { get; set; } = new List<ScoreSquad>();
-        public Dictionary<int, Score>? ScoreTeams { get; set; }
+        public Dictionary<int, Score> ScoreTeams { get; set; } = new Dictionary<int, Score>();
         public required Score ScoreTourney { get; set; }
     }
 
     public class ScoreSquad
     {
         public int SquadId { get; set; }
-        public List<Score>? Scores { get; set; }
+        public List<Score> Scores { get; set; } = new List<Score>();
         public Dictionary<int, Score>? TeamScores { get; set; }
 
     }
