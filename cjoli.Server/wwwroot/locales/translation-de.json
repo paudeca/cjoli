@@ -1,0 +1,21 @@
+{
+  "title": "CJoli - Eishockeyturnier",
+  "lang": {
+    "en": "Englisch",
+    "fr": "Französisch",
+    "pt": "Portugiesisch",
+    "es": "Spanisch",
+    "de": "Deutsch"
+  },
+  "user": {
+    "guest": "Gast"
+  },
+  "menu": {
+    "home": "Startseite",
+    "ranking": "Rangliste",
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "update": "Aktualisieren",
+    "logout": "Abmelden"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "title": "CJoli - Tournoi de hockey sur glace",
+  "lang": {
+    "en": "Anglais",
+    "fr": "Français",
+    "pt": "Portugais",
+    "es": "Espagnol",
+    "de": "Allemand"
+  },
+  "user": {
+    "guest": "Invité"
+  },
+  "menu": {
+    "home": "Accueil",
+    "ranking": "Classement",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "update": "Mettre à jour",
+    "logout": "Déconnexion"
+  }
+}

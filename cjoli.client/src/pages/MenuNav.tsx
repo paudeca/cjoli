@@ -27,6 +27,7 @@ import { useForm } from "react-hook-form";
 import { useEstimate } from "../hooks/useEstimate";
 import { UserConfig } from "../models";
 import { useModal } from "../hooks/useModal";
+import { Trans, useTranslation } from "react-i18next";
 
 const MyImg = styled.img<{ width: string }>`
   width: ${(props) => props.width};
@@ -48,6 +49,8 @@ const MenuNav = () => {
   const navigate = useNavigate();
   const { isMobile } = useScreenSize();
   const { loading, handleUpdateEstimate } = useEstimate();
+  const { t, i18n } = useTranslation();
+  const [lang, setLang] = React.useState(i18n.resolvedLanguage);
 
   const logout = async () => {
     await cjoliService.logout();
@@ -63,6 +66,14 @@ const MenuNav = () => {
   const { register } = useForm<UserConfig>({
     values: userConfig,
   });
+
+  const langs = [
+    { key: "en", icon: "🇬🇧" },
+    { key: "fr", icon: "🇫🇷" },
+    { key: "pt", icon: "🇵🇹" },
+    { key: "es", icon: "🇪🇸" },
+    { key: "de", icon: "🇩🇪" },
+  ];
 
   const tourneyLabel = uid && tourney?.name;
   return (
@@ -86,7 +97,7 @@ const MenuNav = () => {
             </Col>
             {!tourneyLabel && isMobile && <Col>Ice Hockey</Col>}
             {!tourneyLabel && !isMobile && (
-              <Col>CJoli - Ice Hockey Tournament - 1.0.0</Col>
+              <Col>{t("title", "CJoli - Ice Hockey Tournament")} - 1.0.0</Col>
             )}
             {tourneyLabel && <Col>{tourneyLabel}</Col>}
           </Row>
@@ -157,7 +168,7 @@ const MenuNav = () => {
                     }}
                   >
                     <House size={30} className="mx-2" />
-                    Home
+                    <Trans i18nKey="menu.home">Home</Trans>
                   </Nav.Link>
                   <Nav.Link
                     onClick={() => {
@@ -166,15 +177,32 @@ const MenuNav = () => {
                     }}
                   >
                     <ListOl size={30} className="mx-2" />
-                    Ranking
+                    <Trans i18nKey="menu.ranking">Ranking</Trans>
                   </Nav.Link>
                 </>
               )}
               <NavDropdown
+                title={langs.find((l) => l.key == lang)?.icon || "🇬🇧"}
+              >
+                {langs
+                  .filter((l) => l.key != lang)
+                  .map((lang) => (
+                    <NavDropdown.Item
+                      key={lang.key}
+                      onClick={() => {
+                        i18n.changeLanguage(lang.key);
+                        setLang(lang.key);
+                      }}
+                    >
+                      {lang.icon} {t(`lang.${lang.key}`)}
+                    </NavDropdown.Item>
+                  ))}
+              </NavDropdown>
+              <NavDropdown
                 title={
                   <>
                     <PersonSquare size={30} className="mx-2" />
-                    <span>{user?.login || "Guest"}</span>
+                    <span>{user?.login || t("user.guest", "Guest")}</span>
                   </>
                 }
                 className="px-0"
@@ -184,10 +212,10 @@ const MenuNav = () => {
                 {!user && (
                   <>
                     <NavDropdown.Item onClick={() => showLogin(true)}>
-                      Login
+                      <Trans i18nKey="menu.login">Login</Trans>
                     </NavDropdown.Item>
                     <NavDropdown.Item onClick={() => showRegister(true)}>
-                      Register
+                      <Trans i18nKey="menu.register">Register</Trans>
                     </NavDropdown.Item>
                   </>
                 )}
@@ -195,10 +223,12 @@ const MenuNav = () => {
                 {user && (
                   <>
                     <NavDropdown.Item onClick={() => showUpdate(true)}>
-                      Update
+                      <Trans i18nKey="menu.update">Update</Trans>
                     </NavDropdown.Item>
                     <NavDropdown.Divider />
-                    <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
+                    <NavDropdown.Item onClick={logout}>
+                      <Trans i18nKey="menu.logout">Logout</Trans>
+                    </NavDropdown.Item>
                   </>
                 )}
               </NavDropdown>

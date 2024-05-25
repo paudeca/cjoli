@@ -1,0 +1,21 @@
+{
+  "title": "CJoli - Torneio de Hóquei no Gelo",
+  "lang": {
+    "en": "Inglês",
+    "fr": "Francês",
+    "pt": "Português",
+    "es": "Espanhol",
+    "de": "Alemão"
+  },
+  "user": {
+    "guest": "Visitante"
+  },
+  "menu": {
+    "home": "Página Inicial",
+    "ranking": "Classificação",
+    "login": "Entrar",
+    "register": "Registrar",
+    "update": "Atualizar",
+    "logout": "Sair"
+  }
+}

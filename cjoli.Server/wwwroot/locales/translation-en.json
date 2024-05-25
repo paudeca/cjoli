@@ -1,0 +1,21 @@
+{
+  "title": "CJoli - Ice Hockey Tournament",
+  "lang": {
+    "en": "English",
+    "fr": "French",
+    "pt": "Portuguese",
+    "es": "Spanish",
+    "de": "Deutsch"
+  },
+  "user": {
+    "guest": "Guest"
+  },
+  "menu": {
+    "home": "Home",
+    "ranking": "Ranking",
+    "login": "Login",
+    "register": "Register",
+    "update": "Update",
+    "logout": "Logout"
+  }
+}

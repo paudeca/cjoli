@@ -75,8 +75,9 @@ builder.Services.AddDbContextPool<CJoliContext>(options =>
 var app = builder.Build();
 
 app.UseDefaultFiles();
-app.UseStaticFiles();
 app.UseCors();
+app.UseStaticFiles();
+
 app.UseWebSockets();
 if (app.Environment.IsDevelopment())
 {
