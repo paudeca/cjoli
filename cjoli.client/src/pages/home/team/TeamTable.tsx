@@ -58,7 +58,14 @@ const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
       label: "Rang",
       description: t("rank.ranking", "Ranking"),
       callRank: (r: Rank) => r.order || 0,
-      getLabel: (r: Rank) => (r.order == 1 ? "1er" : `${r.order}ème`),
+      getLabel: (r: Rank) =>
+        r.order == 1
+          ? t("rank.first")
+          : r.order == 2
+          ? t("rank.second")
+          : r.order == 3
+          ? t("rank.third")
+          : t("rank.rankth", { rank: r.order }),
       up: false,
       active: true,
       needTeam: true,

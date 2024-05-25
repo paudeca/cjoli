@@ -31,8 +31,9 @@ const SelectPage = () => {
   const navigate = useNavigate();
   const { tourneys, selectTourney } = useCJoli();
   const { formatDate } = useTools();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
+  moment.locale(i18n.resolvedLanguage);
   const now = moment();
 
   let datas: {

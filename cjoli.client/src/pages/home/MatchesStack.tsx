@@ -4,7 +4,6 @@ import CJoliStack from "../../components/CJoliStack";
 import Loading from "../../components/Loading";
 import { Match, Phase } from "../../models";
 import moment from "moment";
-import "moment/dist/locale/fr";
 import { useForm } from "react-hook-form";
 import * as cjoliService from "../../services/cjoliService";
 import { useCJoli } from "../../hooks/useCJoli";
@@ -44,7 +43,7 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
     }, {});
   const keys = Object.keys(datas || {});
   keys.sort();
-  moment.locale("fr");
+  //moment.locale("fr");
 
   const upperFirstLetter = (value: string) => {
     return value.charAt(0).toUpperCase() + value.slice(1);

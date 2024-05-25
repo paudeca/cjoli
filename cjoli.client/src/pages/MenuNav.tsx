@@ -28,6 +28,7 @@ import { useEstimate } from "../hooks/useEstimate";
 import { UserConfig } from "../models";
 import { useModal } from "../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
+import moment from "moment";
 
 const MyImg = styled.img<{ width: string }>`
   width: ${(props) => props.width};
@@ -200,6 +201,7 @@ const MenuNav = () => {
                       onClick={() => {
                         i18n.changeLanguage(lang.key);
                         setLang(lang.key);
+                        moment.locale(lang.key);
                       }}
                     >
                       {lang.icon} {t(`lang.${lang.key}`)}
