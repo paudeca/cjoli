@@ -13,6 +13,7 @@ import MatchRow from "./match/MatchRow";
 import InfoModal from "../../components/InfoModal";
 import { useParams } from "react-router-dom";
 import { useModal } from "../../hooks/useModal";
+import { Trans, useTranslation } from "react-i18next";
 
 const MatchesStack = ({ phase }: { phase?: Phase }) => {
   const { matches, loadRanking, isTeamInMatch, daySelected, selectDay } =
@@ -22,6 +23,7 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
     useForm<Record<string, { scoreA: number | ""; scoreB: number | "" }>>();
   const { setShow } = useModal("blockShot");
   const { squadId, teamId } = useParams();
+  const { t } = useTranslation();
 
   const filter = teamId
     ? (match: Match) => isTeamInMatch(parseInt(teamId), match)
@@ -133,13 +135,19 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
           </Loading>
         </CJoliCard>
       </div>
-      <InfoModal id="blockShot" title="Save Score" variant="danger">
+      <InfoModal
+        id="blockShot"
+        title={t("match.blockShot.title", "Save Score")}
+        variant="danger"
+      >
         <p>
-          Impossible d'enregistrer le score.
-          <br />
-          Le match doit se terminer par une séance de tir aux buts.
-          <br />
-          Merci d'indiquer un vainqueur.
+          <Trans i18nKey="match.blockShot.error">
+            Unable to record the score.
+            <br />
+            The match must end in a penalty shootout.
+            <br />
+            Please indicate a winner.
+          </Trans>
         </p>
       </InfoModal>
     </CJoliStack>

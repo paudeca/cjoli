@@ -1,5 +1,6 @@
 import { Badge } from "react-bootstrap";
 import TeamName from "../../../components/TeamName";
+import { Trans } from "react-i18next";
 
 const TeamCell = ({
   positionId,
@@ -13,7 +14,7 @@ const TeamCell = ({
       <TeamName positionId={positionId} />
       {forfeit && (
         <Badge bg="danger" className="mx-2">
-          Forfait
+          <Trans i18nKey="match.forfeit">Forfeit</Trans>
         </Badge>
       )}
     </>

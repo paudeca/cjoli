@@ -14,6 +14,7 @@ import EstimateButton from "./home/EstimateButton";
 import ButtonFixed from "./home/ButtonFixed";
 import useScreenSize from "../hooks/useScreenSize";
 import { useToast } from "../hooks/useToast";
+import { Trans } from "react-i18next";
 
 const MainPage = () => {
   const {
@@ -60,7 +61,9 @@ const MainPage = () => {
       <ToastContainer position="top-end">
         <Toast onClose={hideToast} show={show} delay={5000} autohide bg={type}>
           <Toast.Header>
-            <strong className="me-auto">Message</strong>
+            <strong className="me-auto">
+              <Trans i18nKey="message">Message</Trans>
+            </strong>
           </Toast.Header>
           <Toast.Body>{message}</Toast.Body>
         </Toast>

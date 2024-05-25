@@ -17,6 +17,7 @@ import * as cjoliService from "../services/cjoliService";
 import useUid from "../hooks/useUid";
 import styled from "@emotion/styled";
 import { useUser } from "../hooks/useUser";
+import { Trans, useTranslation } from "react-i18next";
 
 const MyBadge = styled(Badge)<{ ["data-penalty"]: boolean }>`
   --bs-bg-opacity: ${(props) => (!props["data-penalty"] ? "0.2" : "1")};
@@ -29,6 +30,7 @@ const PenaltyIcon = ({ positionId }: { positionId: number }) => {
   const { getPosition, loadRanking } = useCJoli();
   const uid = useUid();
   const { isAdmin } = useUser();
+  const { t } = useTranslation();
 
   const position = getPosition(positionId)!;
 
@@ -49,9 +51,7 @@ const PenaltyIcon = ({ positionId }: { positionId: number }) => {
         <OverlayTrigger
           overlay={
             <Tooltip>
-              {position.penalty > 1
-                ? `${position.penalty} Penalties`
-                : `${position.penalty} Penalty`}
+              {t("penalty.tooltip", { count: position.penalty })}
             </Tooltip>
           }
         >
@@ -92,7 +92,9 @@ const PenaltyIcon = ({ positionId }: { positionId: number }) => {
                 <Popover.Body>
                   <Form onSubmit={handleSubmit(submit)}>
                     <Form.Group as={Row} controlId="penalty">
-                      <Form.Label column>Penalties</Form.Label>
+                      <Form.Label column>
+                        <Trans i18nKey="penalty.label">Penalties</Trans>
+                      </Form.Label>
                       <Col>
                         <Form.Control
                           type="number"
@@ -105,7 +107,7 @@ const PenaltyIcon = ({ positionId }: { positionId: number }) => {
                     <Form.Group as={Row} className="pt-2">
                       <Col sm={{ span: 10, offset: 2 }}>
                         <Button size="sm" className="mx-1" type="submit">
-                          Save
+                          <Trans i18nKey="button.save">Save</Trans>
                         </Button>
 
                         <Button
@@ -113,7 +115,7 @@ const PenaltyIcon = ({ positionId }: { positionId: number }) => {
                           onClick={() => setOpen(false)}
                           size="sm"
                         >
-                          Close
+                          <Trans i18nKey="button.close">Close</Trans>
                         </Button>
                       </Col>
                     </Form.Group>

@@ -8,14 +8,118 @@
     "de": "Alemão"
   },
   "user": {
-    "guest": "Visitante"
+    "guest": "Convidado"
   },
   "menu": {
-    "home": "Página Inicial",
+    "home": "Início",
     "ranking": "Classificação",
     "login": "Entrar",
     "register": "Registrar",
     "update": "Atualizar",
-    "logout": "Sair"
+    "logout": "Sair",
+    "active": "Ativo",
+    "refresh": "Atualizar",
+    "refreshEstimate": "Atualizar estimativa",
+    "custom": "Personalizado",
+    "useCustom": "Usar personalizado",
+    "menu": "Menu"
+  },
+  "error": {
+    "invalid": "{{field}} é inválido",
+    "required": "{{field}} é obrigatório"
+  },
+  "button": {
+    "submit": "Enviar",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "save": "Salvar",
+    "send": "Enviar",
+    "botAI": "Conversar com BotAI",
+    "back": "Voltar",
+    "edit": "Editar"
+  },
+  "penalty": {
+    "label": "Penalidades",
+    "tooltip_one": "1 penalidade",
+    "tooltip_other": "{{count}} penalidades"
+  },
+  "simulation": {
+    "tooltip": "Simulação",
+    "removeAll": "Remover todas as simulações"
+  },
+  "estimate": {
+    "calculated": "Estimativa calculada"
+  },
+  "login": {
+    "title": {
+      "login": "Entrar",
+      "register": "Registrar",
+      "update": "Atualizar"
+    },
+    "form": {
+      "login": "Nome de usuário",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha"
+    },
+    "error": {
+      "invalidLogin": "Login inválido",
+      "register": "Não foi possível registrar a conta",
+      "update": "Não foi possível atualizar a conta"
+    },
+    "success": {
+      "register": "Conta criada",
+      "update": "Conta atualizada"
+    }
+  },
+  "team": {
+    "title": "Editar {{team}}",
+    "position": "Posição",
+    "youngest": "Mais jovem",
+    "select": "Selecionar equipe",
+    "chart": {
+      "general": "Geral",
+      "timeline": "Linha do tempo"
+    },
+    "form": {
+      "logo": "Logotipo",
+      "youngest": "Mais jovem (data)"
+    },
+    "error": {
+      "update": "Não foi possível atualizar a equipe"
+    }
+  },
+  "message": "Mensagem",
+  "rank": {
+    "title": "Classificação",
+    "ranking": "Classificação",
+    "team": "Equipe",
+    "total": "Pontos",
+    "game": "Jogos disputados",
+    "win": "Vitórias",
+    "neutral": "Jogos empatados",
+    "loss": "Derrotas",
+    "goalFor": "Gols feitos",
+    "goalAgainst": "Gols sofridos",
+    "shutOut": "Sem sofrer gols",
+    "goalDiff": "Saldo de gols",
+    "penalty": "Penalidades",
+    "simulation": "Simulação",
+    "first": "1º",
+    "second": "2º",
+    "third": "3º",
+    "rankth": "{{rank}}º"
+  },
+  "select": {
+    "live": "Ao vivo",
+    "coming": "Próximos...",
+    "past": "Passados"
+  },
+  "match": {
+    "blockShot": {
+      "title": "Registrar Pontuação",
+      "error": "Não foi possível registrar a pontuação.<br/>O jogo deve terminar em uma disputa de pênaltis.<br/>Por favor, indique um vencedor."
+    },
+    "compare": "Comparar",
+    "forfeit": "Desistência"
   }
 }

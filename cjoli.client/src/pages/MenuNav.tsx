@@ -109,7 +109,7 @@ const MenuNav = () => {
               role="button"
               label={
                 <>
-                  Active
+                  <Trans i18nKey="menu.active">Active</Trans>
                   {!isMobile && <Bezier2 className="mx-2" />}
                 </>
               }
@@ -124,7 +124,9 @@ const MenuNav = () => {
             {activeEstimate && (
               <>
                 <Button onClick={handleUpdateEstimate} disabled={loading}>
-                  {isMobile ? "Refresh" : "Refresh estimate"}
+                  {isMobile
+                    ? t("menu.refresh", "Refresh")
+                    : t("menu.refreshEstimate", "Refresh estimate")}
                   {!loading && <Bezier2 className="mx-2" size={20} />}
                   {loading && (
                     <Spinner animation="grow" className="mx-2" size="sm" />
@@ -132,7 +134,11 @@ const MenuNav = () => {
                 </Button>
                 <Form.Check
                   type="switch"
-                  label={isMobile ? "Custom" : "Use custom"}
+                  label={
+                    isMobile
+                      ? t("menu.custom", "Custom")
+                      : t("menu.useCustom", "Use custom")
+                  }
                   role="button"
                   {...register("useCustomEstimate", {
                     onChange: (e: React.FormEvent<HTMLInputElement>) =>
@@ -155,7 +161,9 @@ const MenuNav = () => {
           onShow={() => setShow(true)}
         >
           <Offcanvas.Header closeButton onClick={() => setShow(false)}>
-            <Offcanvas.Title>Menu</Offcanvas.Title>
+            <Offcanvas.Title>
+              <Trans i18nKey="menu.menu">Menu</Trans>
+            </Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body>
             <Nav className="justify-content-end flex-grow-1 pe-3">

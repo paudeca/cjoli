@@ -25,6 +25,7 @@ import TeamRadar from "./team/TeamRadar";
 import TeamTable from "./team/TeamTable";
 import TeamTime from "./team/TeamTime";
 import { useModal } from "../../hooks/useModal";
+import { Trans } from "react-i18next";
 
 const TeamStack = () => {
   const { teams, getTeam, getTeamRank } = useCJoli();
@@ -54,9 +55,12 @@ const TeamStack = () => {
               <Stack>
                 <Card.Title className="ms-auto">{team?.name}</Card.Title>
                 <Card.Subtitle className="ms-auto mb-2 text-muted">
-                  <Stack>Position: {rank?.order}</Stack>
                   <Stack>
-                    Youngest:
+                    <Trans i18nKey="team.position">Position</Trans>:{" "}
+                    {rank?.order}
+                  </Stack>
+                  <Stack>
+                    <Trans i18nKey="team.youngest">Youngest</Trans>:
                     {team.youngest ? moment(team.youngest).format("L") : "-"}
                   </Stack>
                 </Card.Subtitle>
@@ -70,7 +74,7 @@ const TeamStack = () => {
                   eventKey="general"
                   onClick={() => setActiveKey("general")}
                 >
-                  General
+                  <Trans i18nKey="team.chart.general">General</Trans>
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
@@ -78,7 +82,7 @@ const TeamStack = () => {
                   eventKey="timeline"
                   onClick={() => setActiveKey("timeline")}
                 >
-                  Timeline
+                  <Trans i18nKey="team.chart.timeline">Timeline</Trans>
                 </Nav.Link>
               </Nav.Item>
             </Nav>
@@ -105,7 +109,9 @@ const TeamStack = () => {
                             },
                           })}
                         >
-                          <option>Select Team</option>
+                          <option>
+                            <Trans i18nKey="team.select">Select Team</Trans>
+                          </option>
                           {teams
                             ?.filter((t) => t.id != team.id)
                             .map((t) => (
@@ -134,12 +140,12 @@ const TeamStack = () => {
 
             <Stack direction="horizontal" className="p-3">
               <Button variant="primary" onClick={() => navigate(`/${uid}`)}>
-                <ArrowLeft /> Back
+                <ArrowLeft /> <Trans i18nKey="button.back">Back</Trans>
               </Button>
               {isAdmin && (
                 <div className="ms-auto">
                   <Button variant="primary" onClick={() => showTeam(true)}>
-                    Edit
+                    <Trans i18nKey="button.edit">Edit</Trans>
                   </Button>
                 </div>
               )}

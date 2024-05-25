@@ -16,6 +16,110 @@
     "login": "Iniciar sesión",
     "register": "Registrarse",
     "update": "Actualizar",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "active": "Activo",
+    "refresh": "Actualizar",
+    "refreshEstimate": "Actualizar estimación",
+    "custom": "Personalizado",
+    "useCustom": "Usar personalizado",
+    "menu": "Menú"
+  },
+  "error": {
+    "invalid": "{{field}} es inválido",
+    "required": "{{field}} es requerido"
+  },
+  "button": {
+    "submit": "Enviar",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "save": "Guardar",
+    "send": "Enviar",
+    "botAI": "Chat con BotAI",
+    "back": "Volver",
+    "edit": "Editar"
+  },
+  "penalty": {
+    "label": "Penalizaciones",
+    "tooltip_one": "1 penalización",
+    "tooltip_other": "{{count}} penalizaciones"
+  },
+  "simulation": {
+    "tooltip": "Simulación",
+    "removeAll": "Eliminar todas las simulaciones"
+  },
+  "estimate": {
+    "calculated": "Estimación calculada"
+  },
+  "login": {
+    "title": {
+      "login": "Iniciar sesión",
+      "register": "Registrarse",
+      "update": "Actualizar"
+    },
+    "form": {
+      "login": "Usuario",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña"
+    },
+    "error": {
+      "invalidLogin": "Inicio de sesión inválido",
+      "register": "No se puede registrar la cuenta",
+      "update": "No se puede actualizar la cuenta"
+    },
+    "success": {
+      "register": "Cuenta creada",
+      "update": "Cuenta actualizada"
+    }
+  },
+  "team": {
+    "title": "Editar {{team}}",
+    "position": "Posición",
+    "youngest": "Más joven",
+    "select": "Seleccionar equipo",
+    "chart": {
+      "general": "General",
+      "timeline": "Línea de tiempo"
+    },
+    "form": {
+      "logo": "Logotipo",
+      "youngest": "Más joven (fecha)"
+    },
+    "error": {
+      "update": "No se puede actualizar el equipo"
+    }
+  },
+  "message": "Mensaje",
+  "rank": {
+    "title": "Clasificación",
+    "ranking": "Clasificación",
+    "team": "Equipo",
+    "total": "Puntos",
+    "game": "Partidos jugados",
+    "win": "Victorias",
+    "neutral": "Empates",
+    "loss": "Derrotas",
+    "goalFor": "Goles a favor",
+    "goalAgainst": "Goles en contra",
+    "shutOut": "Sin encajar goles",
+    "goalDiff": "Diferencia de goles",
+    "penalty": "Penalizaciones",
+    "simulation": "Simulación",
+    "first": "1.º",
+    "second": "2.º",
+    "third": "3.º",
+    "rankth": "{{rank}}.º"
+  },
+  "select": {
+    "live": "En vivo",
+    "coming": "Próximos...",
+    "past": "Pasados"
+  },
+  "match": {
+    "blockShot": {
+      "title": "Guardar Puntuación",
+      "error": "No se puede registrar la puntuación.<br/>El partido debe terminar en una tanda de penaltis.<br/>Por favor, indica un ganador."
+    },
+    "compare": "Comparar",
+    "forfeit": "Abandono"
   }
 }

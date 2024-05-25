@@ -2,6 +2,7 @@ import { Dropdown, DropdownButton, Form, InputGroup } from "react-bootstrap";
 import { Match } from "../../../models";
 import { useUser } from "../../../hooks/useUser";
 import { FieldValues, UseFormRegister } from "react-hook-form";
+import { Trans } from "react-i18next";
 
 interface ScoreCellProps {
   id: string;
@@ -48,7 +49,7 @@ const ScoreCell = ({
               })
             }
           >
-            Forfait
+            <Trans i18nKey="match.forfeit">Forfeit</Trans>
           </Dropdown.Item>
         </DropdownButton>
       )}
