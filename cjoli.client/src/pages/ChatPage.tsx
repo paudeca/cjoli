@@ -17,6 +17,7 @@ import moment from "moment";
 import useUid from "../hooks/useUid";
 import { useNavigate } from "react-router-dom";
 import useScreenSize from "../hooks/useScreenSize";
+import { Trans } from "react-i18next";
 
 interface Message {
   message: string;
@@ -139,13 +140,14 @@ const ChatPage = () => {
                       disabled={readyState != ReadyState.OPEN}
                       className="px-3"
                     >
-                      Send <Send className="mx-2" />
+                      <Trans i18nKey="button.send">Send</Trans>{" "}
+                      <Send className="mx-2" />
                     </Button>
                     <Button
                       variant="outline-danger"
                       onClick={() => navigate(`/${uid}`)}
                     >
-                      Close
+                      <Trans i18nKey="button.close">Close</Trans>
                     </Button>
                   </InputGroup>
                 )}
@@ -160,7 +162,7 @@ const ChatPage = () => {
                         variant="outline-danger"
                         onClick={() => navigate(`/${uid}`)}
                       >
-                        Close
+                        <Trans i18nKey="button.close">Close</Trans>
                       </Button>
                       <Button
                         type="submit"
@@ -168,7 +170,8 @@ const ChatPage = () => {
                         disabled={readyState != ReadyState.OPEN}
                         className="px-3 ms-auto"
                       >
-                        Send <Send className="mx-2" />
+                        <Trans i18nKey="button.send">Send</Trans>{" "}
+                        <Send className="mx-2" />
                       </Button>
                     </Stack>
                   </Stack>

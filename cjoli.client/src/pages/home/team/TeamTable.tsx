@@ -5,6 +5,7 @@ import React from "react";
 import TeamCell from "./TeamCell";
 import { Rank, Score, Team } from "../../../models";
 import { useCJoli } from "../../../hooks/useCJoli";
+import { useTranslation } from "react-i18next";
 
 const percent = (value: number, total: number) =>
   total == 0 ? "" : `${Math.round((value / total) * 100)}%`;
@@ -15,6 +16,7 @@ const average = (value: number, total: number) =>
 const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
   const { ranking, tourney, getTeamRank, getScoreForTeam, getRankingByField } =
     useCJoli();
+  const { t } = useTranslation();
   const rank = getTeamRank(team);
   const rankB = teamB && getTeamRank(teamB);
   const score = getScoreForTeam(team)!;
@@ -41,29 +43,36 @@ const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
   const formatRank = (rank?: number) => {
     if (rank == undefined) return "";
     if (rank == 0) {
-      return ` - 1er 🥇`;
+      return ` - ${t("rank.first", "1st")} 🥇`;
     } else if (rank == 1) {
-      return ` - 2ème 🥈`;
+      return ` - ${t("rank.second", "2ème")} 🥈`;
     } else if (rank == 2) {
-      return ` - 3ème 🥉`;
+      return ` - ${t("rank.third", "3rd")} 🥉`;
     } else {
-      return ` - ${rank + 1}ème`;
+      return ` - ${t("rank.rankth", { rank: rank + 1 })}`;
     }
   };
 
   let columns = [
     {
       label: "Rang",
-      description: "Classement",
+      description: t("rank.ranking", "Ranking"),
       callRank: (r: Rank) => r.order || 0,
-      getLabel: (r: Rank) => (r.order == 1 ? "1er" : `${r.order}ème`),
+      getLabel: (r: Rank) =>
+        r.order == 1
+          ? t("rank.first")
+          : r.order == 2
+          ? t("rank.second")
+          : r.order == 3
+          ? t("rank.third")
+          : t("rank.rankth", { rank: r.order }),
       up: false,
       active: true,
       needTeam: true,
     },
     {
       label: "PTS",
-      description: "Points",
+      description: t("rank.total", "Points"),
       callScore: (s: Score) => s.total,
       getInfo: (s: Score) => percent(s.total, 3 * s.game),
       up: true,
@@ -72,7 +81,7 @@ const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
     },
     {
       label: "PJ",
-      description: "Parties jouées",
+      description: t("rank.game", "Games played"),
       callScore: (s: Score) => s.game,
       up: true,
       active: false,
@@ -80,7 +89,7 @@ const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
     },
     {
       label: "V",
-      description: "Victoires",
+      description: t("rank.win", "Victories"),
       callScore: (s: Score) => s.win,
       getInfo: (s: Score) => percent(s.win, s.game) + formatRank(s.rank?.win),
       up: true,
@@ -89,7 +98,7 @@ const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
     },
     {
       label: "N",
-      description: "Parties nulles",
+      description: t("rank.neutral", "Drawn games"),
       callScore: (s: Score) => s.neutral,
       getInfo: (s: Score) =>
         percent(s.neutral, s.game) + formatRank(s.rank?.neutral),
@@ -99,7 +108,7 @@ const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
     },
     {
       label: "D",
-      description: "Défaites",
+      description: t("rank.loss", "Defeats"),
       callScore: (s: Score) => s.loss,
       getInfo: (s: Score) => percent(s.loss, s.game) + formatRank(s.rank?.loss),
       up: false,
@@ -108,7 +117,7 @@ const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
     },
     {
       label: "BP",
-      description: "Buts pour",
+      description: t("rank.goalFor", "Goals for"),
       callScore: (s: Score) => {
         if (!teamB) return s.goalFor / s.game;
         return s.goalFor;
@@ -122,7 +131,7 @@ const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
     },
     {
       label: "BC",
-      description: "Buts contre",
+      description: t("rank.goalAgainst", "Goals against"),
       callScore: (s: Score) => {
         if (!teamB) return s.goalAgainst / s.game;
         return s.goalAgainst;
@@ -136,7 +145,7 @@ const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
     },
     {
       label: "BL",
-      description: "Blanchissages",
+      description: t("rank.shutOut", "ShutOut"),
       callScore: (s: Score) => {
         if (!teamB) return s.shutOut / s.game;
         return s.shutOut;
@@ -150,7 +159,7 @@ const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
     },
     {
       label: "+/-",
-      description: "Goal average",
+      description: t("rank.goalDiff", "Goal average"),
       callScore: (s: Score) => {
         if (!teamB) return s.goalDiff / s.game;
         return s.goalDiff;
@@ -169,7 +178,7 @@ const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
       ...columns,
       {
         label: "PEN",
-        description: "Pénalités",
+        description: t("rank.penalty", "Penalties"),
         callScore: (s: Score) => s.penalty,
         up: false,
         active: true,

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import CJoliModal, { Field } from "../components/CJoliModal";
 import { useCJoli } from "../hooks/useCJoli";
 import { useToast } from "../hooks/useToast";
@@ -11,21 +12,27 @@ const LoginModal = () => {
   const { loadUser } = useUser();
   const { showToast } = useToast();
   const uid = useUid();
+  const { t } = useTranslation();
 
   const fields: Field<User>[] = [
     {
       id: "login",
-      label: "Login",
+      label: t("login.form.login", "Login"),
       type: "text",
       required: true,
       autoFocus: true,
     },
-    { id: "password", label: "Password", type: "password", required: true },
+    {
+      id: "password",
+      label: t("login.form.password", "Password"),
+      type: "password",
+      required: true,
+    },
   ];
   const onSubmit = async (user: User) => {
     const result = await cjoliService.login(user);
     if (!result) {
-      showToast("danger", "Invalid login");
+      showToast("danger", t("login.error.invalidLogin", "Invalid login"));
       return false;
     } else {
       user = await cjoliService.getUser();
@@ -40,7 +47,7 @@ const LoginModal = () => {
   return (
     <CJoliModal<User>
       id="login"
-      title="Login"
+      title={t("login.title.login", "Login")}
       fields={fields}
       onSubmit={onSubmit}
     />

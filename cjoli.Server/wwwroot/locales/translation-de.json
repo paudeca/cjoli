@@ -1,0 +1,125 @@
+{
+  "title": "CJoli - Eishockeyturnier",
+  "lang": {
+    "en": "Englisch",
+    "fr": "Französisch",
+    "pt": "Portugiesisch",
+    "es": "Spanisch",
+    "de": "Deutsch"
+  },
+  "user": {
+    "guest": "Gast"
+  },
+  "menu": {
+    "home": "Startseite",
+    "ranking": "Rangliste",
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "update": "Aktualisieren",
+    "logout": "Abmelden",
+    "active": "Aktiv",
+    "refresh": "Aktualisieren",
+    "refreshEstimate": "Schätzung aktualisieren",
+    "custom": "Benutzerdefiniert",
+    "useCustom": "Benutzerdefiniert verwenden",
+    "menu": "Menü"
+  },
+  "error": {
+    "invalid": "{{field}} ist ungültig",
+    "required": "{{field}} ist erforderlich"
+  },
+  "button": {
+    "submit": "Absenden",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "save": "Speichern",
+    "send": "Senden",
+    "botAI": "Mit BotAI chatten",
+    "back": "Zurück",
+    "edit": "Bearbeiten"
+  },
+  "penalty": {
+    "label": "Strafen",
+    "tooltip_one": "1 Strafe",
+    "tooltip_other": "{{count}} Strafen"
+  },
+  "simulation": {
+    "tooltip": "Simulation",
+    "removeAll": "Alle Simulationen entfernen"
+  },
+  "estimate": {
+    "calculated": "Schätzung berechnet"
+  },
+  "login": {
+    "title": {
+      "login": "Anmelden",
+      "register": "Registrieren",
+      "update": "Aktualisieren"
+    },
+    "form": {
+      "login": "Benutzername",
+      "password": "Passwort",
+      "confirmPassword": "Passwort bestätigen"
+    },
+    "error": {
+      "invalidLogin": "Ungültige Anmeldung",
+      "register": "Konto kann nicht registriert werden",
+      "update": "Konto kann nicht aktualisiert werden"
+    },
+    "success": {
+      "register": "Konto erstellt",
+      "update": "Konto aktualisiert"
+    }
+  },
+  "team": {
+    "title": "{{team}} bearbeiten",
+    "position": "Position",
+    "youngest": "Jüngster",
+    "select": "Team auswählen",
+    "chart": {
+      "general": "Allgemein",
+      "timeline": "Zeitleiste"
+    },
+    "form": {
+      "logo": "Logo",
+      "youngest": "Jüngster (Datum)"
+    },
+    "error": {
+      "update": "Team kann nicht aktualisiert werden"
+    }
+  },
+  "message": "Nachricht",
+  "rank": {
+    "title": "Rangliste",
+    "ranking": "Rang",
+    "team": "Team",
+    "total": "Punkte",
+    "game": "Spiele gespielt",
+    "win": "Siege",
+    "neutral": "Unentschieden",
+    "loss": "Niederlagen",
+    "goalFor": "Erzielte Tore",
+    "goalAgainst": "Kassierte Tore",
+    "shutOut": "Zu-Null-Spiele",
+    "goalDiff": "Torverhältnis",
+    "penalty": "Strafen",
+    "simulation": "Simulation",
+    "first": "1.",
+    "second": "2.",
+    "third": "3.",
+    "rankth": "{{rank}}."
+  },
+  "select": {
+    "live": "Live",
+    "coming": "Kommend...",
+    "past": "Vergangene"
+  },
+  "match": {
+    "blockShot": {
+      "title": "Punktzahl speichern",
+      "error": "Punktzahl kann nicht erfasst werden.<br/>Das Spiel muss mit einem Elfmeterschießen enden.<br/>Bitte gib einen Gewinner an."
+    },
+    "compare": "Vergleichen",
+    "forfeit": "Aufgeben"
+  }
+}

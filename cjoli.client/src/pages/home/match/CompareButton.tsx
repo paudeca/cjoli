@@ -4,6 +4,7 @@ import { ArrowsCollapseVertical } from "react-bootstrap-icons";
 import React from "react";
 import TeamTable from "../team/TeamTable";
 import { Team } from "../../../models";
+import { Trans } from "react-i18next";
 
 const MyButton = styled(ArrowsCollapseVertical)`
   color: #bbb;
@@ -34,13 +35,15 @@ const CompareButton = ({ team, teamB }: { team: Team; teamB: Team }) => {
       >
         {(props) => (
           <Popover {...props}>
-            <Popover.Header style={{ color: "black" }}>Compare</Popover.Header>
+            <Popover.Header style={{ color: "black" }}>
+              <Trans i18nKey="match.compare">Compare</Trans>
+            </Popover.Header>
             <Popover.Body>
               <div>
                 <TeamTable team={team} teamB={teamB} />
               </div>
               <Button onClick={() => setOpen(false)} size="sm">
-                Close
+                <Trans i18nKey="button.close">Close</Trans>
               </Button>
             </Popover.Body>
           </Popover>

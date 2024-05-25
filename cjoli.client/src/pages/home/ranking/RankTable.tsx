@@ -18,6 +18,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { zoomIcon, bgSecondary } from "../../../styles";
 import CJoliTooltip from "../../../components/CJoliTooltip";
 import PenaltyIcon from "../../../components/PenaltyIcon";
+import { Trans, useTranslation } from "react-i18next";
 
 const MyTh = styled("th")`
   ${bgSecondary}
@@ -49,6 +50,7 @@ const RankTable = ({ phase }: { phase: Phase }) => {
   const uid = useUid();
   const navigate = useNavigate();
   const { squadId, teamId } = useParams();
+  const { t } = useTranslation();
 
   const handleRemove = (ids: number[]) => async () => {
     const ranking = await cjoliService.clearSimulations(uid, ids);
@@ -85,7 +87,7 @@ const RankTable = ({ phase }: { phase: Phase }) => {
               {squad.name}
               <SimulationIcon
                 show={hasSimulation}
-                title={`Simulation - ${squad.name}`}
+                title={`${t("rank.simulation", "Simulation")} - ${squad.name}`}
                 onRemove={handleRemove(userMatches)}
               />
               {!squadId && squads.length > 1 && (
@@ -110,36 +112,56 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                 <tr>
                   <th rowSpan={isMobile ? 2 : 1}>#</th>
                   <th colSpan={isMobile ? 7 : 1} className="w-50">
-                    Team
+                    <Trans i18nKey="rank.team">Team</Trans>
                   </th>
                   <MyTh rowSpan={isMobile ? 2 : 1}>
-                    <CJoliTooltip info="Points">PTS</CJoliTooltip>
+                    <CJoliTooltip info={t("rank.total", "Points")}>
+                      PTS
+                    </CJoliTooltip>
                   </MyTh>
                   {!isMobile && (
                     <>
                       <th>
-                        <CJoliTooltip info="Parties jouées">PJ</CJoliTooltip>
+                        <CJoliTooltip info={t("rank.game", "Games played")}>
+                          PJ
+                        </CJoliTooltip>
                       </th>
                       <th>
-                        <CJoliTooltip info="Victoires">V</CJoliTooltip>
+                        <CJoliTooltip info={t("rank.win", "Victories")}>
+                          V
+                        </CJoliTooltip>
                       </th>
                       <th>
-                        <CJoliTooltip info="Parties nulles">N</CJoliTooltip>
+                        <CJoliTooltip info={t("rank.neutral", "Drawn games")}>
+                          N
+                        </CJoliTooltip>
                       </th>
                       <th>
-                        <CJoliTooltip info="Défaites">D</CJoliTooltip>
+                        <CJoliTooltip info={t("rank.loss", "Defeats")}>
+                          D
+                        </CJoliTooltip>
                       </th>
                       <th>
-                        <CJoliTooltip info="Buts pour">BP</CJoliTooltip>
+                        <CJoliTooltip info={t("rank.goalFor", "Goals for")}>
+                          BP
+                        </CJoliTooltip>
                       </th>
                       <th>
-                        <CJoliTooltip info="Buts contre">BC</CJoliTooltip>
+                        <CJoliTooltip
+                          info={t("rank.goalAgainst", "Goals against")}
+                        >
+                          BC
+                        </CJoliTooltip>
                       </th>
                       <th>
-                        <CJoliTooltip info="Blanchissages">BL</CJoliTooltip>
+                        <CJoliTooltip info={t("rank.shutOut", "ShutOut")}>
+                          BL
+                        </CJoliTooltip>
                       </th>
                       <th>
-                        <CJoliTooltip info="Goal average">+/-</CJoliTooltip>
+                        <CJoliTooltip info={t("rank.goalDiff", "Goal average")}>
+                          +/-
+                        </CJoliTooltip>
                       </th>
                     </>
                   )}
@@ -169,7 +191,10 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                             <TeamName positionId={score.positionId} />
                             <SimulationIcon
                               show={hasSimulation}
-                              title={`Simulation - ${name}`}
+                              title={`${t(
+                                "rank.simulation",
+                                "Simulation"
+                              )} - ${name}`}
                               onRemove={handleRemove(userMatches)}
                             />
                             {tourney?.config.hasPenalty && (
@@ -204,37 +229,43 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                       {isMobile && (
                         <tr style={{ fontSize: "12px" }}>
                           <td className="w-25">
-                            <CJoliTooltip info="Parties jouées">
+                            <CJoliTooltip info={t("rank.game", "Games played")}>
                               PJ:{score.game}
                             </CJoliTooltip>
                           </td>
                           <td className="w-25">
-                            <CJoliTooltip info="Victoires">
+                            <CJoliTooltip info={t("rank.win", "Victories")}>
                               V:{score.win}
                             </CJoliTooltip>
                           </td>
                           <td className="w-25">
-                            <CJoliTooltip info="Parties nulles">
+                            <CJoliTooltip
+                              info={t("rank.neutral", "Drawn games")}
+                            >
                               N:{score.neutral}
                             </CJoliTooltip>
                           </td>
                           <td className="w-25">
-                            <CJoliTooltip info="Défaites">
+                            <CJoliTooltip info={t("rank.loss", "Defeats")}>
                               D:{score.loss}
                             </CJoliTooltip>
                           </td>
                           <td className="w-25">
-                            <CJoliTooltip info="Buts pout">
+                            <CJoliTooltip info={t("rank.goalFor", "Goals for")}>
                               BP:{score.goalFor}
                             </CJoliTooltip>
                           </td>
                           <td className="w-25">
-                            <CJoliTooltip info="Buts contre">
+                            <CJoliTooltip
+                              info={t("rank.goalAgainst", "Goals against")}
+                            >
                               BC:{score.goalAgainst}
                             </CJoliTooltip>
                           </td>
                           <td className="w-25">
-                            <CJoliTooltip info="Goal average">
+                            <CJoliTooltip
+                              info={t("rank.goalDiff", "Goal average")}
+                            >
                               GA:{score.goalDiff}
                             </CJoliTooltip>
                           </td>

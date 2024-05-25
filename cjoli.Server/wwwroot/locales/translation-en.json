@@ -1,0 +1,125 @@
+{
+  "title": "CJoli - Ice Hockey Tournament",
+  "lang": {
+    "en": "English",
+    "fr": "French",
+    "pt": "Portuguese",
+    "es": "Spanish",
+    "de": "Deutsch"
+  },
+  "user": {
+    "guest": "Guest"
+  },
+  "menu": {
+    "home": "Home",
+    "ranking": "Ranking",
+    "login": "Login",
+    "register": "Register",
+    "update": "Update",
+    "logout": "Logout",
+    "active": "Active",
+    "refresh": "Refresh",
+    "refreshEstimate": "Refresh estimate",
+    "custom": "Custom",
+    "useCustom": "Use custom",
+    "menu": "Menu"
+  },
+  "error": {
+    "invalid": "{{field}} is invalid",
+    "required": "{{field}} is required"
+  },
+  "button": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "close": "Close",
+    "save": "Save",
+    "send": "Send",
+    "botAI": "Chat with BotAI",
+    "back": "Back",
+    "edit": "Edit"
+  },
+  "penalty": {
+    "label": "Penalties",
+    "tooltip_one": "1 penalty",
+    "tooltip_other": "{{count}} penalties"
+  },
+  "simulation": {
+    "tooltip": "Simulation",
+    "removeAll": "Remove all simulations"
+  },
+  "estimate": {
+    "calculated": "Estimate calculated"
+  },
+  "login": {
+    "title": {
+      "login": "Login",
+      "register": "Register",
+      "update": "Update"
+    },
+    "form": {
+      "login": "Login",
+      "password": "Password",
+      "confirmPassword": "Confirm Password"
+    },
+    "error": {
+      "invalidLogin": "Invalid login",
+      "register": "Unable to register account",
+      "update": "Unable to update account"
+    },
+    "success": {
+      "register": "Account created",
+      "update": "Account updated"
+    }
+  },
+  "team": {
+    "title": "Edit {{team}}",
+    "position": "Position",
+    "youngest": "Youngest",
+    "select": "Select Team",
+    "chart": {
+      "general": "General",
+      "timeline": "Timeline"
+    },
+    "form": {
+      "logo": "Logo",
+      "youngest": "Youngest (date)"
+    },
+    "error": {
+      "update": "Unable to update Team"
+    }
+  },
+  "message": "Message",
+  "rank": {
+    "title": "Ranking",
+    "ranking": "Ranking",
+    "team": "Team",
+    "total": "Points",
+    "game": "Games played",
+    "win": "Victories",
+    "neutral": "Drawn games",
+    "loss": "Defeats",
+    "goalFor": "Goals for",
+    "goalAgainst": "Goals against",
+    "shutOut": "ShutOut",
+    "goalDiff": "Goal average",
+    "penalty": "Penalties",
+    "simulation": "Simulation",
+    "first": "1st",
+    "second": "2nd",
+    "third": "3rd",
+    "rankth": "{{rank}}th"
+  },
+  "select": {
+    "live": "Live",
+    "coming": "Coming...",
+    "past": "Past"
+  },
+  "match": {
+    "blockShot": {
+      "title": "Save Score",
+      "error": "Unable to record the score.<br/>The match must end in a penalty shootout.<br/>Please indicate a winner."
+    },
+    "compare": "Compare",
+    "forfeit": "Forfeit"
+  }
+}

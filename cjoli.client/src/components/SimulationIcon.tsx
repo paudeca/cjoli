@@ -9,6 +9,7 @@ import {
 } from "react-bootstrap";
 import { Alt, Trash } from "react-bootstrap-icons";
 import ButtonLoading from "./ButtonLoading";
+import { Trans, useTranslation } from "react-i18next";
 
 interface SimulationIconProps {
   show: boolean;
@@ -18,6 +19,7 @@ interface SimulationIconProps {
 
 const SimulationIcon = ({ show, title, onRemove }: SimulationIconProps) => {
   const [open, setOpen] = React.useState(false);
+  const { t } = useTranslation();
   const target = React.useRef(null);
   const handleRemove = async () => {
     if (onRemove) {
@@ -54,7 +56,7 @@ const SimulationIcon = ({ show, title, onRemove }: SimulationIconProps) => {
             {(props) => (
               <Popover {...props}>
                 <Popover.Header style={{ color: "black" }}>
-                  {title ?? "Simulation"}
+                  {title ?? t("simulation.tooltip", "Simulation")}
                 </Popover.Header>
                 <Popover.Body>
                   <div
@@ -64,13 +66,15 @@ const SimulationIcon = ({ show, title, onRemove }: SimulationIconProps) => {
                       height: 30,
                     }}
                   >
-                    Remove all simulations
+                    <Trans i18nKey="simulation.removeAll">
+                      Remove all simulations
+                    </Trans>
                     <ButtonLoading variant="danger" onClick={handleRemove}>
                       <Trash />
                     </ButtonLoading>
                   </div>
                   <Button onClick={() => setOpen(false)} size="sm">
-                    Close
+                    <Trans i18nKey="button.close">Close</Trans>
                   </Button>
                 </Popover.Body>
               </Popover>

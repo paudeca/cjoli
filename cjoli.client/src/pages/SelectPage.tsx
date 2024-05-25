@@ -9,6 +9,7 @@ import { Clock, ClockHistory } from "react-bootstrap-icons";
 import { Tourney } from "../models";
 import React from "react";
 import styled from "@emotion/styled";
+import { useTranslation } from "react-i18next";
 
 const Title = ({ title, icon }: { title: string; icon: React.ReactNode }) => {
   return (
@@ -30,7 +31,9 @@ const SelectPage = () => {
   const navigate = useNavigate();
   const { tourneys, selectTourney } = useCJoli();
   const { formatDate } = useTools();
+  const { t, i18n } = useTranslation();
 
+  moment.locale(i18n.resolvedLanguage);
   const now = moment();
 
   let datas: {
@@ -41,7 +44,7 @@ const SelectPage = () => {
   }[] = [
     {
       type: "live",
-      title: "Live",
+      title: t("select.live", "Live"),
       icon: (
         <Spinner animation="grow" variant="danger" size="sm" className="mb-1" />
       ),
@@ -49,13 +52,13 @@ const SelectPage = () => {
     },
     {
       type: "coming",
-      title: "Coming...",
+      title: t("select.coming", "Coming..."),
       icon: <Clock size="1rem" className="mb-2" />,
       tourneys: [],
     },
     {
       type: "past",
-      title: "Past",
+      title: t("select.past", "Past"),
       icon: <ClockHistory size="1rem" className="mb-2" />,
       tourneys: [],
     },

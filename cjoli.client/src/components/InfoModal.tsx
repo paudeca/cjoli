@@ -1,6 +1,7 @@
 import { Modal, Button, Alert } from "react-bootstrap";
 import { ReactNode } from "react";
 import { useModal } from "../hooks/useModal";
+import { Trans } from "react-i18next";
 
 const InfoModal = ({
   id,
@@ -34,7 +35,7 @@ const InfoModal = ({
               onClick={() => setShow(false)}
               variant={`outline-${variant}`}
             >
-              Close
+              <Trans i18nKey="button.close">Close</Trans>
             </Button>
           </div>
         </Alert>

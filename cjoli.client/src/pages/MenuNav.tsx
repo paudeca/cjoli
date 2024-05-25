@@ -27,6 +27,8 @@ import { useForm } from "react-hook-form";
 import { useEstimate } from "../hooks/useEstimate";
 import { UserConfig } from "../models";
 import { useModal } from "../hooks/useModal";
+import { Trans, useTranslation } from "react-i18next";
+import moment from "moment";
 
 const MyImg = styled.img<{ width: string }>`
   width: ${(props) => props.width};
@@ -48,6 +50,8 @@ const MenuNav = () => {
   const navigate = useNavigate();
   const { isMobile } = useScreenSize();
   const { loading, handleUpdateEstimate } = useEstimate();
+  const { t, i18n } = useTranslation();
+  const [lang, setLang] = React.useState(i18n.resolvedLanguage);
 
   const logout = async () => {
     await cjoliService.logout();
@@ -63,6 +67,14 @@ const MenuNav = () => {
   const { register } = useForm<UserConfig>({
     values: userConfig,
   });
+
+  const langs = [
+    { key: "en", icon: "🇬🇧" },
+    { key: "fr", icon: "🇫🇷" },
+    { key: "pt", icon: "🇵🇹" },
+    { key: "es", icon: "🇪🇸" },
+    { key: "de", icon: "🇩🇪" },
+  ];
 
   const tourneyLabel = uid && tourney?.name;
   return (
@@ -86,7 +98,7 @@ const MenuNav = () => {
             </Col>
             {!tourneyLabel && isMobile && <Col>Ice Hockey</Col>}
             {!tourneyLabel && !isMobile && (
-              <Col>CJoli - Ice Hockey Tournament - 1.0.0</Col>
+              <Col>{t("title", "CJoli - Ice Hockey Tournament")} - 1.0.0</Col>
             )}
             {tourneyLabel && <Col>{tourneyLabel}</Col>}
           </Row>
@@ -98,7 +110,7 @@ const MenuNav = () => {
               role="button"
               label={
                 <>
-                  Active
+                  <Trans i18nKey="menu.active">Active</Trans>
                   {!isMobile && <Bezier2 className="mx-2" />}
                 </>
               }
@@ -113,7 +125,9 @@ const MenuNav = () => {
             {activeEstimate && (
               <>
                 <Button onClick={handleUpdateEstimate} disabled={loading}>
-                  {isMobile ? "Refresh" : "Refresh estimate"}
+                  {isMobile
+                    ? t("menu.refresh", "Refresh")
+                    : t("menu.refreshEstimate", "Refresh estimate")}
                   {!loading && <Bezier2 className="mx-2" size={20} />}
                   {loading && (
                     <Spinner animation="grow" className="mx-2" size="sm" />
@@ -121,7 +135,11 @@ const MenuNav = () => {
                 </Button>
                 <Form.Check
                   type="switch"
-                  label={isMobile ? "Custom" : "Use custom"}
+                  label={
+                    isMobile
+                      ? t("menu.custom", "Custom")
+                      : t("menu.useCustom", "Use custom")
+                  }
                   role="button"
                   {...register("useCustomEstimate", {
                     onChange: (e: React.FormEvent<HTMLInputElement>) =>
@@ -144,7 +162,9 @@ const MenuNav = () => {
           onShow={() => setShow(true)}
         >
           <Offcanvas.Header closeButton onClick={() => setShow(false)}>
-            <Offcanvas.Title>Menu</Offcanvas.Title>
+            <Offcanvas.Title>
+              <Trans i18nKey="menu.menu">Menu</Trans>
+            </Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body>
             <Nav className="justify-content-end flex-grow-1 pe-3">
@@ -157,7 +177,7 @@ const MenuNav = () => {
                     }}
                   >
                     <House size={30} className="mx-2" />
-                    Home
+                    <Trans i18nKey="menu.home">Home</Trans>
                   </Nav.Link>
                   <Nav.Link
                     onClick={() => {
@@ -166,15 +186,33 @@ const MenuNav = () => {
                     }}
                   >
                     <ListOl size={30} className="mx-2" />
-                    Ranking
+                    <Trans i18nKey="menu.ranking">Ranking</Trans>
                   </Nav.Link>
                 </>
               )}
               <NavDropdown
+                title={langs.find((l) => l.key == lang)?.icon || "🇬🇧"}
+              >
+                {langs
+                  .filter((l) => l.key != lang)
+                  .map((lang) => (
+                    <NavDropdown.Item
+                      key={lang.key}
+                      onClick={() => {
+                        i18n.changeLanguage(lang.key);
+                        setLang(lang.key);
+                        moment.locale(lang.key);
+                      }}
+                    >
+                      {lang.icon} {t(`lang.${lang.key}`)}
+                    </NavDropdown.Item>
+                  ))}
+              </NavDropdown>
+              <NavDropdown
                 title={
                   <>
                     <PersonSquare size={30} className="mx-2" />
-                    <span>{user?.login || "Guest"}</span>
+                    <span>{user?.login || t("user.guest", "Guest")}</span>
                   </>
                 }
                 className="px-0"
@@ -184,10 +222,10 @@ const MenuNav = () => {
                 {!user && (
                   <>
                     <NavDropdown.Item onClick={() => showLogin(true)}>
-                      Login
+                      <Trans i18nKey="menu.login">Login</Trans>
                     </NavDropdown.Item>
                     <NavDropdown.Item onClick={() => showRegister(true)}>
-                      Register
+                      <Trans i18nKey="menu.register">Register</Trans>
                     </NavDropdown.Item>
                   </>
                 )}
@@ -195,10 +233,12 @@ const MenuNav = () => {
                 {user && (
                   <>
                     <NavDropdown.Item onClick={() => showUpdate(true)}>
-                      Update
+                      <Trans i18nKey="menu.update">Update</Trans>
                     </NavDropdown.Item>
                     <NavDropdown.Divider />
-                    <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
+                    <NavDropdown.Item onClick={logout}>
+                      <Trans i18nKey="menu.logout">Logout</Trans>
+                    </NavDropdown.Item>
                   </>
                 )}
               </NavDropdown>

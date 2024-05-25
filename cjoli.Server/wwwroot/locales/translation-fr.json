@@ -1,0 +1,125 @@
+{
+  "title": "CJoli - Tournoi de Hockey sur Glace",
+  "lang": {
+    "en": "Anglais",
+    "fr": "Français",
+    "pt": "Portugais",
+    "es": "Espagnol",
+    "de": "Allemand"
+  },
+  "user": {
+    "guest": "Invité"
+  },
+  "menu": {
+    "home": "Accueil",
+    "ranking": "Classement",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "update": "Mise à Jour",
+    "logout": "Déconnexion",
+    "active": "Actif",
+    "refresh": "Actualiser",
+    "refreshEstimate": "Actualiser l'estimation",
+    "custom": "Personnalisé",
+    "useCustom": "Utiliser personnalisé",
+    "menu": "Menu"
+  },
+  "error": {
+    "invalid": "{{field}} est invalide",
+    "required": "{{field}} est requis"
+  },
+  "button": {
+    "submit": "Soumettre",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "save": "Enregistrer",
+    "send": "Envoyer",
+    "botAI": "Discuter avec BotAI",
+    "back": "Retour",
+    "edit": "Modifier"
+  },
+  "penalty": {
+    "label": "Pénalités",
+    "tooltip_one": "1 pénalité",
+    "tooltip_other": "{{count}} pénalités"
+  },
+  "simulation": {
+    "tooltip": "Simulation",
+    "removeAll": "Supprimer toutes les simulations"
+  },
+  "estimate": {
+    "calculated": "Estimation calculée"
+  },
+  "login": {
+    "title": {
+      "login": "Connexion",
+      "register": "Inscription",
+      "update": "Mise à jour"
+    },
+    "form": {
+      "login": "Identifiant",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe"
+    },
+    "error": {
+      "invalidLogin": "Identifiant invalide",
+      "register": "Impossible de créer le compte",
+      "update": "Impossible de mettre à jour le compte"
+    },
+    "success": {
+      "register": "Compte créé",
+      "update": "Compte mis à jour"
+    }
+  },
+  "team": {
+    "title": "Modifier {{team}}",
+    "position": "Position",
+    "youngest": "Plus jeune",
+    "select": "Sélectionner une équipe",
+    "chart": {
+      "general": "Général",
+      "timeline": "Chronologie"
+    },
+    "form": {
+      "logo": "Logo",
+      "youngest": "Plus jeune (date)"
+    },
+    "error": {
+      "update": "Impossible de mettre à jour l'équipe"
+    }
+  },
+  "message": "Message",
+  "rank": {
+    "title": "Classement",
+    "ranking": "Classement",
+    "team": "Équipe",
+    "total": "Points",
+    "game": "Matchs joués",
+    "win": "Victoires",
+    "neutral": "Matchs nuls",
+    "loss": "Défaites",
+    "goalFor": "Buts marqués",
+    "goalAgainst": "Buts encaissés",
+    "shutOut": "Blanchissages",
+    "goalDiff": "Différence de buts",
+    "penalty": "Pénalités",
+    "simulation": "Simulation",
+    "first": "1er",
+    "second": "2ème",
+    "third": "3ème",
+    "rankth": "{{rank}}ème"
+  },
+  "select": {
+    "live": "En direct",
+    "coming": "À venir...",
+    "past": "Passé"
+  },
+  "match": {
+    "blockShot": {
+      "title": "Enregistrer le score",
+      "error": "Impossible d'enregistrer le score.<br/>Le match doit se terminer par une séance de tirs au but.<br/>Veuillez indiquer un vainqueur."
+    },
+    "compare": "Comparer",
+    "forfeit": "Forfait"
+  }
+}

@@ -9,6 +9,7 @@ import {
 import { useForm, SubmitHandler, FieldValues, Path } from "react-hook-form";
 import React from "react";
 import { useModal } from "../hooks/useModal";
+import { Trans, useTranslation } from "react-i18next";
 
 export interface Field<T extends FieldValues> {
   id: Path<T>;
@@ -35,6 +36,7 @@ const CJoliModal = <T extends FieldValues>({
   values,
 }: CJoliModalProps<T>) => {
   const { show, setShow } = useModal(id);
+  const { t } = useTranslation();
 
   const {
     register,
@@ -80,10 +82,12 @@ const CJoliModal = <T extends FieldValues>({
                 type={f.type}
                 autoFocus={f.autoFocus}
                 {...register(f.id, {
-                  required: f.required ? `${f.label} is required` : false,
+                  required: f.required
+                    ? t("error.required", { field: f.label })
+                    : false,
                   validate: (value) =>
                     f.validate && watch(f.validate) !== value
-                      ? `${f.label} is invalid`
+                      ? t("error.invalid", { field: f.label })
                       : undefined,
                 })}
                 className={`${errors[f.id] ? "is-invalid" : ""}`}
@@ -99,10 +103,10 @@ const CJoliModal = <T extends FieldValues>({
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShow(false)}>
-            Cancel
+            <Trans i18nKey="button.cancel">Cancel</Trans>
           </Button>
           <Button type="submit" variant="primary" disabled={running}>
-            Submit
+            <Trans i18nKey="button.submit">Submit</Trans>
             {running && (
               <Spinner
                 as="span"
