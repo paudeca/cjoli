@@ -17,11 +17,7 @@ import { useToast } from "../hooks/useToast";
 import { Trans } from "react-i18next";
 
 const MainPage = () => {
-  const {
-    loadUser,
-    isConnected,
-    userConfig: { activeEstimate },
-  } = useUser();
+  const { loadUser, isConnected } = useUser();
   const [ready, setReady] = React.useState(false);
   const {
     state: { show, type, message },
@@ -52,9 +48,7 @@ const MainPage = () => {
       <Outlet />
       <ButtonFixed>
         <Stack gap={1}>
-          {uid && activeEstimate && !isOnChat && isMobile && isConnected && (
-            <EstimateButton />
-          )}
+          {uid && !isOnChat && isMobile && isConnected && <EstimateButton />}
           {!isOnChat && <ChatButton />}
         </Stack>
       </ButtonFixed>

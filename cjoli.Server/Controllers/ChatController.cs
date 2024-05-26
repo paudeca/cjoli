@@ -24,12 +24,12 @@ namespace cjoli.Server.Controllers
 
         [HttpGet]
         [Route("{uuid}/ws")]
-        public async Task Get(string uuid)
+        public async Task Get(string uuid, [FromQuery] string lang)
         {
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                await Bot(webSocket,uuid);
+                await Bot(webSocket,uuid, lang);
             }
             else
             {
@@ -37,9 +37,9 @@ namespace cjoli.Server.Controllers
             }
         }
 
-        private async Task Bot(WebSocket webSocket, string uuid)
+        private async Task Bot(WebSocket webSocket, string uuid, string lang)
         {
-            var session = _service.CreateSession(uuid, _context);
+            var session = _service.CreateSession(uuid, lang, _context);
             session.OnReply += async (sender, e) => { await SendMessage(e.Message, webSocket); };
             await _service.PromptMessage(session, _context);
 

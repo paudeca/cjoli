@@ -20,12 +20,10 @@ const ScoreCell = ({
   saveMatch,
   register,
 }: ScoreCellProps) => {
-  const { isConnected, userConfig } = useUser();
-  const placeholder = userConfig.activeEstimate
-    ? teamA
-      ? match.estimate?.scoreA.toString()
-      : match.estimate?.scoreB.toString()
-    : undefined;
+  const { isConnected } = useUser();
+  const placeholder = teamA
+    ? match.estimate?.scoreA.toString()
+    : match.estimate?.scoreB.toString();
   return (
     <InputGroup size="sm" style={{ width: "80px" }}>
       <Form.Control

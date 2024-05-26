@@ -17,11 +17,10 @@
     "register": "Register",
     "update": "Update",
     "logout": "Logout",
-    "active": "Active",
     "refresh": "Refresh",
     "refreshEstimate": "Refresh estimate",
     "custom": "Custom",
-    "useCustom": "Use custom",
+    "useCustom": "use personal estimate",
     "menu": "Menu"
   },
   "error": {

@@ -36,13 +36,7 @@ const MyImg = styled.img<{ width: string }>`
 
 const MenuNav = () => {
   const { loadRanking, tourney } = useCJoli();
-  const {
-    user,
-    userConfig,
-    userConfig: { activeEstimate },
-    loadUser,
-    handleSaveUserConfig,
-  } = useUser();
+  const { user, userConfig, loadUser, handleSaveUserConfig } = useUser();
   const uid = useUid();
   const { setShow: showLogin } = useModal("login");
   const { setShow: showRegister } = useModal("register");
@@ -86,7 +80,7 @@ const MenuNav = () => {
     >
       <Container fluid>
         <Navbar.Brand>
-          <Row>
+          <Row className="align-items-center">
             <Col>
               <MyImg
                 src="/logo.png"
@@ -105,52 +99,31 @@ const MenuNav = () => {
         </Navbar.Brand>
         {user && tourneyLabel && (
           <Stack direction="horizontal" gap={3}>
+            <Button onClick={handleUpdateEstimate} disabled={loading}>
+              {isMobile
+                ? t("menu.refresh", "Refresh")
+                : t("menu.refreshEstimate", "Refresh estimate")}
+              {!loading && <Bezier2 className="mx-2" size={20} />}
+              {loading && (
+                <Spinner animation="grow" className="mx-2" size="sm" />
+              )}
+            </Button>
             <Form.Check
               type="switch"
-              role="button"
               label={
-                <>
-                  <Trans i18nKey="menu.active">Active</Trans>
-                  {!isMobile && <Bezier2 className="mx-2" />}
-                </>
+                isMobile
+                  ? t("menu.custom", "Custom")
+                  : t("menu.useCustom", "Use custom")
               }
-              {...register("activeEstimate", {
+              role="button"
+              {...register("useCustomEstimate", {
                 onChange: (e: React.FormEvent<HTMLInputElement>) =>
                   handleSaveUserConfig({
                     ...userConfig,
-                    activeEstimate: e.currentTarget.checked,
+                    useCustomEstimate: e.currentTarget.checked,
                   }),
               })}
             />
-            {activeEstimate && (
-              <>
-                <Button onClick={handleUpdateEstimate} disabled={loading}>
-                  {isMobile
-                    ? t("menu.refresh", "Refresh")
-                    : t("menu.refreshEstimate", "Refresh estimate")}
-                  {!loading && <Bezier2 className="mx-2" size={20} />}
-                  {loading && (
-                    <Spinner animation="grow" className="mx-2" size="sm" />
-                  )}
-                </Button>
-                <Form.Check
-                  type="switch"
-                  label={
-                    isMobile
-                      ? t("menu.custom", "Custom")
-                      : t("menu.useCustom", "Use custom")
-                  }
-                  role="button"
-                  {...register("useCustomEstimate", {
-                    onChange: (e: React.FormEvent<HTMLInputElement>) =>
-                      handleSaveUserConfig({
-                        ...userConfig,
-                        useCustomEstimate: e.currentTarget.checked,
-                      }),
-                  })}
-                />
-              </>
-            )}
           </Stack>
         )}
         <Navbar.Toggle aria-controls="menu" onClick={() => setShow(true)} />

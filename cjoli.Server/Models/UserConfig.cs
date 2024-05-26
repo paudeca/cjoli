@@ -8,7 +8,6 @@ namespace cjoli.Server.Models
         public int Id { get; set; }
         public required User User { get; set; }
         public required Tourney Tourney { get; set; }
-        public bool ActiveEstimate { get; set; }
         public bool UseCustomEstimate { get; set; }
     }
 }
