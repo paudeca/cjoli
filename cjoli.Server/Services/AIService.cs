@@ -111,7 +111,7 @@ Ton équipe préféré est les Lions de Wasquehal."));
             });
             tourneyAI.Ranks.ForEach(r =>
             {
-                r.Team = tourneyAI.Teams.Single(t => t.Id == r.TeamId).Name;
+                r.Team = tourneyAI.Teams.SingleOrDefault(t => t.Id == r.TeamId)?.Name;
             });
             dto.Scores.ScoreTeams.ToList().ForEach(kv =>
             {
