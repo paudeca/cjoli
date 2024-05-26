@@ -96,7 +96,7 @@ export const updateTeam = async (uid: string, team: Team) => {
 };
 
 export const logout = () => {
-  cookie.remove("CJOLI_AUTH_TOKEN");
+  cookie.remove("CJOLI_AUTH_TOKEN", { path: "/" });
   setHeader();
 };
 
