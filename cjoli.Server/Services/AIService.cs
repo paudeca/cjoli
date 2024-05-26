@@ -23,6 +23,13 @@ namespace cjoli.Server.Services
         private readonly IConfiguration _configuration;
         private readonly Dictionary<string, FunctionDefinition> _functions = new Dictionary<string, FunctionDefinition>();
 
+        private readonly Dictionary<string, string> LANGS = new Dictionary<string, string>{ 
+            { "fr", "français" },
+            { "en", "anglais" },
+            { "pt", "portugais" },
+            { "es", "espagnol" },
+            { "de", "allemand" }
+        };
 
         public AIService(CJoliService cjoliService, IMapper mapper, IConfiguration configuration)
         {
@@ -77,7 +84,7 @@ The query should be returned in plain text, not in JSON."
         }
 
 
-        public ChatSession CreateSession(string uuid, CJoliContext context)
+        public ChatSession CreateSession(string uuid, string lang, CJoliContext context)
         {
             Tourney? tourney = context.Tourneys.SingleOrDefault(t => t.Uid == uuid);
             if(tourney== null)
@@ -86,7 +93,7 @@ The query should be returned in plain text, not in JSON."
             }
             ChatSession session = new ();
             session.Messages.Add(new ChatRequestSystemMessage(""+
-@"Tu es assistant durant le tournois d'Hockey sur glace '"+tourney.Name+@"', tu réponds en Français avec parfois des emoticones.
+@"Tu es assistant durant le tournois d'Hockey sur glace '"+tourney.Name+@"', tu réponds en " + LANGS[lang] +@" avec parfois des emoticones.
 Ton premier message doit indiquer que tu es dans une phase de Beta, et que les réponses ne sont pas fiables.
 Ton équipe préféré est les Lions de Wasquehal."));
 

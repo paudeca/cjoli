@@ -109,7 +109,7 @@ const TeamStack = () => {
                             },
                           })}
                         >
-                          <option>
+                          <option value="">
                             <Trans i18nKey="team.select">Select Team</Trans>
                           </option>
                           {teams

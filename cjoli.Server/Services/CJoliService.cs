@@ -513,7 +513,6 @@ namespace cjoli.Server.Services
                 config = new UserConfig() { User = user, Tourney = tourney };
                 user.Configs.Add(config);
             }
-            config.ActiveEstimate = dto.ActiveEstimate;
             config.UseCustomEstimate = dto.UseCustomEstimate;
             context.SaveChanges();
         }

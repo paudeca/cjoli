@@ -17,7 +17,7 @@ import moment from "moment";
 import useUid from "../hooks/useUid";
 import { useNavigate } from "react-router-dom";
 import useScreenSize from "../hooks/useScreenSize";
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 
 interface Message {
   message: string;
@@ -30,9 +30,10 @@ const server = import.meta.env.VITE_API_WS;
 const ChatPage = () => {
   const [messages, setMessages] = React.useState<Message[]>([]);
   const uid = useUid();
+  const { i18n } = useTranslation();
   const { sendMessage, lastMessage, readyState } = useWebSocket<{
     message: string;
-  }>(`${server}/chat/${uid}/ws`);
+  }>(`${server}/chat/${uid}/ws?lang=${i18n.resolvedLanguage}`);
   React.useEffect(() => {
     if (lastMessage != null) {
       setMessages((messages) => [
