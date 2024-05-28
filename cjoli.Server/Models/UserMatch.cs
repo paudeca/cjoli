@@ -1,5 +1,4 @@
-﻿using AutoMapper.Configuration.Annotations;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace cjoli.Server.Models
 {
@@ -14,6 +13,6 @@ namespace cjoli.Server.Models
         public bool ForfeitA { get; set; }
         public bool ForfeitB { get; set; }
 
-        public DateTime Time { get {  return Match.Time; } }
+        public DateTime Time { get { return Match.Time; } }
     }
 }

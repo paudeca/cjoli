@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using cjoli.Server.Datas;
+using cjoli.Server.Models;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 

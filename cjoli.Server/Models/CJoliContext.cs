@@ -1,9 +1,8 @@
-﻿using cjoli.Server.Models;
-using Microsoft.AspNetCore.DataProtection;
+﻿using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace cjoli.Server.Datas
+namespace cjoli.Server.Models
 {
     public class CJoliContext : DbContext
     {
@@ -47,7 +46,7 @@ namespace cjoli.Server.Datas
 
             modelBuilder.Entity<Team>().HasMany(t => t.Positions).WithOne(p => p.Team).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<Team>().HasMany(t => t.MatchResults).WithOne(m => m.Team).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Team>().HasOne(t=>t.Alias).WithMany(t=>t.Children).OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Team>().HasOne(t => t.Alias).WithMany(t => t.Children).OnDelete(DeleteBehavior.SetNull);
 
             var provider = Database.GetService<IDataProtectionProvider>();
 

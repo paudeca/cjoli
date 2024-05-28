@@ -1,9 +1,6 @@
-﻿using cjoli.Server.Datas;
+﻿using cjoli.Server.Models;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Azure;
-using Microsoft.Extensions.Caching.Memory;
-using System;
 using System.Net.WebSockets;
 using System.Text;
 
@@ -29,7 +26,7 @@ namespace cjoli.Server.Controllers
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                await Bot(webSocket,uuid, lang);
+                await Bot(webSocket, uuid, lang);
             }
             else
             {

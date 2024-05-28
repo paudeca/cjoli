@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using cjoli.Server.Datas;
 using cjoli.Server.Dtos;
+using cjoli.Server.Models;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

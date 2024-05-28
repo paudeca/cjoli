@@ -1,17 +1,14 @@
-﻿using Azure;
+﻿using AutoMapper;
+using Azure;
 using Azure.AI.OpenAI;
-using cjoli.Server.Datas;
-using System.Text.Json;
+using cjoli.Server.Dtos;
+using cjoli.Server.Exceptions;
+using cjoli.Server.Models;
+using cjoli.Server.Models.AI;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
-using cjoli.Server.Controllers;
-using System.Text;
-using AutoMapper;
-using cjoli.Server.Dtos;
+using System.Text.Json;
 using System.Text.Json.Serialization;
-using cjoli.Server.Models;
-using cjoli.Server.Exceptions;
-using cjoli.Server.Models.AI;
 
 namespace cjoli.Server.Services
 {
@@ -23,7 +20,7 @@ namespace cjoli.Server.Services
         private readonly IConfiguration _configuration;
         private readonly Dictionary<string, FunctionDefinition> _functions = new Dictionary<string, FunctionDefinition>();
 
-        private readonly Dictionary<string, string> LANGS = new Dictionary<string, string>{ 
+        private readonly Dictionary<string, string> LANGS = new Dictionary<string, string>{
             { "fr", "français" },
             { "en", "anglais" },
             { "pt", "portugais" },
@@ -87,13 +84,13 @@ The query should be returned in plain text, not in JSON."
         public ChatSession CreateSession(string uuid, string lang, CJoliContext context)
         {
             Tourney? tourney = context.Tourneys.SingleOrDefault(t => t.Uid == uuid);
-            if(tourney== null)
+            if (tourney == null)
             {
                 throw new NotFoundException("Tourney", uuid);
             }
-            ChatSession session = new ();
-            session.Messages.Add(new ChatRequestSystemMessage(""+
-@"Tu es assistant durant le tournois d'Hockey sur glace '"+tourney.Name+@"', tu réponds en " + LANGS[lang] +@" avec parfois des emoticones.
+            ChatSession session = new();
+            session.Messages.Add(new ChatRequestSystemMessage("" +
+@"Tu es assistant durant le tournois d'Hockey sur glace '" + tourney.Name + @"', tu réponds en " + LANGS[lang] + @" avec parfois des emoticones.
 Ton premier message doit indiquer que tu es dans une phase de Beta, et que les réponses ne sont pas fiables.
 Ton équipe préféré est les Lions de Wasquehal."));
 
@@ -121,9 +118,11 @@ Ton équipe préféré est les Lions de Wasquehal."));
                 tourneyAI.Scores.Add(score);
             });
 
-            string json = JsonSerializer.Serialize(tourneyAI, new JsonSerializerOptions() { 
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase, 
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull });
+            string json = JsonSerializer.Serialize(tourneyAI, new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            });
 
 
             /*session.Messages.Add(new ChatRequestSystemMessage(""+
@@ -142,9 +141,9 @@ Ton équipe préféré est les Lions de Wasquehal."));
         }
 
 
-        public async Task PromptMessage(ChatSession session, CJoliContext context,int loop=0)
+        public async Task PromptMessage(ChatSession session, CJoliContext context, int loop = 0)
         {
-            if(loop>3)
+            if (loop > 3)
             {
                 throw new Exception("To many loop, stop it");
             }
@@ -176,7 +175,7 @@ Ton équipe préféré est les Lions de Wasquehal."));
                     {
                         string arguments = responseChoice.Message.FunctionCall.Arguments;
                         Query? query = JsonSerializer.Deserialize<Query>(arguments);
-                        if(query!=null)
+                        if (query != null)
                         {
                             var result = ExecuteQuery(query.query, context);
                             string a = JsonSerializer.Serialize(
@@ -189,14 +188,14 @@ Ton équipe préféré est les Lions de Wasquehal."));
                                     new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
                             session.Messages.Add(functionResponseMessage);
 
-                            await PromptMessage(session, context,loop+1);
+                            await PromptMessage(session, context, loop + 1);
                         }
                     }
                 }
             }
         }
 
-        private QueryResult ExecuteQuery(string query,CJoliContext context)
+        private QueryResult ExecuteQuery(string query, CJoliContext context)
         {
             QueryResult result = new QueryResult();
             //List<string> result = new List<string>();
@@ -263,7 +262,7 @@ The query should be returned in plain text, not in JSON."
                         }
                     },
                     Required = new[] { "query" },
-                },new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }),
+                }, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }),
             };
 
             var findPosition = new FunctionDefinition()
@@ -413,7 +412,7 @@ The query should be returned in plain text, not in JSON."
         }
     }
 
-    public class ReplyMessageEvent :EventArgs
+    public class ReplyMessageEvent : EventArgs
     {
         public required string Message { get; set; }
     }

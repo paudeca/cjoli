@@ -3,7 +3,7 @@
     public class TourneyAI
     {
         public required string Name { get; set; }
-        public required string Uid {  get; set; }
+        public required string Uid { get; set; }
         public required string Season { get; set; }
         public required string Category { get; set; }
         public DateTime StartTime { get; set; }
