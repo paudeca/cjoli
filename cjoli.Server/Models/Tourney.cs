@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using cjoli.Server.Services.Rules;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace cjoli.Server.Models
 {
@@ -14,6 +16,9 @@ namespace cjoli.Server.Models
         public string? Season { get; set; }
         public string? Category { get; set; }
         public string? Rule { get; set; }
+
+        [NotMapped]
+        public IRule? Config { get; set; }
 
         public IList<Team> Teams { get; set; } = new List<Team>();
         public IList<Phase> Phases { get; set; } = new List<Phase>();

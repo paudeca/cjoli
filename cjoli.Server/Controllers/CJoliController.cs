@@ -49,11 +49,7 @@ namespace cjoli.Server.Controllers
         public RankingDto GetRanking(string uuid)
         {
             string? login = GetLogin();
-            var ranking = _mapper.Map<RankingDto>(_service.GetRanking(uuid, login, _context));
-            _service.SetConfig(ranking);
-            _service.AffectationTeams(ranking);
-            _service.CalculateHistory(ranking);
-            return ranking;
+            return _service.CreateRanking(uuid, login, _context);
         }
 
 

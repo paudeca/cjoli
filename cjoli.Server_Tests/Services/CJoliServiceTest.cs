@@ -8,24 +8,16 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace cjoli.Server_Tests.Services
 {
-    public class CJoliServiceTest : IDisposable
+    [Collection("CJoli")]
+    public class CJoliServiceTest : AbstractTest, IDisposable
     {
         private readonly CJoliService _service;
-        private readonly CJoliContext _context;
         private readonly IDbContextTransaction _transaction;
         private readonly IMapper _mapper;
 
-        private const string UID = "uid";
-        private const string NAME = "name";
-        private const string TEAM1 = "team1";
-        private const string TEAM2 = "team2";
-
-        private const string skip = null;//"disabled";
-
-        public CJoliServiceTest(CJoliService service, CJoliContext context, IMapper mapper)
+        public CJoliServiceTest(CJoliService service, CJoliContext context, IMapper mapper) : base(context)
         {
             _service = service;
-            _context = context;
             _mapper = mapper;
             _transaction = _context.Database.BeginTransaction();
         }
@@ -35,53 +27,12 @@ namespace cjoli.Server_Tests.Services
             _transaction.Rollback();
         }
 
-        private Tourney CreateTourney()
-        {
-            var tourney = new Tourney() { Uid = UID, Name = NAME };
 
-            var team1 = new Team() { Name = TEAM1 };
-            var team2 = new Team() { Name = TEAM2 };
-            tourney.Teams.Add(team1);
-            tourney.Teams.Add(team2);
-
-
-            var phase = new Phase() { Name = "phase1", Tourney = tourney };
-            tourney.Phases.Add(phase);
-
-            var squad = new Squad() { Name = "squad1", Phase = phase };
-            phase.Squads.Add(squad);
-
-            var position1 = new Position() { Team = team1 };
-            squad.Positions.Add(position1);
-            var position2 = new Position() { Team = team2 };
-            squad.Positions.Add(position2);
-
-            var match = new Match() { PositionA = position1, PositionB = position2 };
-            squad.Matches.Add(match);
-
-            tourney.Ranks.Add(new Rank() { Squad = squad, Tourney = tourney, Order = 1, Value = 1 });
-            tourney.Ranks.Add(new Rank() { Squad = squad, Tourney = tourney, Order = 2, Value = 2 });
-
-            _context.Tourneys.Add(tourney);
-
-            _context.SaveChanges();
-            return tourney;
-        }
-
-        private User CreateUser()
-        {
-            var user = new User() { Login = "login", Password = "", Role = "ADMIN" };
-            _context.Users.Add(user);
-            _context.SaveChanges();
-            return user;
-        }
-
-
-        [Fact(Skip = skip)]
+        [Fact]
         public void ListTourneys_Found()
         {
             //Arrange
-            CreateTourney();
+            var tourney = CreateTourney();
 
             //Act
             var tourneys = _service.ListTourneys(_context);
@@ -89,99 +40,222 @@ namespace cjoli.Server_Tests.Services
             //Assert
             Assert.NotEmpty(tourneys);
             Assert.Single(tourneys);
-            var tourney = tourneys.First();
-            Assert.Equal(UID, tourney.Uid);
-            Assert.Equal(NAME, tourney.Name);
+            var result = tourneys.First();
+            Assert.Equal(tourney.Uid, result.Uid);
+            Assert.Equal(tourney.Name, result.Name);
         }
 
 
-        [Fact(Skip = skip)]
+        [Fact]
         public void GetTourney_NotFound()
         {
             //Act & Assert
             Assert.Throws<NotFoundException>(() => _service.GetTourney("", _context));
         }
 
-        [Fact(Skip = skip)]
+        [Fact]
         public void GetTourney_Found()
         {
             //Arrange
-            CreateTourney();
+            var tourney = CreateTourney();
 
             //Act
-            var tourney = _service.GetTourney(UID, _context);
+            var result = _service.GetTourney(tourney.Uid, _context);
 
             //Assert
-            Assert.Same(UID, tourney.Uid);
-            Assert.Same(NAME, tourney.Name);
+            Assert.Same(tourney.Uid, result.Uid);
+            Assert.Same(tourney.Name, result.Name);
         }
 
-        [Fact(Skip = skip)]
-        public void GetRanking_Found()
-        {
-            //Arrange
-            CreateTourney();
-            //Act
-            var ranking = _service.GetRanking(UID, null, _context);
-            //Assert
-            Assert.Same(UID, ranking.Tourney.Uid);
-            Assert.NotNull(ranking.Scores);
-            Assert.NotNull(ranking.Scores.ScoreTourney);
-        }
-
-        [Fact(Skip = skip)]
-        public void UpdateEstimate_Ok()
+        [Theory]
+        [InlineData(0, 0, 0, 1)]
+        [InlineData(1, 0, 0, 1)]
+        [InlineData(0, 1, 1, 0)]
+        public void CreateRanking(int score1, int score2, int rank1, int rank2)
         {
             //Arrange
             var tourney = CreateTourney();
-            var match = tourney.Phases.First().Squads.First().Matches.First();
+            var user = CreateUser();
+            var team1 = Team("team1", tourney);
+            var team2 = Team("team2", tourney);
+            CreateMatch(tourney, team1, team2, match =>
+            {
+                match.ScoreA = score1;
+                match.ScoreB = score2;
+                match.Done = true;
+            });
+            //Act
+            var ranking = _service.CreateRanking(tourney.Uid, user.Login, _context);
+            //Assert
+            Assert.Same(tourney.Uid, ranking.Tourney.Uid);
+            Assert.NotNull(ranking.Scores);
+            Assert.NotNull(ranking.Scores.ScoreTourney);
+            var FindIndex = (int teamId) => ranking.Scores.ScoreSquads.First().Scores.FindIndex(s => s.TeamId == teamId);
+            Assert.Equal(rank1, FindIndex(team1.Id));
+            Assert.Equal(rank2, FindIndex(team2.Id));
+
+        }
+
+        [Theory]
+        [InlineData(1, 0)]
+        [InlineData(0, 1)]
+        public void CreateRanking_Order_Direct(int score1, int score2)
+        {
+            //Arrange
+            var tourney = CreateTourney();
+            var user = CreateUser();
+            var team1 = Team("team1", tourney);
+            var team2 = Team("team2", tourney);
+            var team3 = CreateTeam("team3", tourney);
+            CreateMatch(tourney, team1, team3, match =>
+            {
+                match.ScoreA = 1;
+                match.Done = true;
+            });
+            CreateMatch(tourney, team2, team3, match =>
+            {
+                match.ScoreA = 1;
+                match.Done = true;
+            });
+            CreateMatch(tourney, team1, team2, match =>
+            {
+                match.ScoreA = score1;
+                match.ScoreB = score2;
+                match.Done = true;
+            });
+            CreateMatch(tourney, score1 > score2 ? team2 : team1, team3, match =>
+            {
+                match.Done = true;
+            });
+
+            //Act
+            var ranking = _service.CreateRanking(tourney.Uid, user.Login, _context);
+            var result = string.Join(' ', ranking.Scores.ScoreSquads.First().Scores.Select((s, i) => $"{i}:{s.TeamId}:{s.Total}"));
+            //Assert
+            Assert.Same(tourney.Uid, ranking.Tourney.Uid);
+            Assert.NotNull(ranking.Scores);
+            Assert.NotNull(ranking.Scores.ScoreTourney);
+            var first = score1 > score2 ? 1 : 2;
+            var second = score1 > score2 ? 2 : 1;
+            Assert.Equal($"0:{first}:6 1:{second}:6 2:3:4", result);
+        }
+
+        [Theory]
+        [InlineData(2, 1, 0, 0)]
+        [InlineData(1, 2, 0, 0)]
+        [InlineData(2, 1, 1, 0)]
+        public void CreateRanking_Order_Goal(int score1, int score2, int score3_1, int score3_2)
+        {
+            //Arrange
+            var tourney = CreateTourney();
+            var user = CreateUser();
+            var team1 = Team("team1", tourney);
+            var team2 = Team("team2", tourney);
+            var team3 = CreateTeam("team3", tourney);
+            CreateMatch(tourney, team1, team3, match =>
+            {
+                match.ScoreA = score1;
+                match.ScoreB = score3_1;
+                match.Done = true;
+            });
+            CreateMatch(tourney, team2, team3, match =>
+            {
+                match.ScoreA = score2;
+                match.ScoreB = score3_2;
+                match.Done = true;
+            });
+            CreateMatch(tourney, team1, team2, match =>
+            {
+                match.ScoreA = 0;
+                match.ScoreB = 0;
+                match.Done = true;
+            });
+
+            //Act
+            var ranking = _service.CreateRanking(tourney.Uid, user.Login, _context);
+            var result = string.Join(' ', ranking.Scores.ScoreSquads.First().Scores.Select((s, i) => $"{i}:{s.TeamId}:{s.Total}"));
+            //Assert
+            Assert.Same(tourney.Uid, ranking.Tourney.Uid);
+            Assert.NotNull(ranking.Scores);
+            Assert.NotNull(ranking.Scores.ScoreTourney);
+            var first = score1 > score2 ? 1 : 2;
+            var second = score1 > score2 ? 2 : 1;
+            Assert.Equal($"0:{first}:5 1:{second}:5 2:3:2", result);
+        }
+
+
+
+        [Theory]
+        [InlineData("USER")]
+        [InlineData("ADMIN")]
+        public void UpdateEstimate(string role)
+        {
+            //Arrange
+            var tourney = CreateTourney();
+            var user = CreateUser(role);
+            var match = Match(tourney);
             Assert.Empty(match.Estimates);
             //Act
-            _service.UpdateEstimate(UID, "", _context);
+            _service.UpdateEstimate(tourney.Uid, user.Login, _context);
             //Assert
             var estimate = Assert.Single(match.Estimates);
             Assert.Equal(0, estimate.ScoreA);
             Assert.Equal(0, estimate.ScoreB);
         }
 
-        [Fact(Skip = skip)]
+        [Fact]
         public void AfftectationTeams_Ok()
         {
             //Arrange
             var tourney = CreateTourney();
-            var ranking = _service.GetRanking(UID, null, _context);
-            var dto = _mapper.Map<RankingDto>(ranking);
-            var team1 = dto.Tourney.Teams.Single(t => t.Name == TEAM1);
-            var team2 = dto.Tourney.Teams.Single(t => t.Name == TEAM2);
-            var match = dto.Tourney.Phases.First().Squads.First().Matches.First();
+            var team1 = Team("team1", tourney);
+            var team2 = Team("team2", tourney);
 
-            Assert.Equal(0, match.TeamIdA);
-            Assert.Equal(0, match.TeamIdB);
             //Act
-            _service.AffectationTeams(dto);
+            var dto = _service.CreateRanking(tourney.Uid, null, _context);
+            var match = dto.Tourney.Phases.First().Squads.First().Matches.First();
             //Assert
             Assert.Equal(team1.Id, match.TeamIdA);
             Assert.Equal(team2.Id, match.TeamIdB);
             Assert.Equal([team1.Id, team2.Id], dto.Tourney.Ranks.Select(r => r.TeamId).ToList());
+        }
+
+        [Fact]
+        public void AfftectationTeams_ParentPosition()
+        {
+            //Arrange
+            var tourney = CreateTourney();
+            var team1 = Team("team1", tourney);
+            var team2 = Team("team2", tourney);
+            CreateMatch(tourney, team1, team2, match =>
+            {
+                match.ScoreA = 1;
+                match.Done = true;
+            });
+
+
+            //Act
+            var dto = _service.CreateRanking(tourney.Uid, null, _context);
+            //Assert
+            var positions = dto.Tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Positions);
+            var position1 = positions.Single(p => p.Name == "position2-1");
+            var position2 = positions.Single(p => p.Name == "position2-2");
+            Assert.Equal(team1.Id, position1.TeamId);
+            Assert.Equal(team2.Id, position2.TeamId);
 
         }
 
-        [Fact(Skip = skip)]
+
+        [Fact]
         public void CalculateHistory_Ok()
         {
             //Arrange
             var tourney = CreateTourney();
-            var ranking = _service.GetRanking(UID, null, _context);
-            var dto = _mapper.Map<RankingDto>(ranking);
-            var team1 = dto.Tourney.Teams.Single(t => t.Name == TEAM1);
-            var team2 = dto.Tourney.Teams.Single(t => t.Name == TEAM2);
+            var team1 = Team("team1", tourney);
+            var team2 = Team("team2", tourney);
 
-            Assert.False(dto.History.ContainsKey(team1.Id));
-            Assert.False(dto.History.ContainsKey(team2.Id));
-            Assert.False(dto.Scores.ScoreTeams.ContainsKey(team1.Id));
-            Assert.False(dto.Scores.ScoreTeams.ContainsKey(team2.Id));
             //Act
-            _service.CalculateHistory(dto);
+            var dto = _service.CreateRanking(tourney.Uid, null, _context);
             //Assert
             Assert.True(dto.History.ContainsKey(team1.Id));
             Assert.True(dto.History.ContainsKey(team2.Id));
@@ -189,27 +263,25 @@ namespace cjoli.Server_Tests.Services
             Assert.True(dto.Scores.ScoreTeams.ContainsKey(team2.Id));
         }
 
-        [Fact(Skip = skip)]
+        [Fact]
         public void SetConfig()
         {
             //Arrange
-            CreateTourney();
-            var ranking = _service.GetRanking(UID, null, _context);
-            var dto = _mapper.Map<RankingDto>(ranking);
+            var tourney = CreateTourney();
 
-            Assert.Null(dto.Tourney.Config);
             //Act
-            _service.SetConfig(dto);
+            var ranking = _service.CreateRanking(tourney.Uid, null, _context);
+            var dto = _mapper.Map<RankingDto>(ranking);
             //Assert
             Assert.NotNull(dto.Tourney.Config);
         }
 
-        [Fact(Skip = skip)]
+        [Fact]
         public void UpdateScore()
         {
             //Arrange
             var tourney = CreateTourney();
-            var match = tourney.Phases.First().Squads.First().Matches.First();
+            var match = Match(tourney);
             match.ScoreA = 1;
             var scoreA = new Score();
             var scoreB = new Score();
@@ -236,13 +308,13 @@ namespace cjoli.Server_Tests.Services
 
         }
 
-        [Fact(Skip = skip)]
+        [Fact]
         public void SaveMatch()
         {
             //Arrange
             var user = CreateUser();
             var tourney = CreateTourney();
-            var match = tourney.Phases.First().Squads.First().Matches.First();
+            var match = Match(tourney);
             var dto = _mapper.Map<MatchDto>(match);
             dto.ScoreA = 1;
             dto.ScoreB = 0;
@@ -251,27 +323,97 @@ namespace cjoli.Server_Tests.Services
             Assert.Equal(0, match.ScoreA);
             Assert.Equal(0, match.ScoreB);
             //Act
-            _service.SaveMatch(dto, user.Login, UID, _context);
+            _service.SaveMatch(dto, user.Login, tourney.Uid, _context);
             //Assert
             Assert.True(match.Done);
             Assert.Equal(1, match.ScoreA);
             Assert.Equal(0, match.ScoreB);
         }
 
-        [Fact(Skip = skip)]
+        [Fact]
+        public void SaveMatch_NotFound()
+        {
+            //Arrange
+            var user = CreateUser();
+            var tourney = CreateTourney();
+            //Act            
+            //Assert
+            Assert.Throws<NotFoundException>(() => _service.SaveMatch(new MatchDto(), user.Login, tourney.Uid, _context));
+        }
+
+        [Theory]
+        [InlineData("ADMIN")]
+        [InlineData("USER")]
+        public void SaveMatch_Forfeit(string role)
+        {
+            //Arrange
+            var user = CreateUser(role);
+            var tourney = CreateTourney();
+            var match = Match(tourney);
+            var dto = _mapper.Map<MatchDto>(match);
+            dto.ForfeitB = true;
+
+            //Act
+            _service.SaveMatch(dto, user.Login, tourney.Uid, _context);
+            //Assert
+            if (role == "ADMIN")
+            {
+                Assert.True(match.Done);
+                Assert.True(match.ForfeitB);
+            }
+            else
+            {
+                Assert.False(match.Done);
+                Assert.False(match.ForfeitB);
+                Assert.True(match.UserMatches.First().ForfeitB);
+            }
+        }
+
+
+        [Fact]
+        public void SaveMatch_User_Admin()
+        {
+            //Arrange
+            var user = CreateUser("User");
+            var tourney = CreateTourney();
+            var match = Match(tourney);
+            var dto = _mapper.Map<MatchDto>(match);
+            dto.ScoreA = 1;
+            dto.ScoreB = 0;
+
+            _service.SaveMatch(dto, user.Login, tourney.Uid, _context);
+            Assert.False(match.Done);
+            Assert.Equal(1, match.UserMatches.First().ScoreA);
+            Assert.Equal(0, match.UserMatches.First().ScoreB);
+
+            user = CreateUser("ADMIN");
+
+            //Act
+            _service.SaveMatch(dto, user.Login, tourney.Uid, _context);
+            //Assert
+            Assert.True(match.Done);
+            Assert.Equal(1, match.ScoreA);
+            Assert.Equal(0, match.ScoreB);
+            Assert.Empty(match.UserMatches);
+
+
+        }
+
+
+        [Fact]
         public void ClearMatch()
         {
             //Arrange
             var user = CreateUser();
             var tourney = CreateTourney();
-            var match = tourney.Phases.First().Squads.First().Matches.First();
+            var match = Match(tourney);
             var dto = _mapper.Map<MatchDto>(match);
             dto.ScoreA = 1;
             dto.ScoreB = 0;
 
+            _service.SaveMatch(dto, user.Login, tourney.Uid, _context);
             //Act
-            _service.SaveMatch(dto, user.Login, UID, _context);
-            _service.ClearMatch(dto, user.Login, UID, _context);
+            _service.ClearMatch(dto, user.Login, tourney.Uid, _context);
             //Assert
             Assert.False(match.Done);
             Assert.Equal(0, match.ScoreA);
@@ -279,7 +421,44 @@ namespace cjoli.Server_Tests.Services
 
         }
 
-        [Fact(Skip = skip)]
+        [Fact]
+        public void ClearMatch_NotFound()
+        {
+            //Arrange
+            var user = CreateUser();
+            var tourney = CreateTourney();
+
+            //Act
+            //Assert
+            Assert.Throws<NotFoundException>(() => _service.ClearMatch(new MatchDto(), user.Login, tourney.Uid, _context));
+
+        }
+
+        [Fact]
+        public void ClearMatch_User()
+        {
+            //Arrange
+            var user = CreateUser("USER");
+            var tourney = CreateTourney();
+            var match = Match(tourney);
+            var dto = _mapper.Map<MatchDto>(match);
+            dto.ScoreA = 1;
+            dto.ScoreB = 0;
+
+            _service.SaveMatch(dto, user.Login, tourney.Uid, _context);
+            Assert.False(match.Done);
+            Assert.Equal(1, match.UserMatches.First().ScoreA);
+            Assert.Equal(0, match.UserMatches.First().ScoreB);
+            //Act
+            _service.ClearMatch(dto, user.Login, tourney.Uid, _context);
+            //Assert
+            Assert.Empty(match.UserMatches);
+
+        }
+
+
+
+        [Fact]
         public void SaveUserConfig()
         {
             //Arrange
@@ -293,7 +472,29 @@ namespace cjoli.Server_Tests.Services
             Assert.True(config.UseCustomEstimate);
         }
 
-        [Fact(Skip = skip)]
+        [Fact]
+        public void SaveUserConfig_NoTourney()
+        {
+            //Arrange
+            var dto = new UserConfigDto() { UseCustomEstimate = true };
+            //Act
+            //Assert
+            Assert.Throws<NotFoundException>(() => _service.SaveUserConfig("", "", dto, _context));
+        }
+
+        [Fact]
+        public void SaveUserConfig_NoUser()
+        {
+            //Arrange
+            var tourney = CreateTourney();
+            var dto = new UserConfigDto() { UseCustomEstimate = true };
+            //Act
+            //Assert
+            Assert.Throws<NotFoundException>(() => _service.SaveUserConfig(tourney.Uid, "", dto, _context));
+        }
+
+
+        [Fact]
         public void ClearSimulations()
         {
             //Arrange
@@ -302,7 +503,7 @@ namespace cjoli.Server_Tests.Services
             var config = new UserConfigDto() { UseCustomEstimate = true };
             _service.SaveUserConfig(tourney.Uid, user.Login, config, _context);
 
-            var match = tourney.Phases.First().Squads.First().Matches.First();
+            var match = Match(tourney);
             var dto = _mapper.Map<MatchDto>(match);
             dto.ScoreA = 1;
             dto.ScoreB = 0;
@@ -317,7 +518,7 @@ namespace cjoli.Server_Tests.Services
             Assert.Empty(user.UserMatches);
         }
 
-        [Fact(Skip = skip)]
+        [Fact]
         public void UpdatePosition()
         {
             //Arrange
@@ -332,7 +533,7 @@ namespace cjoli.Server_Tests.Services
             Assert.Equal(1, position.Penalty);
         }
 
-        [Fact(Skip = skip)]
+        [Fact]
         public void UpdateTeam()
         {
             //Arrange
@@ -349,6 +550,26 @@ namespace cjoli.Server_Tests.Services
             Assert.Equal(dto.Logo, team.Logo);
             Assert.Equal(dto.Youngest, team.Youngest);
         }
+
+        [Fact]
+        public void UpdateTeam_NoTourney()
+        {
+            //Arrange
+            //Act
+            //Assert
+            Assert.Throws<NotFoundException>(() => _service.UpdateTeam("", new TeamDto() { Name = "name" }, _context));
+        }
+
+        [Fact]
+        public void UpdateTeam_NoTeam()
+        {
+            //Arrange
+            var tourney = CreateTourney();
+            //Act
+            //Assert
+            Assert.Throws<NotFoundException>(() => _service.UpdateTeam(tourney.Uid, new TeamDto() { Name = "name" }, _context));
+        }
+
 
     }
 }

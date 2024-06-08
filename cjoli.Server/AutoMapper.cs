@@ -3,6 +3,7 @@ using cjoli.Server.Dtos;
 using cjoli.Server.Models;
 using cjoli.Server.Models.AI;
 using cjoli.Server.Services;
+using cjoli.Server.Services.Rules;
 
 namespace cjoli.Server
 {
@@ -11,6 +12,7 @@ namespace cjoli.Server
         public AutoMapper()
         {
             CreateMap<Tourney, TourneyDto>();
+            CreateMap<IRule, TourneyConfigDto>();
             CreateMap<Phase, PhaseDto>();
             CreateMap<Squad, SquadDto>();
             CreateMap<Position, PositionDto>()

@@ -84,36 +84,32 @@ namespace cjoli.Server.Services
             };
         }
 
+        private Position FindParentPosition(Position position, IList<ScoreSquad> scores)
+        {
+            while (position.Team == null && position.ParentPosition != null)
+            {
+                var squadParent = position.ParentPosition.Squad;
+                var val = position.ParentPosition.Value;
+                var scoreSquad = scores.SingleOrDefault(s => s.SquadId == squadParent.Id);
+                if (scoreSquad == null)
+                {
+                    break;
+                }
+                var scoreParent = scoreSquad.Scores[val - 1];
+                if (scoreParent.Game == 0)
+                {
+                    break;
+                }
+                position = squadParent.Positions.Single(s => s.Id == scoreParent.PositionId);
+            }
+            return position;
+        }
+
         private void CaculateEstimate(Match match, IList<ScoreSquad> scores, User? user, Func<Match, Team, Team, bool, Score> calculateScore)
         {
-            Position positionA = match.PositionA;
-            int i = 0;
-            while (i < 5 && positionA.Team == null && positionA.ParentPosition != null)
-            {
-                i++;
-                var squadParent = positionA.ParentPosition.Squad;
-                var val = positionA.ParentPosition.Value;
-                var scoreParent = scores.Single(s => s.SquadId == squadParent.Id).Scores![val - 1];
-                if (scoreParent.Game == 0)
-                {
-                    break;
-                }
-                positionA = squadParent.Positions.Single(s => s.Id == scoreParent.PositionId);
-            }
-            Position positionB = match.PositionB;
-            i = 0;
-            while (i < 5 && positionB.Team == null && positionB.ParentPosition != null)
-            {
-                i++;
-                var squadParent = positionB.ParentPosition.Squad;
-                var val = positionB.ParentPosition.Value;
-                var scoreParent = scores.Single(s => s.SquadId == squadParent.Id).Scores![val - 1];
-                if (scoreParent.Game == 0)
-                {
-                    break;
-                }
-                positionB = squadParent.Positions.Single(s => s.Id == scoreParent.PositionId);
-            }
+            Position positionA = FindParentPosition(match.PositionA, scores);
+            Position positionB = FindParentPosition(match.PositionB, scores);
+
             Team? teamA = positionA.Team;
             Team? teamB = positionB.Team;
             if (teamA == null || teamB == null)
