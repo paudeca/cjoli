@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using cjoli.Server.Dtos;
+using cjoli.Server.Exceptions;
 using cjoli.Server.Models;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -54,26 +55,25 @@ namespace cjoli.Server.Controllers
         [Route("Login")]
         public IResult Login(UserDto userDto)
         {
+            if (string.IsNullOrEmpty(userDto.Password))
+            {
+                throw new IllegalArgumentException("password");
+            }
             string token = _service.Login(userDto.Login, userDto.Password, _context);
             return Results.Ok(token);
         }
 
         [HttpPost]
         [Route("Update")]
-        public bool Update(UserUpdate user)
+        public bool Update(UserDto user)
         {
             var login = GetLogin();
-            if (login == null)
+            if (login == null || user.Password == null)
             {
                 return false;
             }
             return _service.Update(login, user.Password, _context);
         }
 
-    }
-
-    public class UserUpdate
-    {
-        public required string Password { get; set; }
     }
 }

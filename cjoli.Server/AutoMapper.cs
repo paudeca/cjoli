@@ -2,7 +2,6 @@
 using cjoli.Server.Dtos;
 using cjoli.Server.Models;
 using cjoli.Server.Models.AI;
-using cjoli.Server.Services;
 using cjoli.Server.Services.Rules;
 
 namespace cjoli.Server

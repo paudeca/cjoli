@@ -1,10 +1,13 @@
-﻿using cjoli.Server.Dtos;
+﻿using Azure;
+using Azure.AI.OpenAI;
+using cjoli.Server.Dtos;
 using cjoli.Server.Models;
 using cjoli.Server.Services;
 using cjoli.Server_Tests.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace cjoli.Server_Tests
 {
@@ -16,6 +19,16 @@ namespace cjoli.Server_Tests
             services.AddSingleton<CJoliService>();
             services.AddSingleton<EstimateService>();
             services.AddSingleton<UserService>();
+            services.AddSingleton<ImportService>();
+            services.AddSingleton<AIService>();
+
+            var openAIClient = new Mock<OpenAIClient>();
+            var response = new Mock<Response<ChatCompletions>>();
+            openAIClient.Setup(x => x.GetChatCompletionsAsync(It.IsAny<ChatCompletionsOptions>(), CancellationToken.None)).ReturnsAsync(response.Object);
+            services.AddSingleton(openAIClient.Object);
+            services.AddSingleton(response);
+
+
 
             var fixture = new DatabaseFixture();
 
@@ -26,7 +39,7 @@ namespace cjoli.Server_Tests
             services.AddAutoMapper(typeof(TourneyDto));
 
             var config = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string> { { "JwtKey", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" } })
+                .AddInMemoryCollection(initialData: [KeyValuePair.Create<string, string?>("JwtKey", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")])
                 .Build();
             services.AddSingleton<IConfiguration>(config);
 

@@ -38,7 +38,7 @@ namespace cjoli.Server.Controllers
         {
             var session = _service.CreateSession(uuid, lang, _context);
             session.OnReply += async (sender, e) => { await SendMessage(e.Message, webSocket); };
-            await _service.PromptMessage(session, _context);
+            await _service.PromptMessage(session);
 
             //await SendMessage(welcome, webSocket);
 
@@ -51,7 +51,7 @@ namespace cjoli.Server.Controllers
                 string message = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
                 session.AddUserMessage(message);
 
-                await _service.PromptMessage(session, _context);
+                await _service.PromptMessage(session);
 
                 receiveResult = await webSocket.ReceiveAsync(
                     new ArraySegment<byte>(buffer), CancellationToken.None);

@@ -1,6 +1,4 @@
-﻿using cjoli.Server.Services;
-
-namespace cjoli.Server.Models.AI
+﻿namespace cjoli.Server.Models.AI
 {
     public class ScoreAI : Score
     {

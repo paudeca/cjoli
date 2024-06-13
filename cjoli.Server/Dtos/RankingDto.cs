@@ -1,4 +1,4 @@
-﻿using cjoli.Server.Services;
+﻿using cjoli.Server.Models;
 
 namespace cjoli.Server.Dtos
 {

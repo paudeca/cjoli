@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Azure;
 using Azure.AI.OpenAI;
+using cjoli.Server.Chat;
 using cjoli.Server.Exceptions;
 using cjoli.Server.Models;
 using cjoli.Server.Models.AI;
@@ -14,7 +15,6 @@ namespace cjoli.Server.Services
         private readonly CJoliService _cjoliService;
         private readonly IMapper _mapper;
         private readonly OpenAIClient _openAIClient;
-        private readonly IConfiguration _configuration;
 
         private readonly Dictionary<string, string> LANGS = new Dictionary<string, string>{
             { "fr", "français" },
@@ -24,13 +24,11 @@ namespace cjoli.Server.Services
             { "de", "allemand" }
         };
 
-        public AIService(CJoliService cjoliService, IMapper mapper, IConfiguration configuration)
+        public AIService(CJoliService cjoliService, IMapper mapper, OpenAIClient openAIClient)
         {
             _cjoliService = cjoliService;
             _mapper = mapper;
-            _configuration = configuration;
-
-            _openAIClient = new OpenAIClient(_configuration["OpenAIKey"]);
+            _openAIClient = openAIClient;
         }
 
 
@@ -79,18 +77,13 @@ Ton équipe préféré est les Lions de Wasquehal."));
         }
 
 
-        public async Task PromptMessage(ChatSession session, CJoliContext context, int loop = 0)
+        public async Task PromptMessage(ChatSession session)
         {
-            if (loop > 3)
-            {
-                throw new Exception("To many loop, stop it");
-            }
             var options = new ChatCompletionsOptions()
             {
                 DeploymentName = "gpt-3.5-turbo",
             };
             session.Messages.ForEach(options.Messages.Add);
-
 
             Response<ChatCompletions> response = await _openAIClient.GetChatCompletionsAsync(options);
             ChatChoice? responseChoice = response.Value.Choices.FirstOrDefault();
@@ -102,37 +95,7 @@ Ton équipe préféré est les Lions de Wasquehal."));
                     session.Messages.Add(new ChatRequestAssistantMessage(reply));
                     session.SendReply(reply);
                 }
-                else if (responseChoice.FinishReason == CompletionsFinishReason.FunctionCall)
-                {
-                    session.Messages.Add(new ChatRequestAssistantMessage(responseChoice.Message.Content)
-                    {
-                        FunctionCall = responseChoice.Message.FunctionCall,
-                    });
-                }
             }
         }
     }
-
-    public class ChatSession
-    {
-        public List<ChatRequestMessage> Messages = new List<ChatRequestMessage>();
-
-        public event EventHandler<ReplyMessageEvent>? OnReply;
-
-        public void AddUserMessage(string message)
-        {
-            Messages.Add(new ChatRequestUserMessage(message));
-        }
-
-        public void SendReply(string reply)
-        {
-            OnReply?.Invoke(this, new ReplyMessageEvent { Message = reply });
-        }
-    }
-
-    public class ReplyMessageEvent : EventArgs
-    {
-        public required string Message { get; set; }
-    }
-
 }

@@ -1,3 +1,4 @@
+using Azure.AI.OpenAI;
 using cjoli.Server.Models;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -63,6 +64,7 @@ builder.Services.AddSingleton<ImportService>();
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<EstimateService>();
 builder.Services.AddSingleton<AIService>();
+builder.Services.AddSingleton(new OpenAIClient(builder.Configuration["OpenAIKey"]));
 
 builder.Services.AddDbContextPool<CJoliContext>(options =>
 {
@@ -70,7 +72,6 @@ builder.Services.AddDbContextPool<CJoliContext>(options =>
     options.UseMySql(cnx, ServerVersion.AutoDetect(cnx));
 }
 );
-
 
 var app = builder.Build();
 
