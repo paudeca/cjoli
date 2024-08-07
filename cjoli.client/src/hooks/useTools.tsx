@@ -10,7 +10,7 @@ export const useTools = () => {
       opt?.upper || opt == undefined
         ? upperFirstLetter(moment(date).format("dddd LL"))
         : moment(date).format("dddd LL"),
-    []
+    [upperFirstLetter]
   );
   return { formatDate, upperFirstLetter };
 };

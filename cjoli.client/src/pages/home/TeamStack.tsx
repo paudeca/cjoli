@@ -46,7 +46,7 @@ const TeamStack = () => {
   const rank = getTeamRank(team);
 
   return (
-    <CJoliStack gap={0} className="col-md-8 mx-auto mt-5">
+    <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="team">
       <div className="p-2">
         <CJoliCard>
           <Card.Header>

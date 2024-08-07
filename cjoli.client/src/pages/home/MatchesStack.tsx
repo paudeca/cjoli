@@ -76,7 +76,7 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
   };
 
   return (
-    <CJoliStack gap={0} className="col-md-8 mx-auto mt-5">
+    <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="matches">
       <div className="p-2">
         <CJoliCard>
           <Loading ready={!!matches}>

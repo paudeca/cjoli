@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useRef } from "react";
 import { Container, ProgressBar } from "react-bootstrap";
 
 const Waiting = ({
@@ -10,9 +10,9 @@ const Waiting = ({
 }) => {
   const [random, setRandom] = React.useState([40, 20, 60, 80]);
 
-  let refreshIdle;
+  const refreshIdle = useRef<number>(0);
   React.useEffect(() => {
-    refreshIdle = window.setInterval(() => {
+    refreshIdle.current = window.setInterval(() => {
       setRandom([
         Math.random() * 100,
         Math.random() * 100,
@@ -22,7 +22,7 @@ const Waiting = ({
     }, 1000);
   }, []);
   if (ready) {
-    clearInterval(refreshIdle);
+    clearInterval(refreshIdle.current);
   }
 
   return (

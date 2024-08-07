@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer, Toast, Stack } from "react-bootstrap";
 import { Outlet, useLocation } from "react-router-dom";
 import Loading from "../components/Loading";
-import MenuNav from "./MenuNav";
+import MenuNav from "./menu/MenuNav";
 import React from "react";
 import * as cjoliService from "../services/cjoliService";
 import { useUser } from "../hooks/useUser";
