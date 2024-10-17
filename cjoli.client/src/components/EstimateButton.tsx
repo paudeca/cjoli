@@ -1,6 +1,6 @@
 import { Button, Spinner } from "react-bootstrap";
 import { Bezier2 } from "react-bootstrap-icons";
-import { useEstimate } from "../../hooks/useEstimate";
+import { useEstimate } from "../hooks/useEstimate";
 
 const EstimateButton = () => {
   const { loading, handleUpdateEstimate } = useEstimate();

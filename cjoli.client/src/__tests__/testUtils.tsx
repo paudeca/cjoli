@@ -67,8 +67,6 @@ export const createTourney = ({
   config: { hasPenalty: false },
 });
 
-
-
 export const createScore: () => Score = () => ({
   teamId: 0,
   positionId: 0,
@@ -86,25 +84,24 @@ export const createScore: () => Score = () => ({
   rank: {},
 });
 
+export const createRanking = (create?: () => Tourney) => {
+  const tourney = create ? create() : createTourney({ id: 1 });
+  return {
+    tourney,
+    scores: {
+      scoreTeams: [],
+      scoreSquads: [],
+      scoreTourney: createScore(),
+    },
+    history: {},
+  };
+};
+
 export const mockGetRanking = (uid: string, create?: () => Tourney) => {
   const get = vi.mocked(axios.get).mockImplementationOnce((url) => {
     expect(url).toMatch(`${uid}/ranking`);
-    const tourney = create ? create() : createTourney({ id: 1 });
     return Promise.resolve<{ data: Ranking }>({
-      data: {
-        tourney,
-        /*tourney: {
-          teams: [],
-          phases: [{ id: 1, name: "phase1", squads: [] }],
-          ranks: [],
-        },*/
-        scores: {
-          scoreTeams: [],
-          scoreSquads: [],
-          scoreTourney: createScore(),
-        },
-        history: {},
-      },
+      data: createRanking(create),
     });
   });
   return get;

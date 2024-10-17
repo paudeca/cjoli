@@ -47,6 +47,5 @@ describe("RankPage", () => {
       target: { value: "game" },
     });
     expect(option.selected).toBeTruthy();
-    screen.debug();
   });
 });

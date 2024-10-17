@@ -20,7 +20,6 @@ const useScreenSize = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
   return {
     ...screenSize,
     isMobile: screenSize.width < 1200,

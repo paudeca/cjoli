@@ -89,7 +89,7 @@ const MatchRow = ({
         <tr>
           <td colSpan={2}>
             {teamA && teamB && <CompareButton team={teamA} teamB={teamB} />}
-            {moment(match.time).format("LT")} - {getSquad(match.squadId)!.name}
+            {moment(match.time).format("LT")} - {getSquad(match.squadId).name}
             {match.location && ` - ${match.location}`}
             <SimulationIcon show={isSimulation} />
           </td>
@@ -101,7 +101,7 @@ const MatchRow = ({
         )}
         {!isMobile && (
           <td>
-            {getSquad(match.squadId)!.name}
+            {getSquad(match.squadId).name}
             <SimulationIcon show={isSimulation} />
           </td>
         )}

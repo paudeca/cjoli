@@ -99,7 +99,7 @@ const TimeLine = ({ type }: { type: keyof Score }) => {
   const data: {
     datasets: {
       label: string;
-      data: { x: number | Date; y: Date | number }[];
+      data: { x: number | Date | Record<string,number>; y: number | Date | Record<string,number> }[];
     }[];
   } = {
     datasets: defintions.map((def) => ({
