@@ -4,3 +4,6 @@
 /cjoli.Server/bin
 /cjoli.Server/appsettings.Development.json
 /backup/*
+/cjoli.Server_Tests/bin
+/cjoli.Server_Tests/obj
+/cjoli.client/coverage

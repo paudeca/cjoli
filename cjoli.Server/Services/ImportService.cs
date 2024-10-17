@@ -1,5 +1,4 @@
-﻿using cjoli.Server.Datas;
-using cjoli.Server.Dtos;
+﻿using cjoli.Server.Dtos;
 using cjoli.Server.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,7 +42,7 @@ namespace cjoli.Server.Services
                     tourney.Name = tourneyDto.Name ?? tourney.Name;
                     tourney.Season = tourneyDto.Season ?? tourney.Season;
                     tourney.Category = tourneyDto.Category ?? tourney.Category;
-                    tourney.StartTime = tourneyDto.StartTime!=DateTime.MinValue? tourneyDto.StartTime: tourney.StartTime;
+                    tourney.StartTime = tourneyDto.StartTime != DateTime.MinValue ? tourneyDto.StartTime : tourney.StartTime;
                     tourney.EndTime = tourneyDto.EndTime != DateTime.MinValue ? tourneyDto.EndTime : tourney.EndTime;
 
                 },

@@ -1,9 +1,6 @@
-﻿using cjoli.Server.Datas;
+﻿using cjoli.Server.Models;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Azure;
-using Microsoft.Extensions.Caching.Memory;
-using System;
 using System.Net.WebSockets;
 using System.Text;
 
@@ -29,7 +26,7 @@ namespace cjoli.Server.Controllers
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                await Bot(webSocket,uuid, lang);
+                await Bot(webSocket, uuid, lang);
             }
             else
             {
@@ -41,7 +38,7 @@ namespace cjoli.Server.Controllers
         {
             var session = _service.CreateSession(uuid, lang, _context);
             session.OnReply += async (sender, e) => { await SendMessage(e.Message, webSocket); };
-            await _service.PromptMessage(session, _context);
+            await _service.PromptMessage(session);
 
             //await SendMessage(welcome, webSocket);
 
@@ -54,7 +51,7 @@ namespace cjoli.Server.Controllers
                 string message = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
                 session.AddUserMessage(message);
 
-                await _service.PromptMessage(session, _context);
+                await _service.PromptMessage(session);
 
                 receiveResult = await webSocket.ReceiveAsync(
                     new ArraySegment<byte>(buffer), CancellationToken.None);

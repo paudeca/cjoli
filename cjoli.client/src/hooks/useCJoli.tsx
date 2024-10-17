@@ -36,7 +36,11 @@ export const useCJoli = () => {
     [dispatch]
   );
   const getSquad = React.useCallback(
-    (squadId: number) => state.squads?.find((s) => s.id === squadId),
+    (squadId: number) => {
+      const squad = state.squads?.find((s) => s.id === squadId);
+      if (!squad) throw new Error(`squad not found with id:${squadId}`);
+      return squad;
+    },
     [state.squads]
   );
   const getTeam = React.useCallback(

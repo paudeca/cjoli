@@ -28,10 +28,9 @@ const HomePage = () => {
   if (!phase && phases && phases?.length > 0) {
     phase = phases[0];
   }
-
   return (
     <Loading ready={ready}>
-      {teamId && <TeamStack />}
+      {teamId && <TeamStack />} 
       <RankingStack phase={phase} />
       <MatchesStack phase={phase} />
     </Loading>

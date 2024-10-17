@@ -29,7 +29,7 @@ const RankingStack = ({ phase }: { phase?: Phase }) => {
   };
 
   return (
-    <CJoliStack gap={0} className="col-md-8 mx-auto mt-5">
+    <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="ranking">
       <div className="p-2">
         <CJoliCard>
           <Loading ready={!!phases && !!phase}>

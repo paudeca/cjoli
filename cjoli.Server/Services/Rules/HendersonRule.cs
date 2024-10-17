@@ -21,22 +21,22 @@ namespace cjoli.Server.Services.Rules
 
         public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads)
         {
-            var mapPositions = squad.Positions.Where(p=>p.ParentPosition!=null).ToDictionary(p=>p.Id, p =>
+            var mapPositions = squad.Positions.Where(p => p.ParentPosition != null).ToDictionary(p => p.Id, p =>
             {
                 var scoreSquad = scoreSquads.Single(s => s.SquadId == p.ParentPosition!.Squad.Id);
                 var score = scoreSquad.Scores![p.ParentPosition!.Value - 1];
                 return score.PositionId;
             });
             var scores = squad.Positions.ToDictionary(p => p.Id, p => new Score() { PositionId = p.Id, TeamId = p.Team?.Id ?? 0 });
-            if (mapPositions.Count==0)
+            if (mapPositions.Count == 0)
             {
                 return scores;
             }
             var positionIds = mapPositions.Select(kv => kv.Value);
             var tourney = squad.Phase.Tourney;
-            var matches = tourney.Phases.SelectMany(p=>p.Squads).SelectMany(s=>s.Matches.Where(m=>positionIds.Contains(m.PositionA.Id) && positionIds.Contains(m.PositionB.Id))).ToList();
+            var matches = tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Matches.Where(m => positionIds.Contains(m.PositionA.Id) && positionIds.Contains(m.PositionB.Id))).ToList();
 
-            Dictionary<int, Score> initScores = positionIds.ToDictionary(p => p, p => new Score() { PositionId=p});
+            Dictionary<int, Score> initScores = positionIds.ToDictionary(p => p, p => new Score() { PositionId = p });
             matches.Aggregate(initScores, (acc, m) =>
             {
                 var userMatch = m.UserMatches.FirstOrDefault();

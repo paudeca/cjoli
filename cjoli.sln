@@ -9,8 +9,11 @@ Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "cjoli.client", "cjoli.clien
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{86734B4F-6512-4C8A-9372-C93EF41319F8}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cjoli.Server_Tests", "cjoli.Server_Tests\cjoli.Server_Tests.csproj", "{92EBE3EB-0C7D-46AE-9A79-E81C2EAD4EB2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,6 +31,10 @@ Global
 		{870989A4-33AA-4983-B58C-C7CEBD051E1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{870989A4-33AA-4983-B58C-C7CEBD051E1C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{870989A4-33AA-4983-B58C-C7CEBD051E1C}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{92EBE3EB-0C7D-46AE-9A79-E81C2EAD4EB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92EBE3EB-0C7D-46AE-9A79-E81C2EAD4EB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92EBE3EB-0C7D-46AE-9A79-E81C2EAD4EB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92EBE3EB-0C7D-46AE-9A79-E81C2EAD4EB2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

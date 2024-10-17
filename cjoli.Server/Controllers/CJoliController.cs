@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using cjoli.Server.Datas;
 using cjoli.Server.Dtos;
+using cjoli.Server.Models;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,11 +49,7 @@ namespace cjoli.Server.Controllers
         public RankingDto GetRanking(string uuid)
         {
             string? login = GetLogin();
-            var ranking = _mapper.Map<RankingDto>(_service.GetRanking(uuid, login, _context));
-            _service.SetConfig(ranking);
-            _service.AffectationTeams(ranking);
-            _service.CalculateHistory(ranking);
-            return ranking;
+            return _service.CreateRanking(uuid, login, _context);
         }
 
 
@@ -61,7 +57,7 @@ namespace cjoli.Server.Controllers
         [Route("{uuid}/Export")]
         public TourneyDto Export(string uuid)
         {
-            return _mapper.Map<TourneyDto>(_service.GetTourney(uuid, null, _context));
+            return _mapper.Map<TourneyDto>(_service.GetTourney(uuid, _context));
         }
 
         [HttpPost]

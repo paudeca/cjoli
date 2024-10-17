@@ -1,4 +1,4 @@
-﻿using cjoli.Server.Services;
+﻿using cjoli.Server.Models;
 
 namespace cjoli.Server.Dtos
 {
@@ -6,6 +6,6 @@ namespace cjoli.Server.Dtos
     {
         public required TourneyDto Tourney { get; set; }
         public required Scores Scores { get; set; }
-        public Dictionary<int, List<Score>>? History { get;set; }
+        public Dictionary<int, List<Score>> History { get; set; } = new Dictionary<int, List<Score>>();
     }
 }

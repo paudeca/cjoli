@@ -1,5 +1,4 @@
-﻿using cjoli.Server.Datas;
-using cjoli.Server.Dtos;
+﻿using cjoli.Server.Dtos;
 using cjoli.Server.Exceptions;
 using cjoli.Server.Models;
 using Microsoft.EntityFrameworkCore;

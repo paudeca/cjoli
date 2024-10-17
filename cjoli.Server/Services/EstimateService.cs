@@ -1,5 +1,4 @@
-﻿using cjoli.Server.Datas;
-using cjoli.Server.Extensions;
+﻿using cjoli.Server.Extensions;
 using cjoli.Server.Models;
 
 namespace cjoli.Server.Services
@@ -85,36 +84,32 @@ namespace cjoli.Server.Services
             };
         }
 
+        private Position FindParentPosition(Position position, IList<ScoreSquad> scores)
+        {
+            while (position.Team == null && position.ParentPosition != null)
+            {
+                var squadParent = position.ParentPosition.Squad;
+                var val = position.ParentPosition.Value;
+                var scoreSquad = scores.SingleOrDefault(s => s.SquadId == squadParent.Id);
+                if (scoreSquad == null)
+                {
+                    break;
+                }
+                var scoreParent = scoreSquad.Scores[val - 1];
+                if (scoreParent.Game == 0)
+                {
+                    break;
+                }
+                position = squadParent.Positions.Single(s => s.Id == scoreParent.PositionId);
+            }
+            return position;
+        }
+
         private void CaculateEstimate(Match match, IList<ScoreSquad> scores, User? user, Func<Match, Team, Team, bool, Score> calculateScore)
         {
-            Position positionA = match.PositionA;
-            int i = 0;
-            while (i < 5 && positionA.Team == null && positionA.ParentPosition != null)
-            {
-                i++;
-                var squadParent = positionA.ParentPosition.Squad;
-                var val = positionA.ParentPosition.Value;
-                var scoreParent = scores.Single(s => s.SquadId == squadParent.Id).Scores![val - 1];
-                if (scoreParent.Game == 0)
-                {
-                    break;
-                }
-                positionA = squadParent.Positions.Single(s => s.Id == scoreParent.PositionId);
-            }
-            Position positionB = match.PositionB;
-            i = 0;
-            while (i < 5 && positionB.Team == null && positionB.ParentPosition != null)
-            {
-                i++;
-                var squadParent = positionB.ParentPosition.Squad;
-                var val = positionB.ParentPosition.Value;
-                var scoreParent = scores.Single(s => s.SquadId == squadParent.Id).Scores![val - 1];
-                if (scoreParent.Game == 0)
-                {
-                    break;
-                }
-                positionB = squadParent.Positions.Single(s => s.Id == scoreParent.PositionId);
-            }
+            Position positionA = FindParentPosition(match.PositionA, scores);
+            Position positionB = FindParentPosition(match.PositionB, scores);
+
             Team? teamA = positionA.Team;
             Team? teamB = positionB.Team;
             if (teamA == null || teamB == null)
@@ -123,11 +118,11 @@ namespace cjoli.Server.Services
             }
             Score scoreA = calculateScore(match, teamA, teamB, false);
             Score scoreB = calculateScore(match, teamB, teamA, true);
-            if(scoreA.Game==0)
+            if (scoreA.Game == 0)
             {
                 scoreA.Game = 1;
             }
-            if(scoreB.Game == 0)
+            if (scoreB.Game == 0)
             {
                 scoreB.Game = 1;
             }
@@ -217,8 +212,9 @@ namespace cjoli.Server.Services
             coef["indirect"] = 10;//^2
             coef["indirectSeason"] = 100;//^3
 
-            var func = (string type,IQueryable<MatchResult> query) => {
-                Score score = query.GroupBy(r=>1).Select(SelectScore<int>(coef[type])).SingleOrDefault() ?? new Score();
+            var func = (string type, IQueryable<MatchResult> query) =>
+            {
+                Score score = query.GroupBy(r => 1).Select(SelectScore<int>(coef[type])).SingleOrDefault() ?? new Score();
                 scoreUsers.ForEach(score.Merge);
                 return score;
             };
@@ -226,11 +222,11 @@ namespace cjoli.Server.Services
             Score scoreTotal = func("total", queryMatch);
             Score scoreTotalSeason = func("totalSeason", queryMatchSeason);
 
-            var getTeamId = (Team? team) => team?.Alias != null ? team.Alias.Id : team!=null?team.Id:0;
+            var getTeamId = (Team? team) => team?.Alias != null ? team.Alias.Id : team != null ? team.Id : 0;
 
             var funcMap = (string type, IQueryable<MatchResult> query) =>
             {
-                var mapScore = query.Where(r=>r.Match.Squad!.Phase.Tourney!=tourney).GroupBy(r => r.Team.Alias!=null?r.Team.Alias.Id:r.Team.Id).ToDictionary(kv => kv.Key, kv => SelectScore<int>(coef[type])(kv)) ?? new Dictionary<int, Score>();
+                var mapScore = query.Where(r => r.Match.Squad!.Phase.Tourney != tourney).GroupBy(r => r.Team.Alias != null ? r.Team.Alias.Id : r.Team.Id).ToDictionary(kv => kv.Key, kv => SelectScore<int>(coef[type])(kv)) ?? new Dictionary<int, Score>();
                 return mapScore;
             };
             var mapAllTeam = funcMap("allTeam", queryMatch);
@@ -242,7 +238,7 @@ namespace cjoli.Server.Services
             var funcDirect = (string type, IQueryable<MatchResult> query) =>
             {
                 var mapScore = query.Where(r => r.Match.Squad!.Phase.Tourney != tourney && r.TeamAgainst != null)
-                    .GroupBy(r => new MyKv { TeamA = r.Team.Alias!=null?r.Team.Alias.Id:r.Team.Id, TeamB = r.TeamAgainst.Alias!=null?r.TeamAgainst.Alias.Id:r.TeamAgainst.Id })
+                    .GroupBy(r => new MyKv { TeamA = r.Team.Alias != null ? r.Team.Alias.Id : r.Team.Id, TeamB = r.TeamAgainst.Alias != null ? r.TeamAgainst.Alias.Id : r.TeamAgainst.Id })
                     .ToDictionary(kv => kv.Key, kv => SelectScore<MyKv>(coef[type])(kv));
                 return mapScore;
             };

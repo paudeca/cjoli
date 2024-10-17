@@ -29,6 +29,7 @@ const RankPage = () => {
   }, [loadRanking, uid]);
   const [type, setType] = React.useState<keyof Score>("total");
 
+  console.log("TYPE", type);
   return (
     <Loading ready={ready}>
       <CJoliStack gap={0} className="col-md-8 mx-auto mt-5">
@@ -84,11 +85,12 @@ const RankPage = () => {
                     onChange={(e) =>
                       setType(e.currentTarget.value as keyof Score)
                     }
+                    data-testid="select"
                   >
                     <option value="total">
                       <Trans i18nKey="rank.total">Points</Trans>
                     </option>
-                    <option value="game">
+                    <option value="game" data-testid="game">
                       <Trans i18nKey="rank.game">Games played</Trans>
                     </option>
                     <option value="win">

@@ -2,7 +2,7 @@
 using cjoli.Server.Dtos;
 using cjoli.Server.Models;
 using cjoli.Server.Models.AI;
-using cjoli.Server.Services;
+using cjoli.Server.Services.Rules;
 
 namespace cjoli.Server
 {
@@ -11,6 +11,7 @@ namespace cjoli.Server
         public AutoMapper()
         {
             CreateMap<Tourney, TourneyDto>();
+            CreateMap<IRule, TourneyConfigDto>();
             CreateMap<Phase, PhaseDto>();
             CreateMap<Squad, SquadDto>();
             CreateMap<Position, PositionDto>()
@@ -31,13 +32,13 @@ namespace cjoli.Server
                 .ForMember(x => x.PhaseId, opt => opt.MapFrom(a => a.Squad != null && a.Squad.Phase != null ? a.Squad.Phase.Id : 0))
                 .ForMember(x => x.UserMatch, opt => opt.MapFrom(u => u.UserMatches.SingleOrDefault()))
                 .ForMember(x => x.Estimate, opt => opt.MapFrom(a => a.Estimates.OrderByDescending(s => s.User).FirstOrDefault()));
-            CreateMap<UserMatch, UserMatchDto>().ForMember(x=>x.Time, opt=>opt.MapFrom(u=>u.Match.Time));
+            CreateMap<UserMatch, UserMatchDto>().ForMember(x => x.Time, opt => opt.MapFrom(u => u.Match.Time));
             CreateMap<MatchEstimate, MatchEstimateDto>();
 
             CreateMap<Team, TeamDto>()
                 .ForMember(x => x.Datas, opt => opt.MapFrom(t => t.TeamDatas.SingleOrDefault()))
-                .ForMember(x=>x.Alias, opt=>opt.MapFrom(t=>t.Alias!=null?t.Alias.Name:null))
-                .ForMember(x=>x.Logo, opt=>opt.MapFrom(t=>t.Logo==null && t.Alias!=null?t.Alias.Logo:t.Logo));
+                .ForMember(x => x.Alias, opt => opt.MapFrom(t => t.Alias != null ? t.Alias.Name : null))
+                .ForMember(x => x.Logo, opt => opt.MapFrom(t => t.Logo == null && t.Alias != null ? t.Alias.Logo : t.Logo));
             CreateMap<TeamData, TeamDataDto>();
 
             CreateMap<Ranking, RankingDto>();
@@ -57,7 +58,7 @@ namespace cjoli.Server
 
             CreateMap<TourneyDto, TourneyAI>();
             CreateMap<PhaseDto, PhaseAI>();
-            CreateMap<SquadDto, SquadAI>().ForMember(x=>x.Matches, opt => opt.MapFrom(s => s.Matches!.Where(m => m.Done)));
+            CreateMap<SquadDto, SquadAI>().ForMember(x => x.Matches, opt => opt.MapFrom(s => s.Matches!.Where(m => m.Done)));
             CreateMap<MatchDto, MatchAI>();
             CreateMap<PositionDto, PositionAI>();
             CreateMap<TeamDto, TeamAI>();
