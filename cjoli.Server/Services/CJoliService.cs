@@ -19,6 +19,7 @@ namespace cjoli.Server.Services
         {
             _estimateService = estimateService;
             _mapper = mapper;
+            _rules.Add("simple", new SimpleRule());
             _rules.Add("scooby", new ScoobyRule());
             _rules.Add("henderson", new HendersonRule(this));
         }

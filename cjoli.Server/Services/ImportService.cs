@@ -44,6 +44,7 @@ namespace cjoli.Server.Services
                     tourney.Category = tourneyDto.Category ?? tourney.Category;
                     tourney.StartTime = tourneyDto.StartTime != DateTime.MinValue ? tourneyDto.StartTime : tourney.StartTime;
                     tourney.EndTime = tourneyDto.EndTime != DateTime.MinValue ? tourneyDto.EndTime : tourney.EndTime;
+                    tourney.Rule = tourneyDto.Rule ?? tourney.Rule;
 
                 },
                 children: [
