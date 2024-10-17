@@ -44,12 +44,16 @@ type Action =
       type: CJoliActions.LOAD_RANKING;
       payload: Ranking;
     }
-  | { type: CJoliActions.SELECT_DAY; payload: string };
+  | { type: CJoliActions.SELECT_DAY; payload: string }
+  | { type: CJoliActions.LOAD_TOURNEY; payload: Tourney };
 
 const reducer = (state: CJoliState, action: Action) => {
   switch (action.type) {
     case CJoliActions.LOAD_TOURNEYS: {
       return { ...state, tourneys: action.payload };
+    }
+    case CJoliActions.LOAD_TOURNEY: {
+      return { ...state, tourney: action.payload };
     }
     case CJoliActions.SELECT_TOURNEY: {
       return { ...state, tourney: action.payload };

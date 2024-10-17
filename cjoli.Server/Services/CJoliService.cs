@@ -29,6 +29,11 @@ namespace cjoli.Server.Services
             return context.Tourneys.OrderByDescending(t => t.StartTime).ToList();
         }
 
+        public List<Team> ListTeams(CJoliContext context)
+        {
+            return context.Team.OrderBy(t => t.Name).ToList();
+        }
+
         private User GetUserWithConfigMatch(string login, string tourneyUid, CJoliContext context)
         {
             User? user = context.Users.Include(u => u.Configs.Where(c => c.Tourney.Uid == tourneyUid)).Include(u => u.UserMatches).SingleOrDefault(u => u.Login == login);
@@ -520,6 +525,8 @@ namespace cjoli.Server.Services
             }
             team.Logo = teamDto.Logo ?? team.Logo;
             team.Youngest = teamDto.Youngest ?? team.Youngest;
+            team.ShortName = teamDto.ShortName ?? team.ShortName;
+            team.Alias = !string.IsNullOrEmpty(teamDto.Alias) ? context.Team.SingleOrDefault(t => t.Name == teamDto.Alias) : team.Alias;
 
             TeamData? data = team.TeamDatas.SingleOrDefault();
             if (data == null)

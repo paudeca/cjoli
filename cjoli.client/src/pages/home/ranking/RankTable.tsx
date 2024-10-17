@@ -197,7 +197,7 @@ const RankTable = ({ phase }: { phase: Phase }) => {
                               )} - ${name}`}
                               onRemove={handleRemove(userMatches)}
                             />
-                            {tourney?.config.hasPenalty && (
+                            {tourney?.config?.hasPenalty && (
                               <PenaltyIcon positionId={score.positionId} />
                             )}
                             {team && (

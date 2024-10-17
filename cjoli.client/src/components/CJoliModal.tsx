@@ -6,18 +6,29 @@ import {
   ProgressBar,
   Spinner,
 } from "react-bootstrap";
-import { useForm, SubmitHandler, FieldValues, Path } from "react-hook-form";
+import {
+  useForm,
+  SubmitHandler,
+  FieldValues,
+  Path,
+  PathValue,
+} from "react-hook-form";
 import React from "react";
 import { useModal } from "../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
+import CreatableSelect from "react-select/creatable";
+import Select, { SingleValue } from "react-select";
 
 export interface Field<T extends FieldValues> {
   id: Path<T>;
   label: string;
-  type: "text" | "password" | "date" | "number";
+  type: "text" | "password" | "date" | "datetime-local" | "number" | "select";
   required?: boolean;
   validate?: Path<T>;
   autoFocus?: boolean;
+  creatable?: boolean;
+  options?: { label: string; value: number }[];
+  onChange?: (value?: string) => void;
 }
 
 interface CJoliModalProps<T extends FieldValues> {
@@ -40,6 +51,7 @@ const CJoliModal = <T extends FieldValues>({
 
   const {
     register,
+    setValue,
     handleSubmit,
     formState: { errors },
     resetField,
@@ -55,6 +67,44 @@ const CJoliModal = <T extends FieldValues>({
       setShow(false);
     }
     setRunning(false);
+  };
+
+  const createInput = (f: Field<T>) => {
+    switch (f.type) {
+      case "select": {
+        const onChange = (v: SingleValue<{ label: string; value: number }>) => {
+          const value = v?.value as PathValue<T, Path<T>>;
+          setValue(f.id, value);
+          f.onChange && f.onChange(value);
+        };
+        return f.creatable ? (
+          <CreatableSelect
+            options={f.options}
+            onChange={onChange}
+            isClearable
+          />
+        ) : (
+          <Select options={f.options} onChange={onChange} isClearable />
+        );
+      }
+      default:
+        return (
+          <Form.Control
+            type={f.type}
+            autoFocus={f.autoFocus}
+            {...register(f.id, {
+              required: f.required
+                ? t("error.required", { field: f.label })
+                : false,
+              validate: (value) =>
+                f.validate && watch(f.validate) !== value
+                  ? t("error.invalid", { field: f.label })
+                  : undefined,
+            })}
+            className={`${errors[f.id] ? "is-invalid" : ""}`}
+          />
+        );
+    }
   };
 
   return (
@@ -78,20 +128,7 @@ const CJoliModal = <T extends FieldValues>({
           {fields.map((f) => (
             <Form.Group key={f.id} className="mb-3" controlId={f.id as string}>
               <Form.Label>{f.label}</Form.Label>
-              <Form.Control
-                type={f.type}
-                autoFocus={f.autoFocus}
-                {...register(f.id, {
-                  required: f.required
-                    ? t("error.required", { field: f.label })
-                    : false,
-                  validate: (value) =>
-                    f.validate && watch(f.validate) !== value
-                      ? t("error.invalid", { field: f.label })
-                      : undefined,
-                })}
-                className={`${errors[f.id] ? "is-invalid" : ""}`}
-              />
+              {createInput(f)}
               <Form.Control.Feedback type="invalid">
                 {errors[f.id]?.message as string}
               </Form.Control.Feedback>

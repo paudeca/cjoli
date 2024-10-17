@@ -10,6 +10,7 @@ import MainPage from "./pages/MainPage";
 import { ToastProvider } from "./contexts/ToastContext";
 import RankPage from "./pages/RankPage";
 import ChatPage from "./pages/ChatPage";
+import SettingPage from "./pages/SettingPage";
 
 const theme = {
   colors: {
@@ -34,6 +35,7 @@ const router = createBrowserRouter([
       { path: ":uid/team/:teamId", element: <HomePage /> },
       { path: ":uid/team/:teamId/phase/:phaseId", element: <HomePage /> },
       { path: ":uid/chat", element: <ChatPage /> },
+      { path: ":uid/setting", element: <SettingPage /> },
     ],
   },
 ]);

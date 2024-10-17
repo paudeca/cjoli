@@ -14,7 +14,9 @@ import EstimateButton from "../components/EstimateButton";
 import ButtonFixed from "../components/ButtonFixed";
 import useScreenSize from "../hooks/useScreenSize";
 import { useToast } from "../hooks/useToast";
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
+import moment from "moment";
+
 
 const MainPage = () => {
   const { loadUser, isConnected } = useUser();
@@ -28,6 +30,11 @@ const MainPage = () => {
   const { pathname } = useLocation();
   const { isMobile } = useScreenSize();
   const isOnChat = pathname.endsWith("chat");
+  const { i18n } = useTranslation();
+
+
+  moment.locale(i18n.resolvedLanguage);
+
 
   React.useEffect(() => {
     const call = async () => {

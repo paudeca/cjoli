@@ -1,15 +1,16 @@
-import { Card, Col, Container, Row, Spinner } from "react-bootstrap";
+import { Button, Card, Col, Container, Row, Spinner } from "react-bootstrap";
 import CJoliCard from "../components/CJoliCard";
 import CJoliStack from "../components/CJoliStack";
 import { useNavigate } from "react-router-dom";
 import { useCJoli } from "../hooks/useCJoli";
 import moment from "moment";
 import { useTools } from "../hooks/useTools";
-import { Clock, ClockHistory } from "react-bootstrap-icons";
+import { Clock, ClockHistory, PlusLg } from "react-bootstrap-icons";
 import { Tourney } from "../models";
 import React from "react";
 import styled from "@emotion/styled";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
+import { useUser } from "../hooks/useUser";
 
 const Title = ({ title, icon }: { title: string; icon: React.ReactNode }) => {
   return (
@@ -31,9 +32,9 @@ const SelectPage = () => {
   const navigate = useNavigate();
   const { tourneys, selectTourney } = useCJoli();
   const { formatDate } = useTools();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const {isAdmin} = useUser();
 
-  moment.locale(i18n.resolvedLanguage);
   const now = moment();
 
   let datas: {
@@ -132,6 +133,9 @@ const SelectPage = () => {
                     </Row>
                   </React.Fragment>
                 ))}
+                {isAdmin && <Row>
+                  <Col><Button variant="primary"><PlusLg /> <Trans i18nKey="button.newTourney">New Tourney</Trans></Button></Col>
+                </Row>}
             </Container>
           </Card.Body>
         </CJoliCard>

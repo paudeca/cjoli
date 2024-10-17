@@ -5,7 +5,7 @@ const ScoreCellView = ({
   bg,
   text,
 }: {
-  score: number;
+  score: number | string;
   bg: string;
   text: string;
 }) => {

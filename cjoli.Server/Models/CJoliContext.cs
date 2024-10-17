@@ -35,7 +35,7 @@ namespace cjoli.Server.Models
 
             modelBuilder.Entity<Position>().HasOne(p => p.ParentPosition).WithOne(p => p.Position).OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<ParentPosition>().HasOne(p => p.Position).WithOne(p => p.ParentPosition).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<ParentPosition>().HasOne(p => p.Position).WithOne(p => p.ParentPosition).OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Match>().HasMany(m => m.UserMatches).WithOne(u => u.Match).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Match>().HasMany(m => m.MatchResults).WithOne(m => m.Match).OnDelete(DeleteBehavior.Cascade);

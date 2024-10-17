@@ -15,6 +15,7 @@ namespace cjoli.Server.Services.Rules
         public int Forfeit => 0;
 
         public bool HasPenalty => false;
+        public bool HasForfeit => false;
 
         public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads)
         {

@@ -3,6 +3,7 @@ export enum CJoliActions {
   SELECT_TOURNEY = "SELECT_TOURNEY",
   LOAD_RANKING = "LOAD_RANKING",
   SELECT_DAY = "SELECT_DAY",
+  LOAD_TOURNEY = "LOAD_TOURNEY",
 }
 
 export enum UserActions {
