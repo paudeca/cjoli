@@ -49,7 +49,7 @@ const MainPage = () => {
       <ButtonFixed>
         <Stack gap={1}>
           {uid && !isOnChat && isMobile && isConnected && <EstimateButton />}
-          {!isOnChat && <ChatButton />}
+          {uid && !isOnChat && <ChatButton />}
         </Stack>
       </ButtonFixed>
       <ToastContainer position="top-end">
