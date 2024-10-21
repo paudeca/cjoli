@@ -15,13 +15,15 @@ namespace cjoli.Server.Controllers
     {
         private readonly CJoliService _service;
         private readonly ImportService _importService;
+        private readonly AIService _aiService;
         private readonly IMapper _mapper;
         private readonly CJoliContext _context;
 
-        public CJoliController(CJoliService service, ImportService importService, IMapper mapper, CJoliContext context)
+        public CJoliController(CJoliService service, ImportService importService, AIService aiService, IMapper mapper, CJoliContext context)
         {
             _service = service;
             _importService = importService;
+            _aiService = aiService;
             _mapper = mapper;
             _context = context;
         }
@@ -145,6 +147,14 @@ namespace cjoli.Server.Controllers
             var login = GetLogin();
             _service.SaveUserConfig(uuid, login, config, _context);
             return GetRanking(uuid);
+        }
+
+        [HttpGet]
+        [Route("{uuid}/Prompt")]
+        public async Task<string?> Prompt(string uuid)
+        {
+            var login = GetLogin();
+            return await _aiService.Prompt(uuid,"fr",login,_context);
         }
 
 

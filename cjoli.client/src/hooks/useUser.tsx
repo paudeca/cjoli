@@ -41,7 +41,7 @@ export const useUser = () => {
     isAdmin: state.user?.role === "ADMIN",
     userConfig: state.user?.configs?.find(
       (c) => c.tourneyId == tourney?.id
-    ) || { tourneyId: 0, useCustomEstimate: false },
+    ) || { tourneyId: 0, useCustomEstimate: false, favoriteTeamId: 0 },
     loadUser,
     handleSaveUserConfig,
   };

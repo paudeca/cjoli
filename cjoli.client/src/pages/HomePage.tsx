@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { useCJoli } from "../hooks/useCJoli";
 import useUid from "../hooks/useUid";
 import TeamStack from "./home/TeamStack";
+import SummaryStack from "./home/SummaryStack";
 
 const HomePage = () => {
   const { loadRanking, phases } = useCJoli();
@@ -30,7 +31,8 @@ const HomePage = () => {
   }
   return (
     <Loading ready={ready}>
-      {teamId && <TeamStack />} 
+      {teamId && <TeamStack />}
+      {!teamId && <SummaryStack />}
       <RankingStack phase={phase} />
       <MatchesStack phase={phase} />
     </Loading>

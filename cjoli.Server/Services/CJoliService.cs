@@ -36,7 +36,9 @@ namespace cjoli.Server.Services
 
         private User GetUserWithConfigMatch(string login, string tourneyUid, CJoliContext context)
         {
-            User? user = context.Users.Include(u => u.Configs.Where(c => c.Tourney.Uid == tourneyUid)).Include(u => u.UserMatches).SingleOrDefault(u => u.Login == login);
+            User? user = context.Users
+                .Include(u => u.Configs.Where(c => c.Tourney.Uid == tourneyUid)).ThenInclude(c=>c.FavoriteTeam)
+                .Include(u => u.UserMatches).SingleOrDefault(u => u.Login == login);
             if (user == null)
             {
                 throw new NotFoundException("User", login);
@@ -46,7 +48,7 @@ namespace cjoli.Server.Services
 
         private User? GetUserWithConfig(string? login, string tourneyUid, CJoliContext context)
         {
-            return context.Users.Include(u => u.Configs.Where(c => c.Tourney.Uid == tourneyUid)).SingleOrDefault(u => u.Login == login);
+            return context.Users.Include(u => u.Configs.Where(c => c.Tourney.Uid == tourneyUid)).ThenInclude(c => c.FavoriteTeam).SingleOrDefault(u => u.Login == login);
         }
 
         private Tourney GetTourney(string tourneyUid, User? user, CJoliContext context)
@@ -472,7 +474,7 @@ namespace cjoli.Server.Services
 
         public void SaveUserConfig(string tourneyUid, string login, UserConfigDto dto, CJoliContext context)
         {
-            Tourney? tourney = context.Tourneys.SingleOrDefault(t => t.Uid == tourneyUid);
+            Tourney? tourney = context.Tourneys.Include(t=>t.Teams).SingleOrDefault(t => t.Uid == tourneyUid);
             if (tourney == null)
             {
                 throw new NotFoundException("Touney", tourneyUid);
@@ -489,6 +491,7 @@ namespace cjoli.Server.Services
                 user.Configs.Add(config);
             }
             config.UseCustomEstimate = dto.UseCustomEstimate;
+            config.FavoriteTeam = dto.FavoriteTeamId>0?tourney.Teams.Single(t => t.Id == dto.FavoriteTeamId):null;
             context.SaveChanges();
         }
 
@@ -526,6 +529,7 @@ namespace cjoli.Server.Services
             team.Logo = teamDto.Logo ?? team.Logo;
             team.Youngest = teamDto.Youngest ?? team.Youngest;
             team.ShortName = teamDto.ShortName ?? team.ShortName;
+            team.FullName = teamDto.FullName ?? team.FullName;
             team.Alias = !string.IsNullOrEmpty(teamDto.Alias) ? context.Team.SingleOrDefault(t => t.Name == teamDto.Alias) : team.Alias;
 
             TeamData? data = team.TeamDatas.SingleOrDefault();

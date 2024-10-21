@@ -35,7 +35,7 @@ const ScoreCellInput = ({
         {...register(id)}
         placeholder={placeholder}
       />
-      {isConnected && tourney?.config.hasForfeit && (
+      {isConnected && tourney?.config?.hasForfeit && (
         <DropdownButton variant="outline-secondary" title="">
           <Dropdown.Item
             href="#"
