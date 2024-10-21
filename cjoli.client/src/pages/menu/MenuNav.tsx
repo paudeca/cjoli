@@ -16,7 +16,13 @@ import LoginModal from "../../modals/LoginModal";
 import RegisterModal from "../../modals/RegisterModal";
 import UpdateModal from "../../modals/UpdateModal";
 import * as cjoliService from "../../services/cjoliService";
-import { Bezier2, House, ListOl, PersonSquare } from "react-bootstrap-icons";
+import {
+  Bezier2,
+  GearWide,
+  House,
+  ListOl,
+  PersonSquare,
+} from "react-bootstrap-icons";
 import { useUser } from "../../hooks/useUser";
 import { useNavigate } from "react-router-dom";
 import useScreenSize from "../../hooks/useScreenSize";
@@ -57,6 +63,7 @@ const MenuNav = () => {
     }
   };
   const [show, setShow] = React.useState(false);
+  const { isAdmin } = useUser();
 
   const { register } = useForm<UserConfig>({
     values: userConfig,
@@ -161,6 +168,17 @@ const MenuNav = () => {
                     <ListOl size={30} className="mx-2" />
                     <Trans i18nKey="menu.ranking">Ranking</Trans>
                   </Nav.Link>
+                  {isAdmin && (
+                    <Nav.Link
+                      onClick={() => {
+                        navigate(`${uid}/setting`);
+                        setShow(false);
+                      }}
+                    >
+                      <GearWide size={30} className="mx-2" />
+                      <Trans i18nKey="menu.setting">Setting</Trans>
+                    </Nav.Link>
+                  )}
                 </>
               )}
               <NavDropdown

@@ -173,7 +173,7 @@ const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
     },
   ];
 
-  if (tourney?.config.hasPenalty) {
+  if (tourney?.config?.hasPenalty) {
     columns = [
       ...columns,
       {

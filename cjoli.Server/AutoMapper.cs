@@ -21,6 +21,7 @@ namespace cjoli.Server
             CreateMap<ParentPosition, ParentPositionDto>()
                 .ForMember(x => x.SquadId, opt => opt.MapFrom(a => a.Squad.Id))
                 .ForMember(x => x.Squad, opt => opt.MapFrom(a => a.Squad.Name))
+                .ForMember(x => x.PhaseId, opt => opt.MapFrom(a => a.Squad.Phase.Id))
                 .ForMember(x => x.Phase, opt => opt.MapFrom(a => a.Squad.Phase.Name));
 
             CreateMap<Match, MatchDto>()

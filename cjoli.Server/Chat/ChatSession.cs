@@ -1,5 +1,4 @@
 ﻿using Azure.AI.OpenAI;
-using cjoli.Server.Services;
 
 namespace cjoli.Server.Chat
 {

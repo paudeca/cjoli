@@ -2,6 +2,7 @@ import { IMatch } from "./IMatch";
 import { Tourney } from "./Tourney";
 import { TourneyConfig } from "./TourneyConfig";
 import { Match } from "./Match";
+import { ParentPosition } from "./ParentPosition";
 import { Phase } from "./Phase";
 import { Position } from "./Position";
 import { Rank } from "./Rank";
@@ -21,6 +22,7 @@ export type {
   Tourney,
   TourneyConfig,
   Match,
+  ParentPosition,
   Phase,
   Position,
   Rank,

@@ -64,7 +64,8 @@ export const createTourney = ({
   phases: phases ?? [],
   ranks: ranks ?? [],
   teams: [],
-  config: { hasPenalty: false },
+  config: { hasPenalty: false, hasForfeit: false },
+  rule: "simple",
 });
 
 export const createScore: () => Score = () => ({

@@ -1,0 +1,186 @@
+import React from "react";
+import { Accordion, Button, Card, Col, Row } from "react-bootstrap";
+import { useSetting } from "../../hooks/useSetting";
+import AddRankModal from "./AddRankModal";
+import { Rank } from "../../models";
+import { useModal } from "../../hooks/useModal";
+import Select from "react-select";
+import { Trash3 } from "react-bootstrap-icons";
+import ConfirmationModal from "../../modals/ConfirmationModal";
+import useUid from "../../hooks/useUid";
+import { useCJoli } from "../../hooks/useCJoli";
+import * as settingService from "../../services/settingService";
+
+const RanksSetting = () => {
+  const uid = useUid();
+  const { tourney, saveTourney, rank, selectRank, setValue } = useSetting();
+  const { loadTourney } = useCJoli();
+  const { setShow: showAddRank } = useModal("addRank");
+  const { setShow: showConfirmDelete } = useModal("confirmDeleteRank");
+
+  const [ranks, setRanks] = React.useState<Rank[]>(tourney.ranks);
+
+  const addRank = React.useCallback(
+    async (rank: Rank) => {
+      rank.order = tourney.ranks.length + 1;
+      saveTourney({
+        ...tourney,
+        ranks: [...tourney.ranks, rank],
+      });
+      return true;
+    },
+    [tourney, saveTourney]
+  );
+
+  const getLabel = React.useCallback(
+    (rank: Rank) => {
+      const phase = tourney.phases.find((p) => p.id == rank.phaseId);
+      const squad = phase?.squads.find((s) => s.id == rank.squadId);
+      return `${rank.order} - ${phase?.name} - ${squad?.name} - ${rank.value}`;
+    },
+    [tourney]
+  );
+
+  const removeRank = React.useCallback(async () => {
+    if (!rank) {
+      return false;
+    }
+    const tourney = await settingService.removeRank(uid, rank.id);
+    loadTourney(tourney);
+    return true;
+  }, [uid, rank, loadTourney]);
+
+  return (
+    <Card>
+      <Card.Body>
+        <Card.Title className="mb-3">Rank</Card.Title>
+
+        <Accordion
+          className="p-3"
+          onSelect={(e) => {
+            selectRank(tourney.ranks.find((r) => r.id.toString() == e)!);
+          }}
+        >
+          {tourney.ranks.map((rank, i) => {
+            const optionsPhase = tourney.phases.map((p) => ({
+              label: p.name,
+              value: p.id,
+            }));
+
+            const r = ranks[i];
+            const phase = tourney.phases.find((p) => p.id == r.phaseId);
+            const optionsSquad = phase?.squads.map((s) => ({
+              label: s.name,
+              value: s.id,
+            }));
+            const squad = phase?.squads.find((s) => s.id == r.squadId);
+
+            const optionsValue = [...Array(squad?.positions.length).keys()].map(
+              (i) => ({
+                label: (i + 1).toString(),
+                value: i + 1,
+              })
+            );
+
+            return (
+              <Accordion.Item key={rank.id} eventKey={rank.id.toString()}>
+                <Accordion.Header>{getLabel(rank)}</Accordion.Header>
+                <Accordion.Body>
+                  <Row className="px-3 py-3">
+                    <Col xs={4}>
+                      <Select
+                        options={optionsPhase}
+                        defaultValue={optionsPhase?.find(
+                          (o) => o.value == r.phaseId
+                        )}
+                        onChange={(val) => {
+                          setRanks(
+                            ranks.map((r, j) =>
+                              i == j
+                                ? ({
+                                    ...r,
+                                    phaseId: val?.value,
+                                    squadId: 0,
+                                    value: 0,
+                                  } as Rank)
+                                : r
+                            )
+                          );
+                          setValue(`ranks.${i}.phaseId`, val?.value || 0);
+                        }}
+                        isClearable
+                        placeholder="Select Phase"
+                      />
+                    </Col>
+                    <Col xs={4}>
+                      <Select
+                        options={optionsSquad}
+                        defaultValue={optionsSquad?.find(
+                          (o) => o.value == r.squadId
+                        )}
+                        onChange={(val) => {
+                          setRanks(
+                            ranks.map((r, j) =>
+                              i == j
+                                ? ({
+                                    ...r,
+                                    squadId: val?.value,
+                                    value: 0,
+                                  } as Rank)
+                                : r
+                            )
+                          );
+                          setValue(`ranks.${i}.squadId`, val?.value || 0);
+                        }}
+                        isClearable
+                        placeholder="Select Squad"
+                      />
+                    </Col>
+                    <Col xs={4}>
+                      <Select
+                        options={optionsValue}
+                        defaultValue={optionsValue?.find(
+                          (o) => o.value == r.value
+                        )}
+                        onChange={(val) => {
+                          setValue(`ranks.${i}.value`, val?.value || 0);
+                        }}
+                        isClearable
+                        placeholder="Select Position"
+                      />
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col>
+                      <Button
+                        variant="danger"
+                        onClick={() => showConfirmDelete(true)}
+                      >
+                        <Trash3 />
+                      </Button>
+                    </Col>
+                  </Row>
+                </Accordion.Body>
+              </Accordion.Item>
+            );
+          })}
+        </Accordion>
+        <Row>
+          <Col>
+            <Button onClick={() => showAddRank(true)}>Add Rank</Button>
+          </Col>
+        </Row>
+      </Card.Body>
+      <AddRankModal onAddRank={addRank} />
+      <ConfirmationModal
+        id="confirmDeleteRank"
+        title="Remove Rank"
+        onConfirm={removeRank}
+      >
+        Are you sure you want to remove this position '{rank?.value}'?
+      </ConfirmationModal>
+    </Card>
+  );
+};
+
+export default RanksSetting;

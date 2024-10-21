@@ -14,5 +14,6 @@ export interface Tourney {
   phases: Phase[];
   teams: Team[];
   ranks: Rank[];
+  rule: string;
   config: TourneyConfig;
 }

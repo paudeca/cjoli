@@ -149,6 +149,9 @@ const MatchRow = ({
                   <ScoreButton action="save" onClick={() => saveMatch(match)} />
                 </>
               )}
+              {!isConnected && (
+                <ScoreCellView score={"-"} bg="light" text="black" />
+              )}
             </MyScoreDiv>
           </td>
         )}

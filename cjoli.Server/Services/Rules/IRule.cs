@@ -10,6 +10,7 @@ namespace cjoli.Server.Services.Rules
         int Loss { get; }
         int Forfeit { get; }
         bool HasPenalty { get; }
+        bool HasForfeit { get; }
 
         Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads);
     }

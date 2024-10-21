@@ -21,7 +21,8 @@
     "refreshEstimate": "Refresh estimate",
     "custom": "Custom",
     "useCustom": "use personal estimate",
-    "menu": "Menu"
+    "menu": "Menu",
+    "setting": "Setting"
   },
   "error": {
     "invalid": "{{field}} is invalid",
@@ -35,7 +36,9 @@
     "send": "Send",
     "botAI": "Chat with BotAI",
     "back": "Back",
-    "edit": "Edit"
+    "edit": "Edit",
+    "yes": "Yes",
+    "no": "No"
   },
   "penalty": {
     "label": "Penalties",
@@ -81,7 +84,10 @@
     },
     "form": {
       "logo": "Logo",
-      "youngest": "Youngest (date)"
+      "youngest": "Youngest (date)",
+      "name": "Name",
+      "shortName": "Short Name",
+      "alias": "Alias"
     },
     "error": {
       "update": "Unable to update Team"

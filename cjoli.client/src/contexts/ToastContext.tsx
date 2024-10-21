@@ -20,7 +20,11 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
     type: "success",
     message: "",
   });
-  const showToast = (type: Type, message: string) => {
+  const showToast = async (type: Type, message: string) => {
+    if (state.show) {
+      hideToast();
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    }
     setState({ show: true, type, message });
   };
   const hideToast = () => {

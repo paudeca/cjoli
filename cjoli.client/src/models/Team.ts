@@ -7,4 +7,5 @@ export interface Team {
   logo?: string;
   youngest?: string;
   datas?: TeamData;
+  alias?: string;
 }

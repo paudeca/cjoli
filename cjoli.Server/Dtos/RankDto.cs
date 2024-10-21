@@ -7,8 +7,8 @@
         public int Value { get; set; }
         public int PhaseId { get; set; }
         public int SquadId { get; set; }
-        public required string Phase { get; set; }
-        public required string Squad { get; set; }
+        public string? Phase { get; set; }
+        public string? Squad { get; set; }
         public string? Name { get; set; }
         public int TeamId { get; set; }
     }

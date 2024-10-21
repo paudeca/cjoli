@@ -35,6 +35,13 @@ export const useCJoli = () => {
       dispatch({ type: CJoliActions.LOAD_RANKING, payload: ranking }),
     [dispatch]
   );
+
+  const loadTourney = React.useCallback(
+    (tourney: Tourney) =>
+      dispatch({ type: CJoliActions.LOAD_TOURNEY, payload: tourney }),
+    [dispatch]
+  );
+
   const getSquad = React.useCallback(
     (squadId: number) => {
       const squad = state.squads?.find((s) => s.id === squadId);
@@ -202,6 +209,7 @@ export const useCJoli = () => {
     ...state,
     loadRanking,
     loadTourneys,
+    loadTourney,
     selectTourney,
     getSquad,
     getTeam,

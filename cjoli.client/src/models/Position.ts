@@ -1,3 +1,5 @@
+import { ParentPosition } from "./ParentPosition";
+
 export interface Position {
   id: number;
   value: number;
@@ -6,4 +8,5 @@ export interface Position {
   teamId: number;
   squadId: number;
   penalty: number;
+  parentPosition?: ParentPosition;
 }

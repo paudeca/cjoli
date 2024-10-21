@@ -3,8 +3,9 @@ import { Match } from "../../../models";
 import { useUser } from "../../../hooks/useUser";
 import { FieldValues, UseFormRegister } from "react-hook-form";
 import { Trans } from "react-i18next";
+import { useCJoli } from "../../../hooks/useCJoli";
 
-interface ScoreCellProps {
+interface ScoreCellInputProps {
   id: string;
   match: Match;
   teamA?: boolean;
@@ -13,14 +14,15 @@ interface ScoreCellProps {
   register: UseFormRegister<FieldValues>;
 }
 
-const ScoreCell = ({
+const ScoreCellInput = ({
   id,
   match,
   teamA,
   saveMatch,
   register,
-}: ScoreCellProps) => {
+}: ScoreCellInputProps) => {
   const { isConnected } = useUser();
+  const { tourney } = useCJoli();
   const placeholder = teamA
     ? match.estimate?.scoreA.toString()
     : match.estimate?.scoreB.toString();
@@ -33,7 +35,7 @@ const ScoreCell = ({
         {...register(id)}
         placeholder={placeholder}
       />
-      {isConnected && (
+      {isConnected && tourney?.config.hasForfeit && (
         <DropdownButton variant="outline-secondary" title="">
           <Dropdown.Item
             href="#"
@@ -55,4 +57,4 @@ const ScoreCell = ({
   );
 };
 
-export default ScoreCell;
+export default ScoreCellInput;

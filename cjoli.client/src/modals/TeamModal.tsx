@@ -14,10 +14,25 @@ const TeamModal = ({ team }: { team?: Team }) => {
 
   const fields: Field<Team>[] = [
     {
+      id: "name",
+      label: t("team.form.name", "Name"),
+      type: "text",
+      autoFocus: true,
+    },
+    {
+      id: "shortName",
+      label: t("team.form.shortName", "ShortName"),
+      type: "text",
+    },
+    {
+      id: "alias",
+      label: t("team.form.alias", "Alias"),
+      type: "text",
+    },
+    {
       id: "logo",
       label: t("team.form.logo", "Logo"),
       type: "text",
-      autoFocus: true,
     },
     {
       id: "youngest",

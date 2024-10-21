@@ -17,7 +17,16 @@ describe("RankPage", () => {
     const get = mockGetRanking(uid, () =>
       createTourney({
         id: 1,
-        ranks: [{ id: 1, order: 1, squadId: 1, value: 1, name: "rank-name" }],
+        ranks: [
+          {
+            id: 1,
+            order: 1,
+            phaseId: 1,
+            squadId: 1,
+            value: 1,
+            name: "rank-name",
+          },
+        ],
       })
     );
 

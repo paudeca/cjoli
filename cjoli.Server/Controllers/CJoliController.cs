@@ -40,7 +40,14 @@ namespace cjoli.Server.Controllers
         [Route("Tourneys")]
         public List<TourneyDto> ListTourneys()
         {
-            return _service.ListTourneys(_context).Select(t => _mapper.Map<TourneyDto>(t)).ToList();
+            return _service.ListTourneys(_context).Select(_mapper.Map<TourneyDto>).ToList();
+        }
+
+        [HttpGet]
+        [Route("Teams")]
+        public List<TeamDto> ListTeams()
+        {
+            return _service.ListTeams(_context).Select(_mapper.Map<TeamDto>).ToList();
         }
 
 
