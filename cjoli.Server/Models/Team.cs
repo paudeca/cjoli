@@ -17,5 +17,6 @@ namespace cjoli.Server.Models
 
         public IList<MatchResult> MatchResults { get; set; } = new List<MatchResult>();
         public IList<TeamData> TeamDatas { get; set; } = new List<TeamData>();
+        public IList<UserConfig> UserConfigs { get; set; } = new List<UserConfig>();
     }
 }

@@ -8,7 +8,9 @@
     "de": "Deutsch"
   },
   "user": {
-    "guest": "Guest"
+    "guest": "Guest",
+    "favoriteSaved": "Favorite team saved",
+    "favoriteRemoved": "Favorite team removed"
   },
   "menu": {
     "home": "Home",

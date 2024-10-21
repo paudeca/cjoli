@@ -47,12 +47,14 @@ namespace cjoli.Server.Models
             modelBuilder.Entity<Team>().HasMany(t => t.Positions).WithOne(p => p.Team).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<Team>().HasMany(t => t.MatchResults).WithOne(m => m.Team).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Team>().HasOne(t => t.Alias).WithMany(t => t.Children).OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Team>().HasMany(t => t.UserConfigs).WithOne(c => c.FavoriteTeam).OnDelete(DeleteBehavior.SetNull);
 
             var provider = Database.GetService<IDataProtectionProvider>();
 
             modelBuilder.Entity<User>().Property(u => u.Password).HasConversion(u => provider.CreateProtector(CRYPT_PURPOSE).Protect(u), u => provider.CreateProtector(CRYPT_PURPOSE).Unprotect(u));
             modelBuilder.Entity<User>().HasIndex(t => t.Login).IsUnique();
             modelBuilder.Entity<User>().HasMany(u => u.UserMatches).WithOne(u => u.User).OnDelete(DeleteBehavior.Cascade);
+
         }
 
     }

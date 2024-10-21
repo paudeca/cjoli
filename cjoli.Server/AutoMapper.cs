@@ -55,7 +55,9 @@ namespace cjoli.Server
             CreateMap<Score, Score>();
 
             CreateMap<User, UserDto>().ForMember(x => x.Password, opt => opt.Ignore());
-            CreateMap<UserConfig, UserConfigDto>().ForMember(x => x.TourneyId, opt => opt.MapFrom(u => u.Tourney.Id));
+            CreateMap<UserConfig, UserConfigDto>()
+                .ForMember(x => x.TourneyId, opt => opt.MapFrom(u => u.Tourney.Id))
+                .ForMember(x => x.FavoriteTeamId, opt => opt.MapFrom(u => u.FavoriteTeam != null ? u.FavoriteTeam.Id : 0));
 
             CreateMap<TourneyDto, TourneyAI>();
             CreateMap<PhaseDto, PhaseAI>();

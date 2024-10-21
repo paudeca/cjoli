@@ -9,5 +9,6 @@ namespace cjoli.Server.Models
         public required User User { get; set; }
         public required Tourney Tourney { get; set; }
         public bool UseCustomEstimate { get; set; }
+        public Team? FavoriteTeam { get; set; }
     }
 }
