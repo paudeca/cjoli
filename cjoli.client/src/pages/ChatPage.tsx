@@ -18,6 +18,7 @@ import useUid from "../hooks/useUid";
 import { useNavigate } from "react-router-dom";
 import useScreenSize from "../hooks/useScreenSize";
 import { Trans, useTranslation } from "react-i18next";
+import { useUser } from "../hooks/useUser";
 
 interface Message {
   message: string;
@@ -31,9 +32,12 @@ const ChatPage = () => {
   const [messages, setMessages] = React.useState<Message[]>([]);
   const uid = useUid();
   const { i18n } = useTranslation();
+  const { user } = useUser();
   const { sendMessage, lastMessage, readyState } = useWebSocket<{
     message: string;
-  }>(`${server}/chat/${uid}/ws?lang=${i18n.resolvedLanguage}`);
+  }>(
+    `${server}/chat/${uid}/ws?lang=${i18n.resolvedLanguage}&login=${user?.login}`
+  );
   React.useEffect(() => {
     if (lastMessage != null) {
       setMessages((messages) => [

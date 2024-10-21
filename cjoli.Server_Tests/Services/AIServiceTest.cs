@@ -50,7 +50,7 @@ namespace cjoli.Server_Tests.Services
             _context.SaveChanges();
             SetResponse("myMessage");
 
-            var session = _service.CreateSession(tourney.Uid, "fr", _context);
+            var session = _service.CreateSessionForChat(tourney.Uid, "fr", null, _context);
 
             var called = false;
             session.OnReply += (sender, m) =>

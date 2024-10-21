@@ -81,6 +81,7 @@ namespace cjoli.Server.Services
                     team.Logo = teamDto.Logo ?? team.Logo;
                     team.Youngest = teamDto.Youngest ?? team.Youngest;
                     team.ShortName = teamDto.ShortName ?? team.ShortName;
+                    team.FullName = teamDto.FullName ?? team.FullName;
                     team.Alias = context.Team.SingleOrDefault(t => t.Name == teamDto.Alias);
                 }
             );
@@ -236,13 +237,13 @@ namespace cjoli.Server.Services
                 Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions)
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches)
                 .Include(t => t.Teams)
-                .Include(t=>t.Ranks.OrderBy(r=>r.Order))
+                .Include(t => t.Ranks.OrderBy(r => r.Order))
                 .Single(t => t.Uid == uid);
         }
 
         public Tourney RemoveTeam(string uid, int teamId, CJoliContext context)
         {
-            Tourney tourney = GetTourney(uid,context);
+            Tourney tourney = GetTourney(uid, context);
             Team team = tourney.Teams.Single(t => t.Id == teamId);
             tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Positions).Where(p => p.Team == team).ToList().ForEach(p => p.Team = null);
             tourney.Teams.Remove(team);
@@ -288,7 +289,7 @@ namespace cjoli.Server.Services
             Rank rank = tourney.Ranks.Single(r => r.Id == rankId);
             tourney.Ranks.Remove(rank);
             context.Remove(rank);
-            for(int i=0;i<tourney.Ranks.Count;i++)
+            for (int i = 0; i < tourney.Ranks.Count; i++)
             {
                 tourney.Ranks[i].Order = i + 1;
             }

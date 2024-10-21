@@ -2,6 +2,7 @@
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
+using System.Security.Claims;
 using System.Text;
 
 namespace cjoli.Server.Controllers
@@ -19,14 +20,25 @@ namespace cjoli.Server.Controllers
             _context = context;
         }
 
+        private string? GetLogin()
+        {
+            if (User.Identity == null || !this.User.Identity.IsAuthenticated)
+            {
+                return null;
+            }
+            return User.Claims.First(i => i.Type == ClaimTypes.NameIdentifier).Value;
+        }
+
+
+
         [HttpGet]
         [Route("{uuid}/ws")]
-        public async Task Get(string uuid, [FromQuery] string lang)
+        public async Task Get(string uuid, [FromQuery] string lang, [FromQuery] string login)
         {
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                await Bot(webSocket, uuid, lang);
+                await Bot(webSocket, uuid, lang, login);
             }
             else
             {
@@ -34,9 +46,9 @@ namespace cjoli.Server.Controllers
             }
         }
 
-        private async Task Bot(WebSocket webSocket, string uuid, string lang)
+        private async Task Bot(WebSocket webSocket, string uuid, string lang, string login)
         {
-            var session = _service.CreateSession(uuid, lang, _context);
+            var session = _service.CreateSessionForChat(uuid, lang, login,_context);
             session.OnReply += async (sender, e) => { await SendMessage(e.Message, webSocket); };
             await _service.PromptMessage(session);
 

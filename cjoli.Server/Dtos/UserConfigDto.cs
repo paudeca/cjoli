@@ -6,5 +6,6 @@
         public int TourneyId { get; set; }
 
         public bool UseCustomEstimate { get; set; }
+        public int FavoriteTeamId { get; set; }
     }
 }

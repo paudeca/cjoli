@@ -130,3 +130,8 @@ export const saveUserConfig = async (uid: string, userConfig: UserConfig) => {
   );
   return data;
 };
+
+export const prompt = async (uid: string) => {
+  const { data } = await axios.get(`${url}/cjoli/${uid}/prompt`);
+  return data;
+};

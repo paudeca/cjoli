@@ -13,9 +13,11 @@ namespace cjoli.Server.Models
         public DateOnly? Youngest { get; set; }
         public string? ShortName { get; set; }
         public Team? Alias { get; set; }
-        public IList<Team>? Children { get; set; }
+        public string? FullName { get; set; }
 
+        public IList<Team>? Children { get; set; }
         public IList<MatchResult> MatchResults { get; set; } = new List<MatchResult>();
         public IList<TeamData> TeamDatas { get; set; } = new List<TeamData>();
+        public IList<UserConfig> UserConfigs { get; set; } = new List<UserConfig>();
     }
 }

@@ -7,6 +7,7 @@ using cjoli.Server.Models;
 using cjoli.Server.Models.AI;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 
 namespace cjoli.Server.Services
 {
@@ -32,18 +33,64 @@ namespace cjoli.Server.Services
         }
 
 
-        public ChatSession CreateSession(string uuid, string lang, CJoliContext context)
+        public ChatSession CreateSessionForChat(string uuid, string lang, string? login, CJoliContext context)
         {
             Tourney? tourney = context.Tourneys.SingleOrDefault(t => t.Uid == uuid);
             if (tourney == null)
             {
                 throw new NotFoundException("Tourney", uuid);
             }
-            ChatSession session = new();
-            session.Messages.Add(new ChatRequestSystemMessage("" +
+
+            User? user = context.Users.Include(u => u.Configs.Where(c => c.Tourney == tourney)).ThenInclude(c => c.FavoriteTeam).SingleOrDefault(u => u.Login == login);
+            UserConfig? config = user?.Configs[0];
+
+            string prompt = "" +
 @"Tu es assistant durant le tournois d'Hockey sur glace '" + tourney.Name + @"', tu réponds en " + LANGS[lang] + @" avec parfois des emoticones.
-Ton premier message doit indiquer que tu es dans une phase de Beta, et que les réponses ne sont pas fiables.
-Ton équipe préféré est les Lions de Wasquehal."));
+Les réponses ne doivent pas dépasser 5 phrases.
+Ton premier message est un message d'accueil en soutenant une équipe. ";
+            //Ton premier message doit indiquer que tu es dans une phase de Beta, et que les réponses ne sont pas fiables. ";
+            if (config != null && config.FavoriteTeam != null)
+            {
+                prompt += $"Ton équipe préféré est {config.FavoriteTeam.FullName ?? config.FavoriteTeam.Name}.";
+            }
+            return CreateSession(uuid, lang, login, prompt, context);
+        }
+
+        public async Task<string?> Prompt(string uuid, string lang, string? login, CJoliContext context)
+        {
+            var session = CreateSessionForPrompt(uuid, lang, login, "Tu dois les dernières actualités du tournoi ou du dernier match. Ne prendre en compte uniquement les matches passées.", context);
+            return await PromptMessage(session);
+        }
+
+
+        public ChatSession CreateSessionForPrompt(string uuid, string lang, string? login, string initPrompt, CJoliContext context)
+        {
+            Tourney? tourney = context.Tourneys.SingleOrDefault(t => t.Uid == uuid);
+            if (tourney == null)
+            {
+                throw new NotFoundException("Tourney", uuid);
+            }
+
+            User? user = context.Users.Include(u => u.Configs.Where(c => c.Tourney == tourney)).ThenInclude(c => c.FavoriteTeam).SingleOrDefault(u => u.Login == login);
+            UserConfig? config = user?.Configs[0];
+
+            string prompt = "" +
+@"Tu es assistant durant le tournois d'Hockey sur glace '" + tourney.Name + @"', tu réponds en " + LANGS[lang] + @" avec parfois des emoticones.
+Les réponses ne doivent pas dépasser 3 phrases.
+"+initPrompt+". ";
+            //Ton premier message doit indiquer que tu es dans une phase de Beta, et que les réponses ne sont pas fiables. ";
+            if (config != null && config.FavoriteTeam != null)
+            {
+                prompt += $"Ton équipe préféré est {config.FavoriteTeam.FullName ?? config.FavoriteTeam.Name}.";
+            }
+            return CreateSession(uuid, lang, login, prompt, context);
+        }
+
+
+        private ChatSession CreateSession(string uuid, string lang, string? login, string prompt, CJoliContext context)
+        {
+            ChatSession session = new();
+            session.Messages.Add(new ChatRequestSystemMessage(prompt));
 
             var dto = _cjoliService.CreateRanking(uuid, null, context);
 
@@ -77,11 +124,11 @@ Ton équipe préféré est les Lions de Wasquehal."));
         }
 
 
-        public async Task PromptMessage(ChatSession session)
+        public async Task<string?> PromptMessage(ChatSession session)
         {
             var options = new ChatCompletionsOptions()
             {
-                DeploymentName = "gpt-3.5-turbo",
+                DeploymentName = "gpt-4-turbo",
             };
             session.Messages.ForEach(options.Messages.Add);
 
@@ -94,8 +141,10 @@ Ton équipe préféré est les Lions de Wasquehal."));
                     string reply = responseChoice.Message.Content;
                     session.Messages.Add(new ChatRequestAssistantMessage(reply));
                     session.SendReply(reply);
+                    return reply;
                 }
             }
+            return null;
         }
     }
 }

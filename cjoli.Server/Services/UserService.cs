@@ -46,7 +46,10 @@ namespace cjoli.Server.Services
 
         public User GetUserDetail(string login, CJoliContext context)
         {
-            User? user = context.Users.Include(u => u.Configs).ThenInclude(s => s.Tourney).SingleOrDefault(u => u.Login == login);
+            User? user = context.Users
+                .Include(u => u.Configs).ThenInclude(c => c.Tourney)
+                .Include(u=>u.Configs).ThenInclude(c=>c.FavoriteTeam)
+                .SingleOrDefault(u => u.Login == login);
             if (user == null)
             {
                 throw new NotFoundException("User", login);
