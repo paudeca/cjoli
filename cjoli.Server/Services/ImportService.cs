@@ -81,6 +81,7 @@ namespace cjoli.Server.Services
                     team.Logo = teamDto.Logo ?? team.Logo;
                     team.Youngest = teamDto.Youngest ?? team.Youngest;
                     team.ShortName = teamDto.ShortName ?? team.ShortName;
+                    team.FullName = teamDto.FullName ?? team.FullName;
                     team.Alias = context.Team.SingleOrDefault(t => t.Name == teamDto.Alias);
                 }
             );

@@ -89,6 +89,7 @@
       "youngest": "Youngest (date)",
       "name": "Name",
       "shortName": "Short Name",
+      "fullName": "Full Name",
       "alias": "Alias"
     },
     "error": {

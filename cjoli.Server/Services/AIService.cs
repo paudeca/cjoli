@@ -7,6 +7,7 @@ using cjoli.Server.Models;
 using cjoli.Server.Models.AI;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 
 namespace cjoli.Server.Services
 {
@@ -32,18 +33,26 @@ namespace cjoli.Server.Services
         }
 
 
-        public ChatSession CreateSession(string uuid, string lang, CJoliContext context)
+        public ChatSession CreateSession(string uuid, string lang, string login, CJoliContext context)
         {
             Tourney? tourney = context.Tourneys.SingleOrDefault(t => t.Uid == uuid);
             if (tourney == null)
             {
                 throw new NotFoundException("Tourney", uuid);
             }
+            User? user = context.Users.Include(u => u.Configs.Where(c=>c.Tourney==tourney)).ThenInclude(c => c.FavoriteTeam).SingleOrDefault(u => u.Login == login);
+            UserConfig? config = user?.Configs[0];
+
             ChatSession session = new();
-            session.Messages.Add(new ChatRequestSystemMessage("" +
+            string prompt = "" +
 @"Tu es assistant durant le tournois d'Hockey sur glace '" + tourney.Name + @"', tu réponds en " + LANGS[lang] + @" avec parfois des emoticones.
-Ton premier message doit indiquer que tu es dans une phase de Beta, et que les réponses ne sont pas fiables.
-Ton équipe préféré est les Lions de Wasquehal."));
+Ton premier message doit indiquer que tu es dans une phase de Beta, et que les réponses ne sont pas fiables. ";
+            if(config!=null && config.FavoriteTeam!=null)
+            {
+                prompt += $"Ton équipe préféré est {config.FavoriteTeam.FullName ?? config.FavoriteTeam.Name}.";
+            }
+
+            session.Messages.Add(new ChatRequestSystemMessage(prompt));
 
             var dto = _cjoliService.CreateRanking(uuid, null, context);
 

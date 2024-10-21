@@ -21,7 +21,12 @@ const TeamModal = ({ team }: { team?: Team }) => {
     },
     {
       id: "shortName",
-      label: t("team.form.shortName", "ShortName"),
+      label: t("team.form.shortName", "Short Name"),
+      type: "text",
+    },
+    {
+      id: "fullName",
+      label: t("team.form.fullName", "Full Name"),
       type: "text",
     },
     {
