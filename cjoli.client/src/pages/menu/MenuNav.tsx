@@ -10,6 +10,7 @@ import {
   Button,
   Stack,
   Spinner,
+  Badge,
 } from "react-bootstrap";
 import styled from "@emotion/styled";
 import LoginModal from "../../modals/LoginModal";
@@ -21,6 +22,7 @@ import {
   GearWide,
   House,
   ListOl,
+  Person,
   PersonSquare,
 } from "react-bootstrap-icons";
 import { useUser } from "../../hooks/useUser";
@@ -28,13 +30,14 @@ import { useNavigate } from "react-router-dom";
 import useScreenSize from "../../hooks/useScreenSize";
 import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useEstimate } from "../../hooks/useEstimate";
 import { UserConfig } from "../../models";
 import { useModal } from "../../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
-import moment from "moment";
+import dayjs from "dayjs";
+import { useServer } from "../../hooks/useServer";
 
 const MyImg = styled.img<{ width: string }>`
   width: ${(props) => props.width};
@@ -42,7 +45,14 @@ const MyImg = styled.img<{ width: string }>`
 
 const MenuNav = () => {
   const { loadRanking, tourney } = useCJoli();
-  const { user, userConfig, loadUser, handleSaveUserConfig } = useUser();
+  const {
+    user,
+    userConfig,
+    loadUser,
+    handleSaveUserConfig,
+    setCountUser,
+    countUser,
+  } = useUser();
   const uid = useUid();
   const { setShow: showLogin } = useModal("login");
   const { setShow: showRegister } = useModal("register");
@@ -52,6 +62,17 @@ const MenuNav = () => {
   const { loading, handleUpdateEstimate } = useEstimate();
   const { t, i18n } = useTranslation();
   const [lang, setLang] = React.useState(i18n.resolvedLanguage);
+  const { register: registerServer } = useServer();
+
+  /*registerServer("users", (value) => {
+    setCountUser(value);
+  });*/
+
+  useEffect(() => {
+    registerServer("users", (value) => {
+      setCountUser(value);
+    });
+  }, [registerServer, setCountUser]);
 
   const logout = async () => {
     await cjoliService.logout();
@@ -102,6 +123,16 @@ const MenuNav = () => {
               <Col>{t("title", "CJoli - Ice Hockey Tournament")} - 1.0.0</Col>
             )}
             {tourneyLabel && <Col>{tourneyLabel}</Col>}
+            <Col>
+              <Badge
+                bg="secondary"
+                className="d-flex menu"
+                style={{ background: "red !important" }}
+              >
+                {countUser}
+                <Person />
+              </Badge>
+            </Col>
           </Row>
         </Navbar.Brand>
         {user && tourneyLabel && (
@@ -192,7 +223,7 @@ const MenuNav = () => {
                       onClick={() => {
                         i18n.changeLanguage(lang.key);
                         setLang(lang.key);
-                        moment.locale(lang.key);
+                        dayjs.locale(lang.key);
                       }}
                     >
                       {lang.icon} {t(`lang.${lang.key}`)}

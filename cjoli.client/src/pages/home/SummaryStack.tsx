@@ -6,17 +6,26 @@ import React from "react";
 import * as cjoliService from "../../services/cjoliService";
 import useUid from "../../hooks/useUid";
 import Loader from "../../components/Loader";
+import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 
 const SummaryStack = () => {
   const uid = useUid();
   const [message, setMessage] = React.useState<string>();
-  React.useEffect(() => {
-    const call = async () => {
-      const response = await cjoliService.prompt(uid);
+  const { i18n } = useTranslation();
+
+  useQuery({
+    queryKey: ["prompt"],
+    queryFn: async () => {
+      const response = await cjoliService.prompt(
+        uid,
+        i18n.resolvedLanguage || "en"
+      );
       setMessage(response);
-    };
-    call();
-  }, [uid]);
+      return response;
+    },
+  });
+
   return (
     <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="ranking">
       <div className="p-2">

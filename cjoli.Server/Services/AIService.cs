@@ -128,7 +128,7 @@ Les réponses ne doivent pas dépasser 3 phrases.
         {
             var options = new ChatCompletionsOptions()
             {
-                DeploymentName = "gpt-4-turbo",
+                DeploymentName = "gpt-4o",
             };
             session.Messages.ForEach(options.Messages.Add);
 

@@ -12,7 +12,7 @@ import CJoliCard from "../../components/CJoliCard";
 import CJoliStack from "../../components/CJoliStack";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCJoli } from "../../hooks/useCJoli";
-import moment from "moment";
+import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
 import React from "react";
 import { Team } from "../../models";
@@ -61,7 +61,7 @@ const TeamStack = () => {
                   </Stack>
                   <Stack>
                     <Trans i18nKey="team.youngest">Youngest</Trans>:
-                    {team.youngest ? moment(team.youngest).format("L") : "-"}
+                    {team.youngest ? dayjs(team.youngest).format("L") : "-"}
                   </Stack>
                 </Card.Subtitle>
               </Stack>

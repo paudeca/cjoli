@@ -1,34 +1,48 @@
 ﻿using cjoli.Server.Models;
+using cjoli.Server.Server;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace cjoli.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ChatController : ControllerBase
+    public class ServerController : ControllerBase
     {
-        private readonly AIService _service;
+        private readonly ServerService _service;
+        private readonly AIService _aiService;
         private readonly CJoliContext _context;
 
-        public ChatController(AIService service, CJoliContext context)
+        public ServerController(ServerService service, AIService aiService,CJoliContext context)
         {
             _service = service;
+            _aiService = aiService;
             _context = context;
         }
 
 
         [HttpGet]
-        [Route("{uuid}/ws")]
-        public async Task Get(string uuid, [FromQuery] string lang, [FromQuery] string login)
+        [Route("ws")]
+        public async Task Get()
         {
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                await Bot(webSocket, uuid, lang, login);
+                string socketId = _service.AddClient(webSocket);
+                try
+                {
+                    await Run(socketId, webSocket);
+                }
+                finally
+                {
+                    _service.RemoveClient(socketId, webSocket);
+                   await _service.SendUsers();
+                }
             }
             else
             {
@@ -36,12 +50,9 @@ namespace cjoli.Server.Controllers
             }
         }
 
-        private async Task Bot(WebSocket webSocket, string uuid, string lang, string login)
+        private async Task Run(string socketId, WebSocket webSocket)
         {
-            var session = _service.CreateSessionForChat(uuid, lang, login,_context);
-            session.OnReply += async (sender, e) => { await SendMessage(e.Message, webSocket); };
-            await _service.PromptMessage(session);
-
+            await _service.SendUsers();
             var buffer = new byte[1024 * 4];
             var receiveResult = await webSocket.ReceiveAsync(
                 new ArraySegment<byte>(buffer), CancellationToken.None);
@@ -49,9 +60,9 @@ namespace cjoli.Server.Controllers
             while (!receiveResult.CloseStatus.HasValue)
             {
                 string message = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
-                session.AddUserMessage(message);
+                var m = ServerMessage.Parse(message);
+                _service.Read(socketId, m);
 
-                await _service.PromptMessage(session);
 
                 receiveResult = await webSocket.ReceiveAsync(
                     new ArraySegment<byte>(buffer), CancellationToken.None);
@@ -65,14 +76,17 @@ namespace cjoli.Server.Controllers
 
         private async Task SendMessage(string message, WebSocket webSocket)
         {
-            byte[] buffer = Encoding.UTF8.GetBytes(message);
-            await webSocket.SendAsync(
-                new ArraySegment<byte>(buffer, 0, buffer.Length),
-                WebSocketMessageType.Text,
-                true,
-                CancellationToken.None);
-
+            if(webSocket.State == WebSocketState.Open)
+            {
+                byte[] buffer = Encoding.UTF8.GetBytes(message);
+                await webSocket.SendAsync(
+                    new ArraySegment<byte>(buffer, 0, buffer.Length),
+                    WebSocketMessageType.Text,
+                    true,
+                    CancellationToken.None);
+            }
         }
+
     }
 
 }

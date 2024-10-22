@@ -10,7 +10,6 @@ import {
 import { useForm } from "react-hook-form";
 import { Tourney } from "../models";
 import useUid from "../hooks/useUid";
-import React from "react";
 import * as settingService from "../services/settingService";
 import * as cjoliService from "../services/cjoliService";
 import TourneySetting from "./setting/TourneySetting";
@@ -22,6 +21,7 @@ import PhasesSetting from "./setting/PhasesSetting";
 import Loading from "../components/Loading";
 import { SettingProvider } from "../contexts/SettingContext";
 import RanksSetting from "./setting/RanksSetting";
+import { useQuery } from "@tanstack/react-query";
 
 const SettingPage = () => {
   const { tourney, loadTourney, loadRanking } = useCJoli();
@@ -32,16 +32,15 @@ const SettingPage = () => {
 
   const { isMobile } = useScreenSize();
   const { showToast } = useToast();
-  const [ready, setReady] = React.useState(false);
 
-  React.useEffect(() => {
-    const call = async () => {
+  const { isLoading } = useQuery({
+    queryKey: ["getRanking", uid],
+    queryFn: async () => {
       const ranking = await cjoliService.getRanking(uid);
       loadRanking(ranking);
-      setReady(true);
-    };
-    call();
-  }, [loadRanking, uid]);
+      return ranking;
+    },
+  });
 
   const submit = async (tourney: Tourney) => {
     await saveTourney(tourney);
@@ -69,7 +68,7 @@ const SettingPage = () => {
   }
 
   return (
-    <Loading ready={ready}>
+    <Loading ready={!isLoading}>
       <SettingProvider
         tourney={tourney}
         register={register}

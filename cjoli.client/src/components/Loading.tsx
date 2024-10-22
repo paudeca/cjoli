@@ -1,5 +1,26 @@
-import React, { ReactNode, useRef } from "react";
-import { Container, ProgressBar } from "react-bootstrap";
+import styled from "@emotion/styled";
+import { ReactNode } from "react";
+import { Container } from "react-bootstrap";
+
+const MyProgressBar = styled("div")`
+  height: 4px;
+  width: 100%;
+  --c: no-repeat linear-gradient(#6100ee 0 0);
+  background: var(--c), var(--c), #d7b8fc;
+  background-size: 60% 100%;
+  animation: l16 3s infinite;
+  @keyframes l16 {
+    0% {
+      background-position: -150% 0, -150% 0;
+    }
+    66% {
+      background-position: 250% 0, -150% 0;
+    }
+    100% {
+      background-position: 250% 0, 250% 0;
+    }
+  }
+`;
 
 const Waiting = ({
   ready,
@@ -8,31 +29,11 @@ const Waiting = ({
   ready: boolean;
   children: ReactNode;
 }) => {
-  const [random, setRandom] = React.useState([40, 20, 60, 80]);
-
-  const refreshIdle = useRef<number>(0);
-  React.useEffect(() => {
-    refreshIdle.current = window.setInterval(() => {
-      setRandom([
-        Math.random() * 100,
-        Math.random() * 100,
-        Math.random() * 100,
-        Math.random() * 100,
-      ]);
-    }, 1000);
-  }, []);
-  if (ready) {
-    clearInterval(refreshIdle.current);
-  }
-
   return (
     <>
       {!ready && (
-        <Container className="py-4" fluid>
-          <ProgressBar variant="success" now={random[0]} />
-          <ProgressBar variant="info" now={random[1]} />
-          <ProgressBar variant="warning" now={random[2]} />
-          <ProgressBar variant="danger" now={random[3]} />
+        <Container className="p-4" fluid>
+          <MyProgressBar />
         </Container>
       )}
       {ready && children}

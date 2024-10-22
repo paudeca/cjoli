@@ -41,7 +41,7 @@ const SquadsSetting = ({ indexPhase }: SquadsSettingProps) => {
       <Card>
         <Card.Body>
           <Tab.Container
-            defaultActiveKey={phase.squads[0].id}
+            defaultActiveKey={phase.squads[0]?.id}
             onSelect={(k) =>
               selectSquad(phase.squads.find((s) => s.id.toString() == k)!)
             }

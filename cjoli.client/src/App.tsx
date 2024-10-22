@@ -11,6 +11,7 @@ import { ToastProvider } from "./contexts/ToastContext";
 import RankPage from "./pages/RankPage";
 import ChatPage from "./pages/ChatPage";
 import SettingPage from "./pages/SettingPage";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const theme = {
   colors: {
@@ -46,12 +47,16 @@ const App = () => {
       <Global
         styles={css`
           body {
-            background-color: #202644;
+            background-color: ${theme.colors.primary};
             color: white;
             uuser-select: none;
           }
           input::placeholder {
             opacity: 0.5 !important;
+          }
+          span.badge.bg-secondary.menu {
+            background-color: grey !important;
+            opacity: 0.5;
           }
           .btn-primary {
             --bs-btn-bg: #313f69;
@@ -63,12 +68,14 @@ const App = () => {
             --bs-btn-disabled-bg: #313f69;
           }
           .progress {
-            --bs-progress-bar-bg: #932829;
+            --bs-progress-bar-bg: ${theme.colors.secondary};
           }
           .accordion-button {
-            --bs-accordion-active-bg: #932829;
-            &:not(collapsed) {
+            --bs-accordion-active-bg: ${theme.colors.secondary};
+            &:not(collapsed),
+            &:not(collapsed)::after {
               --bs-accordion-active-color: white;
+              --bs-body-color: white;
             }
           }
           .bg-secondary {
@@ -107,7 +114,9 @@ const App = () => {
         <ModalProvider>
           <UserProvider>
             <ToastProvider>
-              <RouterProvider router={router} />
+              <QueryClientProvider client={new QueryClient()}>
+                <RouterProvider router={router} />
+              </QueryClientProvider>
             </ToastProvider>
           </UserProvider>
         </ModalProvider>

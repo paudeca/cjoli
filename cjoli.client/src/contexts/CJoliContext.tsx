@@ -18,7 +18,7 @@ interface CJoliState {
   phases?: Phase[];
   squads?: Squad[];
   positions?: Position[];
-  matches?: Match[];
+  matches: Match[];
   daySelected: string;
 }
 
@@ -29,6 +29,7 @@ export const CJoliContext = React.createContext<{
 
 const initialState: CJoliState = {
   daySelected: "0",
+  matches: [],
 };
 
 type Action =

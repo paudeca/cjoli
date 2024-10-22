@@ -1,11 +1,18 @@
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
-
 import "./i18n.ts";
+import { StrictMode } from "react";
 
-import "moment/dist/locale/fr";
-import "moment/dist/locale/pt";
-import "moment/dist/locale/es";
-import "moment/dist/locale/de";
+import "dayjs/locale/fr";
+import "dayjs/locale/pt";
+import "dayjs/locale/es";
+import "dayjs/locale/de";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(<App />);
+import dayjs from "dayjs";
+dayjs.locale("fr");
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);

@@ -1,5 +1,5 @@
 import { Line } from "react-chartjs-2";
-import moment from "moment";
+import dayjs from "dayjs";
 
 import "chartjs-adapter-moment";
 
@@ -171,7 +171,7 @@ const TeamTime = () => {
               ticks: {
                 callback: (value, index, ticks) => {
                   const v = Math.round(ticks.length / 15);
-                  if (index % v == 0) return moment(value).format("LT");
+                  if (index % v == 0) return dayjs(value).format("LT");
                 },
                 source: "auto",
               },

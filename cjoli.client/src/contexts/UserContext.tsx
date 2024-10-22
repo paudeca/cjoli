@@ -4,6 +4,7 @@ import { UserActions } from "./actions";
 
 interface UserState {
   user?: User;
+  countUser: number;
 }
 
 export const UserContext = React.createContext<{
@@ -11,12 +12,14 @@ export const UserContext = React.createContext<{
   dispatch: Dispatch<Action>;
 } | null>(null);
 
-const initialState: UserState = {};
+const initialState: UserState = { countUser: 0 };
 
-type Action = {
-  type: UserActions.LOAD_USER;
-  payload?: User;
-};
+type Action =
+  | {
+      type: UserActions.LOAD_USER;
+      payload?: User;
+    }
+  | { type: UserActions.COUNT_USER; payload: number };
 
 const reducer = (state: UserState, action: Action) => {
   switch (action.type) {
@@ -24,6 +27,8 @@ const reducer = (state: UserState, action: Action) => {
       const user = action.payload;
       return { ...state, user };
     }
+    case UserActions.COUNT_USER:
+      return { ...state, countUser: action.payload };
   }
   return state;
 };

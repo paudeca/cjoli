@@ -4,6 +4,7 @@ import { Team } from "../../models";
 import * as settingService from "../../services/settingService";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../../hooks/useToast";
+import { useQuery } from "@tanstack/react-query";
 
 interface AddTeamModalProps {
   onAddTeam: (team: Partial<Team>) => Promise<boolean>;
@@ -15,13 +16,13 @@ const AddTeamModal = ({ onAddTeam }: AddTeamModalProps) => {
   const { t } = useTranslation();
   const { showToast } = useToast();
 
-  React.useEffect(() => {
-    const call = async () => {
+  useQuery({
+    queryKey: ["getTeams"],
+    queryFn: async () => {
       const teams = await settingService.getTeams();
       setTeams(teams);
-    };
-    call();
-  }, []);
+    },
+  });
 
   const fields: Field<{ name: string | number }>[] = [
     {

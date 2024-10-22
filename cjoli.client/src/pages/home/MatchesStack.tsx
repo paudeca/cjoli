@@ -3,7 +3,7 @@ import CJoliCard from "../../components/CJoliCard";
 import CJoliStack from "../../components/CJoliStack";
 import Loading from "../../components/Loading";
 import { Match, Phase } from "../../models";
-import moment from "moment";
+import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
 import * as cjoliService from "../../services/cjoliService";
 import { useCJoli } from "../../hooks/useCJoli";
@@ -13,6 +13,7 @@ import InfoModal from "../../components/InfoModal";
 import { useParams } from "react-router-dom";
 import { useModal } from "../../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
+import { memo } from "react";
 
 const MatchesStack = ({ phase }: { phase?: Phase }) => {
   const { matches, loadRanking, isTeamInMatch, daySelected, selectDay } =
@@ -33,7 +34,7 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
   const datas = matches
     ?.filter(filter)
     .reduce<Record<string, Match[]>>((acc, m) => {
-      const time = moment(m.time);
+      const time = dayjs(m.time);
       const date = time.format("yyyy-MM-DD");
       const list = [...(acc[date] || []), m];
       list.sort((a, b) => {
@@ -43,7 +44,6 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
     }, {});
   const keys = Object.keys(datas || {});
   keys.sort();
-  //moment.locale("fr");
 
   const upperFirstLetter = (value: string) => {
     return value.charAt(0).toUpperCase() + value.slice(1);
@@ -91,7 +91,7 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                 );
                 const map = datasOrder.reduce<Record<string, Match[]>>(
                   (acc, m) => {
-                    const key = moment(m.time).format("LT");
+                    const key = dayjs(m.time).format("LT");
                     return { ...acc, [key]: [...(acc[key] || []), m] };
                   },
                   {}
@@ -99,7 +99,7 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                 return (
                   <Accordion.Item key={index} eventKey={index.toString()}>
                     <Accordion.Header>
-                      {upperFirstLetter(moment(key).format("dddd LL"))}
+                      {upperFirstLetter(dayjs(key).format("dddd LL"))}
                     </Accordion.Header>
                     <Accordion.Body>
                       <Table
@@ -153,4 +153,5 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
   );
 };
 
+export const MatchesStackMemo = memo(MatchesStack);
 export default MatchesStack;

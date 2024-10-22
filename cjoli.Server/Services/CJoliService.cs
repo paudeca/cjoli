@@ -3,6 +3,7 @@ using cjoli.Server.Dtos;
 using cjoli.Server.Exceptions;
 using cjoli.Server.Extensions;
 using cjoli.Server.Models;
+using cjoli.Server.Models.AI;
 using cjoli.Server.Services.Rules;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,12 +13,14 @@ namespace cjoli.Server.Services
     public class CJoliService
     {
         private readonly EstimateService _estimateService;
+        private readonly ServerService _serverService;
         private readonly IMapper _mapper;
         private readonly Dictionary<string, IRule> _rules = new Dictionary<string, IRule>();
 
-        public CJoliService(EstimateService estimateService, IMapper mapper)
+        public CJoliService(EstimateService estimateService, ServerService serverService, IMapper mapper)
         {
             _estimateService = estimateService;
+            _serverService = serverService;
             _mapper = mapper;
             _rules.Add("simple", new SimpleRule());
             _rules.Add("scooby", new ScoobyRule());
@@ -26,7 +29,11 @@ namespace cjoli.Server.Services
 
         public List<Tourney> ListTourneys(CJoliContext context)
         {
-            return context.Tourneys.OrderByDescending(t => t.StartTime).ToList();
+            return context.Tourneys.OrderByDescending(t => t.StartTime).ToList().Select(t =>
+            {
+                t.Config = _rules[t.Rule ?? "scooby"];
+                return t;
+            }).ToList();
         }
 
         public List<Team> ListTeams(CJoliContext context)
@@ -104,6 +111,7 @@ namespace cjoli.Server.Services
         {
             User? user = GetUserWithConfig(login, uuid, context);
 
+            bool isAdmin = user.IsAdmin();
             if (user.IsAdmin())
             {
                 user = null;
@@ -111,6 +119,10 @@ namespace cjoli.Server.Services
             Tourney tourney = GetTourney(uuid, user, context);
             var scores = CalculateScores(tourney);
             _estimateService.CalculateEstimates(tourney, scores, user, context);
+            if (isAdmin)
+            {
+                _serverService.UpdateRanking(uuid);
+            }
         }
 
         private Scores CalculateScores(Tourney tourney)
@@ -413,6 +425,10 @@ namespace cjoli.Server.Services
 
             }
             context.SaveChanges();
+            if(user.IsAdmin())
+            {
+                _serverService.UpdateRanking(uuid);
+            }
         }
 
         public void ClearMatch(MatchDto dto, string login, string uuid, CJoliContext context)
@@ -447,6 +463,10 @@ namespace cjoli.Server.Services
                 context.Remove(userMatch);
             }
             context.SaveChanges();
+            if (user.IsAdmin())
+            {
+                _serverService.UpdateRanking(uuid);
+            }
         }
 
         private void SaveMatchResult(Position position, Position positionAgainst, Match match, int scoreA, int scoreB)
