@@ -1,4 +1,4 @@
-import React from "react";
+import { useCallback, useContext } from "react";
 import { CJoliContext } from "../contexts/CJoliContext";
 import {
   Match,
@@ -13,36 +13,36 @@ import {
 import { CJoliActions } from "../contexts/actions";
 
 export const useCJoli = () => {
-  const ctx = React.useContext(CJoliContext);
+  const ctx = useContext(CJoliContext);
   if (!ctx) {
     throw new Error("useCJoli has to be used within <CJoliProvider>");
   }
 
   const { state, dispatch } = ctx;
-  const loadTourneys = React.useCallback(
+  const loadTourneys = useCallback(
     (tourneys: Tourney[]) =>
       dispatch({ type: CJoliActions.LOAD_TOURNEYS, payload: tourneys }),
     [dispatch]
   );
-  const selectTourney = React.useCallback(
+  const selectTourney = useCallback(
     (tourney: Tourney) =>
       dispatch({ type: CJoliActions.SELECT_TOURNEY, payload: tourney }),
     [dispatch]
   );
 
-  const loadRanking = React.useCallback(
+  const loadRanking = useCallback(
     (ranking: Ranking) =>
       dispatch({ type: CJoliActions.LOAD_RANKING, payload: ranking }),
     [dispatch]
   );
 
-  const loadTourney = React.useCallback(
+  const loadTourney = useCallback(
     (tourney: Tourney) =>
       dispatch({ type: CJoliActions.LOAD_TOURNEY, payload: tourney }),
     [dispatch]
   );
 
-  const getSquad = React.useCallback(
+  const getSquad = useCallback(
     (squadId: number) => {
       const squad = state.squads?.find((s) => s.id === squadId);
       if (!squad) throw new Error(`squad not found with id:${squadId}`);
@@ -50,15 +50,15 @@ export const useCJoli = () => {
     },
     [state.squads]
   );
-  const getTeam = React.useCallback(
+  const getTeam = useCallback(
     (teamId: number) => state.teams?.find((t) => t.id === teamId),
     [state.teams]
   );
-  const getPosition = React.useCallback(
+  const getPosition = useCallback(
     (positionId: number) => state.positions?.find((p) => p.id === positionId),
     [state.positions]
   );
-  const findTeam = React.useCallback(
+  const findTeam = useCallback(
     ({ positionId }: { positionId?: number }) => {
       if (positionId) {
         const position = getPosition(positionId);
@@ -68,7 +68,7 @@ export const useCJoli = () => {
     },
     [getPosition, getTeam]
   );
-  const getTeamInfo = React.useCallback(
+  const getTeamInfo = useCallback(
     (positionId: number, defaultName?: string) => {
       const position = getPosition(positionId);
       if (!position)
@@ -85,7 +85,7 @@ export const useCJoli = () => {
     [getPosition, getTeam]
   );
 
-  const getRankPosition = React.useCallback(
+  const getRankPosition = useCallback(
     (rank: Rank) => {
       const scoreSquad = state.ranking?.scores.scoreSquads.find(
         (s) => s.squadId == rank.squadId
@@ -95,7 +95,7 @@ export const useCJoli = () => {
     },
     [state.ranking]
   );
-  const getTeamRank = React.useCallback(
+  const getTeamRank = useCallback(
     (team: Team) => {
       for (const rank of state.tourney?.ranks || []) {
         const positionId = getRankPosition(rank);
@@ -112,15 +112,15 @@ export const useCJoli = () => {
     [getPosition, getRankPosition, state.tourney?.ranks]
   );
 
-  const isTeamInPhase = React.useCallback((teamId: number, phase: Phase) => {
+  const isTeamInPhase = useCallback((teamId: number, phase: Phase) => {
     return phase.squads.some((squad) =>
       squad.positions.some((position) => position.teamId == teamId)
     );
   }, []);
-  const isTeamInSquad = React.useCallback((teamId: number, squad: Squad) => {
+  const isTeamInSquad = useCallback((teamId: number, squad: Squad) => {
     return squad.positions.some((position) => position.teamId == teamId);
   }, []);
-  const isTeamInMatch = React.useCallback(
+  const isTeamInMatch = useCallback(
     (teamId: number, match: Match) => {
       return (
         getPosition(match.positionIdA)?.teamId == teamId ||
@@ -130,14 +130,14 @@ export const useCJoli = () => {
     [getPosition]
   );
 
-  const getScoreForTeam = React.useCallback(
+  const getScoreForTeam = useCallback(
     (team: Team) => {
       return state.ranking?.scores.scoreTeams[team.id];
     },
     [state.ranking?.scores.scoreTeams]
   );
 
-  const getRankingByField = React.useCallback(
+  const getRankingByField = useCallback(
     (team: Team) => {
       const scores = state.teams?.map((t) => getScoreForTeam(t)!) || [];
       const columns = [
@@ -200,7 +200,7 @@ export const useCJoli = () => {
     [getScoreForTeam, state.teams]
   );
 
-  const selectDay = React.useCallback(
+  const selectDay = useCallback(
     (day: string) => dispatch({ type: CJoliActions.SELECT_DAY, payload: day }),
     [dispatch]
   );

@@ -4,7 +4,7 @@ import SelectPage from "../SelectPage";
 import { renderPage, createTourney } from "../../__tests__/testUtils";
 import { useCJoli } from "../../hooks/useCJoli";
 import React from "react";
-import moment from "moment";
+import dayjs from "dayjs";
 import { Tourney } from "../../models";
 import { Route, Routes } from "react-router-dom";
 
@@ -28,13 +28,13 @@ describe("SelectPage", () => {
       createTourney({ id: 1 }),
       createTourney({
         id: 2,
-        startTime: moment().add(1, "days").toDate(),
-        endTime: moment().add(2, "days").toDate(),
+        startTime: dayjs().add(1, "days").toDate(),
+        endTime: dayjs().add(2, "days").toDate(),
       }),
       createTourney({
         id: 3,
-        startTime: moment().add(-1, "days").toDate(),
-        endTime: moment().add(1, "days").toDate(),
+        startTime: dayjs().add(-1, "days").toDate(),
+        endTime: dayjs().add(1, "days").toDate(),
       }),
     ];
     await renderPage(

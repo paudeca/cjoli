@@ -6,6 +6,7 @@ import useUid from "../hooks/useUid";
 import { useUser } from "../hooks/useUser";
 import { User } from "../models";
 import * as cjoliService from "../services/cjoliService";
+import { memo } from "react";
 
 const LoginModal = () => {
   const { loadRanking } = useCJoli();
@@ -54,4 +55,6 @@ const LoginModal = () => {
   );
 };
 
-export default LoginModal;
+export const LoginModalMemo = memo(LoginModal);
+
+export default LoginModalMemo;

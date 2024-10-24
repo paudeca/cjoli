@@ -64,6 +64,7 @@ builder.Services.AddSingleton<ImportService>();
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<EstimateService>();
 builder.Services.AddSingleton<AIService>();
+builder.Services.AddSingleton<ServerService>();
 builder.Services.AddSingleton(new OpenAIClient(builder.Configuration["OpenAIKey"]));
 
 builder.Services.AddDbContextPool<CJoliContext>(options =>

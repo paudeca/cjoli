@@ -16,6 +16,11 @@ export const useUser = () => {
     (user?: User) => dispatch({ type: UserActions.LOAD_USER, payload: user }),
     [dispatch]
   );
+  const setCountUser = React.useCallback(
+    (count: number) =>
+      dispatch({ type: UserActions.COUNT_USER, payload: count }),
+    [dispatch]
+  );
 
   const { loadRanking } = useCJoli();
   const uid = useUid();
@@ -43,6 +48,7 @@ export const useUser = () => {
       (c) => c.tourneyId == tourney?.id
     ) || { tourneyId: 0, useCustomEstimate: false, favoriteTeamId: 0 },
     loadUser,
+    setCountUser,
     handleSaveUserConfig,
   };
 };

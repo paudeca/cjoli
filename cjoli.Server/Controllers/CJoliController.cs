@@ -151,10 +151,10 @@ namespace cjoli.Server.Controllers
 
         [HttpGet]
         [Route("{uuid}/Prompt")]
-        public async Task<string?> Prompt(string uuid)
+        public async Task<string?> Prompt(string uuid, [FromQuery] string lang)
         {
             var login = GetLogin();
-            return await _aiService.Prompt(uuid,"fr",login,_context);
+            return await _aiService.Prompt(uuid,lang,login,_context);
         }
 
 

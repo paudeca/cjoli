@@ -13,7 +13,7 @@ import {
 import { Person, Robot, Send } from "react-bootstrap-icons";
 import { useForm } from "react-hook-form";
 import useWebSocket, { ReadyState } from "react-use-websocket";
-import moment from "moment";
+import dayjs from "dayjs";
 import useUid from "../hooks/useUid";
 import { useNavigate } from "react-router-dom";
 import useScreenSize from "../hooks/useScreenSize";
@@ -95,7 +95,7 @@ const ChatPage = () => {
                             className="text-muted small text-nowrap mt-1"
                             style={{ fontSize: "11px" }}
                           >
-                            {moment(m.time).format("LT")}
+                            {dayjs(m.time).format("LT")}
                           </div>
                         </div>
                         <div
@@ -115,7 +115,7 @@ const ChatPage = () => {
                             className="text-muted small text-nowrap mt-1"
                             style={{ fontSize: "11px" }}
                           >
-                            {moment(m.time).format("LT")}
+                            {dayjs(m.time).format("LT")}
                           </div>
                         </div>
                         <div

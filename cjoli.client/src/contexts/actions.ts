@@ -8,4 +8,5 @@ export enum CJoliActions {
 
 export enum UserActions {
   LOAD_USER = "LOAD_USER",
+  COUNT_USER = "COUNT_USER",
 }

@@ -1,7 +1,7 @@
 import { Row, Col, Badge } from "react-bootstrap";
 import useScreenSize from "../../../hooks/useScreenSize";
 import { IMatch, Match } from "../../../models";
-import moment from "moment";
+import dayjs from "dayjs";
 import { useCJoli } from "../../../hooks/useCJoli";
 import TeamCell from "./TeamCell";
 import ScoreCellInput from "./ScoreCellInput";
@@ -89,7 +89,7 @@ const MatchRow = ({
         <tr>
           <td colSpan={2}>
             {teamA && teamB && <CompareButton team={teamA} teamB={teamB} />}
-            {moment(match.time).format("LT")} - {getSquad(match.squadId).name}
+            {dayjs(match.time).format("LT")} - {getSquad(match.squadId).name}
             {match.location && ` - ${match.location}`}
             <SimulationIcon show={isSimulation} />
           </td>
@@ -97,7 +97,7 @@ const MatchRow = ({
       )}
       <tr>
         {index == 0 && !isMobile && (
-          <td rowSpan={rowSpan}>{moment(match.time).format("LT")}</td>
+          <td rowSpan={rowSpan}>{dayjs(match.time).format("LT")}</td>
         )}
         {!isMobile && (
           <td>

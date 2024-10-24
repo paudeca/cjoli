@@ -4,34 +4,42 @@ import { Card, Form, Table } from "react-bootstrap";
 import LeftCenterDiv from "../components/LeftCenterDiv";
 import TeamName from "../components/TeamName";
 import { useCJoli } from "../hooks/useCJoli";
-import React from "react";
+import React, { useEffect } from "react";
 import useUid from "../hooks/useUid";
 import * as cjoliService from "../services/cjoliService";
 import Loading from "../components/Loading";
 import TimeLine from "./rank/TimeLine";
 import { Score } from "../models";
 import { Trans } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { useServer } from "../hooks/useServer";
 
 const RankPage = () => {
   const { tourney, getRankPosition, loadRanking } = useCJoli();
+  const { register } = useServer();
   const ranks = tourney?.ranks || [];
 
-  const [ready, setReady] = React.useState(false);
   const uid = useUid();
 
-  React.useEffect(() => {
-    const call = async () => {
+  const { isLoading, refetch } = useQuery({
+    queryKey: ["getRanking", uid],
+    queryFn: async () => {
       const ranking = await cjoliService.getRanking(uid);
       loadRanking(ranking);
-      setReady(true);
-    };
-    call();
-  }, [loadRanking, uid]);
+      return ranking;
+    },
+  });
+
   const [type, setType] = React.useState<keyof Score>("total");
 
-  console.log("TYPE", type);
+  useEffect(() => {
+    register("updateRanking", async () => {
+      refetch();
+    });
+  }, [register, refetch]);
+
   return (
-    <Loading ready={ready}>
+    <Loading ready={!isLoading}>
       <CJoliStack gap={0} className="col-md-8 mx-auto mt-5">
         <div className="p-2">
           <CJoliCard>

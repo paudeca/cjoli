@@ -6,6 +6,7 @@ import { useUser } from "../hooks/useUser";
 import React from "react";
 import { useToast } from "../hooks/useToast";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "@emotion/react";
 
 const MyStar = styled(Star)`
   ${zoomIcon}
@@ -27,6 +28,7 @@ const TeamName = ({
   const { userConfig, isConnected, handleSaveUserConfig } = useUser();
   const { showToast } = useToast();
   const { t } = useTranslation();
+  const theme = useTheme();
 
   const { name, logo } = positionId
     ? getTeamInfo(positionId, defaultName)
@@ -58,7 +60,7 @@ const TeamName = ({
     <>
       {isConnected && team && userConfig.favoriteTeamId == team.id && (
         <MyStarFill
-          color="#932829"
+          color={theme.colors.secondary}
           role="button"
           onClick={() => saveFavoriteTeam(0)}
         />
