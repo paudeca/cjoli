@@ -5,9 +5,9 @@ using cjoli.Server.Chat;
 using cjoli.Server.Exceptions;
 using cjoli.Server.Models;
 using cjoli.Server.Models.AI;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.EntityFrameworkCore;
 
 namespace cjoli.Server.Services
 {
@@ -77,7 +77,7 @@ Ton premier message est un message d'accueil en soutenant une équipe. ";
             string prompt = "" +
 @"Tu es assistant durant le tournois d'Hockey sur glace '" + tourney.Name + @"', tu réponds en " + LANGS[lang] + @" avec parfois des emoticones.
 Les réponses ne doivent pas dépasser 3 phrases.
-"+initPrompt+". ";
+" + initPrompt + ". ";
             //Ton premier message doit indiquer que tu es dans une phase de Beta, et que les réponses ne sont pas fiables. ";
             if (config != null && config.FavoriteTeam != null)
             {

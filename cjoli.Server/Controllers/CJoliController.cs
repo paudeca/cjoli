@@ -154,7 +154,7 @@ namespace cjoli.Server.Controllers
         public async Task<string?> Prompt(string uuid, [FromQuery] string lang)
         {
             var login = GetLogin();
-            return await _aiService.Prompt(uuid,lang,login,_context);
+            return await _aiService.Prompt(uuid, lang, login, _context);
         }
 
 

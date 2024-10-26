@@ -33,6 +33,12 @@ const TourneySetting = () => {
             <Form.Control type="datetime-local" {...register("endTime")} />
           </Form.Group>
         </Row>
+        <Row className="mb-3">
+          <Form.Group as={Col} lg={3} xs={12} controlId="rule">
+            <Form.Label>Rule</Form.Label>
+            <Form.Control {...register("rule")} />
+          </Form.Group>
+        </Row>
       </Card.Body>
     </Card>
   );

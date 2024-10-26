@@ -48,7 +48,7 @@ namespace cjoli.Server.Services
         {
             User? user = context.Users
                 .Include(u => u.Configs).ThenInclude(c => c.Tourney)
-                .Include(u=>u.Configs).ThenInclude(c=>c.FavoriteTeam)
+                .Include(u => u.Configs).ThenInclude(c => c.FavoriteTeam)
                 .SingleOrDefault(u => u.Login == login);
             if (user == null)
             {

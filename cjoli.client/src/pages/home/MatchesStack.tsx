@@ -35,7 +35,7 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
     ?.filter(filter)
     .reduce<Record<string, Match[]>>((acc, m) => {
       const time = dayjs(m.time);
-      const date = time.format("yyyy-MM-DD");
+      const date = time.format("YYYY-MM-DD");
       const list = [...(acc[date] || []), m];
       list.sort((a, b) => {
         return a.location && b.location && a.location > b.location ? 1 : -1;

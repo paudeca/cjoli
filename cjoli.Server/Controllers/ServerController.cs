@@ -3,10 +3,7 @@ using cjoli.Server.Server;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
-using System.Security.Claims;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace cjoli.Server.Controllers
 {
@@ -18,7 +15,7 @@ namespace cjoli.Server.Controllers
         private readonly AIService _aiService;
         private readonly CJoliContext _context;
 
-        public ServerController(ServerService service, AIService aiService,CJoliContext context)
+        public ServerController(ServerService service, AIService aiService, CJoliContext context)
         {
             _service = service;
             _aiService = aiService;
@@ -41,7 +38,7 @@ namespace cjoli.Server.Controllers
                 finally
                 {
                     _service.RemoveClient(socketId, webSocket);
-                   await _service.SendUsers();
+                    await _service.SendUsers();
                 }
             }
             else
@@ -76,7 +73,7 @@ namespace cjoli.Server.Controllers
 
         private async Task SendMessage(string message, WebSocket webSocket)
         {
-            if(webSocket.State == WebSocketState.Open)
+            if (webSocket.State == WebSocketState.Open)
             {
                 byte[] buffer = Encoding.UTF8.GetBytes(message);
                 await webSocket.SendAsync(

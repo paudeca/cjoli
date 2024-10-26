@@ -6,6 +6,12 @@ namespace cjoli.Server.Services.Rules
 {
     public class ScoobyRule : IRule
     {
+        private readonly CJoliService _service;
+        public ScoobyRule(CJoliService service)
+        {
+            _service = service;
+        }
+
         public int Win => 3;
 
         public int Neutral => 2;
@@ -16,6 +22,8 @@ namespace cjoli.Server.Services.Rules
 
         public bool HasPenalty => true;
         public bool HasForfeit => true;
+
+        public Func<Squad, Comparison<Score>> ScoreComparison => _service.DefaultScoreComparison;
 
         public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads)
         {

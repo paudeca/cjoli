@@ -6,6 +6,12 @@ namespace cjoli.Server.Services.Rules
 {
     public class SimpleRule : IRule
     {
+        private readonly CJoliService _service;
+        public SimpleRule(CJoliService service)
+        {
+            _service = service;
+        }
+
         public int Win => 2;
 
         public int Neutral => 1;
@@ -16,6 +22,8 @@ namespace cjoli.Server.Services.Rules
 
         public bool HasPenalty => false;
         public bool HasForfeit => false;
+
+        public Func<Squad, Comparison<Score>> ScoreComparison => _service.DefaultScoreComparison;
 
         public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads)
         {
