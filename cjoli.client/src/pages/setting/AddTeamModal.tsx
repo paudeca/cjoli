@@ -1,36 +1,33 @@
-import React from "react";
 import CJoliModal, { Field } from "../../components/CJoliModal";
 import { Team } from "../../models";
-import * as settingService from "../../services/settingService";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../../hooks/useToast";
 import { useQuery } from "@tanstack/react-query";
+import { useApi } from "../../hooks/useApi";
+import { useSetting } from "../../hooks/useSetting";
 
 interface AddTeamModalProps {
   onAddTeam: (team: Partial<Team>) => Promise<boolean>;
 }
 
 const AddTeamModal = ({ onAddTeam }: AddTeamModalProps) => {
-  const [teams, setTeams] = React.useState<Team[]>([]);
-
   const { t } = useTranslation();
+  const { tourney } = useSetting();
   const { showToast } = useToast();
+  const { getTeams } = useApi();
 
-  useQuery({
-    queryKey: ["getTeams"],
-    queryFn: async () => {
-      const teams = await settingService.getTeams();
-      setTeams(teams);
-    },
-  });
+  const { data: teams } = useQuery(getTeams());
 
+  const teamsFilter = tourney.teams?.map((t) => t.id);
   const fields: Field<{ name: string | number }>[] = [
     {
       id: "name",
       label: "Name",
       type: "select",
       creatable: true,
-      options: teams.map((t) => ({ label: t.name, value: t.id })),
+      options: teams
+        .filter((t) => !teamsFilter.includes(t.id))
+        .map((t) => ({ label: t.name, value: t.id })),
       autoFocus: true,
     },
   ];

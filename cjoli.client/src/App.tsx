@@ -41,6 +41,7 @@ const router = createBrowserRouter([
   },
 ]);
 
+const queryClient = new QueryClient();
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
@@ -87,6 +88,10 @@ const App = () => {
             border-color: #313f69;
           }
 
+          .nav-pills {
+            --bs-nav-pills-link-active-bg: ${theme.colors.primary};
+          }
+
           .chat-messages {
             display: flex;
             flex-direction: column;
@@ -114,7 +119,7 @@ const App = () => {
         <ModalProvider>
           <UserProvider>
             <ToastProvider>
-              <QueryClientProvider client={new QueryClient()}>
+              <QueryClientProvider client={queryClient}>
                 <RouterProvider router={router} />
               </QueryClientProvider>
             </ToastProvider>

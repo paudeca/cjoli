@@ -5,7 +5,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import Loading from "../components/Loading";
 import MenuNav from "./menu/MenuNav";
 import { useEffect } from "react";
-import * as cjoliService from "../services/cjoliService";
 import { useUser } from "../hooks/useUser";
 import { useCJoli } from "../hooks/useCJoli";
 import useUid from "../hooks/useUid";
@@ -21,18 +20,19 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import duration from "dayjs/plugin/duration";
 import { useServer } from "../hooks/useServer";
+import { useApi } from "../hooks/useApi";
 
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 dayjs.extend(duration);
 
 const MainPage = () => {
-  const { loadUser, isConnected } = useUser();
+  const { isConnected } = useUser();
   const {
     state: { show, type, message },
     hideToast,
   } = useToast();
-  const { loadTourneys, selectTourney } = useCJoli();
+  const { selectTourney } = useCJoli();
   const uid = useUid();
   const { pathname } = useLocation();
   const { isMobile } = useScreenSize();
@@ -40,25 +40,15 @@ const MainPage = () => {
   const { i18n } = useTranslation();
   const { setCountUser } = useUser();
   const { register } = useServer();
+  const { getUser, getTourneys } = useApi();
 
-  useQuery({
-    queryKey: ["getUser"],
-    queryFn: async () => {
-      const user = await cjoliService.getUser();
-      loadUser(user);
-      return user;
-    },
-  });
+  useQuery(getUser());
 
-  const { isLoading } = useQuery({
-    queryKey: ["getTourneys", uid],
-    queryFn: async () => {
-      const tourneys = await cjoliService.getTourneys();
-      loadTourneys(tourneys);
-      uid && tourneys && selectTourney(tourneys.find((t) => t.uid === uid)!);
-      return tourneys;
-    },
-  });
+  const { isLoading, data: tourneys } = useQuery(getTourneys({}));
+
+  useEffect(() => {
+    uid && tourneys && selectTourney(tourneys.find((t) => t.uid === uid)!);
+  }, [uid, tourneys, selectTourney]);
 
   useEffect(() => {
     register("users", (value) => {
@@ -78,7 +68,7 @@ const MainPage = () => {
           {uid && !isOnChat && <ChatButton />}
         </Stack>
       </ButtonFixed>
-      <ToastContainer position="top-end">
+      <ToastContainer position="top-end" className="position-fixed">
         <Toast onClose={hideToast} show={show} delay={5000} autohide bg={type}>
           <Toast.Header>
             <strong className="me-auto">

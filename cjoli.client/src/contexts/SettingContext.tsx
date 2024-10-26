@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { Match, Phase, Position, Rank, Squad, Tourney } from "../models";
-import { UseFormRegister, UseFormSetValue } from "react-hook-form";
+import { Control, UseFormRegister, UseFormSetValue } from "react-hook-form";
 
 interface SettingProps {
   tourney: Tourney;
@@ -16,7 +16,7 @@ interface SettingProps {
   setRank: (rank?: Rank) => void;
   register: UseFormRegister<Tourney>;
   setValue: UseFormSetValue<Tourney>;
-  saveTourney: (tourney: Tourney) => Promise<boolean>;
+  control: Control<Tourney>;
 }
 
 export const SettingContext = React.createContext<SettingProps | null>(null);
@@ -25,7 +25,7 @@ export const SettingProvider = ({
   tourney,
   register,
   setValue,
-  saveTourney,
+  control,
   children,
 }: Omit<
   SettingProps,
@@ -50,7 +50,7 @@ export const SettingProvider = ({
         tourney,
         register,
         setValue,
-        saveTourney,
+        control,
         position,
         setPosition,
         phase,

@@ -4,19 +4,19 @@ import React from "react";
 import { useModal } from "../../hooks/useModal";
 import { Trash3 } from "react-bootstrap-icons";
 import ConfirmationModal from "../../modals/ConfirmationModal";
-import * as settingService from "../../services/settingService";
 import useUid from "../../hooks/useUid";
 import TeamModal from "../../modals/TeamModal";
-import { useCJoli } from "../../hooks/useCJoli";
 import { useSetting } from "../../hooks/useSetting";
-import AddTeamModal from "./AddTeamModal";
+import { useApi } from "../../hooks/useApi";
+import { useMutation } from "@tanstack/react-query";
 
 const TeamsSetting = () => {
-  const { tourney, saveTourney } = useSetting();
+  const { tourney } = useSetting();
   const { setShow: showTeam } = useModal("team");
-  const { setShow: showConfirmDelete } = useModal("confirmDelete");
+  const { setShowWithData: showConfirmDeleteTeam } =
+    useModal<Team>("confirmDeleteTeam");
   const uid = useUid();
-  const { loadTourney } = useCJoli();
+  const { removeTeam } = useApi();
 
   const { setShow: showAddTeam } = useModal("addTeam");
 
@@ -28,11 +28,8 @@ const TeamsSetting = () => {
     },
     [setTeam, showTeam]
   );
-  const removeTeam = React.useCallback(async () => {
-    const tourney = await settingService.removeTeam(uid, team!.id);
-    loadTourney(tourney);
-    return true;
-  }, [uid, team, loadTourney]);
+
+  const { mutateAsync: doRemoveTeam } = useMutation(removeTeam(uid));
 
   return (
     <Card className="mb-3">
@@ -40,7 +37,7 @@ const TeamsSetting = () => {
         <Card.Title className="mb-3">Teams</Card.Title>
         <Col lg={8} xs={12} className="mx-auto py-2">
           <ListGroup>
-            {tourney?.teams.map((team) => (
+            {tourney.teams.map((team) => (
               <ListGroup.Item
                 key={team.id}
                 style={{ cursor: "pointer" }}
@@ -61,7 +58,7 @@ const TeamsSetting = () => {
                       onClick={(e) => {
                         e.stopPropagation();
                         setTeam(team);
-                        showConfirmDelete(true);
+                        showConfirmDeleteTeam(true, team);
                       }}
                     >
                       <Trash3 />
@@ -73,9 +70,9 @@ const TeamsSetting = () => {
 
             <TeamModal team={team} />
             <ConfirmationModal
-              id="confirmDelete"
+              id="confirmDeleteTeam"
               title="Remove Team"
-              onConfirm={removeTeam}
+              onConfirm={async () => !!(await doRemoveTeam(team!))}
             >
               Are you sure you want to remove this team '{team?.name}'?
             </ConfirmationModal>
@@ -87,15 +84,6 @@ const TeamsSetting = () => {
           </Col>
         </Row>
       </Card.Body>
-
-      <AddTeamModal
-        onAddTeam={(team: Partial<Team>) =>
-          saveTourney({
-            ...tourney,
-            teams: [...tourney.teams, team as Team],
-          })
-        }
-      />
     </Card>
   );
 };

@@ -23,6 +23,7 @@ namespace cjoli.Server.Services
             _serverService = serverService;
             _mapper = mapper;
             _rules.Add("simple", new SimpleRule());
+            _rules.Add("simple310", new Simple310Rule());
             _rules.Add("scooby", new ScoobyRule());
             _rules.Add("henderson", new HendersonRule(this));
         }
@@ -31,7 +32,7 @@ namespace cjoli.Server.Services
         {
             return context.Tourneys.OrderByDescending(t => t.StartTime).ToList().Select(t =>
             {
-                t.Config = _rules[t.Rule ?? "scooby"];
+                t.Config = _rules[t.Rule ?? "simple"];
                 return t;
             }).ToList();
         }
@@ -78,7 +79,7 @@ namespace cjoli.Server.Services
             }
             tourney.Ranks = context.Tourneys.Include(t => t.Ranks.OrderBy(r => r.Order)).First(t => t.Uid == tourneyUid).Ranks;
 
-            tourney.Config = _rules[tourney.Rule ?? "scooby"];
+            tourney.Config = _rules[tourney.Rule ?? "simple"];
 
 
             return tourney;
@@ -142,7 +143,7 @@ namespace cjoli.Server.Services
 
         private ScoreSquad CalculateScoreSquad(Squad squad, Score scoreTourney, List<ScoreSquad> scoreSquads)
         {
-            IRule rule = _rules[squad.Phase.Tourney.Rule ?? "scooby"];
+            IRule rule = _rules[squad.Phase.Tourney.Rule ?? "simple"];
             Dictionary<int, Score> scores = rule.InitScoreSquad(squad, scoreSquads);
             squad.Matches.Aggregate(scores, (acc, m) =>
             {
@@ -277,7 +278,7 @@ namespace cjoli.Server.Services
 
                 IMatch match = m.Done ? m : m.UserMatch != null ? m.UserMatch : m;
 
-                IRule rule = _rules[ranking.Tourney.Rule ?? "scooby"];
+                IRule rule = _rules[ranking.Tourney.Rule ?? "simple"];
                 UpdateScore(scoreA, scoreB, null, match, rule);
 
                 if (listA.Count > 0)

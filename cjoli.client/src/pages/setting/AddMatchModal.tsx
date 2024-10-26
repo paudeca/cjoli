@@ -1,35 +1,52 @@
 import CJoliModal, { Field } from "../../components/CJoliModal";
-import { Match, Position, Squad } from "../../models";
-import { useTranslation } from "react-i18next";
-import { useToast } from "../../hooks/useToast";
-import { useCJoli } from "../../hooks/useCJoli";
+import { Match, Phase, Position, Squad } from "../../models";
 import React from "react";
+import { useSetting } from "../../hooks/useSetting";
+import { useApi } from "../../hooks/useApi";
+import { useMutation } from "@tanstack/react-query";
+import { useModal } from "../../hooks/useModal";
 
-interface AddMatchModalProps {
-  squad?: Squad;
-  onAddMatch: (match: Match) => Promise<boolean>;
-}
-
-const AddMatchModal = ({ squad, onAddMatch }: AddMatchModalProps) => {
-  const { t } = useTranslation();
-  const { showToast } = useToast();
-  const { tourney } = useCJoli();
+const AddMatchModal = () => {
+  const { tourney } = useSetting();
+  const { saveTourney } = useApi();
+  const { data } = useModal<{ phase: Phase; squad: Squad }>("addMatch");
 
   const getLabel = React.useCallback(
     (position: Position) => {
       return position.teamId > 0
-        ? tourney!.teams.find((t) => t.id == position.teamId)!.name
+        ? tourney.teams.find((t) => t.id == position.teamId)!.name
         : position.name ?? position.value.toString();
     },
     [tourney]
   );
+
+  const { mutateAsync: doSaveTourney } = useMutation(saveTourney({}));
+
+  const onSubmit = async (match: Match) => {
+    if (!data) {
+      return false;
+    }
+    const newSquad = {
+      ...data.squad,
+      matches: [...data.squad.matches, match],
+    };
+    const squads = data.phase.squads.map((s) =>
+      s.id != data.squad.id ? s : newSquad
+    );
+    const newPhase = { ...data.phase, squads };
+    const phases = tourney.phases.map((p) =>
+      p.id != data.phase!.id ? p : newPhase
+    );
+    await doSaveTourney({ ...tourney, phases });
+    return true;
+  };
 
   const fields: Field<Match>[] = [
     {
       id: "positionA",
       label: "PositionA",
       type: "select",
-      options: squad?.positions.map((p) => ({
+      options: data?.squad.positions.map((p) => ({
         label: getLabel(p),
         value: p.value,
       })),
@@ -39,7 +56,7 @@ const AddMatchModal = ({ squad, onAddMatch }: AddMatchModalProps) => {
       id: "positionB",
       label: "PositionB",
       type: "select",
-      options: squad?.positions.map((p) => ({
+      options: data?.squad.positions.map((p) => ({
         label: getLabel(p),
         value: p.value,
       })),
@@ -51,18 +68,10 @@ const AddMatchModal = ({ squad, onAddMatch }: AddMatchModalProps) => {
     },
   ];
 
-  const onSubmit = async (match: Match) => {
-    if (!(await onAddMatch(match))) {
-      showToast("danger", t("team.error.add", "Unable to add Match"));
-      return false;
-    }
-    return true;
-  };
-
   return (
     <CJoliModal
-      id={`addMatch-${squad?.id}`}
-      title="Add Match"
+      id="addMatch"
+      title={`Add Match in ${data?.squad?.name}`}
       fields={fields}
       onSubmit={onSubmit}
     />

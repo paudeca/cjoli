@@ -1,71 +1,51 @@
 import { Accordion, Button, Col, Form, Row } from "react-bootstrap";
-import { ParentPosition, Position, Squad } from "../../models";
-import { useCJoli } from "../../hooks/useCJoli";
+import { ParentPosition, Phase, Position, Squad } from "../../models";
 import React from "react";
 import { Trash3 } from "react-bootstrap-icons";
 import Select from "react-select";
-import ConfirmationModal from "../../modals/ConfirmationModal";
-import * as settingService from "../../services/settingService";
-import useUid from "../../hooks/useUid";
 import { useModal } from "../../hooks/useModal";
 import { useSetting } from "../../hooks/useSetting";
+import useScreenSize from "../../hooks/useScreenSize";
 
 interface PositionsSettingProps {
   squad: Squad;
+  phase: Phase;
   indexPhase: number;
   indexSquad: number;
 }
 const PositionsSetting = ({
   squad,
+  phase,
   indexPhase,
   indexSquad,
 }: PositionsSettingProps) => {
-  const uid = useUid();
-  const { tourney, register, setValue, position, selectPosition } =
-    useSetting();
-  const phase = tourney.phases[indexPhase];
-  const { loadTourney } = useCJoli();
+  const { tourney, register, setValue } = useSetting();
+  const { isMobile } = useScreenSize();
 
   const [parents, setParents] = React.useState(
     squad.positions.map((p) => p.parentPosition)
   );
-  const { setShow: showConfirmDelete } = useModal(
-    `confirmDeletePosition-${squad.id}`
-  );
+  const { setShowWithData: showConfirmDelete } = useModal<{
+    position: Position;
+    squad: Squad;
+    phase: Phase;
+  }>("confirmDeletePosition");
 
   const getLabel = React.useCallback(
     (position?: Position) => {
       if (position && position.teamId > 0) {
-        return tourney.teams.find((t) => t.id == position.teamId)?.name;
+        return `${position?.name || ""} [ ${
+          tourney.teams.find((t) => t.id == position.teamId)?.name
+        } ]`;
       } else {
-        return position?.name;
+        return `${position?.name}`;
       }
     },
     [tourney?.teams]
   );
 
-  const removePosition = React.useCallback(async () => {
-    if (!position) {
-      return false;
-    }
-    const tourney = await settingService.removePosition(
-      uid,
-      phase.id,
-      squad.id,
-      position.id
-    );
-    loadTourney(tourney);
-    return true;
-  }, [uid, phase, squad, position, loadTourney]);
-
   return (
-    <Accordion
-      className="p-3"
-      onSelect={(e) => {
-        const position = squad.positions.find((p) => p.id.toString() == e);
-        selectPosition(position!);
-      }}
-    >
+    <Accordion className={isMobile ? "py-3" : "p-3"}>
       {squad.positions.map((position, i) => {
         const team = tourney.teams.find((t) => t.id == position.teamId);
         const optionsTeam = tourney?.teams.map((t) => ({
@@ -98,7 +78,7 @@ const PositionsSetting = ({
               <Form.Group
                 as={Row}
                 controlId={`position.team.${position.id}`}
-                className="px-3 py-1"
+                className={isMobile ? "p-1" : "px-3 py-1"}
               >
                 <Form.Label column lg={1}>
                   Team
@@ -118,8 +98,8 @@ const PositionsSetting = ({
                 </Col>
               </Form.Group>
 
-              <Row className="px-3 py-3">
-                <Col xs={4}>
+              <Row className={isMobile ? "px-1 py-3" : "p-3"}>
+                <Col lg={4} className="mb-3">
                   <Select
                     options={optionsPhase}
                     defaultValue={optionsPhase?.find(
@@ -146,7 +126,7 @@ const PositionsSetting = ({
                     placeholder="Select Phase"
                   />
                 </Col>
-                <Col xs={4}>
+                <Col lg={4} className="mb-3">
                   <Select
                     options={optionsSquad}
                     defaultValue={optionsSquad?.find(
@@ -173,7 +153,7 @@ const PositionsSetting = ({
                     placeholder="Select Squad"
                   />
                 </Col>
-                <Col xs={4}>
+                <Col lg={4} className="mb-3">
                   <Select
                     options={optionsValue}
                     defaultValue={optionsValue?.find(
@@ -205,7 +185,7 @@ const PositionsSetting = ({
                 <Form.Label column lg={1}>
                   Short
                 </Form.Label>
-                <Col lg={4}>
+                <Col lg={4} className="mb-3">
                   <Form.Control
                     {...register(
                       `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.short`
@@ -217,7 +197,9 @@ const PositionsSetting = ({
                 <Col>
                   <Button
                     variant="danger"
-                    onClick={() => showConfirmDelete(true)}
+                    onClick={() =>
+                      showConfirmDelete(true, { position, squad, phase })
+                    }
                   >
                     <Trash3 />
                   </Button>
@@ -227,13 +209,6 @@ const PositionsSetting = ({
           </Accordion.Item>
         );
       })}
-      <ConfirmationModal
-        id={`confirmDeletePosition-${squad.id}`}
-        title="Remove Position"
-        onConfirm={removePosition}
-      >
-        Are you sure you want to remove this position '{getLabel(position)}'?
-      </ConfirmationModal>
     </Accordion>
   );
 };

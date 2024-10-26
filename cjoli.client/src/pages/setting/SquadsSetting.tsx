@@ -1,51 +1,40 @@
 import { Button, Card, Col, Form, Nav, Row, Tab } from "react-bootstrap";
 import { Trash3 } from "react-bootstrap-icons";
-import ConfirmationModal from "../../modals/ConfirmationModal";
-import React from "react";
-import * as settingService from "../../services/settingService";
-import useUid from "../../hooks/useUid";
-import { useCJoli } from "../../hooks/useCJoli";
 import { useModal } from "../../hooks/useModal";
-import AddPositionModal from "./AddPositionModal";
-import PositionsAdmin from "./PositionsSetting";
-import AddMatchModal from "./AddMatchModal";
-import MatchesAdmin from "./MatchesSetting";
+import PositionsSetting from "./PositionsSetting";
+import MatchesSetting from "./MatchesSetting";
 import { useSetting } from "../../hooks/useSetting";
+import useScreenSize from "../../hooks/useScreenSize";
+import { Phase, Squad } from "../../models";
 
 interface SquadsSettingProps {
   indexPhase: number;
 }
 
 const SquadsSetting = ({ indexPhase }: SquadsSettingProps) => {
-  const { tourney, register, saveTourney, squad, selectSquad } = useSetting();
+  const { tourney, register } = useSetting();
+  const { isMobile } = useScreenSize();
 
   const phase = tourney.phases[indexPhase];
-  const uid = useUid();
-  const { loadTourney } = useCJoli();
 
-  const { setShow: showConfirmDelete } = useModal("confirmDeleteSquad");
-  const { setShow: showAddPosition } = useModal(`addPosition-${phase!.id}`);
-  const { setShow: showAddMatch } = useModal(`addMatch-${squad?.id}`);
-
-  const removeSquad = React.useCallback(async () => {
-    if (!squad) {
-      return false;
-    }
-    const tourney = await settingService.removeSquad(uid, phase.id, squad.id);
-    loadTourney(tourney);
-    return true;
-  }, [uid, phase, squad, loadTourney]);
+  const { setShowWithData: showConfirmDelete } = useModal<{
+    phase: Phase;
+    squad: Squad;
+  }>("confirmDeleteSquad");
+  const { setShowWithData: showAddPosition } = useModal<{
+    phase: Phase;
+    squad: Squad;
+  }>("addPosition");
+  const { setShowWithData: showAddMatch } = useModal<{
+    phase: Phase;
+    squad: Squad;
+  }>("addMatch");
 
   return (
-    <Row className="p-3">
+    <Row className={isMobile ? "py-3" : "p-3"}>
       <Card>
-        <Card.Body>
-          <Tab.Container
-            defaultActiveKey={phase.squads[0]?.id}
-            onSelect={(k) =>
-              selectSquad(phase.squads.find((s) => s.id.toString() == k)!)
-            }
-          >
+        <Card.Body className={isMobile ? "px-0" : "px-3"}>
+          <Tab.Container defaultActiveKey={phase.squads[0]?.id}>
             <Row>
               <Col sm={3}>
                 <Nav variant="pills" className="flex-column">
@@ -58,7 +47,7 @@ const SquadsSetting = ({ indexPhase }: SquadsSettingProps) => {
               </Col>
               <Col sm={9}>
                 <Tab.Content>
-                  {phase!.squads.map((squad, i) => (
+                  {phase.squads.map((squad, i) => (
                     <Tab.Pane key={squad.id} eventKey={squad.id}>
                       <Form.Group
                         as={Row}
@@ -68,7 +57,7 @@ const SquadsSetting = ({ indexPhase }: SquadsSettingProps) => {
                         <Form.Label column lg={1}>
                           Name
                         </Form.Label>
-                        <Col lg={5}>
+                        <Col lg={5} className="mb-3">
                           <Form.Control
                             {...register(
                               `phases.${indexPhase}.squads.${i}.name`
@@ -77,34 +66,41 @@ const SquadsSetting = ({ indexPhase }: SquadsSettingProps) => {
                         </Col>
                         <Col lg={6}>
                           <Button
-                            className="mx-3"
-                            onClick={() => showAddPosition(true)}
+                            className="mx-3 mb-3"
+                            onClick={() =>
+                              showAddPosition(true, { phase, squad })
+                            }
                           >
                             Add Position
                           </Button>
                           <Button
-                            className="mx-3"
-                            onClick={() => showAddMatch(true)}
+                            className="mx-3 mb-3"
+                            onClick={() => showAddMatch(true, { phase, squad })}
                           >
                             Add Match
                           </Button>
                           <Button
                             variant="danger"
-                            onClick={() => showConfirmDelete(true)}
+                            className="mb-3"
+                            onClick={() =>
+                              showConfirmDelete(true, { squad, phase })
+                            }
                           >
                             <Trash3 />
                           </Button>
                         </Col>
                       </Form.Group>
 
-                      <PositionsAdmin
+                      <PositionsSetting
                         squad={squad}
+                        phase={phase}
                         indexPhase={indexPhase}
                         indexSquad={i}
                       />
 
-                      <MatchesAdmin
+                      <MatchesSetting
                         squad={squad}
+                        phase={phase}
                         indexPhase={indexPhase}
                         indexSquad={i}
                       />
@@ -116,58 +112,6 @@ const SquadsSetting = ({ indexPhase }: SquadsSettingProps) => {
           </Tab.Container>
         </Card.Body>
       </Card>
-
-      <ConfirmationModal
-        id="confirmDeleteSquad"
-        title="Remove Squad"
-        onConfirm={removeSquad}
-      >
-        Are you sure you want to remove this squad '{squad?.name}'?
-      </ConfirmationModal>
-
-      <AddPositionModal
-        phase={phase!}
-        onAddPosition={async (position) => {
-          if (!squad) {
-            return false;
-          }
-          const newSquad = {
-            ...squad,
-            positions: [...squad.positions, position],
-          };
-          const squads = phase!.squads.map((s) =>
-            s.id != squad.id ? s : newSquad
-          );
-          const newPhase = { ...phase!, squads };
-          const phases = tourney.phases.map((p) =>
-            p.id != phase!.id ? p : newPhase
-          );
-          saveTourney({ ...tourney, phases });
-          return true;
-        }}
-      />
-
-      <AddMatchModal
-        squad={squad!}
-        onAddMatch={async (match) => {
-          if (!squad) {
-            return false;
-          }
-          const newSquad = {
-            ...squad,
-            matches: [...squad.matches, match],
-          };
-          const squads = phase!.squads.map((s) =>
-            s.id != squad.id ? s : newSquad
-          );
-          const newPhase = { ...phase!, squads };
-          const phases = tourney.phases.map((p) =>
-            p.id != phase!.id ? p : newPhase
-          );
-          saveTourney({ ...tourney, phases });
-          return true;
-        }}
-      />
     </Row>
   );
 };

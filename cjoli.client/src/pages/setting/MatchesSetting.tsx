@@ -1,46 +1,29 @@
 import { Accordion, Button, Col, Form, Row } from "react-bootstrap";
-import { Squad } from "../../models";
-import { useCJoli } from "../../hooks/useCJoli";
+import { Match, Phase, Squad } from "../../models";
 import React from "react";
 import { Trash3 } from "react-bootstrap-icons";
-import ConfirmationModal from "../../modals/ConfirmationModal";
-import * as settingService from "../../services/settingService";
-import useUid from "../../hooks/useUid";
 import { useModal } from "../../hooks/useModal";
 import { useSetting } from "../../hooks/useSetting";
 
 interface MatchesSettingProps {
   squad: Squad;
+  phase: Phase;
   indexPhase: number;
   indexSquad: number;
 }
 const MatchesSetting = ({
   squad,
+  phase,
   indexPhase,
   indexSquad,
 }: MatchesSettingProps) => {
-  const uid = useUid();
-  const { tourney, register, match, selectMatch } = useSetting();
-  const { loadTourney } = useCJoli();
-  const phase = tourney.phases[indexPhase];
+  const { tourney, register } = useSetting();
 
-  const { setShow: showConfirmDelete } = useModal(
-    `confirmDeleteMatch-${squad.id}`
-  );
-
-  const removeMatch = React.useCallback(async () => {
-    if (!match) {
-      return false;
-    }
-    const tourney = await settingService.removeMatch(
-      uid,
-      phase.id,
-      squad.id,
-      match.id
-    );
-    loadTourney(tourney);
-    return true;
-  }, [uid, phase, squad, match, loadTourney]);
+  const { setShowWithData: showConfirmDelete } = useModal<{
+    match: Match;
+    squad: Squad;
+    phase: Phase;
+  }>("confirmDeleteMatch");
 
   const getLabel = React.useCallback(
     (value?: number) => {
@@ -53,12 +36,7 @@ const MatchesSetting = ({
   );
 
   return (
-    <Accordion
-      className="p-3"
-      onSelect={(e) => {
-        selectMatch(squad.matches.find((m) => m.id.toString() == e)!);
-      }}
-    >
+    <Accordion className="p-3">
       {squad.matches.map((match, i) => {
         return (
           <Accordion.Item key={match.id} eventKey={match.id.toString()}>
@@ -105,7 +83,9 @@ const MatchesSetting = ({
                 <Col>
                   <Button
                     variant="danger"
-                    onClick={() => showConfirmDelete(true)}
+                    onClick={() =>
+                      showConfirmDelete(true, { match, squad, phase })
+                    }
                   >
                     <Trash3 />
                   </Button>
@@ -115,14 +95,6 @@ const MatchesSetting = ({
           </Accordion.Item>
         );
       })}
-      <ConfirmationModal
-        id={`confirmDeleteMatch-${squad.id}`}
-        title="Remove Match"
-        onConfirm={removeMatch}
-      >
-        Are you sure you want to remove this match '{getLabel(match?.positionA)}{" "}
-        - {getLabel(match?.positionB)}'?
-      </ConfirmationModal>
     </Accordion>
   );
 };

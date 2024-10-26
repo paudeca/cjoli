@@ -9,36 +9,42 @@
   },
   "user": {
     "guest": "Invité",
-    "favoriteSaved": "Equipe favorite sauvegardée",
-    "favoriteRemoved": "Equipe favorite supprimée"
+    "favoriteSaved": "Équipe favorite sauvegardée",
+    "favoriteRemoved": "Équipe favorite retirée"
   },
   "menu": {
     "home": "Accueil",
     "ranking": "Classement",
     "login": "Connexion",
-    "register": "S'inscrire",
-    "update": "Mise à Jour",
+    "register": "Inscription",
+    "update": "Mise à jour",
     "logout": "Déconnexion",
-    "active": "Actif",
     "refresh": "Actualiser",
     "refreshEstimate": "Actualiser l'estimation",
     "custom": "Personnalisé",
-    "useCustom": "utiliser l'estimation personnel",
-    "menu": "Menu"
+    "useCustom": "utiliser l'estimation personnelle",
+    "menu": "Menu",
+    "setting": "Paramètres"
+  },
+  "home": {
+    "tourneyNotConfigured": "Tournoi non configuré"
   },
   "error": {
     "invalid": "{{field}} est invalide",
     "required": "{{field}} est requis"
   },
   "button": {
-    "submit": "Soumettre",
+    "submit": "Envoyer",
     "cancel": "Annuler",
     "close": "Fermer",
-    "save": "Enregistrer",
+    "save": "Sauvegarder",
     "send": "Envoyer",
     "botAI": "Discuter avec BotAI",
     "back": "Retour",
-    "edit": "Modifier"
+    "edit": "Modifier",
+    "yes": "Oui",
+    "no": "Non",
+    "newTourney": "Nouveau Tournoi"
   },
   "penalty": {
     "label": "Pénalités",
@@ -76,15 +82,19 @@
   "team": {
     "title": "Modifier {{team}}",
     "position": "Position",
-    "youngest": "Plus jeune",
-    "select": "Sélectionner une équipe",
+    "youngest": "Le plus jeune",
+    "select": "Sélectionner une Équipe",
     "chart": {
       "general": "Général",
       "timeline": "Chronologie"
     },
     "form": {
       "logo": "Logo",
-      "youngest": "Plus jeune (date)"
+      "youngest": "Le plus jeune (date)",
+      "name": "Nom",
+      "shortName": "Nom court",
+      "fullName": "Nom complet",
+      "alias": "Alias"
     },
     "error": {
       "update": "Impossible de mettre à jour l'équipe"
@@ -114,11 +124,12 @@
   "select": {
     "live": "En direct",
     "coming": "À venir...",
-    "past": "Passé"
+    "past": "Passé",
+    "addTourney": "Ajouter un Tournoi"
   },
   "match": {
     "blockShot": {
-      "title": "Enregistrer le score",
+      "title": "Sauvegarder le score",
       "error": "Impossible d'enregistrer le score.<br/>Le match doit se terminer par une séance de tirs au but.<br/>Veuillez indiquer un vainqueur."
     },
     "compare": "Comparer",

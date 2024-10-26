@@ -18,18 +18,6 @@ i18n
     interpolation: {
       escapeValue: false,
     },
-    /*resources: {
-      en: {
-        translation: {
-          bon: "day",
-        },
-      },
-      fr: {
-        translation: {
-          bon: "jour",
-        },
-      },
-    },*/
   });
 
 export default i18n;
