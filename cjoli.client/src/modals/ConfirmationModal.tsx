@@ -3,20 +3,22 @@ import { useModal } from "../hooks/useModal";
 import React, { ReactNode } from "react";
 import { Trans } from "react-i18next";
 
-interface ConfirmationModalProps {
+interface ConfirmationModalProps<T> {
   id: string;
   title: string;
-  children: ReactNode;
-  onConfirm: () => Promise<boolean>;
+  children?: ReactNode;
+  message?: (data: T) => ReactNode;
+  onConfirm: (data: T) => Promise<boolean>;
 }
 
-const ConfirmationModal = ({
+const ConfirmationModal = <T,>({
   id,
   title,
   children,
+  message,
   onConfirm,
-}: ConfirmationModalProps) => {
-  const { show, setShow } = useModal(id);
+}: ConfirmationModalProps<T>) => {
+  const { show, setShow, data } = useModal<T>(id);
   const [running, setRunning] = React.useState(false);
 
   return (
@@ -35,7 +37,7 @@ const ConfirmationModal = ({
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {children}
+        {message && data ? message(data) : children}
         <Fade in={running}>
           <ProgressBar now={100} animated />
         </Fade>
@@ -52,7 +54,7 @@ const ConfirmationModal = ({
           type="submit"
           variant="primary"
           onClick={async () => {
-            if (await onConfirm()) {
+            if (data && (await onConfirm(data))) {
               setShow(false);
             }
           }}

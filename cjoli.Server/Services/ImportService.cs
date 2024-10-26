@@ -33,7 +33,7 @@ namespace cjoli.Server.Services
                     .SingleOrDefault(t => t.Uid == tourneyDto.Uid),
                 create: () =>
                 {
-                    var tourney = new Tourney() { Uid = Guid.NewGuid().ToString(), Name = "" };
+                    var tourney = new Tourney() { Uid = tourneyDto.Uid ?? Guid.NewGuid().ToString(), Name = "" };
                     context.Tourneys.Add(tourney);
                     return tourney;
                 },
@@ -240,6 +240,14 @@ namespace cjoli.Server.Services
                 .Include(t => t.Ranks.OrderBy(r => r.Order))
                 .Single(t => t.Uid == uid);
         }
+
+        public void RemoveTourney(string uid, CJoliContext context)
+        {
+            Tourney tourney = GetTourney(uid, context);
+            context.Tourneys.Remove(tourney);
+            context.SaveChanges();
+        }
+
 
         public Tourney RemoveTeam(string uid, int teamId, CJoliContext context)
         {

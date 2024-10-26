@@ -6,29 +6,23 @@ import TeamName from "../components/TeamName";
 import { useCJoli } from "../hooks/useCJoli";
 import React, { useEffect } from "react";
 import useUid from "../hooks/useUid";
-import * as cjoliService from "../services/cjoliService";
 import Loading from "../components/Loading";
 import TimeLine from "./rank/TimeLine";
 import { Score } from "../models";
 import { Trans } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { useServer } from "../hooks/useServer";
+import { useApi } from "../hooks/useApi";
 
 const RankPage = () => {
-  const { tourney, getRankPosition, loadRanking } = useCJoli();
+  const { tourney, getRankPosition } = useCJoli();
   const { register } = useServer();
+  const { getRanking } = useApi();
   const ranks = tourney?.ranks || [];
 
   const uid = useUid();
 
-  const { isLoading, refetch } = useQuery({
-    queryKey: ["getRanking", uid],
-    queryFn: async () => {
-      const ranking = await cjoliService.getRanking(uid);
-      loadRanking(ranking);
-      return ranking;
-    },
-  });
+  const { isLoading, refetch } = useQuery(getRanking(uid));
 
   const [type, setType] = React.useState<keyof Score>("total");
 

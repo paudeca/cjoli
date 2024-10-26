@@ -26,6 +26,9 @@
     "menu": "Menu",
     "setting": "Setting"
   },
+  "home": {
+    "tourneyNotConfigured": "Tourney not configured"
+  },
   "error": {
     "invalid": "{{field}} is invalid",
     "required": "{{field}} is required"
@@ -40,7 +43,8 @@
     "back": "Back",
     "edit": "Edit",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "newTourney": "New Tourney"
   },
   "penalty": {
     "label": "Penalties",
@@ -120,7 +124,8 @@
   "select": {
     "live": "Live",
     "coming": "Coming...",
-    "past": "Past"
+    "past": "Past",
+    "addTourney": "Add a Tourney"
   },
   "match": {
     "blockShot": {

@@ -3,20 +3,24 @@ import { Phase, Position, Squad } from "../../models";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../../hooks/useToast";
 import { useCJoli } from "../../hooks/useCJoli";
-import React from "react";
+import { useState } from "react";
+import { useModal } from "../../hooks/useModal";
 
 interface AddPositionModalProps {
-  phase: Phase;
-  onAddPosition: (position: Position) => Promise<boolean>;
+  onAddPosition: (
+    position: Position,
+    { phase, squad }: { phase: Phase; squad: Squad }
+  ) => Promise<boolean>;
 }
 
-const AddPositionModal = ({ phase, onAddPosition }: AddPositionModalProps) => {
+const AddPositionModal = ({ onAddPosition }: AddPositionModalProps) => {
   const { t } = useTranslation();
   const { showToast } = useToast();
   const { tourney } = useCJoli();
+  const { data } = useModal<{ phase: Phase; squad: Squad }>("addPosition");
 
-  const [phaseParent, setPhaseParent] = React.useState<Phase>();
-  const [squadParent, setSquadParent] = React.useState<Squad>();
+  const [phaseParent, setPhaseParent] = useState<Phase>();
+  const [squadParent, setSquadParent] = useState<Squad>();
 
   const fields: Field<Position>[] = [
     {
@@ -46,7 +50,7 @@ const AddPositionModal = ({ phase, onAddPosition }: AddPositionModalProps) => {
       label: "Parent Phase",
       type: "select",
       options: tourney?.phases
-        .filter((p) => p.id != phase.id)
+        .filter((p) => p.id != data?.phase.id)
         .map((p) => ({ label: p.name, value: p.id })),
       onChange: (value?: string) =>
         setPhaseParent(tourney?.phases.find((p) => p.id.toString() == value)),
@@ -73,7 +77,10 @@ const AddPositionModal = ({ phase, onAddPosition }: AddPositionModalProps) => {
   ];
 
   const onSubmit = async (position: Position) => {
-    if (!(await onAddPosition(position))) {
+    if (!data) {
+      return false;
+    }
+    if (!(await onAddPosition(position, data))) {
       showToast("danger", t("team.error.add", "Unable to add Position"));
       return false;
     }
@@ -82,8 +89,8 @@ const AddPositionModal = ({ phase, onAddPosition }: AddPositionModalProps) => {
 
   return (
     <CJoliModal
-      id={`addPosition-${phase.id}`}
-      title="Add Position"
+      id="addPosition"
+      title={`Add Position in ${data?.squad.name} in ${data?.phase.name}`}
       fields={fields}
       onSubmit={onSubmit}
     />

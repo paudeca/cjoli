@@ -42,6 +42,14 @@ namespace cjoli.Server.Controllers
         }
 
         [HttpDelete]
+        [Route("Tourney/{uid}")]
+        public void RemoveTourney(string uid)
+        {
+            _importService.RemoveTourney(uid, _context);
+        }
+
+
+        [HttpDelete]
         [Route("Tourney/{uid}/teams/{teamId}")]
         public TourneyDto RemoveTeam(string uid, int teamId)
         {

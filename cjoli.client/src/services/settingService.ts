@@ -28,6 +28,11 @@ export const importTourney = async (tourney: Tourney) => {
   return data;
 };
 
+export const removeTourney = async (uid: string) => {
+  const { data } = await axios.delete<Tourney>(`${url}/setting/tourney/${uid}`);
+  return data;
+};
+
 export const removeTeam = async (uid: string, teamId: number) => {
   const { data } = await axios.delete<Tourney>(
     `${url}/setting/tourney/${uid}/teams/${teamId}`
