@@ -20,6 +20,8 @@ namespace cjoli.Server.Services.Rules
         public bool HasPenalty => false;
         public bool HasForfeit => false;
 
+        public Func<Squad, Comparison<Score>> ScoreComparison => _service.DefaultScoreComparison;
+
         public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads)
         {
             var mapPositions = squad.Positions.Where(p => p.ParentPosition != null).ToDictionary(p => p.Id, p =>

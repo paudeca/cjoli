@@ -11,6 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Properties\PublishProfiles\CJoli - Zip Deploy.pubxml.user" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\cjoli.client\cjoli.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

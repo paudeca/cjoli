@@ -1,5 +1,4 @@
 ﻿using cjoli.Server.Exceptions;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
@@ -28,7 +27,7 @@ namespace cjoli.Server.Server
         {
             var json = JsonNode.Parse(message) ?? throw new IllegalArgumentException("invalid message");
             var type = Enum.Parse(typeof(ServerMessageType), json["type"]!.GetValue<string>());
-            switch(type)
+            switch (type)
             {
                 case ServerMessageType.users:
                     return new UsersMessage(json["value"]!.GetValue<int>());
@@ -44,16 +43,17 @@ namespace cjoli.Server.Server
         [JsonPropertyName("value")]
         public int Value { get; set; }
 
-        public UsersMessage(int value) : base(ServerMessageType.users){
+        public UsersMessage(int value) : base(ServerMessageType.users)
+        {
             Value = value;
         }
     }
 
-    public class SelectTourneyMessage: ServerMessage
+    public class SelectTourneyMessage : ServerMessage
     {
         [JsonPropertyName("uid")]
         public string Uid { get; set; }
-        public SelectTourneyMessage(string uid): base(ServerMessageType.selectTourney)
+        public SelectTourneyMessage(string uid) : base(ServerMessageType.selectTourney)
         {
             Uid = uid;
         }

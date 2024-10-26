@@ -2,7 +2,6 @@
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
-using System.Security.Claims;
 using System.Text;
 
 namespace cjoli.Server.Controllers
@@ -38,7 +37,7 @@ namespace cjoli.Server.Controllers
 
         private async Task Bot(WebSocket webSocket, string uuid, string lang, string login)
         {
-            var session = _service.CreateSessionForChat(uuid, lang, login,_context);
+            var session = _service.CreateSessionForChat(uuid, lang, login, _context);
             session.OnReply += async (sender, e) => { await SendMessage(e.Message, webSocket); };
             await _service.PromptMessage(session);
 

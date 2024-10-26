@@ -15,14 +15,14 @@ namespace cjoli.Server.Services
 
     public class ServerService
     {
-        private readonly ConcurrentDictionary<string, SessionSocket> _clients= new ConcurrentDictionary<string, SessionSocket>();
+        private readonly ConcurrentDictionary<string, SessionSocket> _clients = new ConcurrentDictionary<string, SessionSocket>();
 
 
         public ServerService() { }
 
         public void Read(string socketId, ServerMessage message)
         {
-            switch(message.Type)
+            switch (message.Type)
             {
                 case ServerMessageType.selectTourney:
                     {
@@ -55,13 +55,13 @@ namespace cjoli.Server.Services
         public void UpdateRanking(string uid)
         {
             var message = new UpdateRankingMessage();
-            _ = Broadcast(JsonSerializer.Serialize(message),_clients.Where(s=>s.Value.TourneyUid==uid).Select(s=>s.Value).ToList());
+            _ = Broadcast(JsonSerializer.Serialize(message), _clients.Where(s => s.Value.TourneyUid == uid).Select(s => s.Value).ToList());
         }
 
-        private async Task Broadcast(string message, List<SessionSocket> sockets=null)
+        private async Task Broadcast(string message, List<SessionSocket> sockets = null)
         {
             byte[] buffer = Encoding.UTF8.GetBytes(message);
-            if(sockets==null)
+            if (sockets == null)
             {
                 sockets = _clients.Values.ToList();
             }
