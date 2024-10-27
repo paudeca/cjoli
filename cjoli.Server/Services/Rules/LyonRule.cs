@@ -1,8 +1,6 @@
 ﻿
 
 using cjoli.Server.Models;
-using cjoli.Server.Models.AI;
-using System.Text.RegularExpressions;
 
 namespace cjoli.Server.Services.Rules
 {
@@ -30,25 +28,27 @@ namespace cjoli.Server.Services.Rules
             var diff = a.Total.CompareTo(b.Total);
             if (diff != 0)
             {
+                CJoliService.UpdateSource(a, b, SourceType.total, a.Total - b.Total,true);
                 return -diff;
             }
             diff = a.Win.CompareTo(b.Win);
             if (diff != 0)
             {
+                CJoliService.UpdateSource(a, b, SourceType.win, a.Win - b.Win, true);
                 return -diff;
             }
 
             var positionA = squad.Positions.Single(p => p.Id == a.PositionId);
             var positionB = squad.Positions.Single(p => p.Id == b.PositionId);
-            var matches = squad.Matches.Where(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB)).OrderBy(m=>m.Time).ToList();
+            var matches = squad.Matches.Where(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB)).OrderBy(m => m.Time).ToList();
 
             int goalFor = 0;
             int goalAgainst = 0;
             int goalDiff = 0;
-            if (matches.Count>0)
+            if (matches.Count > 0)
             {
                 diff = 0;
-                foreach(var match in matches)
+                foreach (var match in matches)
                 {
                     var userMatch = match.UserMatches.SingleOrDefault();
                     IMatch m = match.Done ? match : userMatch != null ? userMatch : match;
@@ -56,7 +56,7 @@ namespace cjoli.Server.Services.Rules
                     {
                         goalFor += match.PositionA == positionA ? m.ScoreA : -m.ScoreA;
                         goalAgainst += match.PositionA == positionA ? m.ScoreB : -m.ScoreB;
-                        goalDiff += match.PositionA == positionA ? m.ScoreA-m.ScoreB : m.ScoreB-m.ScoreA;
+                        goalDiff += match.PositionA == positionA ? m.ScoreA - m.ScoreB : m.ScoreB - m.ScoreA;
                         diff += match.PositionA == positionA ? -1 : 1;
                     }
                     else if (m.ScoreB > m.ScoreA || m.ForfeitA)
@@ -69,43 +69,49 @@ namespace cjoli.Server.Services.Rules
                 }
                 if (diff != 0)
                 {
+                    CJoliService.UpdateSource(a, b, SourceType.direct, diff, false);
                     return diff;
                 }
             }
             diff = a.GoalFor.CompareTo(b.GoalFor);
             if (diff != 0)
             {
+                CJoliService.UpdateSource(a, b, SourceType.goalFor, a.GoalFor - b.GoalFor, true);
                 return -diff;
             }
 
-            if(goalFor!=0)
+            if (goalFor != 0)
             {
+                CJoliService.UpdateSource(a, b, SourceType.goalForDirect, goalFor, true);
                 return -goalFor;
             }
 
             diff = a.GoalAgainst.CompareTo(b.GoalAgainst);
             if (diff != 0)
             {
+                CJoliService.UpdateSource(a, b, SourceType.goalAgainst, b.GoalAgainst - a.GoalAgainst, false);
                 return diff;
             }
 
             if (goalAgainst != 0)
             {
+                CJoliService.UpdateSource(a, b, SourceType.goalAgainstDirect, -goalAgainst, false);
                 return goalAgainst;
             }
 
             diff = a.GoalDiff.CompareTo(b.GoalDiff);
             if (diff != 0)
             {
+                CJoliService.UpdateSource(a, b, SourceType.goalDiff, a.GoalDiff - b.GoalDiff, true);
                 return -diff;
             }
 
             if (goalDiff != 0)
             {
+                CJoliService.UpdateSource(a, b, SourceType.goalDiffDirect, goalDiff, true);
                 return -goalDiff;
             }
-
-
+            CJoliService.UpdateSource(a, b, SourceType.equal, 0, true);
 
             return 0;
         };

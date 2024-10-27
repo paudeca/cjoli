@@ -11,7 +11,7 @@ namespace cjoli.Server.Services.Rules
         int Forfeit { get; }
         bool HasPenalty { get; }
         bool HasForfeit { get; }
-        Func<Squad,Comparison<Score>> ScoreComparison { get; }
+        Func<Squad, Comparison<Score>> ScoreComparison { get; }
 
 
         Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads);

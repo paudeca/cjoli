@@ -100,6 +100,31 @@
       "update": "Unable to update Team"
     }
   },
+  "ranking": {
+    "rank": "Rank",
+    "calculation": "Calculation",
+    "equality": "Equality",
+    "victory": "Victory",
+    "defeat": "Defeat",
+    "source": {
+      "win": "More victories",
+      "win-min": "Fewer victories",
+      "goalDiff": "Best goal difference",
+      "goalDiff-min": "Bad goal difference",
+      "goalDiffDirect": "Best goal difference (direct)",
+      "goalDiffDirect-min": "Bad goal difference (direct)",
+      "goalFor": "More goals scored",
+      "goalFormin": "Fewer goals scored",
+      "goalForDirect": "More goals scored (direct)",
+      "goalForDirect-min": "Fewer goals scored (direct)",
+      "goalAgainst": "More goals conceded",
+      "goalAgainst-min": "Fewer goals conceded",
+      "goalAgainstDirect": "More goals conceded (direct)",
+      "goalAgainstDirect-min": "Fewer goals conceded (direct)",
+      "youngest": "Youngest",
+      "equal": "Equal"
+    }
+  },
   "message": "Message",
   "rank": {
     "title": "Ranking",

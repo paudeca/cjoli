@@ -30,7 +30,7 @@ import {
   TimeSeriesScale,
 } from "chart.js";
 import { useCJoli } from "../../hooks/useCJoli";
-import { Score } from "../../models";
+import { Score, ScoreSource } from "../../models";
 import useScreenSize from "../../hooks/useScreenSize";
 
 ChartJS.register(
@@ -100,8 +100,8 @@ const TimeLine = ({ type }: { type: keyof Score }) => {
     datasets: {
       label: string;
       data: {
-        x: number | Date | Record<string, number>;
-        y: number | Date | Record<string, number>;
+        x: number | Date | Record<string, number> | Record<number, ScoreSource>;
+        y: number | Date | Record<string, number> | Record<number, ScoreSource>;
       }[];
     }[];
   } = {

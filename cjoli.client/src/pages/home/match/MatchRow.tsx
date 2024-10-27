@@ -216,7 +216,6 @@ const MatchRow = ({
           <td>
             <MyScoreDiv isMobile={false}>
               {teamA && teamB && <CompareButton team={teamA} teamB={teamB} />}
-
               <ScoreCellView score={imatch.scoreA} bg={badgeA} text={textA} />
               <Badge
                 bg="light"

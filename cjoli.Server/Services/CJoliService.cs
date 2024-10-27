@@ -3,7 +3,6 @@ using cjoli.Server.Dtos;
 using cjoli.Server.Exceptions;
 using cjoli.Server.Extensions;
 using cjoli.Server.Models;
-using cjoli.Server.Models.AI;
 using cjoli.Server.Services.Rules;
 using Microsoft.EntityFrameworkCore;
 
@@ -147,16 +146,25 @@ namespace cjoli.Server.Services
             return new Scores { ScoreSquads = scoreSquads, ScoreTourney = scoreTourney };
         }
 
+        public static void UpdateSource(Score a, Score b, SourceType type, int value, bool positive)
+        {
+            a.Sources.Add(b.PositionId, new ScoreSource { Type = type, Value = value, Winner = (positive && value >= 0) || (!positive && value < 0) });
+            b.Sources.Add(a.PositionId, new ScoreSource { Type = type, Value = -value, Winner = (positive && -value >= 0) || (!positive && -value < 0) });
+        }
+
         public Func<Squad, Comparison<Score>> DefaultScoreComparison = (Squad squad) => (Score a, Score b) =>
         {
+            var positionA = squad.Positions.Single(p => p.Id == a.PositionId);
+            var positionB = squad.Positions.Single(p => p.Id == b.PositionId);
+
+
             var diff = a.Total.CompareTo(b.Total);
             if (diff != 0)
             {
+                UpdateSource(a, b, SourceType.total, a.Total - b.Total, true);
                 return -diff;
             }
 
-            var positionA = squad.Positions.Single(p => p.Id == a.PositionId);
-            var positionB = squad.Positions.Single(p => p.Id == b.PositionId);
             var match = squad.Matches.OrderBy(m => m.Time).LastOrDefault(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB));
             if (match != null)
             {
@@ -164,34 +172,47 @@ namespace cjoli.Server.Services
                 IMatch m = match.Done ? match : userMatch != null ? userMatch : match;
                 if (m.ScoreA > m.ScoreB || m.ForfeitB)
                 {
-                    return match.PositionA == positionA ? -1 : 1;
+                    int result = match.PositionA == positionA ? -1 : 1;
+                    UpdateSource(a, b, SourceType.direct, -result, true);
+                    return result;
                 }
                 else if (m.ScoreB > m.ScoreA || m.ForfeitA)
                 {
-                    return match.PositionB == positionA ? -1 : 1;
+                    int result = match.PositionB == positionA ? -1 : 1;
+                    UpdateSource(a, b, SourceType.direct, -result, true);
+                    return result;
                 }
             }
             diff = a.GoalDiff.CompareTo(b.GoalDiff);
             if (diff != 0)
             {
+                UpdateSource(a, b, SourceType.goalDiff, a.GoalDiff - b.GoalDiff, true);
                 return -diff;
             }
             diff = a.GoalFor.CompareTo(b.GoalFor);
             if (diff != 0)
             {
+                UpdateSource(a, b, SourceType.goalFor, a.GoalFor - b.GoalFor, true);
                 return -diff;
             }
             diff = a.GoalAgainst.CompareTo(b.GoalAgainst);
             if (diff != 0)
             {
+                UpdateSource(a, b, SourceType.goalAgainst, b.GoalAgainst - a.GoalAgainst, false);
                 return diff;
             }
             var teamA = positionA.Team;
             var teamB = positionB.Team;
             if (teamA != null && teamB != null)
             {
-                return -teamA.Youngest?.CompareTo(teamB.Youngest) ?? 0;
+                int result = -teamA.Youngest?.CompareTo(teamB.Youngest) ?? 0;
+                if (result != 0)
+                {
+                    UpdateSource(a, b, SourceType.youngest, result, false);
+                    return result;
+                }
             }
+            UpdateSource(a, b, SourceType.equal, 0, true);
             return 0;
         };
 
@@ -223,54 +244,17 @@ namespace cjoli.Server.Services
             }).ToList();
 
             listScores.Sort(rule.ScoreComparison(squad));
-
-            /*listScores.Sort((a, b) =>
+            for (int i = 0; i < listScores.Count; i++)
             {
-                var diff = a.Total.CompareTo(b.Total);
-                if (diff != 0)
+                var score = listScores[i];
+                score.Rank = i + 1;
+                var scoreBefore = i > 0 ? listScores[i - 1] : null;
+                if (scoreBefore != null && score.Sources[scoreBefore.PositionId]?.Type == SourceType.equal)
                 {
-                    return -diff;
+                    score.Rank = scoreBefore.Rank;
                 }
+            }
 
-                var positionA = squad.Positions.Single(p => p.Id == a.PositionId);
-                var positionB = squad.Positions.Single(p => p.Id == b.PositionId);
-                var match = squad.Matches.LastOrDefault(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB));
-                if (match != null)
-                {
-                    var userMatch = match.UserMatches.SingleOrDefault();
-                    IMatch m = match.Done ? match : userMatch != null ? userMatch : match;
-                    if (m.ScoreA > m.ScoreB || m.ForfeitB)
-                    {
-                        return match.PositionA == positionA ? -1 : 1;
-                    }
-                    else if (m.ScoreB > m.ScoreA || m.ForfeitA)
-                    {
-                        return match.PositionB == positionA ? -1 : 1;
-                    }
-                }
-                diff = a.GoalDiff.CompareTo(b.GoalDiff);
-                if (diff != 0)
-                {
-                    return -diff;
-                }
-                diff = a.GoalFor.CompareTo(b.GoalFor);
-                if (diff != 0)
-                {
-                    return -diff;
-                }
-                diff = a.GoalAgainst.CompareTo(b.GoalAgainst);
-                if (diff != 0)
-                {
-                    return diff;
-                }
-                var teamA = positionA.Team;
-                var teamB = positionB.Team;
-                if (teamA != null && teamB != null)
-                {
-                    return -teamA.Youngest?.CompareTo(teamB.Youngest) ?? 0;
-                }
-                return 0;
-            });*/
 
             var scoreSquad = new ScoreSquad() { SquadId = squad.Id, Scores = listScores };
             return scoreSquad;
