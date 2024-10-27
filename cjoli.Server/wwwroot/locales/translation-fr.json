@@ -100,6 +100,31 @@
       "update": "Impossible de mettre à jour l'équipe"
     }
   },
+  "ranking": {
+    "rank": "Classement",
+    "calculation": "Calcul",
+    "equality": "Égalité",
+    "victory": "Victoire",
+    "defeat": "Défaite",
+    "source": {
+      "win": "Plus de victoires",
+      "win-min": "Moins de victoires",
+      "goalDiff": "Meilleur différence de buts",
+      "goalDiff-min": "Mauvaise différence de buts",
+      "goalDiffDirect": "Meilleur différence de buts (direct)",
+      "goalDiffDirect-min": "Mauvaise différence de buts (direct)",
+      "goalFor": "Plus de buts marqués",
+      "goalFor-min": "Moins de buts marqués",
+      "goalForDirect": "Plus de buts marqués (direct)",
+      "goalForDirect-min": "Moins de buts marqués (direct)",
+      "goalAgainst": "Plus de buts encaissés",
+      "goalAgainst-min": "Moins de buts encaissés",
+      "goalAgainstDirect": "Plus de buts encaissés (direct)",
+      "goalAgainstDirect-min": "Moins de buts encaissés (direct)",
+      "youngest": "Le plus jeune",
+      "equal": "Identique"
+    }
+  },
   "message": "Message",
   "rank": {
     "title": "Classement",

@@ -1,3 +1,5 @@
+import { ScoreSource } from "./ScoreSource";
+
 export interface Score {
   teamId: number;
   positionId: number;
@@ -12,5 +14,7 @@ export interface Score {
   shutOut: number;
   penalty: number;
   time: Date;
-  rank: Record<string, number>;
+  rank: number;
+  ranks: Record<string, number>;
+  sources: Record<number, ScoreSource>;
 }

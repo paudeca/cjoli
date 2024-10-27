@@ -14,6 +14,8 @@ import { bgSecondary, zoomIcon } from "../../../styles";
 import { CaretRight } from "react-bootstrap-icons";
 import { memo, useCallback } from "react";
 import * as cjoliService from "../../../services/cjoliService";
+import InfoButton from "./InfoButton";
+import { Stack } from "react-bootstrap";
 
 const MyTh = styled("th")`
   ${bgSecondary}
@@ -26,24 +28,19 @@ const MyCaretRight = styled(CaretRight)`
 `;
 
 interface RankTableScoreProps {
-  index: number;
   tourney: Tourney;
   score: Score;
   squad: Squad;
 }
-const RankTableScore = ({
-  index,
-  tourney,
-  score,
-  squad,
-}: RankTableScoreProps) => {
+const RankTableScore = ({ tourney, score, squad }: RankTableScoreProps) => {
   const { getTeam, getPosition, getTeamInfo, loadRanking } = useCJoli();
   const { isMobile } = useScreenSize();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const uid = useUid();
 
-  const team = getTeam(getPosition(score.positionId)?.teamId || 0);
+  const position = getPosition(score.positionId);
+  const team = getTeam(position?.teamId || 0);
   const userMatches = squad.matches
     .filter(
       (m) =>
@@ -65,29 +62,32 @@ const RankTableScore = ({
   return (
     <>
       <tr>
-        <td rowSpan={isMobile ? 2 : 1}>{index + 1}</td>
+        <td rowSpan={isMobile ? 2 : 1}>{score.rank}</td>
         <td colSpan={isMobile ? 7 : 1}>
-          <LeftCenterDiv>
-            <TeamName positionId={score.positionId} />
-            <SimulationIcon
-              show={hasSimulation}
-              title={`${t("rank.simulation", "Simulation")} - ${name}`}
-              onRemove={handleRemove(userMatches)}
-            />
-            {tourney.config?.hasPenalty && (
-              <PenaltyIcon positionId={score.positionId} />
-            )}
-            {team && (
-              <MyCaretRight
-                role="button"
-                className="mx-2"
-                onClick={() => {
-                  navigate(`/${uid}/team/${team.id}`);
-                  window.scrollTo(0, 0);
-                }}
+          <Stack direction="horizontal">
+            <LeftCenterDiv className="mx-auto">
+              <TeamName positionId={score.positionId} />
+              <SimulationIcon
+                show={hasSimulation}
+                title={`${t("rank.simulation", "Simulation")} - ${name}`}
+                onRemove={handleRemove(userMatches)}
               />
-            )}
-          </LeftCenterDiv>
+              {tourney.config?.hasPenalty && (
+                <PenaltyIcon positionId={score.positionId} />
+              )}
+              {team && (
+                <MyCaretRight
+                  role="button"
+                  className="mx-2"
+                  onClick={() => {
+                    navigate(`/${uid}/team/${team.id}`);
+                    window.scrollTo(0, 0);
+                  }}
+                />
+              )}
+            </LeftCenterDiv>
+            {position && <InfoButton score={score} squad={squad} />}
+          </Stack>
         </td>
         <MyTd rowSpan={isMobile ? 2 : 1}>{score.total}</MyTd>
         {!isMobile && (

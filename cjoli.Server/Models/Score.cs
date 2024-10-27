@@ -3,6 +3,7 @@
     public class Score
     {
         public int PositionId { get; set; }
+        public int Rank { get; set; }
         public int MatchId { get; set; }
         public int TeamId { get; set; }
         public int TeamAgainstId { get; set; }
@@ -18,6 +19,7 @@
         public int ShutOut { get; set; }
         public int Penalty { get; set; }
         public DateTime Time { get; set; }
+        public Dictionary<int, ScoreSource> Sources { get; set; } = new Dictionary<int, ScoreSource>();
 
         public void Merge(Score score)
         {

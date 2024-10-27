@@ -10,6 +10,7 @@ import { Rank } from "./Rank";
 import { Ranking } from "./Ranking";
 import { Score } from "./Score";
 import { Scores } from "./Scores";
+import { ScoreSource } from "./ScoreSource";
 import { ScoreSquad } from "./ScoreSquad";
 import { Squad } from "./Squad";
 import { Team } from "./Team";
@@ -32,6 +33,7 @@ export type {
   Score,
   Scores,
   ScoreSquad,
+  ScoreSource,
   Squad,
   Team,
   TeamData,

@@ -149,7 +149,6 @@ const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
             <RankTableScore
               key={index}
               score={score}
-              index={index}
               tourney={tourney}
               squad={squad}
             />

@@ -85,6 +85,16 @@ export const useCJoli = () => {
     [getPosition, getTeam]
   );
 
+  const getIndexScoreFromPosition = useCallback(
+    (positionId: number, squadId: number) => {
+      const scoreSquad = state.ranking?.scores.scoreSquads.find(
+        (s) => s.squadId == squadId
+      );
+      return scoreSquad?.scores.find((s) => s.positionId == positionId);
+    },
+    [state.ranking]
+  );
+
   const getRankPosition = useCallback(
     (rank: Rank) => {
       const scoreSquad = state.ranking?.scores.scoreSquads.find(
@@ -224,5 +234,6 @@ export const useCJoli = () => {
     getScoreForTeam,
     selectDay,
     getRankingByField,
+    getIndexScoreFromPosition,
   };
 };
