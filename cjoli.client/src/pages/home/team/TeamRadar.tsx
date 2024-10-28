@@ -80,13 +80,15 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
   const getData = React.useCallback(
     (score: Score, rank?: Rank) => {
       return [
-        ((countTeams - (rank?.order || 0) + 1) / countTeams) * 100,
+        score.game > 0
+          ? ((countTeams - (rank?.order || 0) + 1) / countTeams) * 100
+          : 0,
         (score.total / (score.game * winPt)) * 100,
         (score.win / ranks?.win.max) * 100,
         (score.neutral / ranks?.neutral.max) * 100,
-        ((ranks?.loss.max - score.loss + 1) / ranks?.loss.max) * 100,
+        ((ranks?.loss.max - score.loss) / ranks?.loss.max) * 100,
         (score.goalFor / ranks?.goalFor.max) * 100,
-        ((ranks?.goalAgainst.max - score.goalAgainst + 1) /
+        ((ranks?.goalAgainst.max - score.goalAgainst) /
           ranks?.goalAgainst.max) *
           100,
         (score.shutOut / ranks?.shutOut.max) * 100,
