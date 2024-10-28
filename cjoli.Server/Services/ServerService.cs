@@ -42,8 +42,7 @@ namespace cjoli.Server.Services
 
         public void RemoveClient(string socketId, WebSocket ws)
         {
-            SessionSocket session = null;
-            _clients.TryRemove(socketId, out session);
+            _clients.TryRemove(socketId, out _);
         }
 
         public async Task SendUsers()
@@ -58,7 +57,7 @@ namespace cjoli.Server.Services
             _ = Broadcast(JsonSerializer.Serialize(message), _clients.Where(s => s.Value.TourneyUid == uid).Select(s => s.Value).ToList());
         }
 
-        private async Task Broadcast(string message, List<SessionSocket> sockets = null)
+        private async Task Broadcast(string message, List<SessionSocket>? sockets = null)
         {
             byte[] buffer = Encoding.UTF8.GetBytes(message);
             if (sockets == null)

@@ -422,8 +422,8 @@ namespace cjoli.Server.Services
         {
             User user = GetUserWithConfigMatch(login, uuid, context);
             Match? match = context.Match
-                .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t.MatchResults)
-                .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t.MatchResults)
+                .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t!=null?t.MatchResults:null)
+                .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t!=null?t.MatchResults:null)
                 .SingleOrDefault(m => m.Id == dto.Id);
             if (match == null)
             {
@@ -482,8 +482,8 @@ namespace cjoli.Server.Services
             User user = GetUserWithConfigMatch(login, uuid, context);
             Match? match = context.Match
                 .Include(m => m.UserMatches.Where(u => u.User == user))
-                .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t.MatchResults)
-                .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t.MatchResults)
+                .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t!=null?t.MatchResults:null)
+                .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t!=null?t.MatchResults:null)
                 .SingleOrDefault(m => m.Id == dto.Id);
             if (match == null)
             {
@@ -538,7 +538,7 @@ namespace cjoli.Server.Services
             matchResult.ShutOut = scoreB == 0 ? 1 : 0;
         }
 
-        public void SaveUserConfig(string tourneyUid, string login, UserConfigDto dto, CJoliContext context)
+        public void SaveUserConfig(string tourneyUid, string? login, UserConfigDto dto, CJoliContext context)
         {
             Tourney? tourney = context.Tourneys.Include(t => t.Teams).SingleOrDefault(t => t.Uid == tourneyUid);
             if (tourney == null)
@@ -548,7 +548,7 @@ namespace cjoli.Server.Services
             User? user = GetUserWithConfig(login, tourneyUid, context);
             if (user == null)
             {
-                throw new NotFoundException("User", login);
+                throw new NotFoundException("User", login ?? "no login");
             }
             UserConfig? config = user.Configs.SingleOrDefault(c => c.Id == dto.Id);
             if (config == null)
