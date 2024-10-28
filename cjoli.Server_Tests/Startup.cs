@@ -21,6 +21,7 @@ namespace cjoli.Server_Tests
             services.AddSingleton<UserService>();
             services.AddSingleton<ImportService>();
             services.AddSingleton<AIService>();
+            services.AddSingleton<ServerService>();
 
             var openAIClient = new Mock<OpenAIClient>();
             var response = new Mock<Response<ChatCompletions>>();

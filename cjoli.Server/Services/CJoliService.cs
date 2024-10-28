@@ -22,6 +22,11 @@ namespace cjoli.Server.Services
             _serverService = serverService;
             _mapper = mapper;
             _rules.Add("simple", new SimpleRule(this));
+            _rules.Add("simple210", new Simple210Rule(this));
+            _rules.Add("simple310", new Simple310Rule(this));
+            _rules.Add("simple320", new Simple320Rule(this));
+            _rules.Add("simple321", new Simple321Rule(this));
+
             _rules.Add("lyon", new LyonRule(this));
             _rules.Add("scooby", new ScoobyRule(this));
             _rules.Add("henderson", new HendersonRule(this));
