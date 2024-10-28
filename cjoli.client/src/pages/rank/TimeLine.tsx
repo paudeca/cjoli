@@ -100,8 +100,16 @@ const TimeLine = ({ type }: { type: keyof Score }) => {
     datasets: {
       label: string;
       data: {
-        x: number | Date | Record<string, number> | Record<number, ScoreSource>;
-        y: number | Date | Record<string, number> | Record<number, ScoreSource>;
+        x:
+          | number
+          | Date
+          | Record<string, { rank: number; max: number; min: number }>
+          | Record<number, ScoreSource>;
+        y:
+          | number
+          | Date
+          | Record<string, { rank: number; max: number; min: number }>
+          | Record<number, ScoreSource>;
       }[];
     }[];
   } = {
