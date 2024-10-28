@@ -202,9 +202,12 @@ export const useCJoli = () => {
           else if (valA < valB) return 1;
           return a.teamId == team.id && !c.reverse ? -1 : 1;
         });
-        acc[c.type] = c.rank(scores.findIndex((s) => s.teamId == team.id));
+        const rank = c.rank(scores.findIndex((s) => s.teamId == team.id));
+        const max = c.val(scores[0]);
+        const min = c.val(scores[scores.length - 1]);
+        acc[c.type] = { rank, max, min };
         return acc;
-      }, {} as Record<string, number>);
+      }, {} as Record<string, { rank: number; max: number; min: number }>);
       return result;
     },
     [getScoreForTeam, state.teams]

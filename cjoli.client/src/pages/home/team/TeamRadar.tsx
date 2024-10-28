@@ -62,7 +62,8 @@ interface TeamRadarProps {
 }
 
 const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
-  const { getTeamRank, getScoreForTeam } = useCJoli();
+  const { ranking, getTeamRank, getScoreForTeam, getRankingByField } =
+    useCJoli();
   const options = {
     responsive: true,
   };
@@ -72,28 +73,37 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
   const score = getScoreForTeam(team);
   const scoreB = teamB && getScoreForTeam(teamB);
 
-  const getData = React.useCallback((score: Score, rank?: Rank) => {
-    return [
-      rank?.order || 0,
-      score.total,
-      score.game,
-      score.win,
-      score.neutral,
-      score.loss,
-      score.goalFor / score.game,
-      score.goalAgainst / score.game,
-      score.shutOut,
-      score.goalDiff / score.goalDiff,
-      //score.penalty,
-    ];
-  }, []);
+  const countTeams = ranking?.tourney.teams.length || 0;
+  const winPt = ranking?.tourney.config.win || 2;
+  const ranks = getRankingByField(team);
+
+  const getData = React.useCallback(
+    (score: Score, rank?: Rank) => {
+      return [
+        ((countTeams - (rank?.order || 0) + 1) / countTeams) * 100,
+        (score.total / (score.game * winPt)) * 100,
+        (score.win / ranks?.win.max) * 100,
+        (score.neutral / ranks?.neutral.max) * 100,
+        ((ranks?.loss.max - score.loss + 1) / ranks?.loss.max) * 100,
+        (score.goalFor / ranks?.goalFor.max) * 100,
+        ((ranks?.goalAgainst.max - score.goalAgainst + 1) /
+          ranks?.goalAgainst.max) *
+          100,
+        (score.shutOut / ranks?.shutOut.max) * 100,
+        ((score.goalDiff - ranks?.goalDiff.min) /
+          (ranks?.goalDiff.max - ranks?.goalDiff.min)) *
+          100,
+      ];
+    },
+    [countTeams, ranks, winPt]
+  );
 
   if (!team || !score) {
     return <></>;
   }
 
   const data = {
-    labels: ["Rang", "PTS", "PJ", "V", "N", "D", "BP", "BC", "BL", "GA"],
+    labels: ["Rang", "PTS", "V", "N", "D", "BP", "BC", "BL", "GA"],
     datasets: [
       {
         label: team.name,
