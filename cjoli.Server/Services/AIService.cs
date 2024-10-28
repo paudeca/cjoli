@@ -43,6 +43,11 @@ namespace cjoli.Server.Services
 
             User? user = context.Users.Include(u => u.Configs.Where(c => c.Tourney == tourney)).ThenInclude(c => c.FavoriteTeam).SingleOrDefault(u => u.Login == login);
             UserConfig? config = user?.Configs[0];
+            if(config==null || config.FavoriteTeam==null)
+            {
+                user = context.Users.Include(u => u.Configs.Where(c => c.Tourney == tourney)).ThenInclude(c => c.FavoriteTeam).SingleOrDefault(u => u.Id == 1);
+                config = user?.Configs[0];
+            }
 
             string prompt = "" +
 @"Tu es assistant durant le tournois d'Hockey sur glace '" + tourney.Name + @"', tu réponds en " + LANGS[lang] + @" avec parfois des emoticones.
