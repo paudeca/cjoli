@@ -13,7 +13,7 @@ namespace cjoli.Server_Tests
 
         protected Tourney CreateTourney()
         {
-            var tourney = new Tourney() { Uid = "uid", Name = "name" };
+            var tourney = new Tourney() { Uid = "uid", Name = "name", Rule="simple321" };
 
             var phase = new Phase() { Name = "phase1", Tourney = tourney };
             tourney.Phases.Add(phase);
