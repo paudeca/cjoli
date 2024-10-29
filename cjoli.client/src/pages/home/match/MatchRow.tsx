@@ -200,26 +200,30 @@ const MatchRow = ({
         {!isMobile && !done && (
           <td>
             <MyScoreDiv isMobile={false}>
-              <CJoliTooltip info={t("match.simulated", "Simulated result")}>
-                <Row style={{ color: "#aaaaaa" }}>
-                  <Col>{match.estimate?.scoreA}</Col>
-                </Row>
-              </CJoliTooltip>
+              {!isConnected && (
+                <CJoliTooltip info={t("match.simulated", "Simulated result")}>
+                  <Row style={{ color: "#aaaaaa" }}>
+                    <Col>{match.estimate?.scoreA}</Col>
+                  </Row>
+                </CJoliTooltip>
+              )}
 
               {teamA && teamB && <CompareButton team={teamA} teamB={teamB} />}
 
-              <CJoliTooltip info={t("match.simulated", "Simulated result")}>
-                <Stack direction="horizontal" style={{ color: "#aaaaaa" }}>
-                  <Row>
-                    <Col>{match.estimate?.scoreB}</Col>
-                  </Row>
-                  <Row>
-                    <Col>
-                      <BracesAsterisk size={10} />
-                    </Col>
-                  </Row>
-                </Stack>
-              </CJoliTooltip>
+              {!isConnected && (
+                <CJoliTooltip info={t("match.simulated", "Simulated result")}>
+                  <Stack direction="horizontal" style={{ color: "#aaaaaa" }}>
+                    <Row>
+                      <Col>{match.estimate?.scoreB}</Col>
+                    </Row>
+                    <Row>
+                      <Col>
+                        <BracesAsterisk size={10} />
+                      </Col>
+                    </Row>
+                  </Stack>
+                </CJoliTooltip>
+              )}
 
               {isConnected && (
                 <>
