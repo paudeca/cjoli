@@ -13,7 +13,7 @@ import styled from "@emotion/styled";
 import ScoreButton from "./ScoreButton";
 import SimulationIcon from "../../../components/SimulationIcon";
 import CompareButton from "./CompareButton";
-import { Asterisk, BracesAsterisk } from "react-bootstrap-icons";
+import { BracesAsterisk } from "react-bootstrap-icons";
 import CJoliTooltip from "../../../components/CJoliTooltip";
 import { useTranslation } from "react-i18next";
 
