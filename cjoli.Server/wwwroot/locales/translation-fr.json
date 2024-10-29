@@ -158,6 +158,7 @@
       "error": "Impossible d'enregistrer le score.<br/>Le match doit se terminer par une séance de tirs au but.<br/>Veuillez indiquer un vainqueur."
     },
     "compare": "Comparer",
-    "forfeit": "Forfait"
+    "forfeit": "Forfait",
+    "simulated": "Résultat simulé"
   }
 }

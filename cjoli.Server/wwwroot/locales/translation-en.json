@@ -158,6 +158,7 @@
       "error": "Unable to record the score.<br/>The match must end in a penalty shootout.<br/>Please indicate a winner."
     },
     "compare": "Compare",
-    "forfeit": "Forfeit"
+    "forfeit": "Forfeit",
+    "simulated": "Simulated result"
   }
 }

@@ -65,6 +65,7 @@ const SimulationIcon = ({ show, title, onRemove }: SimulationIconProps) => {
                       alignItems: "center",
                       height: 30,
                     }}
+                    className="mb-3"
                   >
                     <Trans i18nKey="simulation.removeAll">
                       Remove all simulations
