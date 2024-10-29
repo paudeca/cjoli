@@ -339,8 +339,82 @@ namespace cjoli.Server.Services
                 return acc;
             });
             var scoreTeams = mapTeams.ToDictionary(kv => kv.Key, kv => kv.Value.LastOrDefault() ?? new Score() { TeamId = kv.Key });
+            SortTeams(scoreTeams);
             ranking.History = mapTeams;
             ranking.Scores.ScoreTeams = scoreTeams;
+        }
+
+        public class ColumnDef
+        {
+            public string Type;
+            public Func<Score, int> Val;
+            public bool Reverse;
+        }
+
+        private void SortTeams(Dictionary<int, Score> scoreTeams)
+        {
+            var listScores = scoreTeams.Values.ToList();
+            var columns = new List<ColumnDef>{
+            new ColumnDef{
+                Type="win",
+                Val=(Score s)=>s.Win,
+                Reverse=false,
+            },
+            new ColumnDef{
+                Type="neutral",
+                Val=(Score s)=>s.Neutral,
+                Reverse=false,
+            },
+            new ColumnDef{
+                Type="loss",
+                Val=(Score s)=>s.Loss,
+                Reverse=true,
+            },
+            new ColumnDef{
+                Type="goalFor",
+                Val=(Score s)=>s.GoalFor,
+                Reverse=false,
+            },
+            new ColumnDef{
+                Type="goalAgainst",
+                Val=(Score s)=>s.GoalAgainst,
+                Reverse=true,
+            },
+            new ColumnDef{
+                Type="shutOut",
+                Val=(Score s)=>s.ShutOut,
+                Reverse=false,
+            },
+            new ColumnDef{
+                Type="goalDiff",
+                Val=(Score s)=>s.GoalDiff,
+                Reverse=false,
+            },
+            };
+            listScores.ForEach(score =>
+            {
+                int teamId = score.TeamId;
+                var mapResult = columns.Aggregate(new Dictionary<string, RankInfo>(), (acc, c) =>
+                {
+                    var tmp = new List<Score>(listScores);
+                    tmp.Sort((a, b) =>
+                    {
+                        var valueA = c.Val(a);
+                        var valueB = c.Val(b);
+                        if (valueA > valueB) return c.Reverse ? 1 : -1;
+                        else if (valueA < valueB) return c.Reverse ? -1 : 1;
+                        else if (a.TeamId == teamId) return -1;
+                        else if (b.TeamId == teamId) return 1;
+                        return 1;
+                    });
+                    int rank = tmp.FindIndex(s => s.TeamId == teamId);
+                    int max = c.Reverse?c.Val(tmp[tmp.Count - 1]): c.Val(tmp[0]);
+                    int min = c.Reverse? c.Val(tmp[0]):c.Val(tmp[tmp.Count - 1]);
+                    acc[c.Type] = new RankInfo { Rank = rank, Min = min, Max = max };
+                    return acc;
+                });
+                scoreTeams[teamId].Ranks = mapResult;
+            });
         }
 
         public void UpdateScore(Score scoreA, Score scoreB, Score? scoreTourney, IMatch match, IRule rule)
@@ -422,8 +496,8 @@ namespace cjoli.Server.Services
         {
             User user = GetUserWithConfigMatch(login, uuid, context);
             Match? match = context.Match
-                .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t!=null?t.MatchResults:null)
-                .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t!=null?t.MatchResults:null)
+                .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
+                .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
                 .SingleOrDefault(m => m.Id == dto.Id);
             if (match == null)
             {
@@ -482,8 +556,8 @@ namespace cjoli.Server.Services
             User user = GetUserWithConfigMatch(login, uuid, context);
             Match? match = context.Match
                 .Include(m => m.UserMatches.Where(u => u.User == user))
-                .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t!=null?t.MatchResults:null)
-                .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t!=null?t.MatchResults:null)
+                .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
+                .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
                 .SingleOrDefault(m => m.Id == dto.Id);
             if (match == null)
             {

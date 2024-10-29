@@ -32,13 +32,13 @@ namespace cjoli.Server.Services
             };
 
             coef["total"] = 1;
-            coef["totalSeason"] = coef["total"]*2;
-            coef["allTeam"] = coef["totalSeason"]*2;
-            coef["allTeamSeason"] = coef["allTeam"]*2;
-            coef["team"] = coef["allTeamSeason"]*2;
-            coef["indirect"] = coef["team"]*2;
-            coef["indirectSeason"] = coef["indirect"]*2;
-            coef["direct"] = coef["indirectSeason"]*2;
+            coef["totalSeason"] = coef["total"] * 2;
+            coef["allTeam"] = coef["totalSeason"] * 2;
+            coef["allTeamSeason"] = coef["allTeam"] * 2;
+            coef["team"] = coef["allTeamSeason"] * 2;
+            coef["indirect"] = coef["team"] * 2;
+            coef["indirectSeason"] = coef["indirect"] * 2;
+            coef["direct"] = coef["indirectSeason"] * 2;
             coef["directSeason"] = coef["direct"] * 2;
             coef["user"] = coef["directSeason"] * 2;
 
@@ -54,7 +54,7 @@ namespace cjoli.Server.Services
             Score scoreTotal = func(coef["total"], queryMatch);
             int totalGame = scoreTotal.Game;
 
-            Score scoreTotalSeason = func(coef["totalSeason"]*totalGame, queryMatchSeason);
+            Score scoreTotalSeason = func(coef["totalSeason"] * totalGame, queryMatchSeason);
 
             var getTeamId = (Team? team) => team?.Alias != null ? team.Alias.Id : team != null ? team.Id : 0;
 
@@ -66,14 +66,14 @@ namespace cjoli.Server.Services
                     .ToDictionary(kv => kv.Key, kv => SelectScore<int>(coef)(kv)) ?? new Dictionary<int, Score>();
                 return mapScore;
             };
-            var mapAllTeam = funcMap(coef["allTeam"]* totalGame, queryMatch);
-            var mapAllTeamSeason = funcMap(coef["allTeamSeason"]* totalGame, queryMatchSeason);
+            var mapAllTeam = funcMap(coef["allTeam"] * totalGame, queryMatch);
+            var mapAllTeamSeason = funcMap(coef["allTeamSeason"] * totalGame, queryMatchSeason);
 
 
             var mapCurrentTeam = queryMatch
                 .Where(r => r.Match.Squad!.Phase.Tourney == tourney)
                 .GroupBy(r => r.Team.Id)
-                .ToDictionary(kv => kv.Key, kv => SelectScore<int>(coef["team"]*totalGame)(kv)) ?? new Dictionary<int, Score>();
+                .ToDictionary(kv => kv.Key, kv => SelectScore<int>(coef["team"] * totalGame)(kv)) ?? new Dictionary<int, Score>();
 
             var funcDirect = (int coef, IQueryable<MatchResult> query) =>
             {
@@ -82,8 +82,8 @@ namespace cjoli.Server.Services
                     .ToDictionary(kv => kv.Key, kv => SelectScore<MyKv>(coef)(kv));
                 return mapScore;
             };
-            var mapDirects = funcDirect(coef["direct"]*totalGame, queryMatch);
-            var mapDirectSeasons = funcDirect(coef["directSeason"]*totalGame, queryMatchSeason);
+            var mapDirects = funcDirect(coef["direct"] * totalGame, queryMatch);
+            var mapDirectSeasons = funcDirect(coef["directSeason"] * totalGame, queryMatchSeason);
 
             var funcOther = (IQueryable<MatchResult> query) =>
             {
@@ -115,7 +115,7 @@ namespace cjoli.Server.Services
                 {
                     //MergeScore(mapAllTeam, getTeamId(context.Team.SingleOrDefault(t=>t.Id==key)), score, 10);
                     //MergeScore(mapAllTeamSeason, getTeamId(context.Team.SingleOrDefault(t => t.Id == key)), score, 100);
-                    MergeScore(mapCurrentTeam, key, score, coef["user"]*totalGame);
+                    MergeScore(mapCurrentTeam, key, score, coef["user"] * totalGame);
                 }
             });
 

@@ -62,8 +62,7 @@ interface TeamRadarProps {
 }
 
 const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
-  const { ranking, getTeamRank, getScoreForTeam, getRankingByField } =
-    useCJoli();
+  const { ranking, getTeamRank, getScoreForTeam } = useCJoli();
   const options = {
     responsive: true,
   };
@@ -75,25 +74,25 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
 
   const countTeams = ranking?.tourney.teams.length || 0;
   const winPt = ranking?.tourney.config.win || 2;
-  const ranks = getRankingByField(team);
+  const ranks = score?.ranks;
 
   const getData = React.useCallback(
     (score: Score, rank?: Rank) => {
       return [
         score.game > 0
-          ? ((countTeams - (rank?.order || 0) + 1) / countTeams) * 100
+          ? ((countTeams - (rank?.order || 0)) / countTeams) * 100
           : 0,
         (score.total / (score.game * winPt)) * 100,
-        (score.win / ranks?.win.max) * 100,
-        (score.neutral / ranks?.neutral.max) * 100,
-        ((ranks?.loss.max - score.loss) / ranks?.loss.max) * 100,
-        (score.goalFor / ranks?.goalFor.max) * 100,
-        ((ranks?.goalAgainst.max - score.goalAgainst) /
-          ranks?.goalAgainst.max) *
+        (score.win / ranks!.win.max) * 100,
+        (score.neutral / ranks!.neutral.max) * 100,
+        ((ranks!.loss.max - score.loss) / ranks!.loss.max) * 100,
+        (score.goalFor / ranks!.goalFor.max) * 100,
+        ((ranks!.goalAgainst.max - score.goalAgainst) /
+          ranks!.goalAgainst.max) *
           100,
-        (score.shutOut / ranks?.shutOut.max) * 100,
-        ((score.goalDiff - ranks?.goalDiff.min) /
-          (ranks?.goalDiff.max - ranks?.goalDiff.min)) *
+        (score.shutOut / ranks!.shutOut.max) * 100,
+        ((score.goalDiff - ranks!.goalDiff.min) /
+          (ranks!.goalDiff.max - ranks!.goalDiff.min)) *
           100,
       ];
     },

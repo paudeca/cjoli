@@ -20,6 +20,7 @@
         public int Penalty { get; set; }
         public DateTime Time { get; set; }
         public Dictionary<int, ScoreSource> Sources { get; set; } = new Dictionary<int, ScoreSource>();
+        public Dictionary<string, RankInfo> Ranks { get; set; } = new Dictionary<string, RankInfo>();
 
         public void Merge(Score score)
         {

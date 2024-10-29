@@ -1,15 +1,6 @@
 import { useCallback, useContext } from "react";
 import { CJoliContext } from "../contexts/CJoliContext";
-import {
-  Match,
-  Phase,
-  Rank,
-  Ranking,
-  Score,
-  Squad,
-  Team,
-  Tourney,
-} from "../models";
+import { Match, Phase, Rank, Ranking, Squad, Team, Tourney } from "../models";
 import { CJoliActions } from "../contexts/actions";
 
 export const useCJoli = () => {
@@ -147,72 +138,6 @@ export const useCJoli = () => {
     [state.ranking?.scores.scoreTeams]
   );
 
-  const getRankingByField = useCallback(
-    (team: Team) => {
-      const scores = state.teams?.map((t) => getScoreForTeam(t)!) || [];
-      const columns = [
-        {
-          type: "win",
-          val: (s: Score) => s.win,
-          rank: (p: number) => p,
-          reverse: false,
-        },
-        {
-          type: "neutral",
-          val: (s: Score) => s.neutral,
-          rank: (p: number) => p,
-          reverse: false,
-        },
-        {
-          type: "loss",
-          val: (s: Score) => s.loss,
-          rank: (p: number) => state.teams!.length - p - 1,
-          reverse: true,
-        },
-        {
-          type: "goalFor",
-          val: (s: Score) => s.goalFor,
-          rank: (p: number) => p,
-          reverse: true,
-        },
-        {
-          type: "goalAgainst",
-          val: (s: Score) => s.goalAgainst,
-          rank: (p: number) => state.teams!.length - p - 1,
-          reverse: true,
-        },
-        {
-          type: "shutOut",
-          val: (s: Score) => s.shutOut,
-          rank: (p: number) => p,
-          reverse: false,
-        },
-        {
-          type: "goalDiff",
-          val: (s: Score) => s.goalDiff,
-          rank: (p: number) => p,
-          reverse: false,
-        },
-      ];
-      const result = columns.reduce((acc, c) => {
-        scores.sort((a, b) => {
-          const valA = c.val(a);
-          const valB = c.val(b);
-          if (valA > valB) return -1;
-          else if (valA < valB) return 1;
-          return a.teamId == team.id && !c.reverse ? -1 : 1;
-        });
-        const rank = c.rank(scores.findIndex((s) => s.teamId == team.id));
-        const max = c.val(scores[0]);
-        const min = c.val(scores[scores.length - 1]);
-        acc[c.type] = { rank, max, min };
-        return acc;
-      }, {} as Record<string, { rank: number; max: number; min: number }>);
-      return result;
-    },
-    [getScoreForTeam, state.teams]
-  );
-
   const selectDay = useCallback(
     (day: string) => dispatch({ type: CJoliActions.SELECT_DAY, payload: day }),
     [dispatch]
@@ -236,7 +161,6 @@ export const useCJoli = () => {
     isTeamInMatch,
     getScoreForTeam,
     selectDay,
-    getRankingByField,
     getIndexScoreFromPosition,
   };
 };
