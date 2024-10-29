@@ -10,7 +10,7 @@ const CJoliTooltip = ({
 }) => {
   return (
     <OverlayTrigger overlay={<Tooltip>{info}</Tooltip>}>
-      <span>{children}</span>
+      <span className="user-select-none">{children}</span>
     </OverlayTrigger>
   );
 };
