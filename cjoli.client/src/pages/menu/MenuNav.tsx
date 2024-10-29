@@ -127,7 +127,7 @@ const MenuNav = () => {
               <Badge
                 bg="secondary"
                 className="d-flex menu"
-                style={{ background: "red !important" }}
+                style={{ maxWidth: 60 }}
               >
                 {countUser}
                 <Person />
