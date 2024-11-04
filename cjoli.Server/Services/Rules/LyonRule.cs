@@ -28,7 +28,7 @@ namespace cjoli.Server.Services.Rules
             var diff = a.Total.CompareTo(b.Total);
             if (diff != 0)
             {
-                CJoliService.UpdateSource(a, b, SourceType.total, a.Total - b.Total,true);
+                CJoliService.UpdateSource(a, b, SourceType.total, a.Total - b.Total, true);
                 return -diff;
             }
             diff = a.Win.CompareTo(b.Win);

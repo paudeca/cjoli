@@ -4,12 +4,12 @@ import { ToastContainer, Toast, Stack } from "react-bootstrap";
 import { Outlet, useLocation } from "react-router-dom";
 import Loading from "../components/Loading";
 import MenuNav from "./menu/MenuNav";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from "../hooks/useUser";
 import { useCJoli } from "../hooks/useCJoli";
 import useUid from "../hooks/useUid";
-import ChatButton from "../components/ChatButton";
-import EstimateButton from "../components/EstimateButton";
+import ChatButton from "./home/button/ChatButton";
+import EstimateButton from "./home/button/EstimateButton";
 import ButtonFixed from "../components/ButtonFixed";
 import useScreenSize from "../hooks/useScreenSize";
 import { useToast } from "../hooks/useToast";
@@ -21,6 +21,9 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 import duration from "dayjs/plugin/duration";
 import { useServer } from "../hooks/useServer";
 import { useApi } from "../hooks/useApi";
+import ScrollButton from "./home/button/ScrollButton";
+import { Match } from "../models";
+import { ArrowDown, ArrowUp } from "react-bootstrap-icons";
 
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
@@ -32,7 +35,7 @@ const MainPage = () => {
     state: { show, type, message },
     hideToast,
   } = useToast();
-  const { selectTourney } = useCJoli();
+  const { selectTourney, matches } = useCJoli();
   const uid = useUid();
   const { pathname } = useLocation();
   const { isMobile } = useScreenSize();
@@ -58,6 +61,18 @@ const MainPage = () => {
 
   dayjs.locale(i18n.resolvedLanguage);
 
+  const [nextMatch, setNextMatch] = useState<Match>();
+  useEffect(() => {
+    const filtered = matches.filter((m) => !m.done);
+    filtered.sort((a, b) => (a.time < b.time ? -1 : 1));
+    if (filtered.length > 0) {
+      const nextMatch = filtered[0];
+      setNextMatch(nextMatch);
+    } else {
+      setNextMatch(undefined);
+    }
+  }, [matches, nextMatch]);
+
   return (
     <Loading ready={!isLoading}>
       <MenuNav />
@@ -65,6 +80,14 @@ const MainPage = () => {
       <ButtonFixed>
         <Stack gap={1}>
           {uid && !isOnChat && isMobile && isConnected && <EstimateButton />}
+          <ScrollButton to="ranking" icon={<ArrowUp />} down={false} />
+          {nextMatch && (
+            <ScrollButton
+              to={`match-${nextMatch.id}`}
+              icon={<ArrowDown />}
+              down
+            />
+          )}
           {uid && !isOnChat && <ChatButton />}
         </Stack>
       </ButtonFixed>

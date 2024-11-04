@@ -24,6 +24,7 @@ import {
   ListOl,
   Person,
   PersonSquare,
+  ThreeDotsVertical,
 } from "react-bootstrap-icons";
 import { useUser } from "../../hooks/useUser";
 import { useNavigate } from "react-router-dom";
@@ -41,6 +42,11 @@ import { useServer } from "../../hooks/useServer";
 
 const MyImg = styled.img<{ width: string }>`
   width: ${(props) => props.width};
+`;
+
+const MyNavbar = styled(Navbar)`
+  color: black;
+  border-bottom: 3px solid ${(props) => props.theme.colors.secondary};
 `;
 
 const MenuNav = () => {
@@ -63,10 +69,6 @@ const MenuNav = () => {
   const { t, i18n } = useTranslation();
   const [lang, setLang] = React.useState(i18n.resolvedLanguage);
   const { register: registerServer } = useServer();
-
-  /*registerServer("users", (value) => {
-    setCountUser(value);
-  });*/
 
   useEffect(() => {
     registerServer("users", (value) => {
@@ -100,11 +102,10 @@ const MenuNav = () => {
 
   const tourneyLabel = uid && tourney?.name;
   return (
-    <Navbar
+    <MyNavbar
       expand="sm"
       className="bg-body-tertiary mb-3"
       sticky={isMobile ? undefined : "top"}
-      style={{ color: "black" }}
     >
       <Container fluid>
         <Navbar.Brand>
@@ -127,11 +128,16 @@ const MenuNav = () => {
               <Badge
                 bg="secondary"
                 className="d-flex menu"
-                style={{ background: "red !important" }}
+                style={{ maxWidth: 60 }}
               >
                 {countUser}
                 <Person />
               </Badge>
+            </Col>
+            <Col className="d-flex justify-content-end">
+              <Navbar.Toggle aria-controls="menu" onClick={() => setShow(true)}>
+                <ThreeDotsVertical />
+              </Navbar.Toggle>
             </Col>
           </Row>
         </Navbar.Brand>
@@ -164,7 +170,6 @@ const MenuNav = () => {
             />
           </Stack>
         )}
-        <Navbar.Toggle aria-controls="menu" onClick={() => setShow(true)} />
         <Navbar.Offcanvas
           id="menu"
           aria-labelledby="menu"
@@ -271,7 +276,7 @@ const MenuNav = () => {
       <LoginModal />
       <RegisterModal />
       <UpdateModal />
-    </Navbar>
+    </MyNavbar>
   );
 };
 

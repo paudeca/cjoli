@@ -41,7 +41,13 @@ const router = createBrowserRouter([
   },
 ]);
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
@@ -90,6 +96,10 @@ const App = () => {
 
           .nav-pills {
             --bs-nav-pills-link-active-bg: ${theme.colors.primary};
+          }
+
+          .popover {
+            --bs-popover-max-width: 800px;
           }
 
           .chat-messages {

@@ -3,7 +3,11 @@ import { useCJoli } from "../../../hooks/useCJoli";
 import { useParams } from "react-router-dom";
 import RankTableSquad from "./RankTableSquad";
 
-const RankTable = ({ phase }: { phase: Phase }) => {
+interface RankTableProps {
+  phase: Phase;
+}
+
+const RankTable = ({ phase }: RankTableProps) => {
   const { isTeamInSquad } = useCJoli();
   const { squadId, teamId } = useParams();
 

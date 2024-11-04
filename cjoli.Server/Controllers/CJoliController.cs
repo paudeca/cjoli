@@ -107,6 +107,15 @@ namespace cjoli.Server.Controllers
             return GetRanking(uuid);
         }
 
+        /*[HttpPost]
+        [Authorize]
+        [Route("{uuid}/ApplySimulations")]
+        public RankingDto ApplySimulations([FromRoute] string uuid)
+        {
+            var login = GetLogin();
+            return _service.ApplySimulations(uuid, login!, _context);
+        }*/
+
 
         [HttpPost]
         [Authorize]

@@ -1,4 +1,4 @@
-import { Row, Col, Badge } from "react-bootstrap";
+import { Row, Col, Badge, Stack } from "react-bootstrap";
 import useScreenSize from "../../../hooks/useScreenSize";
 import { IMatch, Match } from "../../../models";
 import dayjs from "dayjs";
@@ -13,6 +13,10 @@ import styled from "@emotion/styled";
 import ScoreButton from "./ScoreButton";
 import SimulationIcon from "../../../components/SimulationIcon";
 import CompareButton from "./CompareButton";
+import { BracesAsterisk } from "react-bootstrap-icons";
+import CJoliTooltip from "../../../components/CJoliTooltip";
+import { useTranslation } from "react-i18next";
+import { Element } from "react-scroll";
 
 const MyScoreDiv = styled("div")<{ isMobile: boolean }>`
   display: flex;
@@ -48,6 +52,7 @@ const MatchRow = ({
   const { getSquad, findTeam } = useCJoli();
   const { isMobile } = useScreenSize();
   const { isConnected, isAdmin, userConfig } = useUser();
+  const { t } = useTranslation();
 
   const hasUserMatch =
     match.userMatch && (!isAdmin || (isAdmin && userConfig.useCustomEstimate));
@@ -88,10 +93,12 @@ const MatchRow = ({
       {isMobile && (
         <tr>
           <td colSpan={2}>
-            {teamA && teamB && <CompareButton team={teamA} teamB={teamB} />}
-            {dayjs(match.time).format("LT")} - {getSquad(match.squadId).name}
-            {match.location && ` - ${match.location}`}
-            <SimulationIcon show={isSimulation} />
+            <Element name={`match-${match.id}`}>
+              {teamA && teamB && <CompareButton team={teamA} teamB={teamB} />}
+              {dayjs(match.time).format("LT")} - {getSquad(match.squadId).name}
+              {match.location && ` - ${match.location}`}
+              <SimulationIcon show={isSimulation} />
+            </Element>
           </td>
         </tr>
       )}
@@ -150,7 +157,21 @@ const MatchRow = ({
                 </>
               )}
               {!isConnected && (
-                <ScoreCellView score={"-"} bg="light" text="black" />
+                <CJoliTooltip info={t("match.simulated", "Simulated result")}>
+                  <Stack style={{ color: "grey" }}>
+                    <Row>
+                      <Col>{match.estimate?.scoreA}</Col>
+                    </Row>
+                    <Row>
+                      <Col>{match.estimate?.scoreB}</Col>
+                    </Row>
+                    <Row>
+                      <Col>
+                        <BracesAsterisk size={10} />
+                      </Col>
+                    </Row>
+                  </Stack>
+                </CJoliTooltip>
               )}
             </MyScoreDiv>
           </td>
@@ -182,7 +203,31 @@ const MatchRow = ({
         {!isMobile && !done && (
           <td>
             <MyScoreDiv isMobile={false}>
+              {!isConnected && (
+                <CJoliTooltip info={t("match.simulated", "Simulated result")}>
+                  <Row style={{ color: "#aaaaaa" }}>
+                    <Col>{match.estimate?.scoreA}</Col>
+                  </Row>
+                </CJoliTooltip>
+              )}
+
               {teamA && teamB && <CompareButton team={teamA} teamB={teamB} />}
+
+              {!isConnected && (
+                <CJoliTooltip info={t("match.simulated", "Simulated result")}>
+                  <Stack direction="horizontal" style={{ color: "#aaaaaa" }}>
+                    <Row>
+                      <Col>{match.estimate?.scoreB}</Col>
+                    </Row>
+                    <Row>
+                      <Col>
+                        <BracesAsterisk size={10} />
+                      </Col>
+                    </Row>
+                  </Stack>
+                </CJoliTooltip>
+              )}
+
               {isConnected && (
                 <>
                   <ScoreCellInput

@@ -13,7 +13,7 @@ import InfoModal from "../../components/InfoModal";
 import { useParams } from "react-router-dom";
 import { useModal } from "../../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
-import { memo } from "react";
+import { memo, useCallback, useEffect, useMemo } from "react";
 
 const MatchesStack = ({ phase }: { phase?: Phase }) => {
   const { matches, loadRanking, isTeamInMatch, daySelected, selectDay } =
@@ -25,15 +25,24 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
   const { squadId, teamId } = useParams();
   const { t } = useTranslation();
 
-  const filter = teamId
-    ? (match: Match) => isTeamInMatch(parseInt(teamId), match)
-    : (match: Match) =>
-        match.phaseId == phase?.id &&
-        (!squadId || parseInt(squadId) == match.squadId);
+  const filter = useCallback(
+    (match: Match) => {
+      if (teamId) {
+        return isTeamInMatch(parseInt(teamId), match);
+      } else {
+        return (
+          match.phaseId == phase?.id &&
+          (!squadId || parseInt(squadId) == match.squadId)
+        );
+      }
+    },
+    [isTeamInMatch, phase, teamId, squadId]
+  );
 
-  const datas = matches
-    ?.filter(filter)
-    .reduce<Record<string, Match[]>>((acc, m) => {
+  const datas = useMemo(() => {
+    const matchesFiltered = matches.filter(filter);
+
+    const datas = matchesFiltered.reduce<Record<string, Match[]>>((acc, m) => {
       const time = dayjs(m.time);
       const date = time.format("YYYY-MM-DD");
       const list = [...(acc[date] || []), m];
@@ -42,8 +51,29 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
       });
       return { ...acc, [date]: list };
     }, {});
-  const keys = Object.keys(datas || {});
-  keys.sort();
+    return datas;
+  }, [filter, matches]);
+
+  const matchesNotDone = useMemo(
+    () => matches.filter(filter).filter((m) => !m.done),
+    [filter, matches]
+  );
+
+  const keys = useMemo(() => {
+    const keys = Object.keys(datas);
+    keys.sort();
+    return keys;
+  }, [datas]);
+
+  useEffect(() => {
+    if (matchesNotDone.length > 0) {
+      const time = dayjs(matchesNotDone[0].time);
+      const date = time.format("YYYY-MM-DD");
+      selectDay(date);
+    } else if (keys) {
+      keys && selectDay(keys[0]);
+    }
+  }, [keys, selectDay, datas, matchesNotDone]);
 
   const upperFirstLetter = (value: string) => {
     return value.charAt(0).toUpperCase() + value.slice(1);
@@ -82,7 +112,10 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
           <Loading ready={!!matches}>
             <Accordion
               activeKey={daySelected}
-              onSelect={(e) => selectDay(e as string)}
+              onSelect={(e) => {
+                console.log("day", e);
+                selectDay(e as string);
+              }}
             >
               {keys.map((key, index) => {
                 const datasOrder = datas ? datas[key] : [];
@@ -97,7 +130,7 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
                   {}
                 );
                 return (
-                  <Accordion.Item key={index} eventKey={index.toString()}>
+                  <Accordion.Item key={index} eventKey={key}>
                     <Accordion.Header>
                       {upperFirstLetter(dayjs(key).format("dddd LL"))}
                     </Accordion.Header>
