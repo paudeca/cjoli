@@ -30,7 +30,7 @@ const HomePage = () => {
 
   useEffect(() => {
     register("updateRanking", async () => {
-      refetch();
+      //refetch(); //disable, cause full refresh page on saveMatch
     });
   }, [refetch, register]);
 

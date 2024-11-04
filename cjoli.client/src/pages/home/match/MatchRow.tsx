@@ -16,6 +16,7 @@ import CompareButton from "./CompareButton";
 import { BracesAsterisk } from "react-bootstrap-icons";
 import CJoliTooltip from "../../../components/CJoliTooltip";
 import { useTranslation } from "react-i18next";
+import { Element } from "react-scroll";
 
 const MyScoreDiv = styled("div")<{ isMobile: boolean }>`
   display: flex;
@@ -92,10 +93,12 @@ const MatchRow = ({
       {isMobile && (
         <tr>
           <td colSpan={2}>
-            {teamA && teamB && <CompareButton team={teamA} teamB={teamB} />}
-            {dayjs(match.time).format("LT")} - {getSquad(match.squadId).name}
-            {match.location && ` - ${match.location}`}
-            <SimulationIcon show={isSimulation} />
+            <Element name={`match-${match.id}`}>
+              {teamA && teamB && <CompareButton team={teamA} teamB={teamB} />}
+              {dayjs(match.time).format("LT")} - {getSquad(match.squadId).name}
+              {match.location && ` - ${match.location}`}
+              <SimulationIcon show={isSimulation} />
+            </Element>
           </td>
         </tr>
       )}

@@ -1,8 +1,8 @@
 import { Button } from "react-bootstrap";
 import { ChatLeftDots } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
-import useUid from "../hooks/useUid";
-import useScreenSize from "../hooks/useScreenSize";
+import useUid from "../../../hooks/useUid";
+import useScreenSize from "../../../hooks/useScreenSize";
 import { useTranslation } from "react-i18next";
 
 const ChatButton = () => {

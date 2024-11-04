@@ -118,6 +118,22 @@ namespace cjoli.Server.Services
             return dto;
         }
 
+        public RankingDto ApplySimulations(string tourneyUid, string login, CJoliContext context)
+        {
+            login = "local";
+            var ranking = GetRanking(tourneyUid, login, context);
+            var matches = ranking.Tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Matches.Where(m => !m.Done)).ToList();
+            matches.ForEach(match =>
+            {
+                var dto = _mapper.Map<MatchDto>(match);
+                var estimate = match.Estimates.First();
+                dto.ScoreA = estimate.ScoreA;
+                dto.ScoreB = estimate.ScoreB;
+                SaveMatch(dto, login, tourneyUid, context);
+            });
+            return CreateRanking(tourneyUid,login, context);
+        }
+
         public void UpdateEstimate(string uuid, string login, CJoliContext context)
         {
             User? user = GetUserWithConfig(login, uuid, context);
