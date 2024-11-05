@@ -1,19 +1,19 @@
 import { Button } from "react-bootstrap";
 import { ChatLeftDots } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
-import useUid from "../../../hooks/useUid";
 import useScreenSize from "../../../hooks/useScreenSize";
 import { useTranslation } from "react-i18next";
+import { useServer } from "../../../hooks/useServer";
 
 const ChatButton = () => {
   const navigate = useNavigate();
-  const uid = useUid();
+  const { path } = useServer();
   const { isMobile } = useScreenSize();
   const { t } = useTranslation();
 
   return (
     <Button
-      onClick={() => navigate(`${uid}/chat`)}
+      onClick={() => navigate(`${path}chat`)}
       variant={isMobile ? "primary" : "light"}
     >
       {!isMobile && t("button.botAI", "Chat with BotAI")}

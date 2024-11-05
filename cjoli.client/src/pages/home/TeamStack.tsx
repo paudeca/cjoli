@@ -20,12 +20,12 @@ import { ArrowLeft } from "react-bootstrap-icons";
 import useScreenSize from "../../hooks/useScreenSize";
 import TeamModal from "../../modals/TeamModal";
 import { useUser } from "../../hooks/useUser";
-import useUid from "../../hooks/useUid";
 import TeamRadar from "./team/TeamRadar";
 import TeamTable from "./team/TeamTable";
 import TeamTime from "./team/TeamTime";
 import { useModal } from "../../hooks/useModal";
 import { Trans } from "react-i18next";
+import { useServer } from "../../hooks/useServer";
 
 const TeamStack = () => {
   const { teams, getTeam, getTeamRank } = useCJoli();
@@ -36,7 +36,7 @@ const TeamStack = () => {
   const { setShow: showTeam } = useModal("team");
   const { isAdmin } = useUser();
   const navigate = useNavigate();
-  const uid = useUid();
+  const { path } = useServer();
   const [activeKey, setActiveKey] = React.useState("general");
 
   const team = getTeam(parseInt(teamId!));
@@ -139,7 +139,7 @@ const TeamStack = () => {
             )}
 
             <Stack direction="horizontal" className="p-3">
-              <Button variant="primary" onClick={() => navigate(`/${uid}`)}>
+              <Button variant="primary" onClick={() => navigate(path)}>
                 <ArrowLeft /> <Trans i18nKey="button.back">Back</Trans>
               </Button>
               {isAdmin && (

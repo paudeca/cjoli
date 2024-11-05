@@ -6,8 +6,8 @@ import Loading from "../../components/Loading";
 import { Phase } from "../../models";
 import { useCJoli } from "../../hooks/useCJoli";
 import { useNavigate, useParams } from "react-router-dom";
-import useUid from "../../hooks/useUid";
 import { Element } from "react-scroll";
+import { useServer } from "../../hooks/useServer";
 
 interface RankingStackProps {
   phase?: Phase;
@@ -15,7 +15,7 @@ interface RankingStackProps {
 
 const RankingStack = ({ phase }: RankingStackProps) => {
   const { phases, isTeamInPhase, selectDay } = useCJoli();
-  const uid = useUid();
+  const { path } = useServer();
   const navigate = useNavigate();
   const { phaseId, squadId, teamId } = useParams();
 
@@ -28,8 +28,8 @@ const RankingStack = ({ phase }: RankingStackProps) => {
     selectDay("0");
     navigate(
       teamId
-        ? `/${uid}/team/${teamId}/phase/${phase.id}`
-        : `/${uid}/phase/${phase.id}`
+        ? `${path}team/${teamId}/phase/${phase.id}`
+        : `${path}phase/${phase.id}`
     );
   };
 

@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import useScreenSize from "../hooks/useScreenSize";
 import { Trans, useTranslation } from "react-i18next";
 import { useUser } from "../hooks/useUser";
+import { useServer } from "../hooks/useServer";
 
 interface Message {
   message: string;
@@ -31,6 +32,7 @@ const server = import.meta.env.VITE_API_WS;
 const ChatPage = () => {
   const [messages, setMessages] = React.useState<Message[]>([]);
   const uid = useUid();
+  const { path } = useServer();
   const { i18n } = useTranslation();
   const { user } = useUser();
   const { sendMessage, lastMessage, readyState } = useWebSocket<{
@@ -150,7 +152,7 @@ const ChatPage = () => {
                     </Button>
                     <Button
                       variant="outline-danger"
-                      onClick={() => navigate(`/${uid}`)}
+                      onClick={() => navigate(path)}
                     >
                       <Trans i18nKey="button.close">Close</Trans>
                     </Button>
@@ -165,7 +167,7 @@ const ChatPage = () => {
                     <Stack direction="horizontal" className="pt-2">
                       <Button
                         variant="outline-danger"
-                        onClick={() => navigate(`/${uid}`)}
+                        onClick={() => navigate(path)}
                       >
                         <Trans i18nKey="button.close">Close</Trans>
                       </Button>

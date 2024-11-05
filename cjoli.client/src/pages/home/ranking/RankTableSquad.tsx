@@ -16,6 +16,7 @@ import useUid from "../../../hooks/useUid";
 import useScreenSize from "../../../hooks/useScreenSize";
 import * as cjoliService from "../../../services/cjoliService";
 import RankTableScore from "./RankTableScore";
+import { useServer } from "../../../hooks/useServer";
 
 const MyTh = styled("th")`
   ${bgSecondary}
@@ -38,6 +39,7 @@ const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
   const { squadId } = useParams();
   const navigate = useNavigate();
   const uid = useUid();
+  const { path } = useServer();
   const { isMobile } = useScreenSize();
   const { t } = useTranslation();
 
@@ -68,7 +70,7 @@ const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
             role="button"
             className="mx-2"
             size={26}
-            onClick={() => navigate(`/${uid}/phase/${phase.id}`)}
+            onClick={() => navigate(`${path}phase/${phase.id}`)}
           />
         )}
         {squad.name}
@@ -83,7 +85,7 @@ const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
             className="mx-2"
             size={26}
             onClick={() =>
-              navigate(`/${uid}/phase/${phase.id}/squad/${squad.id}`)
+              navigate(`${path}phase/${phase.id}/squad/${squad.id}`)
             }
           />
         )}
