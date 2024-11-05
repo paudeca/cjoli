@@ -16,6 +16,7 @@ import { memo, useCallback } from "react";
 import * as cjoliService from "../../../services/cjoliService";
 import InfoButton from "./InfoButton";
 import { Stack } from "react-bootstrap";
+import { useServer } from "../../../hooks/useServer";
 
 const MyTh = styled("th")`
   ${bgSecondary}
@@ -38,6 +39,7 @@ const RankTableScore = ({ tourney, score, squad }: RankTableScoreProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const uid = useUid();
+  const { path } = useServer();
 
   const position = getPosition(score.positionId);
   const team = getTeam(position?.teamId || 0);
@@ -80,7 +82,7 @@ const RankTableScore = ({ tourney, score, squad }: RankTableScoreProps) => {
                   role="button"
                   className="mx-2"
                   onClick={() => {
-                    navigate(`/${uid}/team/${team.id}`);
+                    navigate(`${path}team/${team.id}`);
                     window.scrollTo(0, 0);
                   }}
                 />

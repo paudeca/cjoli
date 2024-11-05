@@ -12,6 +12,7 @@ import RankPage from "./pages/RankPage";
 import ChatPage from "./pages/ChatPage";
 import SettingPage from "./pages/SettingPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useServer } from "./hooks/useServer";
 
 const theme = {
   colors: {
@@ -19,27 +20,6 @@ const theme = {
     secondary: "#932829",
   },
 };
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <MainPage />,
-    children: [
-      { path: "", element: <SelectPage /> },
-      {
-        path: ":uid",
-        element: <HomePage />,
-      },
-      { path: ":uid/ranking", element: <RankPage /> },
-      { path: ":uid/phase/:phaseId", element: <HomePage /> },
-      { path: ":uid/phase/:phaseId/squad/:squadId", element: <HomePage /> },
-      { path: ":uid/team/:teamId", element: <HomePage /> },
-      { path: ":uid/team/:teamId/phase/:phaseId", element: <HomePage /> },
-      { path: ":uid/chat", element: <ChatPage /> },
-      { path: ":uid/setting", element: <SettingPage /> },
-    ],
-  },
-]);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,6 +29,51 @@ const queryClient = new QueryClient({
   },
 });
 const App = () => {
+  const { isUseDomain } = useServer();
+
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <MainPage />,
+      children: [
+        { path: "", element: isUseDomain ? <HomePage /> : <SelectPage /> },
+        {
+          path: ":uid",
+          element: <HomePage />,
+        },
+        {
+          path: isUseDomain ? "ranking" : ":uid/ranking",
+          element: <RankPage />,
+        },
+        {
+          path: isUseDomain ? "phase/:phaseId" : ":uid/phase/:phaseId",
+          element: <HomePage />,
+        },
+        {
+          path: isUseDomain
+            ? "phase/:phaseId/squad/:squadId"
+            : ":uid/phase/:phaseId/squad/:squadId",
+          element: <HomePage />,
+        },
+        {
+          path: isUseDomain ? "team/:teamId" : ":uid/team/:teamId",
+          element: <HomePage />,
+        },
+        {
+          path: isUseDomain
+            ? "team/:teamId/phase/:phaseId"
+            : ":uid/team/:teamId/phase/:phaseId",
+          element: <HomePage />,
+        },
+        { path: isUseDomain ? "chat" : ":uid/chat", element: <ChatPage /> },
+        {
+          path: isUseDomain ? "setting" : ":uid/setting",
+          element: <SettingPage />,
+        },
+      ],
+    },
+  ]);
+
   return (
     <ThemeProvider theme={theme}>
       <Global

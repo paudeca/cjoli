@@ -60,6 +60,7 @@ const MenuNav = () => {
     countUser,
   } = useUser();
   const uid = useUid();
+  const { path } = useServer();
   const { setShow: showLogin } = useModal("login");
   const { setShow: showRegister } = useModal("register");
   const { setShow: showUpdate } = useModal("update");
@@ -188,7 +189,7 @@ const MenuNav = () => {
                 <>
                   <Nav.Link
                     onClick={() => {
-                      navigate(`${uid}`);
+                      navigate(`${path}`);
                       setShow(false);
                     }}
                   >
@@ -197,7 +198,7 @@ const MenuNav = () => {
                   </Nav.Link>
                   <Nav.Link
                     onClick={() => {
-                      navigate(`${uid}/ranking`);
+                      navigate(`${path}ranking`);
                       setShow(false);
                     }}
                   >
@@ -207,7 +208,7 @@ const MenuNav = () => {
                   {isAdmin && (
                     <Nav.Link
                       onClick={() => {
-                        navigate(`${uid}/setting`);
+                        navigate(`${path}setting`);
                         setShow(false);
                       }}
                     >

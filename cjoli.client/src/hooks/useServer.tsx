@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import useWebSocket from "react-use-websocket";
 import { MessageServer } from "../models";
+import useUid from "./useUid";
 
 const server = import.meta.env.VITE_API_WS;
 
@@ -17,5 +18,15 @@ export const useServer = () => {
     [lastMessage]
   );
 
-  return { register, sendMessage, lastMessage };
+  const uid = useUid();
+  const host = window.location.host;
+  const uidDomain = host.split(".")[0];
+  const isUseDomain =
+    uidDomain &&
+    uidDomain != "www" &&
+    uidDomain != "cjoli-hockey" &&
+    !uidDomain.startsWith("localhost");
+  const path = isUseDomain ? "/" : `/${uid}/`;
+
+  return { register, sendMessage, lastMessage, isUseDomain, path };
 };
