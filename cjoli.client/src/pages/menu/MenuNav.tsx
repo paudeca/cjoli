@@ -50,7 +50,7 @@ const MyNavbar = styled(Navbar)`
 `;
 
 const MenuNav = () => {
-  const { loadRanking, tourney } = useCJoli();
+  const { loadRanking, tourney, teams } = useCJoli();
   const {
     user,
     userConfig,
@@ -102,6 +102,9 @@ const MenuNav = () => {
   ];
 
   const tourneyLabel = uid && tourney?.name;
+
+  const logo =
+    teams?.find((t) => t.id == userConfig.favoriteTeamId)?.logo ?? "/logo.png";
   return (
     <MyNavbar
       expand="sm"
@@ -113,7 +116,7 @@ const MenuNav = () => {
           <Row className="align-items-center">
             <Col>
               <MyImg
-                src="/logo.png"
+                src={logo}
                 width="60px"
                 className="mx-4"
                 onClick={() => navigate("/")}

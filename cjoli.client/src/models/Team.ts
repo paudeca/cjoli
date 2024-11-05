@@ -9,4 +9,6 @@ export interface Team {
   youngest?: string;
   datas?: TeamData;
   alias?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
 }

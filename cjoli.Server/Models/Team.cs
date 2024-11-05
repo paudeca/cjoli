@@ -14,6 +14,8 @@ namespace cjoli.Server.Models
         public string? ShortName { get; set; }
         public Team? Alias { get; set; }
         public string? FullName { get; set; }
+        public string? PrimaryColor { get; set; }
+        public string? SecondaryColor { get; set; }
 
         public IList<Team>? Children { get; set; }
         public IList<MatchResult> MatchResults { get; set; } = new List<MatchResult>();

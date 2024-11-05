@@ -10,6 +10,8 @@
         public string? Alias { get; set; }
         public TeamDataDto? Datas { get; set; }
         public string? FullName { get; set; }
+        public string? PrimaryColor { get; set; }
+        public string? SecondaryColor { get; set; }
 
     }
 }
