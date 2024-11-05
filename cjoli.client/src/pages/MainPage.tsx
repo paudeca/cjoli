@@ -24,6 +24,8 @@ import { useApi } from "../hooks/useApi";
 import ScrollButton from "./home/button/ScrollButton";
 import { Match } from "../models";
 import { ArrowDown, ArrowUp } from "react-bootstrap-icons";
+import { css, Global, ThemeProvider } from "@emotion/react";
+import { useColor } from "../hooks/useColor";
 
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
@@ -35,15 +37,31 @@ const MainPage = () => {
     state: { show, type, message },
     hideToast,
   } = useToast();
-  const { selectTourney, matches } = useCJoli();
+  const {
+    selectTourney,
+    matches,
+    theme: { primary, secondary },
+    teams,
+    setColor,
+  } = useCJoli();
   const uid = useUid();
   const { pathname } = useLocation();
   const { isMobile } = useScreenSize();
   const isOnChat = pathname.endsWith("chat");
   const { i18n } = useTranslation();
-  const { setCountUser } = useUser();
+  const { setCountUser, userConfig } = useUser();
   const { register } = useServer();
   const { getUser, getTourneys } = useApi();
+  const { lightness, isWhite } = useColor();
+
+  //const primary = "#202644";
+  //const secondary = "#932829";
+  const theme = {
+    colors: {
+      primary,
+      secondary,
+    },
+  };
 
   useQuery(getUser());
 
@@ -58,6 +76,16 @@ const MainPage = () => {
       setCountUser(value);
     });
   }, [register, setCountUser]);
+
+  useEffect(() => {
+    const team = teams?.find((t) => t.id == userConfig.favoriteTeamId);
+    if (team) {
+      setColor(
+        team.primaryColor ?? "#202644",
+        team.secondaryColor ?? "#932829"
+      );
+    }
+  }, [teams, userConfig, setColor]);
 
   dayjs.locale(i18n.resolvedLanguage);
 
@@ -74,34 +102,135 @@ const MainPage = () => {
   }, [matches, nextMatch]);
 
   return (
-    <Loading ready={!isLoading}>
-      <MenuNav />
-      <Outlet />
-      <ButtonFixed>
-        <Stack gap={1}>
-          {uid && !isOnChat && isMobile && isConnected && <EstimateButton />}
-          <ScrollButton to="ranking" icon={<ArrowUp />} down={false} />
-          {nextMatch && (
-            <ScrollButton
-              to={`match-${nextMatch.id}`}
-              icon={<ArrowDown />}
-              down
-            />
-          )}
-          {uid && !isOnChat && <ChatButton />}
-        </Stack>
-      </ButtonFixed>
-      <ToastContainer position="top-end" className="position-fixed">
-        <Toast onClose={hideToast} show={show} delay={5000} autohide bg={type}>
-          <Toast.Header>
-            <strong className="me-auto">
-              <Trans i18nKey="message">Message</Trans>
-            </strong>
-          </Toast.Header>
-          <Toast.Body>{message}</Toast.Body>
-        </Toast>
-      </ToastContainer>
-    </Loading>
+    <ThemeProvider theme={theme}>
+      <Global
+        styles={css`
+          body {
+            background-color: ${theme.colors.primary};
+            color: white;
+            uuser-select: none;
+          }
+          input::placeholder {
+            opacity: 0.5 !important;
+          }
+          span.badge.bg-secondary.menu {
+            background-color: grey !important;
+            opacity: 0.5;
+          }
+          .btn-primary {
+            --bs-btn-bg: ${lightness(primary, 10)};
+            --bs-btn-border-color: ${isWhite(primary)
+              ? "black"
+              : lightness(primary, 10)};
+            --bs-btn-hover-bg: ${lightness(
+              primary,
+              isWhite(primary) ? -5 : 20
+            )};
+            --bs-btn-hover-border-color: ${isWhite(primary)
+              ? "black"
+              : lightness(primary, 20)};
+            --bs-btn-active-bg: ${lightness(
+              primary,
+              isWhite(primary) ? -10 : 30
+            )};
+            --bs-btn-active-border-color: ${isWhite(primary)
+              ? "black"
+              : lightness(primary, 30)};
+            --bs-btn-disabled-bg: ${lightness(primary, 10)};
+            --bs-btn-color: ${isWhite(primary) ? "black" : "white"};
+            --bs-btn-hover-color: ${isWhite(primary) ? "black" : "white"};
+            --bs-btn-active-color: ${isWhite(primary) ? "black" : "white"};
+            --bs-btn-disabled-color: ${isWhite(primary) ? "black" : "white"};
+          }
+          .progress {
+            --bs-progress-bar-bg: ${theme.colors.secondary};
+          }
+          .accordion-button {
+            --bs-accordion-active-bg: ${theme.colors.secondary};
+            &:not(collapsed),
+            &:not(collapsed)::after {
+              --bs-accordion-active-color: white;
+              --bs-body-color: white;
+            }
+          }
+          .bg-secondary {
+            --bs-bg-opacity: 1;
+            --bs-secondary-rgb: 120, 129, 169;
+          }
+          .form-check-input:checked {
+            background-color: ${lightness(
+              primary,
+              isWhite(primary) ? -50 : 10
+            )};
+            border-color: ${lightness(primary, isWhite(primary) ? -50 : 10)};
+          }
+
+          .nav-pills {
+            --bs-nav-pills-link-active-bg: ${theme.colors.primary};
+          }
+
+          .popover {
+            --bs-popover-max-width: 800px;
+          }
+
+          .chat-messages {
+            display: flex;
+            flex-direction: column;
+            max-height: 800px;
+            overflow-y: scroll;
+          }
+
+          .chat-message-left,
+          .chat-message-right {
+            display: flex;
+            flex-shrink: 0;
+          }
+
+          .chat-message-left {
+            margin-right: auto;
+          }
+
+          .chat-message-right {
+            flex-direction: row-reverse;
+            margin-left: auto;
+          }
+        `}
+      />
+      <Loading ready={!isLoading}>
+        <MenuNav />
+        <Outlet />
+        <ButtonFixed>
+          <Stack gap={1}>
+            {uid && !isOnChat && isMobile && isConnected && <EstimateButton />}
+            <ScrollButton to="ranking" icon={<ArrowUp />} down={false} />
+            {nextMatch && (
+              <ScrollButton
+                to={`match-${nextMatch.id}`}
+                icon={<ArrowDown />}
+                down
+              />
+            )}
+            {uid && !isOnChat && <ChatButton />}
+          </Stack>
+        </ButtonFixed>
+        <ToastContainer position="top-end" className="position-fixed">
+          <Toast
+            onClose={hideToast}
+            show={show}
+            delay={5000}
+            autohide
+            bg={type}
+          >
+            <Toast.Header>
+              <strong className="me-auto">
+                <Trans i18nKey="message">Message</Trans>
+              </strong>
+            </Toast.Header>
+            <Toast.Body>{message}</Toast.Body>
+          </Toast>
+        </ToastContainer>
+      </Loading>
+    </ThemeProvider>
   );
 };
 

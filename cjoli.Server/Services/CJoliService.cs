@@ -687,6 +687,8 @@ namespace cjoli.Server.Services
             team.ShortName = teamDto.ShortName ?? team.ShortName;
             team.FullName = teamDto.FullName ?? team.FullName;
             team.Alias = !string.IsNullOrEmpty(teamDto.Alias) ? context.Team.SingleOrDefault(t => t.Name == teamDto.Alias) : team.Alias;
+            team.PrimaryColor = teamDto.PrimaryColor;
+            team.SecondaryColor = teamDto.SecondaryColor;
 
             TeamData? data = team.TeamDatas.SingleOrDefault();
             if (data == null)

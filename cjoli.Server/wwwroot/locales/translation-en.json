@@ -94,7 +94,9 @@
       "name": "Name",
       "shortName": "Short Name",
       "fullName": "Full Name",
-      "alias": "Alias"
+      "alias": "Alias",
+      "primaryColor": "Primary Color",
+      "secondaryColor": "Secondary Color"
     },
     "error": {
       "update": "Unable to update Team"

@@ -143,6 +143,15 @@ export const useCJoli = () => {
     [dispatch]
   );
 
+  const setColor = useCallback(
+    (primary: string, secondary: string) =>
+      dispatch({
+        type: CJoliActions.SET_COLOR,
+        payload: { primary, secondary },
+      }),
+    [dispatch]
+  );
+
   return {
     ...state,
     loadRanking,
@@ -162,5 +171,6 @@ export const useCJoli = () => {
     getScoreForTeam,
     selectDay,
     getIndexScoreFromPosition,
+    setColor,
   };
 };

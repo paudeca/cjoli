@@ -44,6 +44,16 @@ const TeamModal = ({ team }: { team?: Team }) => {
       label: t("team.form.youngest", "Youngest (date)"),
       type: "date",
     },
+    {
+      id: "primaryColor",
+      label: t("team.form.primaryColor", "Primary color"),
+      type: "text",
+    },
+    {
+      id: "secondaryColor",
+      label: t("team.form.secondaryColor", "Secondary color"),
+      type: "text",
+    },
   ];
   const onSubmit = async (team: Team) => {
     const ranking = await cjoliService.updateTeam(uid, team);

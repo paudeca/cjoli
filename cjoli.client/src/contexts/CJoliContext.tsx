@@ -20,6 +20,10 @@ interface CJoliState {
   positions?: Position[];
   matches: Match[];
   daySelected: string;
+  theme: {
+    primary: string;
+    secondary: string;
+  };
 }
 
 export const CJoliContext = React.createContext<{
@@ -30,6 +34,10 @@ export const CJoliContext = React.createContext<{
 const initialState: CJoliState = {
   daySelected: "0",
   matches: [],
+  theme: {
+    primary: "#202644",
+    secondary: "#932829",
+  },
 };
 
 type Action =
@@ -46,7 +54,11 @@ type Action =
       payload: Ranking;
     }
   | { type: CJoliActions.SELECT_DAY; payload: string }
-  | { type: CJoliActions.LOAD_TOURNEY; payload: Tourney };
+  | { type: CJoliActions.LOAD_TOURNEY; payload: Tourney }
+  | {
+      type: CJoliActions.SET_COLOR;
+      payload: { primary: string; secondary: string };
+    };
 
 const reducer = (state: CJoliState, action: Action) => {
   switch (action.type) {
@@ -57,7 +69,10 @@ const reducer = (state: CJoliState, action: Action) => {
       return { ...state, tourney: action.payload };
     }
     case CJoliActions.SELECT_TOURNEY: {
-      return { ...state, tourney: action.payload };
+      return {
+        ...state,
+        tourney: action.payload,
+      };
     }
     case CJoliActions.LOAD_RANKING: {
       const ranking = action.payload;
@@ -89,7 +104,13 @@ const reducer = (state: CJoliState, action: Action) => {
       };
     }
     case CJoliActions.SELECT_DAY: {
-      return { ...state, daySelected: action.payload };
+      return {
+        ...state,
+        daySelected: action.payload,
+      };
+    }
+    case CJoliActions.SET_COLOR: {
+      return { ...state, theme: action.payload };
     }
   }
 };
