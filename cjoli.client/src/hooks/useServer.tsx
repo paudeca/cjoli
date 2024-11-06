@@ -7,7 +7,13 @@ const server = import.meta.env.VITE_API_WS;
 
 export const useServer = () => {
   const { sendJsonMessage: sendMessage, lastJsonMessage: lastMessage } =
-    useWebSocket<MessageServer>(`${server}/server/ws`, { share: true });
+    useWebSocket<MessageServer>(`${server}/server/ws`, {
+      share: true,
+      shouldReconnect: () => true,
+      reconnectAttempts: 100,
+      reconnectInterval: (count: number) =>
+        Math.min(Math.pow(2, count) * 1000, 60000), //max 60s interval
+    });
 
   const register = useCallback(
     (type: string, callback: (value: number) => void) => {
