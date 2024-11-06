@@ -6,6 +6,8 @@ import useUid from "./useUid";
 const server = import.meta.env.VITE_API_WS;
 
 export const useServer = () => {
+  const uid = useUid();
+
   const { sendJsonMessage: sendMessage, lastJsonMessage: lastMessage } =
     useWebSocket<MessageServer>(`${server}/server/ws`, {
       share: true,
@@ -13,6 +15,9 @@ export const useServer = () => {
       reconnectAttempts: 100,
       reconnectInterval: (count: number) =>
         Math.min(Math.pow(2, count) * 1000, 60000), //max 60s interval
+      onOpen: () => {
+        uid && sendMessage({ type: "selectTourney", uid });
+      },
     });
 
   const register = useCallback(
@@ -24,7 +29,6 @@ export const useServer = () => {
     [lastMessage]
   );
 
-  const uid = useUid();
   const host = window.location.host;
   const uidDomain = host.split(".")[0];
   const isUseDomain =
