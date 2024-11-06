@@ -8,7 +8,7 @@ import TeamStack from "./home/TeamStack";
 //import SummaryStack from "./home/SummaryStack";
 import { useQuery } from "@tanstack/react-query";
 import { useServer } from "../hooks/useServer";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import CJoliStack from "../components/CJoliStack";
 import CJoliCard from "../components/CJoliCard";
 import { Alert } from "react-bootstrap";
@@ -21,16 +21,18 @@ const HomePage = () => {
   const { getRanking } = useApi();
   const uid = useUid();
   const { phaseId, teamId } = useParams();
+  const [loading, setLoading] = useState(true);
 
   const { refetch, isFetching } = useQuery(getRanking(uid));
 
   useEffect(() => {
     !isFetching && sendMessage({ type: "selectTourney", uid });
+    !isFetching && setLoading(false);
   }, [uid, isFetching, sendMessage]);
 
   useEffect(() => {
     register("updateRanking", async () => {
-      //refetch(); //disable, cause full refresh page on saveMatch
+      refetch(); //disable, cause full refresh page on saveMatch
     });
   }, [refetch, register]);
 
@@ -40,7 +42,7 @@ const HomePage = () => {
     phase = phases[0];
   }
   return (
-    <Loading ready={!isFetching}>
+    <Loading ready={!loading}>
       {teamId && <TeamStack />}
       {/*!teamId && <SummaryStack />*/}
       {phase && <RankingStack phase={phase} />}
