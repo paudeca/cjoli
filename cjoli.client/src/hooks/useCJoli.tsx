@@ -76,7 +76,7 @@ export const useCJoli = () => {
     [getPosition, getTeam]
   );
 
-  const getIndexScoreFromPosition = useCallback(
+  const getScoreFromPosition = useCallback(
     (positionId: number, squadId: number) => {
       const scoreSquad = state.ranking?.scores.scoreSquads.find(
         (s) => s.squadId == squadId
@@ -138,6 +138,16 @@ export const useCJoli = () => {
     [state.ranking?.scores.scoreTeams]
   );
 
+  const getScoreFromSquad = useCallback(
+    (squad: Squad, team: Team) => {
+      const scoreSquad = state.ranking?.scores.scoreSquads.find(
+        (s) => s.squadId == squad.id
+      );
+      return scoreSquad?.scores.find((s) => s.teamId == team.id);
+    },
+    [state]
+  );
+
   const selectDay = useCallback(
     (day: string) => dispatch({ type: CJoliActions.SELECT_DAY, payload: day }),
     [dispatch]
@@ -170,7 +180,8 @@ export const useCJoli = () => {
     isTeamInMatch,
     getScoreForTeam,
     selectDay,
-    getIndexScoreFromPosition,
+    getScoreFromPosition,
+    getScoreFromSquad,
     setColor,
   };
 };

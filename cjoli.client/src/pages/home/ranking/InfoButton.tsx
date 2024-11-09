@@ -24,7 +24,7 @@ interface InfoButtonProps {
 }
 
 const InfoButton = ({ score, squad }: InfoButtonProps) => {
-  const { getTeamInfo, tourney, getIndexScoreFromPosition } = useCJoli();
+  const { getTeamInfo, tourney, getScoreFromPosition } = useCJoli();
 
   const { name, logo } = getTeamInfo(score.positionId);
   const [open, setOpen] = useState(false);
@@ -144,7 +144,7 @@ const InfoButton = ({ score, squad }: InfoButtonProps) => {
                   const positionB = s.positionId;
                   const source = score.sources[positionB];
                   const infoB = getTeamInfo(positionB);
-                  const scoreB = getIndexScoreFromPosition(positionB, squad.id);
+                  const scoreB = getScoreFromPosition(positionB, squad.id);
 
                   return (
                     <ListGroup.Item

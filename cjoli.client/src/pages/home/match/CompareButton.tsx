@@ -3,7 +3,7 @@ import { Overlay, Popover, Button } from "react-bootstrap";
 import { ArrowsCollapseVertical } from "react-bootstrap-icons";
 import React from "react";
 import TeamTable from "../team/TeamTable";
-import { Team } from "../../../models";
+import { Squad, Team } from "../../../models";
 import { Trans } from "react-i18next";
 
 const MyButton = styled(ArrowsCollapseVertical)`
@@ -13,7 +13,13 @@ const MyButton = styled(ArrowsCollapseVertical)`
   }
 `;
 
-const CompareButton = ({ team, teamB }: { team: Team; teamB: Team }) => {
+interface CompareButtonProps {
+  team: Team;
+  teamB: Team;
+  squad?: Squad;
+}
+
+const CompareButton = ({ team, teamB, squad }: CompareButtonProps) => {
   const [open, setOpen] = React.useState(false);
   const target = React.useRef(null);
   return (
@@ -40,7 +46,7 @@ const CompareButton = ({ team, teamB }: { team: Team; teamB: Team }) => {
             </Popover.Header>
             <Popover.Body>
               <div>
-                <TeamTable team={team} teamB={teamB} />
+                <TeamTable team={team} teamB={teamB} squad={squad} />
               </div>
               <Button onClick={() => setOpen(false)} size="sm">
                 <Trans i18nKey="button.close">Close</Trans>

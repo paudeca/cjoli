@@ -94,7 +94,13 @@ const MatchRow = ({
         <tr>
           <td colSpan={2}>
             <Element name={`match-${match.id}`}>
-              {teamA && teamB && <CompareButton team={teamA} teamB={teamB} />}
+              {teamA && teamB && (
+                <CompareButton
+                  team={teamA}
+                  teamB={teamB}
+                  squad={getSquad(match.squadId)}
+                />
+              )}
               {dayjs(match.time).format("LT")} - {getSquad(match.squadId).name}
               {match.location && ` - ${match.location}`}
               <SimulationIcon show={isSimulation} />
@@ -211,7 +217,13 @@ const MatchRow = ({
                 </CJoliTooltip>
               )}
 
-              {teamA && teamB && <CompareButton team={teamA} teamB={teamB} />}
+              {teamA && teamB && (
+                <CompareButton
+                  team={teamA}
+                  teamB={teamB}
+                  squad={getSquad(match.squadId)}
+                />
+              )}
 
               {!isConnected && (
                 <CJoliTooltip info={t("match.simulated", "Simulated result")}>
@@ -260,7 +272,13 @@ const MatchRow = ({
         {!isMobile && done && (
           <td>
             <MyScoreDiv isMobile={false}>
-              {teamA && teamB && <CompareButton team={teamA} teamB={teamB} />}
+              {teamA && teamB && (
+                <CompareButton
+                  team={teamA}
+                  teamB={teamB}
+                  squad={getSquad(match.squadId)}
+                />
+              )}
               <ScoreCellView score={imatch.scoreA} bg={badgeA} text={textA} />
               <Badge
                 bg="light"
