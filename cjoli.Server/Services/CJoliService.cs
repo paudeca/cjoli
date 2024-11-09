@@ -71,12 +71,10 @@ namespace cjoli.Server.Services
 
         private Tourney GetTourney(string tourneyUid, User? user, CJoliContext context)
         {
-
-            bool isAdmin = user.IsAdmin();
             Tourney? tourney = context.Tourneys
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.Team)
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.ParentPosition)
-                .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(m => m.UserMatches.Where(u => user != null && !user.IsAdmin() && u.User == user))
+                .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(m => m.UserMatches.Where(u => user != null && !user.IsAdminWithNoCustomEstimate() && u.User == user))
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(
                     m => m.Estimates.Where(s => user != null && user.HasCustomEstimate() ? s.User == user : s.User == null)
                  )
@@ -138,8 +136,8 @@ namespace cjoli.Server.Services
         {
             User? user = GetUserWithConfig(login, uuid, context);
 
-            bool isAdmin = user.IsAdmin();
-            if (user.IsAdmin())
+            bool isAdmin = user.IsAdminWithNoCustomEstimate();
+            if (isAdmin)
             {
                 user = null;
             }
@@ -519,7 +517,8 @@ namespace cjoli.Server.Services
             {
                 throw new NotFoundException("Match", dto.Id);
             }
-            if (user.IsAdmin())
+            bool isAdmin = user.IsAdminWithNoCustomEstimate();
+            if (isAdmin)
             {
                 match.Done = true;
                 if (dto.ForfeitA || dto.ForfeitB)
@@ -561,7 +560,7 @@ namespace cjoli.Server.Services
 
             }
             context.SaveChanges();
-            if (user.IsAdmin())
+            if (isAdmin)
             {
                 _serverService.UpdateRanking(uuid);
             }
@@ -579,7 +578,7 @@ namespace cjoli.Server.Services
             {
                 throw new NotFoundException("Match", dto.Id);
             }
-            if (user.IsAdmin())
+            if (user.IsAdmin() && match.Done)
             {
                 match.Done = false;
                 match.ScoreA = 0;
