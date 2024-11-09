@@ -3,7 +3,7 @@ import TeamName from "../../../components/TeamName";
 import CJoliTooltip from "../../../components/CJoliTooltip";
 import React from "react";
 import TeamCell from "./TeamCell";
-import { Rank, Score, Team } from "../../../models";
+import { Rank, Score, Squad, Team } from "../../../models";
 import { useCJoli } from "../../../hooks/useCJoli";
 import { useTranslation } from "react-i18next";
 
@@ -13,13 +13,26 @@ const percent = (value: number, total: number) =>
 const average = (value: number, total: number) =>
   total == 0 ? "" : `avg: ${(value / total).toFixed(1)}`;
 
-const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
-  const { ranking, tourney, getTeamRank, getScoreForTeam } = useCJoli();
+interface TeamTableProps {
+  team: Team;
+  teamB?: Team;
+  squad?: Squad;
+}
+
+const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
+  const { ranking, tourney, getTeamRank, getScoreForTeam, getScoreFromSquad } =
+    useCJoli();
   const { t } = useTranslation();
-  const rank = getTeamRank(team);
-  const rankB = teamB && getTeamRank(teamB);
+  let rank = getTeamRank(team);
+  let rankB = teamB && getTeamRank(teamB);
   const score = getScoreForTeam(team)!;
   let scoreB = teamB && getScoreForTeam(teamB);
+  const scoreSquad = squad && getScoreFromSquad(squad, team);
+  const scoreSquadB = squad && teamB && getScoreFromSquad(squad, teamB);
+  if ((!rank || !rankB) && scoreSquad && scoreSquadB) {
+    rank = { order: scoreSquad.rank } as Rank;
+    rankB = { order: scoreSquadB.rank } as Rank;
+  }
 
   let datas: { team?: Team; rank?: Rank; score?: Score }[] = [
     { team, rank, score },
@@ -55,11 +68,11 @@ const TeamTable = ({ team, teamB }: { team: Team; teamB?: Team }) => {
       callRank: (r: Rank) => r.order || 0,
       getLabel: (r: Rank) =>
         r.order == 1
-          ? t("rank.first")
+          ? `${t("rank.first")} 🥇`
           : r.order == 2
-          ? t("rank.second")
+          ? `${t("rank.second")} 🥈`
           : r.order == 3
-          ? t("rank.third")
+          ? `${t("rank.third")} 🥉`
           : t("rank.rankth", { rank: r.order }),
       up: false,
       active: true,
