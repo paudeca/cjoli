@@ -1,9 +1,6 @@
 import CJoliCard from "../components/CJoliCard";
 import CJoliStack from "../components/CJoliStack";
-import { Card, Form, Table } from "react-bootstrap";
-import LeftCenterDiv from "../components/LeftCenterDiv";
-import TeamName from "../components/TeamName";
-import { useCJoli } from "../hooks/useCJoli";
+import { Card, Form } from "react-bootstrap";
 import React, { useEffect } from "react";
 import useUid from "../hooks/useUid";
 import Loading from "../components/Loading";
@@ -13,12 +10,11 @@ import { Trans } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { useServer } from "../hooks/useServer";
 import { useApi } from "../hooks/useApi";
+import RankTable from "./rank/RankTable";
 
 const RankPage = () => {
-  const { tourney, getRankPosition } = useCJoli();
   const { register } = useServer();
   const { getRanking } = useApi();
-  const ranks = tourney?.ranks || [];
 
   const uid = useUid();
 
@@ -35,49 +31,7 @@ const RankPage = () => {
   return (
     <Loading ready={!isLoading}>
       <CJoliStack gap={0} className="col-md-8 mx-auto mt-5">
-        <div className="p-2">
-          <CJoliCard>
-            <Card.Body>
-              <Card.Title>
-                <Trans i18nKey="rank.title">Ranking</Trans>
-              </Card.Title>
-              <Table
-                striped
-                bordered
-                hover
-                size="sm"
-                style={{ textAlign: "center" }}
-              >
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th className="w-50">
-                      <Trans i18nKey="rank.team">Team</Trans>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {ranks.map((rank) => {
-                    const positionId = getRankPosition(rank);
-                    return (
-                      <tr key={rank.id}>
-                        <td>{rank.order}</td>
-                        <td>
-                          <LeftCenterDiv>
-                            <TeamName
-                              positionId={positionId || 0}
-                              defaultName={rank.name}
-                            />
-                          </LeftCenterDiv>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </Table>
-            </Card.Body>
-          </CJoliCard>
-        </div>
+        <RankTable />
         <div className="p-2">
           <CJoliCard>
             <Card.Body>

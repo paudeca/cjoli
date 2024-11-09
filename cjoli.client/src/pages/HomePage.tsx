@@ -14,9 +14,10 @@ import CJoliCard from "../components/CJoliCard";
 import { Alert } from "react-bootstrap";
 import { Trans } from "react-i18next";
 import { useApi } from "../hooks/useApi";
+import RankStack from "./home/RankStack";
 
 const HomePage = () => {
-  const { phases } = useCJoli();
+  const { phases, matches } = useCJoli();
   const { sendMessage, register } = useServer();
   const { getRanking } = useApi();
   const uid = useUid();
@@ -41,8 +42,10 @@ const HomePage = () => {
   if (!phase && phases && phases?.length > 0) {
     phase = phases[0];
   }
+  const allMatchesDone = matches.every((m) => m.done);
   return (
     <Loading ready={!loading}>
+      {!teamId && allMatchesDone && <RankStack />}
       {teamId && <TeamStack />}
       {/*!teamId && <SummaryStack />*/}
       {phase && <RankingStack phase={phase} />}
