@@ -1,12 +1,4 @@
-import {
-  Button,
-  Card,
-  Col,
-  Container,
-  Form,
-  Row,
-  Stack,
-} from "react-bootstrap";
+import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { Match, Phase, Position, Rank, Squad, Team, Tourney } from "../models";
 import useUid from "../hooks/useUid";
@@ -31,9 +23,10 @@ import { Trash3 } from "react-bootstrap-icons";
 import { useModal } from "../hooks/useModal";
 import AddPhaseModal from "./setting/AddPhaseModal";
 import AddSquadModal from "./setting/AddSquadModal";
+import CJoliStack from "../components/CJoliStack";
 
 const SettingPage = () => {
-  const { tourney } = useCJoli();
+  const { tourney } = useCJoli("setting");
   const {
     getRanking,
     removeTourney,
@@ -149,7 +142,7 @@ const SettingPage = () => {
   };
 
   const buttons = (
-    <Stack direction={isMobile ? "vertical" : "horizontal"} gap={3}>
+    <CJoliStack direction={isMobile ? "vertical" : "horizontal"} gap={3}>
       <div className="p-2">
         <Button variant="primary" type="submit" style={{ width: 200 }}>
           Save
@@ -165,7 +158,7 @@ const SettingPage = () => {
           <Trash3 />
         </Button>
       </div>
-    </Stack>
+    </CJoliStack>
   );
 
   if (!tourney) {

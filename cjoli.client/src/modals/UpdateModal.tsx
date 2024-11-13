@@ -16,6 +16,7 @@ const UpdateModal = () => {
       label: t("login.form.password", "Password"),
       type: "password",
       required: true,
+      autoFocus: true,
     },
     {
       id: "passwordConfirm",

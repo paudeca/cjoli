@@ -43,6 +43,7 @@ const MainPage = () => {
     theme: { primary, secondary },
     teams,
     setColor,
+    isHomePage,
   } = useCJoli();
   const uid = useUid();
   const { pathname } = useLocation();
@@ -54,8 +55,6 @@ const MainPage = () => {
   const { getUser, getTourneys } = useApi();
   const { lightness, isWhite } = useColor();
 
-  //const primary = "#202644";
-  //const secondary = "#932829";
   const theme = {
     colors: {
       primary,
@@ -202,7 +201,9 @@ const MainPage = () => {
         <ButtonFixed>
           <Stack gap={1}>
             {uid && !isOnChat && isMobile && isConnected && <EstimateButton />}
-            <ScrollButton to="ranking" icon={<ArrowUp />} down={false} />
+            {isHomePage && (
+              <ScrollButton to="ranking" icon={<ArrowUp />} down={false} />
+            )}
             {nextMatch && (
               <ScrollButton
                 to={`match-${nextMatch.id}`}

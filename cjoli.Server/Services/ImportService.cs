@@ -187,7 +187,7 @@ namespace cjoli.Server.Services
             return Import(
                 dto: matchDto,
                 context: context,
-                select: () => squad.Matches.SingleOrDefault(m => m.PositionA.Value == matchDto.PositionA && m.PositionB.Value == matchDto.PositionB),
+                select: () => squad.Matches.SingleOrDefault(m => m.Id == matchDto.Id),
                 create: () =>
                 {
                     var positionA = squad.Positions.Single(m => m.Value == matchDto.PositionA);

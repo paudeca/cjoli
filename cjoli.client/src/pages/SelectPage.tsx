@@ -65,7 +65,7 @@ const Title = memo(
 );
 
 const SelectPage = () => {
-  const { tourneys } = useCJoli();
+  const { tourneys } = useCJoli("welcome");
   const { t } = useTranslation();
   const { isAdmin } = useUser();
   const { setShow: showAddTourney } = useModal("addTourney");

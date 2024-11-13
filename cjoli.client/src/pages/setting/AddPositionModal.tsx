@@ -27,12 +27,12 @@ const AddPositionModal = ({ onAddPosition }: AddPositionModalProps) => {
       id: "value",
       label: "Value",
       type: "number",
-      autoFocus: true,
     },
     {
       id: "name",
       label: "Name",
       type: "text",
+      autoFocus: true,
     },
     {
       id: "short",
@@ -93,6 +93,7 @@ const AddPositionModal = ({ onAddPosition }: AddPositionModalProps) => {
       title={`Add Position in ${data?.squad.name} in ${data?.phase.name}`}
       fields={fields}
       onSubmit={onSubmit}
+      values={{ value: data ? data.squad.positions.length + 1 : 1 }}
     />
   );
 };

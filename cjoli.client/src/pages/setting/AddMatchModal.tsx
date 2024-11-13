@@ -5,6 +5,7 @@ import { useSetting } from "../../hooks/useSetting";
 import { useApi } from "../../hooks/useApi";
 import { useMutation } from "@tanstack/react-query";
 import { useModal } from "../../hooks/useModal";
+import dayjs from "dayjs";
 
 const AddMatchModal = () => {
   const { tourney } = useSetting();
@@ -14,7 +15,7 @@ const AddMatchModal = () => {
   const getLabel = React.useCallback(
     (position: Position) => {
       return position.teamId > 0
-        ? tourney.teams.find((t) => t.id == position.teamId)!.name
+        ? tourney.teams.find((t) => t.id == position.teamId)?.name || "noname"
         : position.name ?? position.value.toString();
     },
     [tourney]
@@ -41,6 +42,16 @@ const AddMatchModal = () => {
     return true;
   };
 
+  const locationOptions = data?.squad.matches
+    .reduce<string[]>((acc, m) => {
+      if (m.location && !acc.includes(m.location)) return [...acc, m.location];
+      return acc;
+    }, [])
+    .map((location) => ({ label: location, value: location }));
+  locationOptions?.sort((a, b) => a.label.localeCompare(b.label));
+
+  const nextTime = data?.squad.matches[data?.squad.matches.length - 1]?.time;
+
   const fields: Field<Match>[] = [
     {
       id: "positionA",
@@ -66,6 +77,18 @@ const AddMatchModal = () => {
       label: "Time",
       type: "datetime-local",
     },
+    {
+      id: "location",
+      label: "Location",
+      type: "select",
+      creatable: true,
+      options: locationOptions,
+    },
+    {
+      id: "shot",
+      label: "Shot",
+      type: "switch",
+    },
   ];
 
   return (
@@ -74,6 +97,11 @@ const AddMatchModal = () => {
       title={`Add Match in ${data?.squad?.name}`}
       fields={fields}
       onSubmit={onSubmit}
+      values={{
+        time: dayjs(nextTime).format("YYYY-MM-DDThh:mm:ss"),
+        location: "glace A",
+        shot: true,
+      }}
     />
   );
 };

@@ -1,4 +1,13 @@
-import { Button, Card, Col, Form, Row, Tab, Tabs } from "react-bootstrap";
+import {
+  Button,
+  Card,
+  Col,
+  Form,
+  Row,
+  Stack,
+  Tab,
+  Tabs,
+} from "react-bootstrap";
 import { Trash3 } from "react-bootstrap-icons";
 import { useModal } from "../../hooks/useModal";
 import SquadsSetting from "./SquadsSetting";
@@ -16,7 +25,11 @@ const PhasesSetting = () => {
   return (
     <Card className="mb-3">
       <Card.Body>
-        <Card.Title className="mb-3">Phases</Card.Title>
+        <Card.Title className="mb-3">
+          <Stack direction="horizontal" gap={3}>
+            <Button onClick={() => showAddPhase(true)}>Add Phase</Button>Phases
+          </Stack>
+        </Card.Title>
         <Tabs className="mb-3" fill variant="underline" defaultActiveKey={0}>
           {tourney.phases.map((phase, i) => (
             <Tab key={phase.id} eventKey={i} title={phase.name}>

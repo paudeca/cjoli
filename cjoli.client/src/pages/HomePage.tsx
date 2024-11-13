@@ -17,7 +17,7 @@ import { useApi } from "../hooks/useApi";
 import RankStack from "./home/RankStack";
 
 const HomePage = () => {
-  const { phases, matches } = useCJoli();
+  const { phases, matches } = useCJoli("home");
   const { sendMessage, register } = useServer();
   const { getRanking } = useApi();
   const uid = useUid();

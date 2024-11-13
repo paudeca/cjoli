@@ -11,8 +11,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useServer } from "../hooks/useServer";
 import { useApi } from "../hooks/useApi";
 import RankTable from "./rank/RankTable";
+import { useCJoli } from "../hooks/useCJoli";
 
 const RankPage = () => {
+  useCJoli("ranking");
   const { register } = useServer();
   const { getRanking } = useApi();
 

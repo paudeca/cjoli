@@ -19,6 +19,8 @@ import { User } from "./User";
 import { UserConfig } from "./UserConfig";
 import { UserMatch } from "./UserMatch";
 
+type TypePage = "welcome" | "home" | "ranking" | "setting";
+
 export type {
   IMatch,
   Tourney,
@@ -37,6 +39,7 @@ export type {
   Squad,
   Team,
   TeamData,
+  TypePage,
   User,
   UserConfig,
   UserMatch,
