@@ -13,7 +13,7 @@ import {
   Path,
   PathValue,
 } from "react-hook-form";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useModal } from "../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
 import CreatableSelect from "react-select/creatable";
@@ -56,9 +56,15 @@ const CJoliModal = <T extends FieldValues>({
     formState: { errors },
     resetField,
     watch,
+    setFocus,
   } = useForm<T>({ values });
 
-  const [running, setRunning] = React.useState(false);
+  const [running, setRunning] = useState(false);
+
+  const focusField = fields.find((f) => f.autoFocus);
+  useEffect(() => {
+    focusField && show && setFocus(focusField.id);
+  }, [focusField, show, setFocus]);
 
   const submit: SubmitHandler<T> = async (data) => {
     setRunning(true);
