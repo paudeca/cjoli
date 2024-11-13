@@ -5,6 +5,7 @@ export enum CJoliActions {
   SELECT_DAY = "SELECT_DAY",
   LOAD_TOURNEY = "LOAD_TOURNEY",
   SET_COLOR = "SET_COLOR",
+  SELECT_PAGE = "SELECT_PAGE",
 }
 
 export enum UserActions {

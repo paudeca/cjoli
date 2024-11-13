@@ -360,8 +360,8 @@ namespace cjoli.Server.Services
 
         public class ColumnDef
         {
-            public string Type;
-            public Func<Score, int> Val;
+            public required string Type;
+            public required Func<Score, int> Val;
             public bool Reverse;
         }
 

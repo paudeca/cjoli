@@ -35,6 +35,8 @@ const MatchesSetting = ({
     [tourney, squad.positions]
   );
 
+  squad.matches.sort((a, b) => (a.time < b.time ? -1 : 1));
+
   return (
     <Accordion className="p-3">
       {squad.matches.map((match, i) => {

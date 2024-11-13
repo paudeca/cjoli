@@ -7,6 +7,7 @@ import {
   Squad,
   Team,
   Tourney,
+  TypePage,
 } from "../models";
 import { CJoliActions } from "./actions";
 
@@ -24,6 +25,7 @@ interface CJoliState {
     primary: string;
     secondary: string;
   };
+  page: TypePage;
 }
 
 export const CJoliContext = React.createContext<{
@@ -38,6 +40,7 @@ const initialState: CJoliState = {
     primary: "#202644",
     secondary: "#932829",
   },
+  page: "welcome",
 };
 
 type Action =
@@ -58,6 +61,10 @@ type Action =
   | {
       type: CJoliActions.SET_COLOR;
       payload: { primary: string; secondary: string };
+    }
+  | {
+      type: CJoliActions.SELECT_PAGE;
+      payload: TypePage;
     };
 
 const reducer = (state: CJoliState, action: Action) => {
@@ -111,6 +118,9 @@ const reducer = (state: CJoliState, action: Action) => {
     }
     case CJoliActions.SET_COLOR: {
       return { ...state, theme: action.payload };
+    }
+    case CJoliActions.SELECT_PAGE: {
+      return { ...state, page: action.payload };
     }
   }
 };

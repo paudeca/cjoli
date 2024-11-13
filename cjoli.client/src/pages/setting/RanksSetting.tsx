@@ -1,5 +1,5 @@
 import React from "react";
-import { Accordion, Button, Card, Col, Row } from "react-bootstrap";
+import { Accordion, Button, Card, Col, Row, Stack } from "react-bootstrap";
 import { useSetting } from "../../hooks/useSetting";
 import { Rank } from "../../models";
 import { useModal } from "../../hooks/useModal";
@@ -25,7 +25,11 @@ const RanksSetting = () => {
   return (
     <Card>
       <Card.Body>
-        <Card.Title className="mb-3">Rank</Card.Title>
+        <Card.Title className="mb-3">
+          <Stack direction="horizontal" gap={3}>
+            <Button onClick={() => showAddRank(true)}>Add Rank</Button>Rank
+          </Stack>
+        </Card.Title>
 
         <Accordion className="p-3">
           {tourney.ranks.map((rank, i) => {

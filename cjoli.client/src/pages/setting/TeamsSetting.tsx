@@ -34,7 +34,11 @@ const TeamsSetting = () => {
   return (
     <Card className="mb-3">
       <Card.Body>
-        <Card.Title className="mb-3">Teams</Card.Title>
+        <Card.Title className="mb-3">
+          <Stack direction="horizontal" gap={3}>
+            <Button onClick={() => showAddTeam(true)}>Add Team</Button>Teams
+          </Stack>
+        </Card.Title>
         <Col lg={8} xs={12} className="mx-auto py-2">
           <ListGroup>
             {tourney.teams.map((team) => (

@@ -1,9 +1,18 @@
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import { CJoliContext } from "../contexts/CJoliContext";
-import { Match, Phase, Rank, Ranking, Squad, Team, Tourney } from "../models";
+import {
+  Match,
+  Phase,
+  Rank,
+  Ranking,
+  Squad,
+  Team,
+  Tourney,
+  TypePage,
+} from "../models";
 import { CJoliActions } from "../contexts/actions";
 
-export const useCJoli = () => {
+export const useCJoli = (page?: TypePage) => {
   const ctx = useContext(CJoliContext);
   if (!ctx) {
     throw new Error("useCJoli has to be used within <CJoliProvider>");
@@ -162,6 +171,16 @@ export const useCJoli = () => {
     [dispatch]
   );
 
+  const selectPage = useCallback(
+    (page: TypePage) =>
+      dispatch({ type: CJoliActions.SELECT_PAGE, payload: page }),
+    [dispatch]
+  );
+
+  useEffect(() => {
+    page && selectPage(page);
+  }, [page, selectPage]);
+
   return {
     ...state,
     loadRanking,
@@ -183,5 +202,7 @@ export const useCJoli = () => {
     getScoreFromPosition,
     getScoreFromSquad,
     setColor,
+    selectPage,
+    isHomePage: state.page == "home",
   };
 };

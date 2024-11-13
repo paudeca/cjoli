@@ -13,7 +13,7 @@ import {
   Path,
   PathValue,
 } from "react-hook-form";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useModal } from "../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
 import CreatableSelect from "react-select/creatable";
@@ -22,12 +22,19 @@ import Select, { SingleValue } from "react-select";
 export interface Field<T extends FieldValues> {
   id: Path<T>;
   label: string;
-  type: "text" | "password" | "date" | "datetime-local" | "number" | "select";
+  type:
+    | "text"
+    | "password"
+    | "date"
+    | "datetime-local"
+    | "number"
+    | "select"
+    | "switch";
   required?: boolean;
   validate?: Path<T>;
   autoFocus?: boolean;
   creatable?: boolean;
-  options?: { label: string; value: number }[];
+  options?: { label: string; value: string | number }[];
   onChange?: (value?: string) => void;
 }
 
@@ -36,7 +43,7 @@ interface CJoliModalProps<T extends FieldValues> {
   title: string;
   fields: Field<T>[];
   onSubmit: (data: T) => Promise<boolean>;
-  values?: T;
+  values?: Partial<T>;
 }
 
 const CJoliModal = <T extends FieldValues>({
@@ -57,7 +64,7 @@ const CJoliModal = <T extends FieldValues>({
     resetField,
     watch,
     setFocus,
-  } = useForm<T>({ values });
+  } = useForm<T>({ values: values as T });
 
   const [running, setRunning] = useState(false);
 
@@ -78,7 +85,9 @@ const CJoliModal = <T extends FieldValues>({
   const createInput = (f: Field<T>) => {
     switch (f.type) {
       case "select": {
-        const onChange = (v: SingleValue<{ label: string; value: number }>) => {
+        const onChange = (
+          v: SingleValue<{ label: string; value: string | number }>
+        ) => {
           const value = v?.value as PathValue<T, Path<T>>;
           setValue(f.id, value);
           f.onChange && f.onChange(value);
@@ -93,6 +102,23 @@ const CJoliModal = <T extends FieldValues>({
           <Select options={f.options} onChange={onChange} isClearable />
         );
       }
+      case "switch":
+        return (
+          <Form.Check
+            type="switch"
+            label={f.label}
+            {...register(f.id, {
+              required: f.required
+                ? t("error.required", { field: f.label })
+                : false,
+              validate: (value) =>
+                f.validate && watch(f.validate) !== value
+                  ? t("error.invalid", { field: f.label })
+                  : undefined,
+            })}
+            className={`${errors[f.id] ? "is-invalid" : ""}`}
+          />
+        );
       default:
         return (
           <Form.Control
