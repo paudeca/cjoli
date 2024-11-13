@@ -105,6 +105,7 @@ const MenuNav = () => {
 
   const logo =
     teams?.find((t) => t.id == userConfig.favoriteTeamId)?.logo ?? "/logo.png";
+  const version = __APP_VERSION__;
   return (
     <MyNavbar
       expand="sm"
@@ -125,7 +126,9 @@ const MenuNav = () => {
             </Col>
             {!tourneyLabel && isMobile && <Col>Ice Hockey</Col>}
             {!tourneyLabel && !isMobile && (
-              <Col>{t("title", "CJoli - Ice Hockey Tournament")} - 1.0.0</Col>
+              <Col>
+                {t("title", "CJoli - Ice Hockey Tournament")} - {version}
+              </Col>
             )}
             {tourneyLabel && <Col>{tourneyLabel}</Col>}
             <Col>
