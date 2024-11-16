@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
 using cjoli.Server.Dtos;
+using cjoli.Server.Extensions;
 using cjoli.Server.Models;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
+using Serilog.Context;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace cjoli.Server.Controllers
 {
@@ -18,14 +22,16 @@ namespace cjoli.Server.Controllers
         private readonly AIService _aiService;
         private readonly IMapper _mapper;
         private readonly CJoliContext _context;
+        private readonly ILogger<CJoliController> _logger;
 
-        public CJoliController(CJoliService service, ImportService importService, AIService aiService, IMapper mapper, CJoliContext context)
+        public CJoliController(CJoliService service, ImportService importService, AIService aiService, IMapper mapper, CJoliContext context, ILogger<CJoliController> logger)
         {
             _service = service;
             _importService = importService;
             _aiService = aiService;
             _mapper = mapper;
             _context = context;
+            _logger = logger;
         }
 
         private string? GetLogin()
@@ -82,9 +88,13 @@ namespace cjoli.Server.Controllers
         [Route("{uuid}/SaveMatch")]
         public RankingDto SaveMatch([FromRoute] string uuid, [FromBody] MatchDto match)
         {
-            var login = GetLogin();
-            _service.SaveMatch(match, login!, uuid, _context);
-            return GetRanking(uuid);
+            using (LogContext.PushProperty("uid", uuid))
+            {
+                var login = GetLogin();
+                _service.SaveMatch(match, login!, uuid, _context);
+                _logger.LogInformationWithData("SaveMatch", match);
+                return GetRanking(uuid);
+            }
         }
 
         [HttpPost]
@@ -92,9 +102,13 @@ namespace cjoli.Server.Controllers
         [Route("{uuid}/ClearMatch")]
         public RankingDto ClearMatch([FromRoute] string uuid, [FromBody] MatchDto match)
         {
-            var login = GetLogin();
-            _service.ClearMatch(match, login!, uuid, _context);
-            return GetRanking(uuid);
+            using (LogContext.PushProperty("uid", uuid))
+            {
+                var login = GetLogin();
+                _service.ClearMatch(match, login!, uuid, _context);
+                _logger.LogInformationWithData("ClearMatch", match);
+                return GetRanking(uuid);
+            }
         }
 
         [HttpPost]
@@ -102,9 +116,13 @@ namespace cjoli.Server.Controllers
         [Route("{uuid}/ClearSimulations")]
         public RankingDto ClearSimulations([FromRoute] string uuid, [FromBody] int[] ids)
         {
-            var login = GetLogin();
-            _service.ClearSimulations(ids, login!, uuid, _context);
-            return GetRanking(uuid);
+            using (LogContext.PushProperty("uid", uuid))
+            {
+                var login = GetLogin();
+                _service.ClearSimulations(ids, login!, uuid, _context);
+                _logger.LogInformationWithData("ClearSimulation", ids);
+                return GetRanking(uuid);
+            }
         }
 
         /*[HttpPost]

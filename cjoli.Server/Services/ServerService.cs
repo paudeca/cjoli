@@ -16,9 +16,12 @@ namespace cjoli.Server.Services
     public class ServerService
     {
         private readonly ConcurrentDictionary<string, SessionSocket> _clients = new ConcurrentDictionary<string, SessionSocket>();
+        private readonly ILogger<ServerService> _logger;
 
-
-        public ServerService() { }
+        
+        public ServerService(ILogger<ServerService> logger) {
+            _logger = logger;
+        }
 
         public void Read(string socketId, ServerMessage message)
         {
@@ -28,6 +31,7 @@ namespace cjoli.Server.Services
                     {
                         var m = message as SelectTourneyMessage;
                         _clients.First(s => s.Key == socketId).Value.TourneyUid = m!.Uid;
+                        _logger.LogInformation("users connected to {@uid} count:{@count}", m!.Uid, _clients.Where(c => c.Value.TourneyUid == m!.Uid).Count());
                         break;
                     }
             }
@@ -37,12 +41,14 @@ namespace cjoli.Server.Services
         {
             string socketId = Guid.NewGuid().ToString();
             _clients.TryAdd(socketId, new SessionSocket() { WebSocket = ws });
+            _logger.LogInformation("new user connected count:{@count}",_clients.Count);
             return socketId;
         }
 
         public void RemoveClient(string socketId, WebSocket ws)
         {
             _clients.TryRemove(socketId, out _);
+            _logger.LogInformation("user leaves count:{@count}", _clients.Count);
         }
 
         public async Task SendUsers()

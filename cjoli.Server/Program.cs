@@ -5,7 +5,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog.Sinks.Datadog.Logs;
+using Serilog;
 using System.Text;
+using Serilog.Exceptions;
+using cjoli.Server.Exceptions;
+using cjoli.Server.Middlewares;
+using Serilog.Enrichers.Sensitive;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,6 +73,7 @@ builder.Services.AddSingleton<EstimateService>();
 builder.Services.AddSingleton<AIService>();
 builder.Services.AddSingleton<ServerService>();
 builder.Services.AddSingleton(new OpenAIClient(builder.Configuration["OpenAIKey"]));
+builder.Services.AddSingleton<LoggerMiddleware>();
 
 builder.Services.AddDbContextPool<CJoliContext>(options =>
 {
@@ -74,11 +82,33 @@ builder.Services.AddDbContextPool<CJoliContext>(options =>
 }
 );
 
+builder.Services.AddLogging(configure =>
+{
+    var logger = new LoggerConfiguration()
+    .Enrich.WithExceptionDetails()
+    .Enrich.FromLogContext()
+    .Enrich.WithSensitiveDataMasking(opt => { 
+        opt.MaskProperties.Add("Password");
+    })
+    .WriteTo.DatadogLogs(builder.Configuration["DatadogKey"],
+        configuration: new DatadogConfiguration() { Url = "https://http-intake.logs.datadoghq.eu" },
+        service: "server",
+        host: "local")
+    .MinimumLevel.Debug()
+    .Filter.ByIncludingOnly("SourceContext like 'cjoli%' OR SourceContext='Microsoft.AspNetCore.Hosting.Diagnostics'")
+    .CreateLogger();
+    configure.AddSerilog(logger);
+});
+
+builder.Services.AddExceptionHandler<LoggerExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseCors();
 app.UseStaticFiles();
+app.UseExceptionHandler();
 
 app.UseWebSockets();
 if (app.Environment.IsDevelopment())
@@ -93,10 +123,13 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<LoggerMiddleware>();
+
 
 
 app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
+
 
 app.Run();

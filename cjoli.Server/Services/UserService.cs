@@ -12,9 +12,11 @@ namespace cjoli.Server.Services
     public class UserService
     {
         private readonly IConfiguration _configuration;
-        public UserService(IConfiguration configuration)
+        private readonly ILogger<UserService> _logger;
+        public UserService(IConfiguration configuration, ILogger<UserService> logger)
         {
             _configuration = configuration;
+            _logger = logger;
         }
 
         public User Register(UserDto userDto, CJoliContext context)
