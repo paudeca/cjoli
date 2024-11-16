@@ -113,7 +113,6 @@ const MatchesStack = ({ phase }: { phase?: Phase }) => {
             <Accordion
               activeKey={daySelected}
               onSelect={(e) => {
-                console.log("day", e);
                 selectDay(e as string);
               }}
             >

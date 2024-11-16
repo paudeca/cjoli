@@ -27,7 +27,7 @@ const SummaryStack = () => {
   });
 
   return (
-    <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="ranking">
+    <CJoliStack gap={0} className="col-md-8 mx-auto mt-5">
       <div className="p-2">
         <CJoliCard>
           <Row>

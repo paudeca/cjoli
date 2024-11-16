@@ -9,6 +9,25 @@ import { MemoryRouter } from "react-router-dom";
 import { Ranking, Score, Tourney } from "../models";
 import { expect, vi } from "vitest";
 import axios from "axios";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import localizedFormat from "dayjs/plugin/localizedFormat";
+import duration from "dayjs/plugin/duration";
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+
+dayjs.extend(relativeTime);
+dayjs.extend(localizedFormat);
+dayjs.extend(duration);
+
+i18n.use(initReactI18next).init({
+  debug: false,
+  fallbackLng: "en",
+  interpolation: {
+    escapeValue: false,
+  },
+});
 
 //fix error TypeError: targetWindow.matchMedia is not a function
 Object.defineProperty(window, "matchMedia", {
@@ -34,11 +53,13 @@ export const renderPage = (page: React.ReactNode, path?: string) => {
         <CJoliProvider>
           <UserProvider>
             <ToastProvider>
-              <ModalProvider>
-                <MemoryRouter initialEntries={path ? [path] : undefined}>
-                  {page}
-                </MemoryRouter>
-              </ModalProvider>
+              <QueryClientProvider client={new QueryClient()}>
+                <ModalProvider>
+                  <MemoryRouter initialEntries={path ? [path] : undefined}>
+                    {page}
+                  </MemoryRouter>
+                </ModalProvider>
+              </QueryClientProvider>
             </ToastProvider>
           </UserProvider>
         </CJoliProvider>
