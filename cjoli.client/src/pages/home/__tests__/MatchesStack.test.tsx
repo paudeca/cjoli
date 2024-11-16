@@ -1,5 +1,4 @@
 import { describe, it, vi } from "vitest";
-import { screen } from "@testing-library/react";
 import {
   createRanking,
   createTourney,
@@ -29,7 +28,7 @@ const Load = ({ children }: { children: ReactNode }) => {
                   id: 1,
                   name: "squad1",
                   positions: [],
-                  matches: [{} as Match],
+                  matches: [{ id: 1, squadId: 1 } as Match],
                 },
               ],
             },
@@ -37,7 +36,7 @@ const Load = ({ children }: { children: ReactNode }) => {
         })
       )
     );
-  }, []);
+  }, [loadRanking]);
   return children;
 };
 
@@ -73,6 +72,5 @@ describe("MatchesStack", () => {
         <MatchesStack />
       </Load>
     );
-    screen.debug();
   });
 });

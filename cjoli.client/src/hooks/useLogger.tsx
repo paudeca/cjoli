@@ -6,7 +6,6 @@ import useUid from "./useUid";
 const token = import.meta.env.VITE_DATADOG_TOKEN;
 const host = import.meta.env.VITE_DATADOG_HOST;
 
-console.log("Init logger");
 datadogLogs.init({
   clientToken: token,
   site: "datadoghq.eu",
