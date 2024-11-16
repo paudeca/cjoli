@@ -26,13 +26,17 @@ import { Match } from "../models";
 import { ArrowDown, ArrowUp } from "react-bootstrap-icons";
 import { css, Global, ThemeProvider } from "@emotion/react";
 import { useColor } from "../hooks/useColor";
+import { useLogger } from "../hooks/useLogger";
 
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 dayjs.extend(duration);
 
+let init = false;
+
 const MainPage = () => {
   const { isConnected } = useUser();
+  const logger = useLogger();
   const {
     state: { show, type, message },
     hideToast,
@@ -54,6 +58,7 @@ const MainPage = () => {
   const { register } = useServer();
   const { getUser, getTourneys } = useApi();
   const { lightness, isWhite } = useColor();
+  const location = useLocation();
 
   const theme = {
     colors: {
@@ -86,6 +91,13 @@ const MainPage = () => {
     }
   }, [teams, userConfig, setColor]);
 
+  useEffect(() => {
+    if (!init) {
+      logger.info("Start Application CJoli");
+      init = true;
+    }
+  }, [logger]);
+
   dayjs.locale(i18n.resolvedLanguage);
 
   const [nextMatch, setNextMatch] = useState<Match>();
@@ -99,6 +111,10 @@ const MainPage = () => {
       setNextMatch(undefined);
     }
   }, [matches, nextMatch]);
+
+  useEffect(() => {
+    logger.info("Navigation", location.pathname);
+  }, [location.pathname, logger]);
 
   return (
     <ThemeProvider theme={theme}>

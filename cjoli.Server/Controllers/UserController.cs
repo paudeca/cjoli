@@ -16,6 +16,15 @@ namespace cjoli.Server.Controllers
         private readonly UserService _service;
         private readonly IMapper _mapper;
         private readonly CJoliContext _context;
+        private readonly ILogger<UserController> _logger;
+
+        public UserController(UserService service, IMapper mapper, CJoliContext context, ILogger<UserController> logger)
+        {
+            _service = service;
+            _mapper = mapper;
+            _context = context;
+            _logger = logger;
+        }
 
         private string? GetLogin()
         {
@@ -24,13 +33,6 @@ namespace cjoli.Server.Controllers
                 return null;
             }
             return User.Claims.First(i => i.Type == ClaimTypes.NameIdentifier).Value;
-        }
-
-        public UserController(UserService service, IMapper mapper, CJoliContext context)
-        {
-            _service = service;
-            _mapper = mapper;
-            _context = context;
         }
 
         [HttpGet]
@@ -48,6 +50,7 @@ namespace cjoli.Server.Controllers
         [Route("Register")]
         public UserDto Register(UserDto dto)
         {
+            _logger.LogInformation("User register {@data}",dto.Login);
             return _mapper.Map<UserDto>(_service.Register(dto, _context));
         }
 
@@ -55,11 +58,13 @@ namespace cjoli.Server.Controllers
         [Route("Login")]
         public IResult Login(UserDto userDto)
         {
+            _logger.LogInformation("Login user {@data}",userDto);
             if (string.IsNullOrEmpty(userDto.Password))
             {
                 throw new IllegalArgumentException("password");
             }
             string token = _service.Login(userDto.Login, userDto.Password, _context);
+            _logger.LogDebug("User connected");
             return Results.Ok(token);
         }
 
@@ -67,6 +72,7 @@ namespace cjoli.Server.Controllers
         [Route("Update")]
         public bool Update(UserDto user)
         {
+            _logger.LogInformation("Update user {@data}", user);
             var login = GetLogin();
             if (login == null || user.Password == null)
             {

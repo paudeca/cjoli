@@ -95,7 +95,7 @@ Les réponses ne doivent pas dépasser 3 phrases.
         private ChatSession CreateSession(string uuid, string lang, string? login, string prompt, CJoliContext context)
         {
             ChatSession session = new();
-            session.Messages.Add(new ChatRequestSystemMessage(prompt));
+            session.AddSystemMessage(prompt);
 
             var dto = _cjoliService.CreateRanking(uuid, null, context);
 
@@ -123,7 +123,7 @@ Les réponses ne doivent pas dépasser 3 phrases.
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             });
 
-            session.Messages.Add(new ChatRequestSystemMessage("Utilise le json suivant pour donner des informations.\n" + json));
+            session.AddSystemMessage("Utilise le json suivant pour donner des informations.\n" + json);
 
             return session;
         }
@@ -144,7 +144,7 @@ Les réponses ne doivent pas dépasser 3 phrases.
                 if (responseChoice.FinishReason == CompletionsFinishReason.Stopped)
                 {
                     string reply = responseChoice.Message.Content;
-                    session.Messages.Add(new ChatRequestAssistantMessage(reply));
+                    session.AddAssistantMessage(reply);                    
                     session.SendReply(reply);
                     return reply;
                 }

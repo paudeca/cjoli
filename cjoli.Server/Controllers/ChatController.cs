@@ -1,8 +1,10 @@
 ﻿using cjoli.Server.Models;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Mvc;
+using Serilog.Context;
 using System.Net.WebSockets;
 using System.Text;
+using cjoli.Server.Extensions;
 
 namespace cjoli.Server.Controllers
 {
@@ -12,11 +14,13 @@ namespace cjoli.Server.Controllers
     {
         private readonly AIService _service;
         private readonly CJoliContext _context;
+        private readonly ILogger _logger;
 
-        public ChatController(AIService service, CJoliContext context)
+        public ChatController(AIService service, CJoliContext context, ILogger<ChatController> logger)
         {
             _service = service;
             _context = context;
+            _logger = logger;
         }
 
 
@@ -24,14 +28,17 @@ namespace cjoli.Server.Controllers
         [Route("{uuid}/ws")]
         public async Task Get(string uuid, [FromQuery] string lang, [FromQuery] string login)
         {
-            if (HttpContext.WebSockets.IsWebSocketRequest)
+            using(LogContext.PushProperty("uid",uuid))
             {
-                using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                await Bot(webSocket, uuid, lang, login);
-            }
-            else
-            {
-                HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                if (HttpContext.WebSockets.IsWebSocketRequest)
+                {
+                    using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+                    await Bot(webSocket, uuid, lang, login);
+                }
+                else
+                {
+                    HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                }
             }
         }
 
@@ -55,6 +62,9 @@ namespace cjoli.Server.Controllers
                 receiveResult = await webSocket.ReceiveAsync(
                     new ArraySegment<byte>(buffer), CancellationToken.None);
             }
+
+            _logger.LogInformationWithData("chat done", session.ChatMessages);
+
 
             await webSocket.CloseAsync(
                 receiveResult.CloseStatus.Value,
