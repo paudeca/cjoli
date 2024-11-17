@@ -1,17 +1,29 @@
 import { Badge } from "react-bootstrap";
+import { IMatch } from "../../../models";
 
-const ScoreCellView = ({
-  score,
-  bg,
-  text,
-}: {
-  score: number | string;
-  bg: string;
-  text: string;
-}) => {
+interface ScoreCellViewProps {
+  match: IMatch;
+  mode: "A" | "B";
+}
+
+const ScoreCellView = ({ match, mode }: ScoreCellViewProps) => {
+  let badge =
+    (mode == "A" && match.scoreA > match.scoreB) ||
+    (mode == "B" && match.scoreA < match.scoreB)
+      ? "success"
+      : match.scoreA === match.scoreB
+      ? "warning"
+      : "danger";
+  if (match.forfeitA) {
+    badge = mode == "A" ? "danger" : "success";
+  } else if (match.forfeitB) {
+    badge = mode == "A" ? "success" : "danger";
+  }
+  const text = badge == "warning" ? "black" : "white";
+
   return (
-    <Badge bg={bg} text={text} style={{ fontSize: "18px" }} className="my-1">
-      {score}
+    <Badge bg={badge} text={text} style={{ fontSize: "18px" }} className="my-1">
+      {mode == "A" ? match.scoreA : match.scoreB}
     </Badge>
   );
 };

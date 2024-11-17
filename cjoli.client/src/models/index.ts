@@ -19,7 +19,7 @@ import { User } from "./User";
 import { UserConfig } from "./UserConfig";
 import { UserMatch } from "./UserMatch";
 
-type TypePage = "welcome" | "home" | "ranking" | "setting";
+type TypePage = "welcome" | "home" | "team" | "ranking" | "setting";
 
 export type {
   IMatch,

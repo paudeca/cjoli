@@ -15,7 +15,7 @@ import { useModal } from "../../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
 import { memo, useCallback, useEffect, useMemo } from "react";
 
-const MatchesStack = ({ phase }: { phase?: Phase }) => {
+const MatchesStack = ({ phase }: { phase: Phase }) => {
   const { matches, loadRanking, isTeamInMatch, daySelected, selectDay } =
     useCJoli();
   const uid = useUid();

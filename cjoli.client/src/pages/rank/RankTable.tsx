@@ -6,9 +6,10 @@ import TeamName from "../../components/TeamName";
 import { useCJoli } from "../../hooks/useCJoli";
 import { useCallback } from "react";
 import { Rank } from "../../models";
+import ButtonTeam from "../../components/ButtonTeam";
 
 const RankTable = () => {
-  const { tourney, getRankPosition } = useCJoli();
+  const { tourney, getRankPosition, findTeam } = useCJoli();
 
   const ranks = tourney?.ranks || [];
 
@@ -51,6 +52,7 @@ const RankTable = () => {
             <tbody>
               {ranks.map((rank) => {
                 const positionId = getRankPosition(rank);
+                const team = findTeam({ positionId });
                 return (
                   <tr key={rank.id}>
                     <td>{formatRank(rank)}</td>
@@ -60,6 +62,7 @@ const RankTable = () => {
                           positionId={positionId || 0}
                           defaultName={rank.name}
                         />
+                        {team && <ButtonTeam team={team} />}
                       </LeftCenterDiv>
                     </td>
                   </tr>

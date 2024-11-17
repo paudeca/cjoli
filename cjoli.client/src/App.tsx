@@ -12,6 +12,7 @@ import ChatPage from "./pages/ChatPage";
 import SettingPage from "./pages/SettingPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useServer } from "./hooks/useServer";
+import TeamPage from "./pages/TeamPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,13 +50,13 @@ const App = () => {
         },
         {
           path: isUseDomain ? "team/:teamId" : ":uid/team/:teamId",
-          element: <HomePage />,
+          element: <TeamPage />,
         },
         {
           path: isUseDomain
             ? "team/:teamId/phase/:phaseId"
             : ":uid/team/:teamId/phase/:phaseId",
-          element: <HomePage />,
+          element: <TeamPage />,
         },
         { path: isUseDomain ? "chat" : ":uid/chat", element: <ChatPage /> },
         {
