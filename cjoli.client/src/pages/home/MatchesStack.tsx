@@ -16,27 +16,19 @@ import { Trans, useTranslation } from "react-i18next";
 import { memo, useCallback, useEffect, useMemo } from "react";
 
 const MatchesStack = ({ phase }: { phase: Phase }) => {
-  const { matches, loadRanking, isTeamInMatch, daySelected, selectDay } =
-    useCJoli();
+  const { matches, loadRanking, daySelected, selectDay } = useCJoli();
   const uid = useUid();
   const { register, getValues } =
     useForm<Record<string, { scoreA: number | ""; scoreB: number | "" }>>();
   const { setShow } = useModal("blockShot");
-  const { squadId, teamId } = useParams();
+  const { squadId } = useParams();
   const { t } = useTranslation();
 
   const filter = useCallback(
-    (match: Match) => {
-      if (teamId) {
-        return isTeamInMatch(parseInt(teamId), match);
-      } else {
-        return (
-          match.phaseId == phase?.id &&
-          (!squadId || parseInt(squadId) == match.squadId)
-        );
-      }
-    },
-    [isTeamInMatch, phase, teamId, squadId]
+    (match: Match) =>
+      match.phaseId == phase.id &&
+      (!squadId || parseInt(squadId) == match.squadId),
+    [phase, squadId]
   );
 
   const datas = useMemo(() => {
