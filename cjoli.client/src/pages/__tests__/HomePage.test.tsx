@@ -57,17 +57,4 @@ describe("HomePage", () => {
     const team = await screen.queryByText("No team found");
     expect(team).toBeNull();
   });
-
-  it("renderTeam", async () => {
-    const uid = "123";
-    const get = mockGetRanking(uid);
-    await renderPage(
-      <Routes>
-        <Route path="/:uid/:teamId" element={<HomePage />}></Route>
-      </Routes>,
-      `/${uid}/1`
-    );
-    expect(get).toHaveBeenCalledTimes(1);
-    screen.getByText("No team found");
-  });
 });

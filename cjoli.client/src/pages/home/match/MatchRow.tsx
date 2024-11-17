@@ -66,28 +66,6 @@ const MatchRow = ({
   const teamA = findTeam({ positionId: match.positionIdA });
   const teamB = findTeam({ positionId: match.positionIdB });
 
-  let badgeA =
-    imatch.scoreA > imatch.scoreB
-      ? "success"
-      : imatch.scoreA === imatch.scoreB
-      ? "warning"
-      : "danger";
-  let badgeB =
-    imatch.scoreA < imatch.scoreB
-      ? "success"
-      : imatch.scoreA === imatch.scoreB
-      ? "warning"
-      : "danger";
-  if (imatch.forfeitA) {
-    badgeA = "danger";
-    badgeB = "success";
-  } else if (imatch.forfeitB) {
-    badgeB = "danger";
-    badgeA = "success";
-  }
-  const textA = badgeA == "warning" ? "black" : "white";
-  const textB = badgeB == "warning" ? "black" : "white";
-
   return (
     <>
       {isMobile && (
@@ -185,8 +163,8 @@ const MatchRow = ({
         {isMobile && done && (
           <td>
             <MyScoreDiv isMobile={true}>
-              <ScoreCellView score={imatch.scoreA} bg={badgeA} text={textA} />
-              <ScoreCellView score={imatch.scoreB} bg={badgeB} text={textB} />
+              <ScoreCellView match={imatch} mode="A" />
+              <ScoreCellView match={imatch} mode="B" />
               {(isAdmin || (isConnected && isSimulation)) && (
                 <ScoreButton
                   action="remove"
@@ -279,7 +257,7 @@ const MatchRow = ({
                   squad={getSquad(match.squadId)}
                 />
               )}
-              <ScoreCellView score={imatch.scoreA} bg={badgeA} text={textA} />
+              <ScoreCellView match={imatch} mode="A" />
               <Badge
                 bg="light"
                 text="black"
@@ -287,7 +265,7 @@ const MatchRow = ({
               >
                 <b>-</b>
               </Badge>
-              <ScoreCellView score={imatch.scoreB} bg={badgeB} text={textB} />
+              <ScoreCellView match={imatch} mode="B" />
               {(isAdmin || (isConnected && isSimulation)) && (
                 <ScoreButton
                   action="remove"

@@ -4,7 +4,6 @@ import Loading from "../components/Loading";
 import { useParams } from "react-router-dom";
 import { useCJoli } from "../hooks/useCJoli";
 import useUid from "../hooks/useUid";
-import TeamStack from "./home/TeamStack";
 //import SummaryStack from "./home/SummaryStack";
 import { useQuery } from "@tanstack/react-query";
 import { useServer } from "../hooks/useServer";
@@ -21,7 +20,7 @@ const HomePage = () => {
   const { sendMessage, register } = useServer();
   const { getRanking } = useApi();
   const uid = useUid();
-  const { phaseId, teamId } = useParams();
+  const { phaseId } = useParams();
   const [loading, setLoading] = useState(true);
 
   const { refetch, isFetching } = useQuery(getRanking(uid));
@@ -33,7 +32,7 @@ const HomePage = () => {
 
   useEffect(() => {
     register("updateRanking", async () => {
-      refetch(); //disable, cause full refresh page on saveMatch
+      refetch();
     });
   }, [refetch, register]);
 
@@ -45,8 +44,7 @@ const HomePage = () => {
   const allMatchesDone = matches.every((m) => m.done);
   return (
     <Loading ready={!loading}>
-      {!teamId && allMatchesDone && <RankStack />}
-      {teamId && <TeamStack />}
+      {allMatchesDone && <RankStack />}
       {/*!teamId && <SummaryStack />*/}
       {phase && <RankingStack phase={phase} />}
       {phase && <MatchesStack phase={phase} />}

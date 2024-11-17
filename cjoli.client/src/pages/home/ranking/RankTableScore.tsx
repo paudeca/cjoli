@@ -6,27 +6,21 @@ import { useCJoli } from "../../../hooks/useCJoli";
 import useScreenSize from "../../../hooks/useScreenSize";
 import { Score, Squad, Tourney } from "../../../models";
 import PenaltyIcon from "../../../components/PenaltyIcon";
-import { useNavigate } from "react-router-dom";
 import useUid from "../../../hooks/useUid";
 import CJoliTooltip from "../../../components/CJoliTooltip";
 import styled from "@emotion/styled";
-import { bgSecondary, zoomIcon } from "../../../styles";
-import { CaretRight } from "react-bootstrap-icons";
+import { bgSecondary } from "../../../styles";
 import { memo, useCallback } from "react";
 import * as cjoliService from "../../../services/cjoliService";
 import InfoButton from "./InfoButton";
 import { Stack } from "react-bootstrap";
-import { useServer } from "../../../hooks/useServer";
+import ButtonTeam from "../../../components/ButtonTeam";
 
 const MyTh = styled("th")`
   ${bgSecondary}
 `;
 
 const MyTd = MyTh.withComponent("td");
-
-const MyCaretRight = styled(CaretRight)`
-  ${zoomIcon}
-`;
 
 interface RankTableScoreProps {
   tourney: Tourney;
@@ -37,9 +31,7 @@ const RankTableScore = ({ tourney, score, squad }: RankTableScoreProps) => {
   const { getTeam, getPosition, getTeamInfo, loadRanking } = useCJoli();
   const { isMobile } = useScreenSize();
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const uid = useUid();
-  const { path } = useServer();
 
   const position = getPosition(score.positionId);
   const team = getTeam(position?.teamId || 0);
@@ -77,16 +69,7 @@ const RankTableScore = ({ tourney, score, squad }: RankTableScoreProps) => {
               {tourney.config?.hasPenalty && (
                 <PenaltyIcon positionId={score.positionId} />
               )}
-              {team && (
-                <MyCaretRight
-                  role="button"
-                  className="mx-2"
-                  onClick={() => {
-                    navigate(`${path}team/${team.id}`);
-                    window.scrollTo(0, 0);
-                  }}
-                />
-              )}
+              {team && <ButtonTeam team={team} />}
             </LeftCenterDiv>
             {position && <InfoButton score={score} squad={squad} />}
           </Stack>

@@ -2,7 +2,6 @@ import { describe, it, vi } from "vitest";
 import {
   createRanking,
   createTourney,
-  mockGetRanking,
   renderPage,
 } from "../../../__tests__/testUtils";
 import MatchesStack from "../MatchesStack";
@@ -42,9 +41,9 @@ const Load = ({ children }: { children: ReactNode }) => {
 
 describe("MatchesStack", () => {
   it("render", async () => {
-    //const phase = { id: 1, name: "name", squads: [] };
-    const uid = "123";
-    mockGetRanking(uid, () =>
+    const phase = { id: 1, name: "name", squads: [] };
+    //const uid = "123";
+    /*mockGetRanking(uid, () =>
       createTourney({
         id: 1,
         phases: [
@@ -66,10 +65,10 @@ describe("MatchesStack", () => {
           },
         ],
       })
-    );
+    );*/
     await renderPage(
       <Load>
-        <MatchesStack />
+        <MatchesStack phase={phase} />
       </Load>
     );
   });

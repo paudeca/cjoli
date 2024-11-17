@@ -10,27 +10,23 @@ import { Element } from "react-scroll";
 import { useServer } from "../../hooks/useServer";
 
 interface RankingStackProps {
-  phase?: Phase;
+  phase: Phase;
 }
 
 const RankingStack = ({ phase }: RankingStackProps) => {
-  const { phases, isTeamInPhase, selectDay } = useCJoli();
+  const { phases, selectDay } = useCJoli();
   const { path } = useServer();
   const navigate = useNavigate();
-  const { phaseId, squadId, teamId } = useParams();
+  const { phaseId, squadId } = useParams();
 
-  const filter = teamId
-    ? (phase: Phase) => isTeamInPhase(parseInt(teamId), phase)
-    : (phase: Phase) => !squadId || !phaseId || parseInt(phaseId) == phase.id;
-  const datas = phases?.filter(filter) || [];
+  const filterPhases =
+    phases?.filter(
+      (phase: Phase) => !squadId || !phaseId || parseInt(phaseId) == phase.id
+    ) || [];
 
   const handleClick = (phase: Phase) => {
     selectDay("0");
-    navigate(
-      teamId
-        ? `${path}team/${teamId}/phase/${phase.id}`
-        : `${path}phase/${phase.id}`
-    );
+    navigate(`${path}phase/${phase.id}`);
   };
 
   return (
@@ -41,7 +37,7 @@ const RankingStack = ({ phase }: RankingStackProps) => {
             <Loading ready={!!phases && !!phase}>
               <Card.Header>
                 <Nav variant="underline" activeKey={`${phase?.id}`}>
-                  {datas.map((phase) => (
+                  {filterPhases.map((phase) => (
                     <Nav.Item key={phase.id}>
                       <Nav.Link onClick={() => handleClick(phase)}>
                         {phase.name}
@@ -50,7 +46,7 @@ const RankingStack = ({ phase }: RankingStackProps) => {
                   ))}
                 </Nav>
               </Card.Header>
-              {phase && <RankTable phase={phase} />}
+              <RankTable phase={phase} />
             </Loading>
           </Element>
         </CJoliCard>

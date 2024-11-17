@@ -7,12 +7,19 @@ import React from "react";
 import { useToast } from "../hooks/useToast";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@emotion/react";
+import { useParams } from "react-router-dom";
+import { useColor } from "../hooks/useColor";
 
 const MyStar = styled(Star)`
   ${zoomIcon}
 `;
 const MyStarFill = styled(StarFill)`
   ${zoomIcon}
+`;
+
+const MyTeam = styled("span")<{ color: string }>`
+  font-weight: 600;
+  color: ${(props) => props.color};
 `;
 
 const TeamName = ({
@@ -29,6 +36,8 @@ const TeamName = ({
   const { showToast } = useToast();
   const { t } = useTranslation();
   const theme = useTheme();
+  const { teamId: currentTeamId } = useParams();
+  const { isWhite } = useColor();
 
   const { name, logo } = positionId
     ? getTeamInfo(positionId, defaultName)
@@ -56,6 +65,10 @@ const TeamName = ({
     [handleSaveUserConfig, userConfig, showToast, t]
   );
 
+  const isCurrentTeam =
+    currentTeamId && team && team.id == parseInt(currentTeamId);
+
+  const color = isWhite(theme.colors.primary) ? "black" : theme.colors.primary;
   return (
     <>
       {isConnected && team && userConfig.favoriteTeamId == team.id && (
@@ -77,7 +90,7 @@ const TeamName = ({
         style={{ maxWidth: "30px", maxHeight: "30px" }}
         className="mx-2"
       />
-      {name}
+      {isCurrentTeam ? <MyTeam color={color}>{name}</MyTeam> : name}
     </>
   );
 };
