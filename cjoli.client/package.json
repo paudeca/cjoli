@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "coverage": "vitest --coverage",
-    "test-ui": "vitest --ui"
+    "test-ui": "vitest --ui --coverage"
   },
   "dependencies": {
     "@datadog/browser-logs": "^5.30.0",

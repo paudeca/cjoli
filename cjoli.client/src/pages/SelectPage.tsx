@@ -110,6 +110,7 @@ const SelectPage = () => {
     }, init);
   }, [t, now, tourneys]);
 
+  //invert order tourney in future
   groups[1].tourneys.sort((a, b) => (a.startTime < b.startTime ? -1 : 1));
 
   return (

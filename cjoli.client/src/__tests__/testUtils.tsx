@@ -6,7 +6,7 @@ import { ToastProvider } from "../contexts/ToastContext";
 import { ModalProvider } from "../contexts/ModalContext";
 import { ThemeProvider } from "@emotion/react";
 import { MemoryRouter } from "react-router-dom";
-import { Ranking, Score, Tourney } from "../models";
+import { Ranking, Score, Tourney, User } from "../models";
 import { expect, vi } from "vitest";
 import axios from "axios";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -28,6 +28,18 @@ i18n.use(initReactI18next).init({
     escapeValue: false,
   },
 });
+
+const registers: Record<string, (msg: Record<string, string>) => void> = {};
+vi.mock("../hooks/useServer", () => ({
+  useServer: () => ({
+    register: (type: string, c: () => void) => {
+      registers[type] = c;
+    },
+    sendMessage: (msg: Record<string, string>) => {
+      registers[msg.type] && registers[msg.type](msg);
+    },
+  }),
+}));
 
 //fix error TypeError: targetWindow.matchMedia is not a function
 Object.defineProperty(window, "matchMedia", {
@@ -127,6 +139,12 @@ export const createRanking = (create?: () => Tourney) => {
     history: {},
   };
 };
+
+export const createUser: (user: Partial<User>) => User = (user) => ({
+  login: user.login ?? "login",
+  password: user.password ?? "password",
+  role: user.role,
+});
 
 export const mockGetRanking = (uid: string, create?: () => Tourney) => {
   const get = vi.mocked(axios.get).mockImplementationOnce((url) => {
