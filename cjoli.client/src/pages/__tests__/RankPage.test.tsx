@@ -1,17 +1,30 @@
 import { fireEvent, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
-import RankPage from "../RankPage";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createTourney,
   mockGetRanking,
   renderPage,
 } from "../../__tests__/testUtils";
+import RankPage from "../RankPage";
 import { Route, Routes } from "react-router-dom";
+import { ReactNode, useEffect } from "react";
+import { useServer } from "../../hooks/useServer";
 
 vi.mock("axios");
 vi.mock("react-chartjs-2");
 
+const InitPage = ({ children }: { children: ReactNode }) => {
+  const { sendMessage } = useServer();
+  useEffect(() => {
+    sendMessage({ type: "updateRanking" });
+  }, [sendMessage]);
+  return children;
+};
+
 describe("RankPage", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
   it("render", async () => {
     const uid = "123";
     const get = mockGetRanking(uid, () =>
@@ -56,5 +69,26 @@ describe("RankPage", () => {
       target: { value: "game" },
     });
     expect(option.selected).toBeTruthy();
+  });
+
+  it("updateRanking", async () => {
+    const uid = "123";
+    const get = mockGetRanking(uid);
+
+    await renderPage(
+      <Routes>
+        <Route
+          path="/:uid"
+          element={
+            <InitPage>
+              <RankPage />
+            </InitPage>
+          }
+        />
+      </Routes>,
+      `/${uid}`
+    );
+
+    expect(get).toHaveBeenCalledTimes(1);
   });
 });

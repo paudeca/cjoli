@@ -136,6 +136,7 @@ const MenuNav = () => {
                 bg="secondary"
                 className="d-flex menu"
                 style={{ maxWidth: 60 }}
+                data-testid="countUser"
               >
                 {countUser}
                 <Person />

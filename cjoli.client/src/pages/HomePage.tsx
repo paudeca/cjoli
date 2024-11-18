@@ -41,7 +41,7 @@ const HomePage = () => {
   if (!phase && phases && phases?.length > 0) {
     phase = phases[0];
   }
-  const allMatchesDone = matches.every((m) => m.done);
+  const allMatchesDone = matches.length > 0 && matches.every((m) => m.done);
   return (
     <Loading ready={!loading}>
       {allMatchesDone && <RankStack />}

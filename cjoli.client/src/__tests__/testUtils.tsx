@@ -29,14 +29,14 @@ i18n.use(initReactI18next).init({
   },
 });
 
-const registers: Record<string, (msg: Record<string, string>) => void> = {};
+const registers: Record<string, (value: object) => void> = {};
 vi.mock("../hooks/useServer", () => ({
   useServer: () => ({
     register: (type: string, c: () => void) => {
       registers[type] = c;
     },
-    sendMessage: (msg: Record<string, string>) => {
-      registers[msg.type] && registers[msg.type](msg);
+    sendMessage: (msg: { type: string; payload: object }) => {
+      registers[msg.type] && registers[msg.type](msg.payload);
     },
   }),
 }));
@@ -82,6 +82,7 @@ export const renderPage = (page: React.ReactNode, path?: string) => {
 
 export const createTourney = ({
   id,
+  teams,
   phases,
   ranks,
   startTime,
@@ -96,7 +97,7 @@ export const createTourney = ({
   endTime: endTime ?? new Date(),
   phases: phases ?? [],
   ranks: ranks ?? [],
-  teams: [],
+  teams: teams ?? [],
   config: {
     hasPenalty: false,
     hasForfeit: false,
