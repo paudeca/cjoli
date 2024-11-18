@@ -6,7 +6,7 @@ import { useModal } from "../hooks/useModal";
 interface AddItemModalProps<T> {
   id: string;
   title: string;
-  onItemTeam: (value: string, data: T) => Promise<boolean>;
+  onItemTeam: (value: string, data?: T) => Promise<boolean>;
   fieldLabel?: string;
 }
 
@@ -30,10 +30,6 @@ const AddItemModal = <T,>({
   ];
 
   const onSubmit = async ({ value }: { value: string }) => {
-    if (!data) {
-      showToast("danger", "Invalid data is undefined");
-      return false;
-    }
     if (!(await onItemTeam(value, data))) {
       showToast("danger", t("team.error.add", "Unable to add item"));
       return false;
