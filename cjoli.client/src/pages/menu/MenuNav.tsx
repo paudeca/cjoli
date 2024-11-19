@@ -31,7 +31,7 @@ import { useNavigate } from "react-router-dom";
 import useScreenSize from "../../hooks/useScreenSize";
 import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
-import React, { useEffect } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { useEstimate } from "../../hooks/useEstimate";
 import { UserConfig } from "../../models";
@@ -51,14 +51,8 @@ const MyNavbar = styled(Navbar)`
 
 const MenuNav = () => {
   const { loadRanking, tourney, teams } = useCJoli();
-  const {
-    user,
-    userConfig,
-    loadUser,
-    handleSaveUserConfig,
-    setCountUser,
-    countUser,
-  } = useUser();
+  const { user, userConfig, loadUser, handleSaveUserConfig, countUser } =
+    useUser();
   const uid = useUid();
   const { path } = useServer();
   const { setShow: showLogin } = useModal("login");
@@ -69,13 +63,6 @@ const MenuNav = () => {
   const { loading, handleUpdateEstimate } = useEstimate();
   const { t, i18n } = useTranslation();
   const [lang, setLang] = React.useState(i18n.resolvedLanguage);
-  const { register: registerServer } = useServer();
-
-  useEffect(() => {
-    registerServer("users", (value) => {
-      setCountUser(value);
-    });
-  }, [registerServer, setCountUser]);
 
   const logout = async () => {
     await cjoliService.logout();

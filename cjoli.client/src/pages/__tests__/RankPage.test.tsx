@@ -1,5 +1,5 @@
 import { fireEvent, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createTourney,
   mockGetRanking,
@@ -7,23 +7,19 @@ import {
 } from "../../__tests__/testUtils";
 import RankPage from "../RankPage";
 import { Route, Routes } from "react-router-dom";
-import { ReactNode, useEffect } from "react";
-import { useServer } from "../../hooks/useServer";
+import WS from "jest-websocket-mock";
 
 vi.mock("axios");
 vi.mock("react-chartjs-2");
 
-const InitPage = ({ children }: { children: ReactNode }) => {
-  const { sendMessage } = useServer();
-  useEffect(() => {
-    sendMessage({ type: "updateRanking" });
-  }, [sendMessage]);
-  return children;
-};
+const url = import.meta.env.VITE_API_WS;
 
 describe("RankPage", () => {
   beforeEach(() => {
     vi.resetAllMocks();
+  });
+  afterEach(() => {
+    WS.clean();
   });
   it("render", async () => {
     const uid = "123";
@@ -75,20 +71,19 @@ describe("RankPage", () => {
     const uid = "123";
     const get = mockGetRanking(uid);
 
+    const server = new WS(`${url}/server/ws`, { jsonProtocol: true });
+
     await renderPage(
       <Routes>
-        <Route
-          path="/:uid"
-          element={
-            <InitPage>
-              <RankPage />
-            </InitPage>
-          }
-        />
+        <Route path="/:uid" element={<RankPage />} />
       </Routes>,
       `/${uid}`
     );
+    await server.connected;
 
-    expect(get).toHaveBeenCalledTimes(1);
+    server.send({ type: "updateRanking" });
+    expect(get).toHaveBeenCalledTimes(2);
+
+    server.close();
   });
 });

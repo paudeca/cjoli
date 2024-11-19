@@ -32,6 +32,7 @@ const HomePage = () => {
 
   useEffect(() => {
     register("updateRanking", async () => {
+      console.log("refetch");
       refetch();
     });
   }, [refetch, register]);

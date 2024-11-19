@@ -1,4 +1,4 @@
-import React from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import {
   Container,
   Card,
@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 import useScreenSize from "../hooks/useScreenSize";
 import { Trans, useTranslation } from "react-i18next";
 import { useUser } from "../hooks/useUser";
-import { useServer } from "../hooks/useServer";
+import { animateScroll } from "react-scroll";
 
 interface Message {
   message: string;
@@ -30,17 +30,24 @@ interface Message {
 const server = import.meta.env.VITE_API_WS;
 
 const ChatPage = () => {
-  const [messages, setMessages] = React.useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const uid = useUid();
-  const { path } = useServer();
   const { i18n } = useTranslation();
   const { user } = useUser();
+  const params = [
+    { key: "lang", value: i18n.resolvedLanguage },
+    { key: "login", value: user?.login },
+  ];
+  const url = `${server}/chat/${uid}/ws?${new URLSearchParams(
+    params
+      .filter((p) => p.value)
+      .map((p) => `${p.key}=${encodeURI(p.value!)}`)
+      .join("&")
+  ).toString()}`;
   const { sendMessage, lastMessage, readyState } = useWebSocket<{
     message: string;
-  }>(
-    `${server}/chat/${uid}/ws?lang=${i18n.resolvedLanguage}&login=${user?.login}`
-  );
-  React.useEffect(() => {
+  }>(url);
+  useEffect(() => {
     if (lastMessage != null) {
       setMessages((messages) => [
         ...messages,
@@ -50,13 +57,11 @@ const ChatPage = () => {
           time: new Date(),
         },
       ]);
-      window.setTimeout(() => {
-        ref.current?.scroll(0, ref.current?.scrollHeight);
-      }, 100);
+      animateScroll.scrollToBottom();
     }
   }, [lastMessage, setMessages]);
   const { register, handleSubmit, resetField } = useForm<Message>();
-  const ref = React.useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { height, isMobile } = useScreenSize();
 
@@ -88,7 +93,7 @@ const ChatPage = () => {
                 ref={ref}
               >
                 {messages.map((m, i) => (
-                  <React.Fragment key={i}>
+                  <Fragment key={i}>
                     {m.author == "user" && (
                       <div className="chat-message-right pt-1">
                         <div>
@@ -129,7 +134,7 @@ const ChatPage = () => {
                         ></div>
                       </div>
                     )}
-                  </React.Fragment>
+                  </Fragment>
                 ))}
               </div>
             </div>
@@ -152,7 +157,7 @@ const ChatPage = () => {
                     </Button>
                     <Button
                       variant="outline-danger"
-                      onClick={() => navigate(path)}
+                      onClick={() => navigate(-1)}
                     >
                       <Trans i18nKey="button.close">Close</Trans>
                     </Button>
@@ -167,7 +172,7 @@ const ChatPage = () => {
                     <Stack direction="horizontal" className="pt-2">
                       <Button
                         variant="outline-danger"
-                        onClick={() => navigate(path)}
+                        onClick={() => navigate(-1)}
                       >
                         <Trans i18nKey="button.close">Close</Trans>
                       </Button>

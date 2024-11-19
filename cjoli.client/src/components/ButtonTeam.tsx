@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { CaretRight } from "react-bootstrap-icons";
-
+import { animateScroll } from "react-scroll";
 import { zoomIcon } from "../styles";
 import { useNavigate } from "react-router-dom";
 import { useServer } from "../hooks/useServer";
@@ -24,7 +24,7 @@ const ButtonTeam = ({ team }: ButtonTeamProps) => {
       className="mx-2"
       onClick={() => {
         navigate(`${path}team/${team.id}`);
-        window.scrollTo(0, 0);
+        animateScroll.scrollToTop();
       }}
     />
   );
