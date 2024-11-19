@@ -1,4 +1,4 @@
-import { beforeEach, describe, it, vi, expect, Mock } from "vitest";
+import { beforeEach, describe, it, vi, expect, Mock, afterEach } from "vitest";
 import { screen } from "@testing-library/react";
 import {
   createTourney,
@@ -8,27 +8,15 @@ import {
 import MainPage from "../MainPage";
 import axios from "axios";
 import { Route, Routes } from "react-router-dom";
-import { ReactNode, useEffect } from "react";
-import { useServer } from "../../hooks/useServer";
+import { ReactNode } from "react";
 import { Match, Team } from "../../models";
 import HomePage from "../HomePage";
 import dayjs from "dayjs";
+import WS from "jest-websocket-mock";
 
 vi.mock("axios");
 
-const InitPage = ({
-  count,
-  children,
-}: {
-  count: number;
-  children: ReactNode;
-}) => {
-  const { sendMessage } = useServer();
-  useEffect(() => {
-    sendMessage({ type: "users", payload: count });
-  }, [sendMessage, count]);
-  return children;
-};
+const url = import.meta.env.VITE_API_WS;
 
 const renderMainPage = async ({
   uid,
@@ -79,6 +67,9 @@ describe("MainPage", async () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });
+  afterEach(() => {
+    WS.clean();
+  });
   it("render", async () => {
     const uid = "123";
     await renderMainPage({ uid });
@@ -88,18 +79,21 @@ describe("MainPage", async () => {
   it("countUser", async () => {
     const uid = "123";
     const count = 12;
+    const server = new WS(`${url}/server/ws`, { jsonProtocol: true });
+
     await renderMainPage({
       uid,
-      element: (
-        <InitPage count={count}>
-          <MainPage />
-        </InitPage>
-      ),
+      element: <MainPage />,
     });
     screen.getByText("content");
+    await server.connected;
 
-    const countUser = screen.getByTestId("countUser");
+    server.send({ type: "users", value: count });
+
+    const countUser = await screen.getByTestId("countUser");
     expect(countUser.childNodes[0].textContent).toBe(`${count}`);
+
+    server.close();
   });
 
   it("favoriteBlack", async () => {

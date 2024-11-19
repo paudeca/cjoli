@@ -1,5 +1,5 @@
 import { screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createTourney,
   mockGetRanking,
@@ -7,33 +7,24 @@ import {
 } from "../../__tests__/testUtils";
 import HomePage from "../HomePage";
 import { Route, Routes } from "react-router-dom";
-import { useServer } from "../../hooks/useServer";
-import { ReactNode, useEffect } from "react";
 import { Match, Tourney } from "../../models";
+import WS from "jest-websocket-mock";
 
 vi.mock("axios");
 
-const InitPage = ({ children }: { children: ReactNode }) => {
-  const { sendMessage } = useServer();
-  useEffect(() => {
-    sendMessage({ type: "updateRanking" });
-  }, [sendMessage]);
-  return children;
-};
+const url = import.meta.env.VITE_API_WS;
 
 const renderHomePage = async ({
   uid,
   phaseId,
   path,
   initialPath,
-  element,
   tourney,
 }: {
   uid: string;
   phaseId: number;
   path: string;
   initialPath: string;
-  element?: ReactNode;
   tourney?: Tourney;
 }) => {
   const get = mockGetRanking(
@@ -47,18 +38,22 @@ const renderHomePage = async ({
   );
   await renderPage(
     <Routes>
-      <Route path={path} element={element ?? <HomePage />} />
+      <Route path={path} element={<HomePage />} />
     </Routes>,
     initialPath
   );
   expect(get).toHaveBeenCalledTimes(1);
   screen.getByTestId("ranking");
   screen.getByTestId("matches");
+  return { get };
 };
 
 describe("HomePage", () => {
   beforeEach(() => {
     vi.resetAllMocks();
+  });
+  afterEach(() => {
+    WS.clean();
   });
 
   it("render", async () => {
@@ -86,17 +81,21 @@ describe("HomePage", () => {
   it("refresh", async () => {
     const uid = "123";
     const phaseId = 1;
-    await renderHomePage({
+    const server = new WS(`${url}/server/ws`, { jsonProtocol: true });
+
+    const { get } = await renderHomePage({
       uid,
       phaseId,
       path: "/:uid",
       initialPath: `/${uid}`,
-      element: (
-        <InitPage>
-          <HomePage />
-        </InitPage>
-      ),
     });
+
+    await server.connected;
+
+    server.send({ type: "updateRanking" });
+    expect(get).toHaveBeenCalledTimes(2);
+
+    server.close();
   });
 
   it("ranking", async () => {
@@ -126,7 +125,6 @@ describe("HomePage", () => {
       phaseId,
       path: "/:uid",
       initialPath: `/${uid}`,
-      element: <HomePage />,
       tourney,
     });
     screen.getByTestId("rank");

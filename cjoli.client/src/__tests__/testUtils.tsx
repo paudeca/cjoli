@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ComponentType } from "react";
 import { render, act } from "@testing-library/react";
 import { CJoliProvider } from "../contexts/CJoliContext";
 import { UserProvider } from "../contexts/UserContext";
@@ -29,18 +29,6 @@ i18n.use(initReactI18next).init({
   },
 });
 
-const registers: Record<string, (value: object) => void> = {};
-vi.mock("../hooks/useServer", () => ({
-  useServer: () => ({
-    register: (type: string, c: () => void) => {
-      registers[type] = c;
-    },
-    sendMessage: (msg: { type: string; payload: object }) => {
-      registers[msg.type] && registers[msg.type](msg.payload);
-    },
-  }),
-}));
-
 //fix error TypeError: targetWindow.matchMedia is not a function
 Object.defineProperty(window, "matchMedia", {
   writable: true,
@@ -58,7 +46,7 @@ Object.defineProperty(window, "matchMedia", {
 
 export const renderPage = (page: React.ReactNode, path?: string) => {
   return act(async () => {
-    render(
+    return render(
       <ThemeProvider
         theme={{ colors: { primary: "primary", secondary: "secondary" } }}
       >
@@ -155,4 +143,11 @@ export const mockGetRanking = (uid: string, create?: () => Tourney) => {
     });
   });
   return get;
+};
+
+export const initPage = (Component: ComponentType, init: () => void) => {
+  return () => {
+    init();
+    return <Component />;
+  };
 };

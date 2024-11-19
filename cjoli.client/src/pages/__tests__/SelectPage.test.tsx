@@ -5,35 +5,17 @@ import {
   renderPage,
   createTourney,
   createUser,
+  initPage,
 } from "../../__tests__/testUtils";
 import { useCJoli } from "../../hooks/useCJoli";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import dayjs from "dayjs";
-import { Tourney, User } from "../../models";
+import { Tourney } from "../../models";
 import { Route, Routes } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import axios from "axios";
 
 vi.mock("axios");
-
-const InitPage = ({
-  tourneys,
-  user,
-  children,
-}: {
-  tourneys: Tourney[];
-  user?: User;
-  children: React.ReactNode;
-}) => {
-  const { loadTourneys } = useCJoli();
-  const { loadUser } = useUser();
-
-  useEffect(() => {
-    loadTourneys(tourneys);
-    user && loadUser(user);
-  }, [loadTourneys, tourneys, user, loadUser]);
-  return children;
-};
 
 describe("SelectPage", () => {
   it("render", async () => {
@@ -60,11 +42,15 @@ describe("SelectPage", () => {
         endTime: dayjs().add(3, "days").toDate(),
       }),
     ];
-    await renderPage(
-      <InitPage tourneys={tourneys}>
-        <SelectPage />
-      </InitPage>
-    );
+
+    const InitSelectPage = initPage(SelectPage, () => {
+      const { loadTourneys } = useCJoli();
+      useEffect(() => {
+        loadTourneys(tourneys);
+      }, [loadTourneys]);
+    });
+
+    await renderPage(<InitSelectPage />);
 
     const t2 = screen.getByText("name-2");
     const t4 = screen.getByText("name-4");
@@ -82,13 +68,18 @@ describe("SelectPage", () => {
   it("selectTourney", async () => {
     const tourneys = [createTourney({ id: 1 })];
 
+    const InitSelectPage = initPage(SelectPage, () => {
+      const { loadTourneys } = useCJoli();
+      useEffect(() => {
+        loadTourneys(tourneys);
+      }, [loadTourneys]);
+    });
+
     await renderPage(
-      <InitPage tourneys={tourneys}>
-        <Routes>
-          <Route path="" element={<SelectPage />} />
-          <Route path="uid-1" element={<div>uid-1</div>} />
-        </Routes>
-      </InitPage>
+      <Routes>
+        <Route path="" element={<InitSelectPage />} />
+        <Route path="uid-1" element={<div>uid-1</div>} />
+      </Routes>
     );
     const div = screen.getByText("name-1");
     fireEvent.click(div);
@@ -105,13 +96,21 @@ describe("SelectPage", () => {
       return Promise.resolve();
     });
 
+    const InitSelectPage = initPage(SelectPage, () => {
+      const { loadTourneys } = useCJoli();
+      const { loadUser } = useUser();
+
+      useEffect(() => {
+        loadTourneys(tourneys);
+        user && loadUser(user);
+      }, [loadTourneys, loadUser]);
+    });
+
     await renderPage(
-      <InitPage tourneys={tourneys} user={user}>
-        <Routes>
-          <Route path="" element={<SelectPage />} />
-          <Route path="uid-1" element={<div>uid-1</div>} />
-        </Routes>
-      </InitPage>
+      <Routes>
+        <Route path="" element={<InitSelectPage />} />
+        <Route path="uid-1" element={<div>uid-1</div>} />
+      </Routes>
     );
 
     const btn = await screen.getByText("New Tourney");
