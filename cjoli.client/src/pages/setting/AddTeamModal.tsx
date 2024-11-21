@@ -28,12 +28,11 @@ const AddTeamModal = ({ onAddTeam }: AddTeamModalProps) => {
       options: teams
         .filter((t) => !teamsFilter.includes(t.id))
         .map((t) => ({ label: t.name, value: t.id })),
-      autoFocus: true,
+      autoFocus: false,
     },
   ];
 
   const onSubmit = async ({ nameTeam }: { nameTeam: string | number }) => {
-    console.log("onSubmit", nameTeam);
     const team =
       typeof nameTeam == "number"
         ? { id: nameTeam, name: teams.find((t) => t.id == nameTeam)!.name }

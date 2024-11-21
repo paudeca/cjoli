@@ -88,7 +88,6 @@ const CJoliModal = <T extends FieldValues>({
         const onChange = (
           v: SingleValue<{ label: string; value: string | number }>
         ) => {
-          console.log("on change select");
           const value = v?.value as PathValue<T, Path<T>>;
           setValue(f.id, value);
           f.onChange && f.onChange(value);

@@ -2,8 +2,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createTourney,
   mockGetRanking,
+  mockGetTeams,
   mockGetTourneys,
   mockGetUser,
+  mockPost,
   renderPage,
   renderPageWithRoute,
 } from "../../__tests__/testUtils";
@@ -12,8 +14,7 @@ import { act, fireEvent, screen } from "@testing-library/react";
 import { Route, Routes } from "react-router-dom";
 import MainPage from "../MainPage";
 import axios from "axios";
-import { Tourney } from "../../models";
-import userEvent from "@testing-library/user-event";
+import { Team, Tourney } from "../../models";
 
 describe("SettingPage", () => {
   beforeEach(() => {
@@ -71,18 +72,24 @@ describe("SettingPage", () => {
 
   it("addTeam", async () => {
     const uid = "123";
-    const tourney = createTourney({ id: 1 });
+    const tourney = createTourney({
+      id: 1,
+    });
     mockGetUser({});
     mockGetTourneys(uid);
     mockGetRanking(uid, () => tourney);
+    const TEAM = "team1";
+    mockGetTeams([{ id: 1, name: TEAM } as Team]);
 
-    const NAME = "nameTeam";
-    const post = vi.mocked(axios.post).mockImplementationOnce((_url, data) => {
-      expect((data as Tourney).teams[0].name).toBe(NAME);
-      return Promise.resolve({ data: tourney });
-    });
+    const post = mockPost<Tourney>(
+      "tourney",
+      (data) => {
+        expect(data.teams[0].name).toBe(TEAM);
+      },
+      "saveTourney"
+    );
 
-    const { container } = await renderPage(
+    await renderPage(
       <Routes>
         <Route path="/" element={<MainPage />}>
           <Route path=":uid/setting" element={<SettingPage />} />
@@ -90,7 +97,6 @@ describe("SettingPage", () => {
       </Routes>,
       `/${uid}/setting`
     );
-
     screen.getByText("Tourney");
 
     const btns = screen.getAllByText("Add Team");
@@ -98,29 +104,18 @@ describe("SettingPage", () => {
       fireEvent.click(btns[0]);
     });
 
-    const submit = screen.getByText("Submit");
-
-    //const name = container.querySelectorAll("input");
-    //console.log("Name", name[6].name);
     const input = screen.getByRole("combobox");
-    //console.log("input", input.value);
-    /*fireEvent.change(input, {
-      target: { value: { label: NAME, value: NAME } },
-    });*/
-    const user = userEvent.setup();
-    //console.log("user", user);
+    fireEvent.change(input, { target: { value: TEAM } });
 
-    await act(async () => {
-      await user.click(input);
-    });
+    const items = screen.getAllByText(TEAM);
+    fireEvent.click(items[0]);
 
-    userEvent.selectOptions(input, NAME);
-
+    const submit = screen.getByText("Submit");
     await act(async () => {
       fireEvent.submit(submit);
     });
 
-    //screen.getByText("Tourney updated");
-    //expect(post).toHaveBeenCalledTimes(1);
+    screen.getByText("Tourney updated");
+    expect(post).toHaveBeenCalledTimes(1);
   });
 });
