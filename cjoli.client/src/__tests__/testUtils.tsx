@@ -1,4 +1,4 @@
-import React, { ComponentType, ReactNode } from "react";
+import { ComponentType, ReactNode } from "react";
 import { render, act } from "@testing-library/react";
 import { CJoliProvider } from "../contexts/CJoliContext";
 import { UserProvider } from "../contexts/UserContext";
@@ -6,7 +6,7 @@ import { ToastProvider } from "../contexts/ToastContext";
 import { ModalProvider } from "../contexts/ModalContext";
 import { ThemeProvider } from "@emotion/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { Ranking, Score, Tourney, User } from "../models";
+import { Ranking, Score, Team, Tourney, User } from "../models";
 import { expect, vi } from "vitest";
 import axios from "axios";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -22,6 +22,11 @@ vi.mock("axios");
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 dayjs.extend(duration);
+
+/*vi.mock("react-select", () => {
+  console.log("react");
+  return { default: () => ({}) };
+});*/
 
 i18n.use(initReactI18next).init({
   debug: false,
@@ -145,48 +150,52 @@ export const createUser: (user: Partial<User>) => User = (user) => ({
   role: user.role,
 });
 
-export const mockGetRanking = (uid: string, create?: () => Tourney) => {
+export const mockGet = <T,>(uri: string, data: T, name: string) => {
   const get = vi.mocked(axios.get).mockImplementationOnce((url) => {
     try {
-      expect(url).toMatch(`${uid}/ranking`);
-      return Promise.resolve<{ data: Ranking }>({
-        data: createRanking(create),
-      });
-    } catch (error) {
-      console.error("Error in mockGetRanking", error);
-      throw error;
-    }
-  });
-  return get;
-};
-
-export const mockGetUser = (user: Partial<User>) => {
-  const get = vi.mocked(axios.get).mockImplementationOnce((url) => {
-    try {
-      expect(url).toMatch(/user/);
+      expect(url).toMatch(uri);
       return Promise.resolve({
-        data: user,
+        data,
       });
     } catch (error) {
-      console.error("Error in mockGetUser", error);
+      console.error(`Error in ${name}`, error);
       throw error;
     }
   });
   return get;
 };
 
-export const mockGetTourneys = (uid: string) => {
-  const get = vi.mocked(axios.get).mockImplementationOnce((url) => {
+export const mockPost = <T,>(
+  uri: string,
+  check: (data: T) => void,
+  name: string
+) => {
+  const post = vi.mocked(axios.post).mockImplementationOnce((url, data) => {
     try {
-      expect(url).toMatch(/tourneys/);
-      return Promise.resolve({ data: [{ uid }] });
+      expect(url).toMatch(uri);
+      check(data as T);
+      return Promise.resolve({
+        data,
+      });
     } catch (error) {
-      console.error("Error in mockGetTourneys", error);
+      console.error(`Error in ${name}`, error);
       throw error;
     }
   });
-  return get;
+  return post;
 };
+
+export const mockGetRanking = (uid: string, create?: () => Tourney) =>
+  mockGet(`${uid}/ranking`, createRanking(create), "mockGetRanking");
+
+export const mockGetUser = (user: Partial<User>) =>
+  mockGet("user", user, "mockGetUser");
+
+export const mockGetTourneys = (uid: string) =>
+  mockGet("tourneys", [{ uid }], "mockGetTourneys");
+
+export const mockGetTeams = (teams: Team[]) =>
+  mockGet("teams", teams, "mockGetTeams");
 
 export const initPage = (Component: ComponentType, init: () => void) => {
   return () => {
