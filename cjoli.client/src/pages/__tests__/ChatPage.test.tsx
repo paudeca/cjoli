@@ -1,9 +1,8 @@
 import { afterEach, beforeEach, describe, it, vi } from "vitest";
-import { initPage, renderPage } from "../../__tests__/testUtils";
+import { initPage, renderPageWithRoute } from "../../__tests__/testUtils";
 import ChatPage from "../ChatPage";
 import { act, fireEvent, screen } from "@testing-library/react";
 import WS from "jest-websocket-mock";
-import { Route, Routes } from "react-router-dom";
 import { useEffect } from "react";
 import { useUser } from "../../hooks/useUser";
 
@@ -25,12 +24,7 @@ const renderChatPage = async ({ uid }: { uid: string }) => {
     server.send(welcome);
   });
 
-  const { container } = await renderPage(
-    <Routes>
-      <Route path="/:uid" element={<InitChat />}></Route>
-    </Routes>,
-    `/${uid}`
-  );
+  const { container } = await renderPageWithRoute(uid, <InitChat />);
   await server.connected;
 
   screen.getByText("BotAI");

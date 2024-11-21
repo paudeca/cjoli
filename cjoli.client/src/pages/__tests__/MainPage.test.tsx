@@ -3,18 +3,17 @@ import { screen } from "@testing-library/react";
 import {
   createTourney,
   mockGetRanking,
+  mockGetTourneys,
+  mockGetUser,
   renderPage,
 } from "../../__tests__/testUtils";
 import MainPage from "../MainPage";
-import axios from "axios";
 import { Route, Routes } from "react-router-dom";
 import { ReactNode } from "react";
 import { Match, Team } from "../../models";
 import HomePage from "../HomePage";
 import dayjs from "dayjs";
 import WS from "jest-websocket-mock";
-
-vi.mock("axios");
 
 const url = import.meta.env.VITE_API_WS;
 
@@ -31,21 +30,12 @@ const renderMainPage = async ({
 }) => {
   const calls = [
     () =>
-      vi.mocked(axios.get).mockImplementationOnce((url) => {
-        expect(url).toMatch(/user/);
-        return Promise.resolve({
-          data: {
-            configs: [
-              { favoriteTeamId: 1, tourneyId: 1, useCustomEstimate: false },
-            ],
-          },
-        });
+      mockGetUser({
+        configs: [
+          { favoriteTeamId: 1, tourneyId: 1, useCustomEstimate: false },
+        ],
       }),
-    () =>
-      vi.mocked(axios.get).mockImplementationOnce((url) => {
-        expect(url).toMatch(/tourneys/);
-        return Promise.resolve({ data: [{ uid }] });
-      }),
+    () => mockGetTourneys(uid),
   ];
   if (call) calls.push(call);
   const gets = calls.map((c) => c());

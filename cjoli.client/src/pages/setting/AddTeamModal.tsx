@@ -19,10 +19,10 @@ const AddTeamModal = ({ onAddTeam }: AddTeamModalProps) => {
   const { data: teams } = useQuery(getTeams());
 
   const teamsFilter = tourney.teams?.map((t) => t.id);
-  const fields: Field<{ name: string | number }>[] = [
+  const fields: Field<{ nameTeam: string | number }>[] = [
     {
-      id: "name",
-      label: "Name",
+      id: "nameTeam",
+      label: "Name Team",
       type: "select",
       creatable: true,
       options: teams
@@ -32,11 +32,12 @@ const AddTeamModal = ({ onAddTeam }: AddTeamModalProps) => {
     },
   ];
 
-  const onSubmit = async ({ name }: { name: string | number }) => {
+  const onSubmit = async ({ nameTeam }: { nameTeam: string | number }) => {
+    console.log("onSubmit", nameTeam);
     const team =
-      typeof name == "number"
-        ? { id: name, name: teams.find((t) => t.id == name)!.name }
-        : { id: 0, name };
+      typeof nameTeam == "number"
+        ? { id: nameTeam, name: teams.find((t) => t.id == nameTeam)!.name }
+        : { id: 0, name: nameTeam };
     if (!(await onAddTeam(team))) {
       showToast("danger", t("team.error.add", "Unable to add Team"));
       return false;

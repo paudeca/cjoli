@@ -52,7 +52,11 @@ const SettingPage = () => {
   const { isLoading } = useQuery(getRanking(uid));
 
   const { mutateAsync: doSaveTourney } = useMutation(
-    saveTourney({ onSuccess: () => showToast("success", "Tourney updated") })
+    saveTourney({
+      onSuccess: () => {
+        showToast("success", "Tourney updated");
+      },
+    })
   );
 
   const addTeam = useCallback(
@@ -162,7 +166,7 @@ const SettingPage = () => {
   );
 
   if (!tourney) {
-    return <></>;
+    return <Loading ready={false}>wait</Loading>;
   }
 
   return (
