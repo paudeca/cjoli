@@ -27,7 +27,6 @@ export const getTourneys = async () => {
 };
 
 export const getRanking = async (uid: string) => {
-  console.log("getRanking");
   const { data } = await axios.get<Ranking>(`${url}/cjoli/${uid}/ranking`);
   return data;
 };

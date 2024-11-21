@@ -10,8 +10,6 @@ import { Route, Routes } from "react-router-dom";
 import { Match, Tourney } from "../../models";
 import WS from "jest-websocket-mock";
 
-vi.mock("axios");
-
 const url = import.meta.env.VITE_API_WS;
 
 const renderHomePage = async ({

@@ -1,12 +1,12 @@
-import { act, fireEvent, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import SelectPage from "../SelectPage";
 import {
   renderPage,
   createTourney,
   createUser,
   initPage,
 } from "../../__tests__/testUtils";
+import SelectPage from "../SelectPage";
 import { useCJoli } from "../../hooks/useCJoli";
 import { useEffect } from "react";
 import dayjs from "dayjs";
@@ -14,8 +14,6 @@ import { Tourney } from "../../models";
 import { Route, Routes } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import axios from "axios";
-
-vi.mock("axios");
 
 describe("SelectPage", () => {
   it("render", async () => {
@@ -113,13 +111,13 @@ describe("SelectPage", () => {
       </Routes>
     );
 
-    const btn = await screen.getByText("New Tourney");
+    const btn = screen.getByText("New Tourney");
     fireEvent.click(btn);
 
-    const input = await screen.getByLabelText("Id");
+    const input = screen.getByLabelText("Id");
     fireEvent.change(input, { target: { value: uid } });
 
-    const submit = await waitFor(() => screen.getByText("Submit"));
+    const submit = screen.getByText("Submit");
     await act(() => {
       fireEvent.click(submit);
     });
