@@ -98,7 +98,7 @@ const AddMatchModal = () => {
       fields={fields}
       onSubmit={onSubmit}
       values={{
-        time: dayjs(nextTime).format("YYYY-MM-DDThh:mm:ss"),
+        time: dayjs(nextTime).format("YYYY-MM-DDTHH:mm:ss"),
         location: "glace A",
         shot: true,
       }}
