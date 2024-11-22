@@ -48,6 +48,7 @@ const MainPage = () => {
     teams,
     setColor,
     isHomePage,
+    daySelected,
   } = useCJoli();
   const uid = useUid();
   const { pathname } = useLocation();
@@ -102,7 +103,9 @@ const MainPage = () => {
 
   const [nextMatch, setNextMatch] = useState<Match>();
   useEffect(() => {
-    const filtered = matches.filter((m) => !m.done);
+    const filtered = matches.filter(
+      (m) => !m.done && dayjs(m.time).format("YYYY-MM-DD") == daySelected
+    );
     filtered.sort((a, b) => (a.time < b.time ? -1 : 1));
     if (filtered.length > 0) {
       const nextMatch = filtered[0];
@@ -110,7 +113,7 @@ const MainPage = () => {
     } else {
       setNextMatch(undefined);
     }
-  }, [matches, nextMatch]);
+  }, [matches, nextMatch, daySelected]);
 
   useEffect(() => {
     logger.info("Navigation", location.pathname);
