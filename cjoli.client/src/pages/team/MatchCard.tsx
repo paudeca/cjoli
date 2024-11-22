@@ -15,13 +15,15 @@ const MatchCard = ({ match }: MatchCardProps) => {
         <Stack direction="horizontal">
           <TeamName positionId={match.positionIdA} />
           <div className="ms-auto">
-            <ScoreCellView match={match} mode="A" />
+            {match.done && <ScoreCellView match={match} mode="A" />}
+            {!match.done && <div>-</div>}
           </div>
         </Stack>
         <Stack direction="horizontal">
           <TeamName positionId={match.positionIdB} />
           <div className="ms-auto">
-            <ScoreCellView match={match} mode="B" />
+            {match.done && <ScoreCellView match={match} mode="B" />}
+            {!match.done && <div>-</div>}
           </div>
         </Stack>
       </Card.Body>
