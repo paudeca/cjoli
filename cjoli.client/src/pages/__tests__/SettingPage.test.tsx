@@ -118,4 +118,50 @@ describe("SettingPage", () => {
     screen.getByText("Tourney updated");
     expect(post).toHaveBeenCalledTimes(1);
   });
+
+  it("addPhase", async () => {
+    const uid = "123";
+    const tourney = createTourney({
+      id: 1,
+    });
+    mockGetUser({});
+    mockGetTourneys(uid);
+    mockGetRanking(uid, () => tourney);
+    const PHASE = "phase1";
+    //mockGetTeams([{ id: 1, name: TEAM } as Team]);
+
+    const post = mockPost<Tourney>(
+      "tourney",
+      (data) => {
+        expect(data.phases[0].name).toBe(PHASE);
+      },
+      "saveTourney"
+    );
+
+    await renderPage(
+      <Routes>
+        <Route path="/" element={<MainPage />}>
+          <Route path=":uid/setting" element={<SettingPage />} />
+        </Route>
+      </Routes>,
+      `/${uid}/setting`
+    );
+    screen.getByText("Tourney");
+
+    const btns = screen.getAllByText("Add Phase");
+    await act(() => {
+      fireEvent.click(btns[0]);
+    });
+
+    const input = screen.getByText("Name");
+    fireEvent.change(input, { target: { value: PHASE } });
+
+    const submit = screen.getByText("Submit");
+    await act(async () => {
+      fireEvent.submit(submit);
+    });
+
+    screen.getByText("Tourney updated");
+    expect(post).toHaveBeenCalledTimes(1);
+  });
 });
