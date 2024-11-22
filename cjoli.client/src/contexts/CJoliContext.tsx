@@ -73,7 +73,10 @@ const reducer = (state: CJoliState, action: Action) => {
       return { ...state, tourneys: action.payload };
     }
     case CJoliActions.LOAD_TOURNEY: {
-      return { ...state, tourney: action.payload };
+      const tourney = action.payload;
+      const teams = tourney.teams;
+      teams.sort((a, b) => (a.name > b.name ? 1 : -1));
+      return { ...state, tourney: tourney };
     }
     case CJoliActions.SELECT_TOURNEY: {
       return {
