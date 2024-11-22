@@ -103,8 +103,8 @@ const MenuNav = () => {
 
   const tourneyLabel = uid && tourney?.name;
 
-  const logo =
-    teams?.find((t) => t.id == userConfig.favoriteTeamId)?.logo ?? "/logo.png";
+  const team = teams?.find((t) => t.id == userConfig.favoriteTeamId);
+  const logo = team?.logo ?? "/logo.png";
   const version = __APP_VERSION__;
   return (
     <MyNavbar
@@ -123,6 +123,15 @@ const MenuNav = () => {
                 onClick={() => navigate("/")}
                 role="button"
               />
+              {team?.datas?.logo && (
+                <MyImg
+                  src={team.datas.logo}
+                  width="60px"
+                  className="mr-4"
+                  onClick={() => navigate("/")}
+                  role="button"
+                />
+              )}
             </Col>
             {!tourneyLabel && isMobile && <Col>Ice Hockey</Col>}
             {!tourneyLabel && !isMobile && (

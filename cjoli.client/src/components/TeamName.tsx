@@ -50,7 +50,6 @@ const TeamName = ({
     : undefined;
 
   const fullname = team?.datas?.name ? `${name} - ${team.datas.name}` : name;
-  console.log("team", team);
 
   const saveFavoriteTeam = React.useCallback(
     async (teamId?: number) => {
