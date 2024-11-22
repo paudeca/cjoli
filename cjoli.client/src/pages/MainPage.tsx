@@ -85,8 +85,8 @@ const MainPage = () => {
     const team = teams?.find((t) => t.id == userConfig.favoriteTeamId);
     if (team) {
       setColor(
-        team.primaryColor ?? "#202644",
-        team.secondaryColor ?? "#932829"
+        team.datas?.primaryColor ?? team.primaryColor ?? "#202644",
+        team.datas?.secondaryColor ?? team.secondaryColor ?? "#932829"
       );
     }
   }, [teams, userConfig, setColor]);

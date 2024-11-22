@@ -49,6 +49,9 @@ const TeamName = ({
     ? getTeam(teamId)
     : undefined;
 
+  const fullname = team?.datas?.name ? `${name} - ${team.datas.name}` : name;
+  console.log("team", team);
+
   const saveFavoriteTeam = React.useCallback(
     async (teamId?: number) => {
       await handleSaveUserConfig({
@@ -90,7 +93,14 @@ const TeamName = ({
         style={{ maxWidth: "30px", maxHeight: "30px" }}
         className="mx-2"
       />
-      {isCurrentTeam ? <MyTeam color={color}>{name}</MyTeam> : name}
+      {isCurrentTeam ? <MyTeam color={color}>{fullname}</MyTeam> : fullname}
+      {team?.datas?.logo && (
+        <img
+          src={team.datas.logo}
+          style={{ maxWidth: "30px", maxHeight: "30px" }}
+          className="mx-2"
+        />
+      )}
     </>
   );
 };
