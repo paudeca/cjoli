@@ -97,9 +97,19 @@ const CJoliModal = <T extends FieldValues>({
             options={f.options}
             onChange={onChange}
             isClearable
+            defaultValue={f.options?.find(
+              (o) => values && o.value == values[f.id]
+            )}
           />
         ) : (
-          <Select options={f.options} onChange={onChange} isClearable />
+          <Select
+            options={f.options}
+            onChange={onChange}
+            isClearable
+            defaultValue={f.options?.find(
+              (o) => values && o.value == values[f.id]
+            )}
+          />
         );
       }
       case "switch":

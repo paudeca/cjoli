@@ -12,8 +12,12 @@ const AddRankModal = ({ onAddRank }: AddRankModalProps) => {
   const { showToast } = useToast();
   const { tourney } = useCJoli();
 
-  const [phase, setPhase] = React.useState<Phase>();
-  const [squad, setSquad] = React.useState<Squad>();
+  const [phase, setPhase] = React.useState<Phase | undefined>(
+    tourney?.phases.length == 1 ? tourney?.phases[0] : undefined
+  );
+  const [squad, setSquad] = React.useState<Squad | undefined>(
+    phase?.squads.length == 1 ? phase?.squads[0] : undefined
+  );
 
   const fields: Field<Rank>[] = [
     {
@@ -43,6 +47,11 @@ const AddRankModal = ({ onAddRank }: AddRankModalProps) => {
     },
   ];
 
+  const values = {
+    phaseId: tourney?.phases.length == 1 ? tourney?.phases[0].id : undefined,
+    squadId: phase?.squads.length == 1 ? phase?.squads[0].id : undefined,
+  };
+
   const onSubmit = async (rank: Rank) => {
     if (!(await onAddRank(rank))) {
       showToast("danger", "Unable to add Rank");
@@ -54,6 +63,7 @@ const AddRankModal = ({ onAddRank }: AddRankModalProps) => {
   return (
     <CJoliModal
       id="addRank"
+      values={values}
       title="Add Rank"
       fields={fields}
       onSubmit={onSubmit}
