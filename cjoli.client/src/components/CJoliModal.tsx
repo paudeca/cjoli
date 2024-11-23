@@ -94,11 +94,8 @@ const CJoliModal = <T extends FieldValues>({
         };
         return f.creatable ? (
           <CreatableSelect
-            id={f.id}
             options={f.options}
             onChange={onChange}
-            aria-label={f.id}
-            aria-labelledby={f.id}
             isClearable
             defaultValue={f.options?.find(
               (o) => values && o.value == values[f.id]
