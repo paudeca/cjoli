@@ -2,14 +2,20 @@ import CJoliModal, { Field } from "../../components/CJoliModal";
 import { Match, Phase, Position, Squad } from "../../models";
 import React from "react";
 import { useSetting } from "../../hooks/useSetting";
-import { useApi } from "../../hooks/useApi";
-import { useMutation } from "@tanstack/react-query";
 import { useModal } from "../../hooks/useModal";
 import dayjs from "dayjs";
+import { useToast } from "../../hooks/useToast";
 
-const AddMatchModal = () => {
+interface AddMatchModalProps {
+  onAddMatch: (
+    match: Match,
+    { phase, squad }: { phase: Phase; squad: Squad }
+  ) => Promise<boolean>;
+}
+
+const AddMatchModal = ({ onAddMatch }: AddMatchModalProps) => {
   const { tourney } = useSetting();
-  const { saveTourney } = useApi();
+  const { showToast } = useToast();
   const { data } = useModal<{ phase: Phase; squad: Squad }>("addMatch");
 
   const getLabel = React.useCallback(
@@ -21,24 +27,14 @@ const AddMatchModal = () => {
     [tourney]
   );
 
-  const { mutateAsync: doSaveTourney } = useMutation(saveTourney({}));
-
   const onSubmit = async (match: Match) => {
     if (!data) {
       return false;
     }
-    const newSquad = {
-      ...data.squad,
-      matches: [...data.squad.matches, match],
-    };
-    const squads = data.phase.squads.map((s) =>
-      s.id != data.squad.id ? s : newSquad
-    );
-    const newPhase = { ...data.phase, squads };
-    const phases = tourney.phases.map((p) =>
-      p.id != data.phase!.id ? p : newPhase
-    );
-    await doSaveTourney({ ...tourney, phases });
+    if (!(await onAddMatch(match, data))) {
+      showToast("danger", "Unable to add Match");
+      return false;
+    }
     return true;
   };
 
@@ -99,8 +95,6 @@ const AddMatchModal = () => {
       onSubmit={onSubmit}
       values={{
         time: dayjs(nextTime).format("YYYY-MM-DDTHH:mm:ss"),
-        location: "glace A",
-        shot: true,
       }}
     />
   );

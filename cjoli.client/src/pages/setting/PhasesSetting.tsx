@@ -50,6 +50,7 @@ const PhasesSetting = () => {
                   <Button
                     variant="danger"
                     onClick={() => showConfirmDelete(true, phase)}
+                    data-testid="deletePhase"
                   >
                     <Trash3 />
                   </Button>

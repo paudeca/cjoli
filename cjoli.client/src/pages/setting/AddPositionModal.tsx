@@ -30,9 +30,10 @@ const AddPositionModal = ({ onAddPosition }: AddPositionModalProps) => {
     },
     {
       id: "name",
-      label: "Name",
+      label: "Position Name",
       type: "text",
       autoFocus: true,
+      testId: "positionName",
     },
     {
       id: "short",
@@ -44,6 +45,7 @@ const AddPositionModal = ({ onAddPosition }: AddPositionModalProps) => {
       label: "Team",
       type: "select",
       options: tourney?.teams.map((t) => ({ label: t.name, value: t.id })),
+      testId: "teamPosition",
     },
     {
       id: "parentPosition.phaseId",

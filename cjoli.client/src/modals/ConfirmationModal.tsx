@@ -51,7 +51,6 @@ const ConfirmationModal = <T,>({
           <Trans i18nKey="button.no">No</Trans>
         </Button>
         <Button
-          type="submit"
           variant="primary"
           onClick={async () => {
             if (data && (await onConfirm(data))) {

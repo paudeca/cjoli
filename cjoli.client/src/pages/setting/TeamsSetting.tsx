@@ -64,6 +64,7 @@ const TeamsSetting = () => {
                         setTeam(team);
                         showConfirmDeleteTeam(true, team);
                       }}
+                      data-testid="deleteTeam"
                     >
                       <Trash3 />
                     </Button>

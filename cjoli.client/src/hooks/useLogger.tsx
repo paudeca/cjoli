@@ -30,16 +30,17 @@ export const useLogger = () => {
     }),
     [uid, user]
   );
+  const isTest = process.env.TEST == "true";
   return useMemo(() => {
     const log = datadogLogs.logger;
     return {
       debug: (message: string, ...data: unknown[]) => {
         log.debug(message, getProperties(data));
-        console.debug(message, ...data);
+        !isTest && console.debug(message, ...data);
       },
       info: (message: string, ...data: unknown[]) => {
         log.info(message, getProperties(data));
-        console.info(message, ...data);
+        !isTest && console.info(message, ...data);
       },
       warn: (message: string, ...data: unknown[]) => {
         log.warn(message, getProperties(data));

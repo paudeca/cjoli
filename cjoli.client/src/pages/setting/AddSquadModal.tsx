@@ -17,7 +17,7 @@ const AddSquadModal = ({ onAddSquad, fieldLabel }: AddSquadModalProps) => {
   const fields: Field<{ value: string }>[] = [
     {
       id: "value",
-      label: fieldLabel ?? "Name",
+      label: fieldLabel ?? "Squad Name",
       type: "text",
       autoFocus: true,
     },

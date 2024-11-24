@@ -45,7 +45,7 @@ const SettingPage = () => {
 
   const { isMobile } = useScreenSize();
   const { showToast } = useToast();
-  const { setShow: showConfirmDeleteTourney } = useModal(
+  const { setShowWithData: showConfirmDeleteTourney } = useModal<Tourney>(
     "confirmDeleteTourney"
   );
 
@@ -121,6 +121,23 @@ const SettingPage = () => {
     [doSaveTourney]
   );
 
+  const addMatch = useCallback(
+    async (tourney: Tourney, phase: Phase, squad: Squad, match: Match) => {
+      const newSquad = {
+        ...squad,
+        matches: [...squad.matches, match],
+      };
+      const squads = phase.squads.map((s) => (s.id != squad.id ? s : newSquad));
+      const newPhase = { ...phase, squads };
+      const phases = tourney.phases.map((p) =>
+        p.id != phase!.id ? p : newPhase
+      );
+      doSaveTourney({ ...tourney, phases });
+      return true;
+    },
+    [doSaveTourney]
+  );
+
   const addRank = useCallback(
     async (tourney: Tourney, rank: Rank) => {
       rank.order = tourney.ranks.length + 1;
@@ -145,6 +162,10 @@ const SettingPage = () => {
     await doSaveTourney(tourney);
   };
 
+  if (!tourney) {
+    return <Loading ready={false}>wait</Loading>;
+  }
+
   const buttons = (
     <CJoliStack direction={isMobile ? "vertical" : "horizontal"} gap={3}>
       <div className="p-2">
@@ -155,19 +176,14 @@ const SettingPage = () => {
       <div className="p-2">
         <Button
           variant="danger"
-          onClick={() => {
-            showConfirmDeleteTourney(true);
-          }}
+          onClick={() => showConfirmDeleteTourney(true, tourney)}
+          data-testid="deleteTourney"
         >
           <Trash3 />
         </Button>
       </div>
     </CJoliStack>
   );
-
-  if (!tourney) {
-    return <Loading ready={false}>wait</Loading>;
-  }
 
   return (
     <Loading ready={!isLoading}>
@@ -200,13 +216,20 @@ const SettingPage = () => {
                     addPosition(tourney, phase, squad, name)
                   }
                 />
-                <AddMatchModal />
+                <AddMatchModal
+                  onAddMatch={(match, { phase, squad }) =>
+                    addMatch(tourney, phase, squad, match)
+                  }
+                />
                 <AddRankModal onAddRank={(rank) => addRank(tourney, rank)} />
 
                 <ConfirmationModal
                   id="confirmDeleteTourney"
                   title="Remove Tourney"
-                  onConfirm={doRemoveTourney}
+                  onConfirm={async () => {
+                    doRemoveTourney();
+                    return true;
+                  }}
                 >
                   Are you sure you want to remove this tourney '{tourney.name}'?
                 </ConfirmationModal>

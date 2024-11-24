@@ -69,6 +69,7 @@ const PositionsSetting = ({
           label: p.value.toString(),
           value: p.value,
         }));
+
         return (
           <Accordion.Item key={position.id} eventKey={position.id.toString()}>
             <Accordion.Header>
@@ -200,6 +201,7 @@ const PositionsSetting = ({
                     onClick={() =>
                       showConfirmDelete(true, { position, squad, phase })
                     }
+                    data-testid="deletePosition"
                   >
                     <Trash3 />
                   </Button>

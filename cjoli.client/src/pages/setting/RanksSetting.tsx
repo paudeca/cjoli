@@ -126,6 +126,7 @@ const RanksSetting = () => {
                       <Button
                         variant="danger"
                         onClick={() => showConfirmDelete(true, rank)}
+                        data-testid="deleteRank"
                       >
                         <Trash3 />
                       </Button>

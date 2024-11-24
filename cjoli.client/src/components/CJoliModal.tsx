@@ -36,6 +36,7 @@ export interface Field<T extends FieldValues> {
   creatable?: boolean;
   options?: { label: string; value: string | number }[];
   onChange?: (value?: string) => void;
+  testId?: string;
 }
 
 interface CJoliModalProps<T extends FieldValues> {
@@ -100,6 +101,7 @@ const CJoliModal = <T extends FieldValues>({
             defaultValue={f.options?.find(
               (o) => values && o.value == values[f.id]
             )}
+            aria-label={f.label}
           />
         ) : (
           <Select
@@ -109,6 +111,7 @@ const CJoliModal = <T extends FieldValues>({
             defaultValue={f.options?.find(
               (o) => values && o.value == values[f.id]
             )}
+            aria-label={f.label}
           />
         );
       }
@@ -133,6 +136,7 @@ const CJoliModal = <T extends FieldValues>({
         return (
           <Form.Control
             type={f.type}
+            data-testid={f.testId}
             autoFocus={f.autoFocus}
             {...register(f.id, {
               required: f.required

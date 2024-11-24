@@ -6,7 +6,7 @@ import { ToastProvider } from "../contexts/ToastContext";
 import { ModalProvider } from "../contexts/ModalContext";
 import { ThemeProvider } from "@emotion/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { Ranking, Score, Team, Tourney, User } from "../models";
+import { Score, Team, Tourney, User } from "../models";
 import { expect, vi } from "vitest";
 import axios from "axios";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -167,13 +167,13 @@ export const mockGet = <T,>(uri: string, data: T, name: string) => {
 
 export const mockPost = <T,>(
   uri: string,
-  check: (data: T) => void,
+  check: (data: T) => T,
   name: string
 ) => {
   const post = vi.mocked(axios.post).mockImplementationOnce((url, data) => {
     try {
       expect(url).toMatch(uri);
-      check(data as T);
+      data = check(data as T);
       return Promise.resolve({
         data,
       });
@@ -183,6 +183,26 @@ export const mockPost = <T,>(
     }
   });
   return post;
+};
+
+export const mockDelete = <T,>(
+  uri: string,
+  callback: () => T,
+  name: string
+) => {
+  const del = vi.mocked(axios.delete).mockImplementationOnce((url) => {
+    try {
+      expect(url).toMatch(uri);
+      const data = callback();
+      return Promise.resolve({
+        data,
+      });
+    } catch (error) {
+      console.error(`Error in ${name}`, error);
+      throw error;
+    }
+  });
+  return del;
 };
 
 export const mockGetRanking = (uid: string, create?: () => Tourney) =>

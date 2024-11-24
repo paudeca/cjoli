@@ -85,6 +85,7 @@ const SquadsSetting = ({ indexPhase }: SquadsSettingProps) => {
                             onClick={() =>
                               showConfirmDelete(true, { squad, phase })
                             }
+                            data-testid="deleteSquad"
                           >
                             <Trash3 />
                           </Button>

@@ -4,6 +4,7 @@ import React from "react";
 import { Trash3 } from "react-bootstrap-icons";
 import { useModal } from "../../hooks/useModal";
 import { useSetting } from "../../hooks/useSetting";
+import dayjs from "dayjs";
 
 interface MatchesSettingProps {
   squad: Squad;
@@ -43,7 +44,7 @@ const MatchesSetting = ({
         return (
           <Accordion.Item key={match.id} eventKey={match.id.toString()}>
             <Accordion.Header>
-              {match.time.toString()} - [{getLabel(match.positionA)} -{" "}
+              {dayjs(match.time).format()} - [{getLabel(match.positionA)} -{" "}
               {getLabel(match.positionB)}] - {match.location}
             </Accordion.Header>
             <Accordion.Body>
@@ -88,6 +89,7 @@ const MatchesSetting = ({
                     onClick={() =>
                       showConfirmDelete(true, { match, squad, phase })
                     }
+                    data-testid="deleteMatch"
                   >
                     <Trash3 />
                   </Button>
