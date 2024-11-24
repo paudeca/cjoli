@@ -231,7 +231,8 @@ const SettingPage = () => {
                     return true;
                   }}
                 >
-                  Are you sure you want to remove this tourney '{tourney.name}'?
+                  Are you sure you want to remove this tourney &apos;
+                  {tourney.name}&apos;?
                 </ConfirmationModal>
 
                 <ConfirmationModal<Team>
@@ -239,7 +240,7 @@ const SettingPage = () => {
                   title="Remove Team"
                   onConfirm={doRemoveTeam}
                   message={(team) =>
-                    `Are you sure you want to remove this team '${team.name}'?`
+                    `Are you sure you want to remove this team &apos;${team.name}&apos;?`
                   }
                 />
                 <ConfirmationModal<Phase>
@@ -247,7 +248,7 @@ const SettingPage = () => {
                   title="Remove Phase"
                   onConfirm={doRemovePhase}
                   message={(phase) =>
-                    `Are you sure you want to remove this Phase '${phase.name}'?`
+                    `Are you sure you want to remove this Phase &apos;${phase.name}&apos;?`
                   }
                 />
                 <ConfirmationModal<{ squad: Squad; phase: Phase }>

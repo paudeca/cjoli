@@ -17,7 +17,7 @@ const RankingMatchesStack = ({ phase, team }: RankingMatchesStackProps) => {
   const filterMatches = useMemo(
     () =>
       matches.filter((m) => m.phaseId == phase.id && isTeamInMatch(team.id, m)),
-    []
+    [isTeamInMatch, matches, phase.id, team.id]
   );
   return (
     <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="ranking">

@@ -50,5 +50,5 @@ export const useLogger = () => {
         console.error(message, ...data);
       },
     };
-  }, [getProperties]);
+  }, [getProperties, isTest]);
 };

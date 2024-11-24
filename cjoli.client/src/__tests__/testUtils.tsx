@@ -218,8 +218,9 @@ export const mockGetTeams = (teams: Team[]) =>
   mockGet("teams", teams, "mockGetTeams");
 
 export const initPage = (Component: ComponentType, init: () => void) => {
-  return () => {
+  const component = () => {
     init();
     return <Component />;
   };
+  return component;
 };

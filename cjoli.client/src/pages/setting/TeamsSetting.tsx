@@ -79,7 +79,8 @@ const TeamsSetting = () => {
               title="Remove Team"
               onConfirm={async () => !!(await doRemoveTeam(team!))}
             >
-              Are you sure you want to remove this team '{team?.name}'?
+              Are you sure you want to remove this team &apos;{team?.name}
+              &apos;?
             </ConfirmationModal>
           </ListGroup>
         </Col>

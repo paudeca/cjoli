@@ -5,7 +5,7 @@ import { useCJoli } from "../hooks/useCJoli";
 import dayjs from "dayjs";
 import { Clock, ClockHistory, PlusLg } from "react-bootstrap-icons";
 import { Tourney } from "../models";
-import React, { memo, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import TourneyCard from "./select/TourneyCard";
 import { useUser } from "../hooks/useUser";
@@ -50,19 +50,17 @@ const MySpinner = styled("div")`
   }
 `;
 
-const Title = memo(
-  ({ title, icon }: { title: string; icon: React.ReactNode }) => {
-    return (
-      <h4
-        className="display-4"
-        style={{ fontSize: 24, display: "flex", alignItems: "baseline" }}
-      >
-        <span className="mx-1">{icon}</span>
-        {title}
-      </h4>
-    );
-  }
-);
+const Title = ({ title, icon }: { title: string; icon: React.ReactNode }) => {
+  return (
+    <h4
+      className="display-4"
+      style={{ fontSize: 24, display: "flex", alignItems: "baseline" }}
+    >
+      <span className="mx-1">{icon}</span>
+      {title}
+    </h4>
+  );
+};
 
 const SelectPage = () => {
   const { tourneys } = useCJoli("welcome");
