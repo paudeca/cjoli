@@ -10,6 +10,7 @@ import {
   TypePage,
 } from "../models";
 import { CJoliActions } from "./actions";
+import dayjs from "dayjs";
 
 interface CJoliState {
   tourneys?: Tourney[];
@@ -34,7 +35,7 @@ export const CJoliContext = React.createContext<{
 } | null>(null);
 
 const initialState: CJoliState = {
-  daySelected: "0",
+  daySelected: dayjs().format("YYYY-MM-DD"),
   matches: [],
   theme: {
     primary: "#202644",

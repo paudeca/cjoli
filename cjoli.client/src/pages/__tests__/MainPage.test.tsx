@@ -144,8 +144,8 @@ describe("MainPage", async () => {
                     positions: [],
                     matches: [
                       { time: dayjs().toDate() } as Match,
-                      { time: dayjs().add(2, "days").toDate() } as Match,
-                      { time: dayjs().add(1, "days").toDate() } as Match,
+                      { time: dayjs().add(2, "hour").toDate() } as Match,
+                      { time: dayjs().add(1, "hour").toDate() } as Match,
                     ],
                   },
                 ],
