@@ -15,17 +15,16 @@ export const mutationOptions = <
   TData = unknown,
   TError = DefaultError,
   TVariables = void,
-  TContext = unknown
+  TContext = unknown,
 >(
   options: UseMutationOptions<TData, TError, TVariables, TContext>
 ): UseMutationOptions<TData, TError, TVariables, TContext> => {
   return options;
 };
 
-export const useApi = () => {
-  const { loadTourney, loadTourneys, loadRanking } = useCJoli();
+const useApiGet = () => {
+  const { loadTourneys, loadRanking } = useCJoli();
   const { loadUser } = useUser();
-  const navigate = useNavigate();
 
   const getUser = useCallback(
     () =>
@@ -76,6 +75,11 @@ export const useApi = () => {
       }),
     [loadRanking]
   );
+  return { getUser, getTourneys, getTeams, getRanking };
+};
+
+const useApiPost = () => {
+  const { loadTourney } = useCJoli();
 
   const saveTourney = useCallback(
     ({ onSuccess }: { onSuccess?: () => void }) =>
@@ -90,13 +94,19 @@ export const useApi = () => {
       }),
     [loadTourney]
   );
+  return { saveTourney };
+};
+
+const useApiDelete = () => {
+  const { loadTourney } = useCJoli();
+  const navigate = useNavigate();
 
   const removeTourney = useCallback(
     (uid: string) =>
       mutationOptions({
         mutationKey: ["removeTourney"],
         mutationFn: async () => {
-          await settingService.removeTourney(uid);
+          await settingService.removeTourney({ uid });
           navigate("/");
           return true;
         },
@@ -109,7 +119,10 @@ export const useApi = () => {
       mutationOptions({
         mutationKey: ["removeTeam"],
         mutationFn: async (team: Team) => {
-          const tourney = await settingService.removeTeam(uid, team.id);
+          const tourney = await settingService.removeTeam({
+            uid,
+            teamId: team.id,
+          });
           loadTourney(tourney);
           return true;
         },
@@ -122,7 +135,10 @@ export const useApi = () => {
       mutationOptions({
         mutationKey: ["removePhase"],
         mutationFn: async (phase: Phase) => {
-          const tourney = await settingService.removePhase(uid, phase.id);
+          const tourney = await settingService.removePhase({
+            uid,
+            phaseId: phase.id,
+          });
           loadTourney(tourney);
           return true;
         },
@@ -141,11 +157,11 @@ export const useApi = () => {
           squad: Squad;
           phase: Phase;
         }) => {
-          const tourney = await settingService.removeSquad(
+          const tourney = await settingService.removeSquad({
             uid,
-            phase.id,
-            squad.id
-          );
+            phaseId: phase.id,
+            squadId: squad.id,
+          });
           loadTourney(tourney);
           return true;
         },
@@ -166,12 +182,12 @@ export const useApi = () => {
           phase: Phase;
           squad: Squad;
         }) => {
-          const tourney = await settingService.removePosition(
+          const tourney = await settingService.removePosition({
             uid,
-            phase.id,
-            squad.id,
-            position.id
-          );
+            phaseId: phase.id,
+            squadId: squad.id,
+            positionId: position.id,
+          });
           loadTourney(tourney);
           return true;
         },
@@ -192,12 +208,12 @@ export const useApi = () => {
           squad: Squad;
           phase: Phase;
         }) => {
-          const tourney = await settingService.removeMatch(
+          const tourney = await settingService.removeMatch({
             uid,
-            phase.id,
-            squad.id,
-            match.id
-          );
+            phaseId: phase.id,
+            squadId: squad.id,
+            matchId: match.id,
+          });
           loadTourney(tourney);
           return true;
         },
@@ -210,7 +226,10 @@ export const useApi = () => {
       mutationOptions({
         mutationKey: ["removeRank"],
         mutationFn: async (rank: Rank) => {
-          const tourney = await settingService.removeRank(uid, rank.id);
+          const tourney = await settingService.removeRank({
+            uid,
+            rankId: rank.id,
+          });
           loadTourney(tourney);
           return true;
         },
@@ -219,11 +238,6 @@ export const useApi = () => {
   );
 
   return {
-    getUser,
-    getTourneys,
-    getRanking,
-    getTeams,
-    saveTourney,
     removeTourney,
     removeTeam,
     removePhase,
@@ -231,5 +245,17 @@ export const useApi = () => {
     removePosition,
     removeMatch,
     removeRank,
+  };
+};
+
+export const useApi = () => {
+  const get = useApiGet();
+  const post = useApiPost();
+  const del = useApiDelete();
+
+  return {
+    ...get,
+    ...post,
+    ...del,
   };
 };

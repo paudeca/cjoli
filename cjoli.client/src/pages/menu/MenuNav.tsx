@@ -4,13 +4,10 @@ import {
   Offcanvas,
   Nav,
   NavDropdown,
-  Col,
-  Row,
   Form,
   Button,
   Stack,
   Spinner,
-  Badge,
 } from "react-bootstrap";
 import styled from "@emotion/styled";
 import LoginModal from "../../modals/LoginModal";
@@ -22,9 +19,7 @@ import {
   GearWide,
   House,
   ListOl,
-  Person,
   PersonSquare,
-  ThreeDotsVertical,
 } from "react-bootstrap-icons";
 import { useUser } from "../../hooks/useUser";
 import { useNavigate } from "react-router-dom";
@@ -39,20 +34,24 @@ import { useModal } from "../../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import { useServer } from "../../hooks/useServer";
-
-const MyImg = styled.img<{ width: string }>`
-  width: ${(props) => props.width};
-`;
+import MenuBrand from "./MenuBrand";
 
 const MyNavbar = styled(Navbar)`
   color: black;
   border-bottom: 3px solid ${(props) => props.theme.colors.secondary};
 `;
 
+const langs = [
+  { key: "en", icon: "🇬🇧" },
+  { key: "fr", icon: "🇫🇷" },
+  { key: "pt", icon: "🇵🇹" },
+  { key: "es", icon: "🇪🇸" },
+  { key: "de", icon: "🇩🇪" },
+];
+
 const MenuNav = () => {
-  const { loadRanking, tourney, teams } = useCJoli();
-  const { user, userConfig, loadUser, handleSaveUserConfig, countUser } =
-    useUser();
+  const { loadRanking, tourney } = useCJoli();
+  const { user, userConfig, loadUser, handleSaveUserConfig } = useUser();
   const uid = useUid();
   const { path } = useServer();
   const { setShow: showLogin } = useModal("login");
@@ -80,19 +79,8 @@ const MenuNav = () => {
     values: userConfig,
   });
 
-  const langs = [
-    { key: "en", icon: "🇬🇧" },
-    { key: "fr", icon: "🇫🇷" },
-    { key: "pt", icon: "🇵🇹" },
-    { key: "es", icon: "🇪🇸" },
-    { key: "de", icon: "🇩🇪" },
-  ];
-
   const tourneyLabel = uid && tourney?.name;
 
-  const team = teams?.find((t) => t.id == userConfig.favoriteTeamId);
-  const logo = team?.logo ?? "/logo.png";
-  const version = __APP_VERSION__;
   return (
     <MyNavbar
       expand="sm"
@@ -100,51 +88,7 @@ const MenuNav = () => {
       sticky={isMobile ? undefined : "top"}
     >
       <Container fluid>
-        <Navbar.Brand>
-          <Row className="align-items-center">
-            <Col>
-              <MyImg
-                src={logo}
-                width="60px"
-                className="mx-4"
-                onClick={() => navigate("/")}
-                role="button"
-              />
-              {team?.datas?.logo && (
-                <MyImg
-                  src={team.datas.logo}
-                  width="60px"
-                  className="mr-4"
-                  onClick={() => navigate("/")}
-                  role="button"
-                />
-              )}
-            </Col>
-            {!tourneyLabel && isMobile && <Col>Ice Hockey</Col>}
-            {!tourneyLabel && !isMobile && (
-              <Col>
-                {t("title", "CJoli - Ice Hockey Tournament")} - {version}
-              </Col>
-            )}
-            {tourneyLabel && <Col>{tourneyLabel}</Col>}
-            <Col>
-              <Badge
-                bg="secondary"
-                className="d-flex menu"
-                style={{ maxWidth: 60 }}
-                data-testid="countUser"
-              >
-                {countUser}
-                <Person />
-              </Badge>
-            </Col>
-            <Col className="d-flex justify-content-end">
-              <Navbar.Toggle aria-controls="menu" onClick={() => setShow(true)}>
-                <ThreeDotsVertical />
-              </Navbar.Toggle>
-            </Col>
-          </Row>
-        </Navbar.Brand>
+        <MenuBrand setShow={setShow} />
         {user && tourneyLabel && (
           <Stack direction="horizontal" gap={3}>
             <Button onClick={handleUpdateEstimate} disabled={loading}>

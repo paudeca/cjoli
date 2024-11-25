@@ -38,16 +38,12 @@ export const useColor = () => {
     b: parseInt(hex.slice(5, 7), 16),
   });
 
-  const RGBToHSL = (r: number, g: number, b: number) => {
-    r /= 255;
-    g /= 255;
-    b /= 255;
-
-    const min = Math.min(r, g, b);
-    const max = Math.max(r, g, b);
-    const delta = max - min;
-    let [h, s, l] = [0, 0, 0];
-
+  const calculH = (
+    delta: number,
+    max: number,
+    { r, g, b }: { r: number; g: number; b: number }
+  ) => {
+    let h = 0;
     if (delta === 0) {
       h = 0;
     } else if (max === r) {
@@ -60,6 +56,20 @@ export const useColor = () => {
 
     h = Math.round(h * 60);
     h = h < 0 ? h + 360 : h;
+    return h;
+  };
+
+  const RGBToHSL = (r: number, g: number, b: number) => {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+
+    const min = Math.min(r, g, b);
+    const max = Math.max(r, g, b);
+    const delta = max - min;
+    let [h, s, l] = [0, 0, 0];
+
+    h = calculH(delta, max, { r, g, b });
 
     l = (max + min) / 2;
     s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
@@ -73,13 +83,8 @@ export const useColor = () => {
     return { h, s, l };
   };
 
-  const HSLToRGB = (h: number, s: number, l: number) => {
-    s /= 100;
-    l /= 100;
-
-    const c = (1 - Math.abs(2 * l - 1)) * s;
-    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-    const m = l - c / 2;
+  // eslint-disable-next-line max-statements
+  const calculRgb = ({ h, c, x }: { h: number; c: number; x: number }) => {
     let [r, g, b] = [0, 0, 0];
 
     if (0 <= h && h < 60) {
@@ -107,6 +112,17 @@ export const useColor = () => {
       g = 0;
       b = x;
     }
+    return { r, g, b };
+  };
+
+  const HSLToRGB = (h: number, s: number, l: number) => {
+    s /= 100;
+    l /= 100;
+
+    const c = (1 - Math.abs(2 * l - 1)) * s;
+    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+    const m = l - c / 2;
+    let { r, g, b } = calculRgb({ c, h, x });
 
     r = Math.round((r + m) * 255);
     g = Math.round((g + m) * 255);

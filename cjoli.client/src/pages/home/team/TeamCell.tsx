@@ -1,8 +1,43 @@
 import { CaretDownFill, CaretUpFill, PauseFill } from "react-bootstrap-icons";
 import LeftCenterDiv from "../../../components/LeftCenterDiv";
 
+interface CellValueProps<T> {
+  value?: T;
+  getLabel?: (a: T) => string | number | undefined;
+  val: number | undefined;
+  display: boolean;
+}
+const CellValue = <T,>({
+  value,
+  val,
+  display,
+  getLabel,
+}: CellValueProps<T>) => {
+  if (val == undefined || !display) {
+    return "-";
+  } else if (value && getLabel) {
+    return getLabel(value);
+  } else {
+    return val;
+  }
+};
+
+interface CellEvolutionProps {
+  result: number;
+  valB: number | undefined;
+}
+
+const CellEvolution = ({ result, valB }: CellEvolutionProps) => {
+  if (result == 1) {
+    return <CaretUpFill color="rgb(25, 135, 84)" className="mx-1" />;
+  } else if (result == -1) {
+    return <CaretDownFill color="rgb(220, 53, 69)" className="mx-1" />;
+  } else if (!!valB && result == 0) {
+    return <PauseFill style={{ transform: "rotate(90deg)" }} color="#ffc107" />;
+  }
+};
+
 type TeamCellProps<T> = {
-  label: string;
   value?: T;
   valueB?: T;
   call: (a: T) => number | undefined;
@@ -33,20 +68,13 @@ const TeamCell = <T,>({
   return (
     <td>
       <LeftCenterDiv width={40}>
-        {val === undefined || !display
-          ? "-"
-          : value && getLabel
-          ? getLabel(value)
-          : val}
-        {active && result == 1 && (
-          <CaretUpFill color="rgb(25, 135, 84)" className="mx-1" />
-        )}
-        {active && result == -1 && (
-          <CaretDownFill color="rgb(220, 53, 69)" className="mx-1" />
-        )}
-        {active && !!valB && result == 0 && (
-          <PauseFill style={{ transform: "rotate(90deg)" }} color="#ffc107" />
-        )}
+        <CellValue
+          val={val}
+          value={value}
+          getLabel={getLabel}
+          display={display}
+        />
+        {active && <CellEvolution result={result} valB={valB} />}
         <span className="mx-1" style={{ fontSize: 11, color: "grey" }}>
           {getInfo && value && display && getInfo(value)}
         </span>

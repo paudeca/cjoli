@@ -3,7 +3,7 @@ import TeamName from "../../../components/TeamName";
 import CJoliTooltip from "../../../components/CJoliTooltip";
 import React from "react";
 import TeamCell from "./TeamCell";
-import { Rank, Score, Squad, Team } from "../../../models";
+import { Rank, Score, Squad, Team, Tourney } from "../../../models";
 import { useCJoli } from "../../../hooks/useCJoli";
 import { useTranslation } from "react-i18next";
 
@@ -19,35 +19,9 @@ interface TeamTableProps {
   squad?: Squad;
 }
 
-const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
-  const { ranking, tourney, getTeamRank, getScoreForTeam, getScoreFromSquad } =
-    useCJoli();
+const useFormatRank = () => {
   const { t } = useTranslation();
-  let rank = getTeamRank(team);
-  let rankB = teamB && getTeamRank(teamB);
-  const score = getScoreForTeam(team)!;
-  let scoreB = teamB && getScoreForTeam(teamB);
-  const scoreSquad = squad && getScoreFromSquad(squad, team);
-  const scoreSquadB = squad && teamB && getScoreFromSquad(squad, teamB);
-  if ((!rank || !rankB) && scoreSquad && scoreSquadB) {
-    rank = { order: scoreSquad.rank } as Rank;
-    rankB = { order: scoreSquadB.rank } as Rank;
-  }
-
-  let datas: { team?: Team; rank?: Rank; score?: Score }[] = [
-    { team, rank, score },
-  ];
-  if (teamB) {
-    datas = [...datas, { team: teamB, rank: rankB, score: scoreB }];
-  } else {
-    const scoreTourney = ranking?.scores.scoreTourney;
-    scoreB = scoreTourney;
-    datas = [
-      ...datas,
-      { team: undefined, rank: undefined, score: scoreTourney },
-    ];
-  }
-  const formatRank = (rank?: number) => {
+  return (rank?: number) => {
     if (rank == undefined) return "";
     if (rank == 0) {
       return ` - ${t("rank.first", "1st")} 🥇`;
@@ -59,6 +33,12 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
       return ` - ${t("rank.rankth", { rank: rank + 1 })}`;
     }
   };
+};
+
+const useColumns = (tourney?: Tourney, teamB?: Team) => {
+  const { t } = useTranslation();
+  const formatRank = useFormatRank();
+
   const winPt = tourney?.config.win || 2;
 
   let columns = [
@@ -70,10 +50,10 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
         r.order == 1
           ? `${t("rank.first")} 🥇`
           : r.order == 2
-          ? `${t("rank.second")} 🥈`
-          : r.order == 3
-          ? `${t("rank.third")} 🥉`
-          : t("rank.rankth", { rank: r.order }),
+            ? `${t("rank.second")} 🥈`
+            : r.order == 3
+              ? `${t("rank.third")} 🥉`
+              : t("rank.rankth", { rank: r.order }),
       up: false,
       active: true,
       needTeam: true,
@@ -182,7 +162,6 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
       needTeam: false,
     },
   ];
-
   if (tourney?.config?.hasPenalty) {
     columns = [
       ...columns,
@@ -196,6 +175,39 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
       },
     ];
   }
+
+  return columns;
+};
+
+const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
+  const { ranking, tourney, getTeamRank, getScoreForTeam, getScoreFromSquad } =
+    useCJoli();
+  let rank = getTeamRank(team);
+  let rankB = teamB && getTeamRank(teamB);
+  const score = getScoreForTeam(team)!;
+  let scoreB = teamB && getScoreForTeam(teamB);
+  const scoreSquad = squad && getScoreFromSquad(squad, team);
+  const scoreSquadB = squad && teamB && getScoreFromSquad(squad, teamB);
+  if ((!rank || !rankB) && scoreSquad && scoreSquadB) {
+    rank = { order: scoreSquad.rank } as Rank;
+    rankB = { order: scoreSquadB.rank } as Rank;
+  }
+
+  let datas: { team?: Team; rank?: Rank; score?: Score }[] = [
+    { team, rank, score },
+  ];
+  if (teamB) {
+    datas = [...datas, { team: teamB, rank: rankB, score: scoreB }];
+  } else {
+    const scoreTourney = ranking?.scores.scoreTourney;
+    scoreB = scoreTourney;
+    datas = [
+      ...datas,
+      { team: undefined, rank: undefined, score: scoreTourney },
+    ];
+  }
+
+  const columns = useColumns(tourney, teamB);
 
   return (
     <Table striped bordered size="sm" style={{ textAlign: "center" }}>
@@ -219,7 +231,6 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
               <React.Fragment key={j}>
                 {c.callRank ? (
                   <TeamCell
-                    label={c.label}
                     value={rank}
                     valueB={rankB}
                     call={c.callRank}
@@ -231,7 +242,6 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
                   />
                 ) : (
                   <TeamCell
-                    label={c.label}
                     value={score}
                     valueB={scoreB}
                     call={c.callScore!}

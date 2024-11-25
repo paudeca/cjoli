@@ -6,7 +6,6 @@ import TourneySetting from "./setting/TourneySetting";
 import TeamsSetting from "./setting/TeamsSetting";
 import { useCJoli } from "../hooks/useCJoli";
 import useScreenSize from "../hooks/useScreenSize";
-import { useToast } from "../hooks/useToast";
 import PhasesSetting from "./setting/PhasesSetting";
 import Loading from "../components/Loading";
 import { SettingProvider } from "../contexts/SettingContext";
@@ -14,7 +13,6 @@ import RanksSetting from "./setting/RanksSetting";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useApi } from "../hooks/useApi";
 import AddRankModal from "./setting/AddRankModal";
-import { useCallback } from "react";
 import AddTeamModal from "./setting/AddTeamModal";
 import AddPositionModal from "./setting/AddPositionModal";
 import AddMatchModal from "./setting/AddMatchModal";
@@ -24,6 +22,7 @@ import { useModal } from "../hooks/useModal";
 import AddPhaseModal from "./setting/AddPhaseModal";
 import AddSquadModal from "./setting/AddSquadModal";
 import CJoliStack from "../components/CJoliStack";
+import { useAddSetting } from "./setting/useAddSetting";
 
 const SettingPage = () => {
   const { tourney } = useCJoli("setting");
@@ -41,114 +40,23 @@ const SettingPage = () => {
   const { register, handleSubmit, setValue, control } = useForm<Tourney>({
     values: tourney,
   });
-  const { saveTourney } = useApi();
 
   const { isMobile } = useScreenSize();
-  const { showToast } = useToast();
   const { setShowWithData: showConfirmDeleteTourney } = useModal<Tourney>(
     "confirmDeleteTourney"
   );
 
   const { isLoading } = useQuery(getRanking(uid));
 
-  const { mutateAsync: doSaveTourney } = useMutation(
-    saveTourney({
-      onSuccess: () => {
-        showToast("success", "Tourney updated");
-      },
-    })
-  );
-
-  const addTeam = useCallback(
-    async (tourney: Tourney, team: Partial<Team>) => {
-      await doSaveTourney({
-        ...tourney,
-        teams: [...tourney.teams, team as Team],
-      });
-      return true;
-    },
-    [doSaveTourney]
-  );
-
-  const addPhase = useCallback(
-    async (tourney: Tourney, phase: Phase) => {
-      doSaveTourney({
-        ...tourney,
-        phases: [...tourney.phases, phase],
-      });
-      return true;
-    },
-    [doSaveTourney]
-  );
-
-  const addSquad = useCallback(
-    async (tourney: Tourney, phase: Phase, squad: Squad) => {
-      const newPhase = {
-        ...phase,
-        squads: [...phase.squads, squad],
-      };
-      const phases = tourney.phases.map((p) =>
-        p.id == phase.id ? newPhase : p
-      );
-      doSaveTourney({
-        ...tourney,
-        phases,
-      });
-      return true;
-    },
-    [doSaveTourney]
-  );
-
-  const addPosition = useCallback(
-    async (
-      tourney: Tourney,
-      phase: Phase,
-      squad: Squad,
-      position: Position
-    ) => {
-      const newSquad = {
-        ...squad,
-        positions: [...squad.positions, position],
-      };
-      const squads = phase.squads.map((s) => (s.id != squad.id ? s : newSquad));
-      const newPhase = { ...phase, squads };
-      const phases = tourney.phases.map((p) =>
-        p.id != phase!.id ? p : newPhase
-      );
-      doSaveTourney({ ...tourney, phases });
-      return true;
-    },
-    [doSaveTourney]
-  );
-
-  const addMatch = useCallback(
-    async (tourney: Tourney, phase: Phase, squad: Squad, match: Match) => {
-      const newSquad = {
-        ...squad,
-        matches: [...squad.matches, match],
-      };
-      const squads = phase.squads.map((s) => (s.id != squad.id ? s : newSquad));
-      const newPhase = { ...phase, squads };
-      const phases = tourney.phases.map((p) =>
-        p.id != phase!.id ? p : newPhase
-      );
-      doSaveTourney({ ...tourney, phases });
-      return true;
-    },
-    [doSaveTourney]
-  );
-
-  const addRank = useCallback(
-    async (tourney: Tourney, rank: Rank) => {
-      rank.order = tourney.ranks.length + 1;
-      await doSaveTourney({
-        ...tourney,
-        ranks: [...tourney.ranks, rank],
-      });
-      return true;
-    },
-    [doSaveTourney]
-  );
+  const {
+    doSaveTourney,
+    addTeam,
+    addPhase,
+    addSquad,
+    addPosition,
+    addMatch,
+    addRank,
+  } = useAddSetting();
 
   const { mutateAsync: doRemoveTourney } = useMutation(removeTourney(uid));
   const { mutateAsync: doRemoveTeam } = useMutation(removeTeam(uid));
@@ -206,22 +114,30 @@ const SettingPage = () => {
                   {buttons}
                 </Form>
 
-                <AddTeamModal onAddTeam={(team) => addTeam(tourney, team)} />
-                <AddPhaseModal onAddPhase={(name) => addPhase(tourney, name)} />
+                <AddTeamModal
+                  onAddTeam={(team) => addTeam({ tourney, team })}
+                />
+                <AddPhaseModal
+                  onAddPhase={(phase) => addPhase({ tourney, phase })}
+                />
                 <AddSquadModal
-                  onAddSquad={(squad, phase) => addSquad(tourney, phase, squad)}
+                  onAddSquad={(squad, phase) =>
+                    addSquad({ tourney, phase, squad })
+                  }
                 />
                 <AddPositionModal
-                  onAddPosition={(name, { phase, squad }) =>
-                    addPosition(tourney, phase, squad, name)
+                  onAddPosition={(position, { phase, squad }) =>
+                    addPosition({ tourney, phase, squad, position })
                   }
                 />
                 <AddMatchModal
                   onAddMatch={(match, { phase, squad }) =>
-                    addMatch(tourney, phase, squad, match)
+                    addMatch({ tourney, phase, squad, match })
                   }
                 />
-                <AddRankModal onAddRank={(rank) => addRank(tourney, rank)} />
+                <AddRankModal
+                  onAddRank={(rank) => addRank({ tourney, rank })}
+                />
 
                 <ConfirmationModal
                   id="confirmDeleteTourney"

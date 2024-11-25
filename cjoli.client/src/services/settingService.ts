@@ -28,61 +28,93 @@ export const importTourney = async (tourney: Tourney) => {
   return data;
 };
 
-export const removeTourney = async (uid: string) => {
+export const removeTourney = async ({ uid }: { uid: string }) => {
   const { data } = await axios.delete<Tourney>(`${url}/setting/tourney/${uid}`);
   return data;
 };
 
-export const removeTeam = async (uid: string, teamId: number) => {
+export const removeTeam = async ({
+  uid,
+  teamId,
+}: {
+  uid: string;
+  teamId: number;
+}) => {
   const { data } = await axios.delete<Tourney>(
     `${url}/setting/tourney/${uid}/teams/${teamId}`
   );
   return data;
 };
 
-export const removePhase = async (uid: string, phaseId: number) => {
+export const removePhase = async ({
+  uid,
+  phaseId,
+}: {
+  uid: string;
+  phaseId: number;
+}) => {
   const { data } = await axios.delete<Tourney>(
     `${url}/setting/tourney/${uid}/phases/${phaseId}`
   );
   return data;
 };
 
-export const removeSquad = async (
-  uid: string,
-  phaseId: number,
-  squadId: number
-) => {
+export const removeSquad = async ({
+  uid,
+  phaseId,
+  squadId,
+}: {
+  uid: string;
+  phaseId: number;
+  squadId: number;
+}) => {
   const { data } = await axios.delete<Tourney>(
     `${url}/setting/tourney/${uid}/phases/${phaseId}/squads/${squadId}`
   );
   return data;
 };
 
-export const removePosition = async (
-  uid: string,
-  phaseId: number,
-  squadId: number,
-  positionId: number
-) => {
+export const removePosition = async ({
+  uid,
+  phaseId,
+  squadId,
+  positionId,
+}: {
+  uid: string;
+  phaseId: number;
+  squadId: number;
+  positionId: number;
+}) => {
   const { data } = await axios.delete<Tourney>(
     `${url}/setting/tourney/${uid}/phases/${phaseId}/squads/${squadId}/positions/${positionId}`
   );
   return data;
 };
 
-export const removeMatch = async (
-  uid: string,
-  phaseId: number,
-  squadId: number,
-  matchId: number
-) => {
+export const removeMatch = async ({
+  uid,
+  phaseId,
+  squadId,
+  matchId,
+}: {
+  uid: string;
+  phaseId: number;
+  squadId: number;
+  matchId: number;
+}) => {
   const { data } = await axios.delete<Tourney>(
     `${url}/setting/tourney/${uid}/phases/${phaseId}/squads/${squadId}/matches/${matchId}`
   );
   return data;
 };
 
-export const removeRank = async (uid: string, rankId: number) => {
+export const removeRank = async ({
+  uid,
+  rankId,
+}: {
+  uid: string;
+  rankId: number;
+}) => {
   const { data } = await axios.delete<Tourney>(
     `${url}/setting/tourney/${uid}/ranks/${rankId}`
   );

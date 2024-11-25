@@ -11,6 +11,7 @@ const CJoliProfiler = ({
   return (
     <Profiler
       id={id}
+      // eslint-disable-next-line max-params
       onRender={(id, phase, actualDuration, _baseDuration, startTime) => {
         console.log(
           `Profile[${id}] - ${phase}${

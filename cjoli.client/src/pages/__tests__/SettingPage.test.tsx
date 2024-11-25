@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createTourney,
@@ -14,209 +15,239 @@ import SettingPage from "../SettingPage";
 import { act, fireEvent, screen } from "@testing-library/react";
 import { Route, Routes } from "react-router-dom";
 import MainPage from "../MainPage";
-import axios from "axios";
 import { Match, Position, Rank, Team, Tourney } from "../../models";
+
+const UID = "123";
+const TEAM = "team1";
+const PHASE = "phase1";
+const SQUAD = "squad1";
+const POSITION = "position1";
+const TEAM_ID = 1;
+const PHASE_ID = 1;
+const SQUAD_ID = 1;
+const POSITION_ID = 1;
+const MATCH_ID = 1;
+const RANK_ID = 1;
+
+const render = async ({
+  tourney,
+  check,
+  init,
+  del,
+}: {
+  tourney: Tourney;
+  check?: (data: Tourney) => Tourney;
+  init?: () => void;
+  del?: { path: string; name: string };
+}) => {
+  mockGetUser({});
+  mockGetTourneys(UID);
+  mockGetRanking(UID, () => tourney);
+  init && init();
+
+  const mockAxios = del
+    ? mockDelete<Tourney>(del.path, () => tourney, del.name)
+    : mockPost<Tourney>(
+        "tourney",
+        check ? check : (data) => data,
+        "saveTourney"
+      );
+
+  await renderPage(
+    <Routes>
+      <Route path="/" element={<MainPage />}>
+        <Route path=":uid/setting" element={<SettingPage />} />
+      </Route>
+    </Routes>,
+    `/${UID}/setting`
+  );
+
+  screen.getByText("Tourney");
+
+  const open = async ({ btn, testId }: { btn?: string; testId?: string }) => {
+    const btns = testId
+      ? screen.getAllByTestId(testId)
+      : screen.getAllByText(btn!);
+    await act(() => {
+      fireEvent.click(btns[0]);
+    });
+  };
+
+  return {
+    save: async () => {
+      const btns = screen.getAllByText("Save");
+      await act(() => {
+        fireEvent.submit(btns[0]);
+      });
+      expect(mockAxios).toHaveBeenCalledTimes(1);
+      screen.getByText("Tourney updated");
+    },
+    submit: async () => {
+      const submit = screen.getByText("Submit");
+      await act(async () => {
+        fireEvent.submit(submit);
+      });
+      expect(mockAxios).toHaveBeenCalledTimes(1);
+      screen.getByText("Tourney updated");
+    },
+    open,
+    text: async ({
+      label,
+      value,
+      btn,
+      testId,
+    }: {
+      label?: string;
+      value: string;
+      btn?: string;
+      testId?: string;
+    }) => {
+      btn && (await open({ btn }));
+      const input = testId
+        ? screen.getByTestId(testId)
+        : screen.getByLabelText(label!);
+      fireEvent.change(input, { target: { value } });
+    },
+    select: async (btn: string, value: string) => {
+      await open({ btn });
+
+      const input = screen.getByRole("combobox");
+      fireEvent.change(input, { target: { value } });
+
+      const items = screen.getAllByText(value);
+      fireEvent.click(items[0]);
+    },
+    yes: async (btn: string) => {
+      await open({ testId: btn });
+
+      const yes = screen.getAllByText("Yes");
+      await act(async () => {
+        fireEvent.click(yes[0]);
+      });
+      expect(mockAxios).toHaveBeenCalledTimes(1);
+    },
+  };
+};
+
+const deleteItem = async (path: string, name: string, btn: string) => {
+  const tourney = createTourney({
+    id: 1,
+    teams: [{ id: TEAM_ID } as Team],
+    phases: [
+      {
+        id: PHASE_ID,
+        name: "phase1",
+        squads: [
+          {
+            id: SQUAD_ID,
+            name: "squad1",
+            positions: [{ id: POSITION_ID, teamId: TEAM_ID } as Position],
+            matches: [{ id: MATCH_ID } as Match],
+          },
+        ],
+      },
+    ],
+    ranks: [{ id: RANK_ID } as Rank],
+  });
+
+  const { yes } = await render({
+    tourney,
+    del: {
+      path,
+      name,
+    },
+  });
+
+  await yes(btn);
+};
 
 describe("SettingPage", () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });
   it("render", async () => {
-    const uid = "123";
-    mockGetRanking(uid);
-    await renderPageWithRoute(uid, <SettingPage />);
+    mockGetRanking(UID);
+    await renderPageWithRoute(UID, <SettingPage />);
     screen.getByText("Tourney");
   });
 
   it("waiting", async () => {
-    const uid = "123";
-    await renderPageWithRoute(uid, <SettingPage />);
+    await renderPageWithRoute(UID, <SettingPage />);
     expect(screen.queryByText("Tourney")).toBeNull();
   });
 
   it("desktop", async () => {
-    const uid = "123";
     window.innerWidth = 1200;
-    mockGetRanking(uid);
-    await renderPageWithRoute(uid, <SettingPage />);
+    mockGetRanking(UID);
+    await renderPageWithRoute(UID, <SettingPage />);
     screen.getByText("Tourney");
   });
 
   it("save", async () => {
-    const uid = "123";
     const tourney = createTourney({ id: 1 });
-    mockGetUser({});
-    mockGetTourneys(uid);
-    mockGetRanking(uid, () => tourney);
-
-    vi.mocked(axios.post).mockImplementationOnce(() => {
-      return Promise.resolve({ data: tourney });
+    const NAME = "newName";
+    const { save, text } = await render({
+      tourney,
+      check: (tourney) => {
+        expect(tourney.name).toBe(NAME);
+        return tourney;
+      },
     });
+    await text({ label: "Name", value: NAME });
 
-    await renderPage(
-      <Routes>
-        <Route path="/" element={<MainPage />}>
-          <Route path=":uid/setting" element={<SettingPage />} />
-        </Route>
-      </Routes>,
-      `/${uid}/setting`
-    );
-
-    screen.getByText("Tourney");
-
-    const btns = screen.getAllByText("Save");
-    await act(() => {
-      fireEvent.submit(btns[0]);
-    });
-    screen.getByText("Tourney updated");
+    await save();
   });
 
   it("addTeam", async () => {
-    const uid = "123";
-    const tourney = createTourney({
-      id: 1,
-    });
-    mockGetUser({});
-    mockGetTourneys(uid);
-    mockGetRanking(uid, () => tourney);
-    const TEAM = "team1";
-    mockGetTeams([{ id: 1, name: TEAM } as Team]);
-
-    const post = mockPost<Tourney>(
-      "tourney",
-      (data) => {
-        expect(data.teams[0].name).toBe(TEAM);
-        return data;
+    const tourney = createTourney({ id: 1 });
+    const { submit, select } = await render({
+      tourney,
+      check: (tourney) => {
+        expect(tourney.teams[0].name).toBe(TEAM);
+        return tourney;
       },
-      "saveTourney"
-    );
-
-    await renderPage(
-      <Routes>
-        <Route path="/" element={<MainPage />}>
-          <Route path=":uid/setting" element={<SettingPage />} />
-        </Route>
-      </Routes>,
-      `/${uid}/setting`
-    );
-    screen.getByText("Tourney");
-
-    const btns = screen.getAllByText("Add Team");
-    await act(() => {
-      fireEvent.click(btns[0]);
+      init: () => mockGetTeams([{ id: 1, name: TEAM } as Team]),
     });
 
-    const input = screen.getByRole("combobox");
-    fireEvent.change(input, { target: { value: TEAM } });
-
-    const items = screen.getAllByText(TEAM);
-    fireEvent.click(items[0]);
-
-    const submit = screen.getByText("Submit");
-    await act(async () => {
-      fireEvent.submit(submit);
-    });
-
-    screen.getByText("Tourney updated");
-    expect(post).toHaveBeenCalledTimes(1);
+    await select("Add Team", TEAM);
+    await submit();
   });
 
   it("addPhase", async () => {
-    const uid = "123";
-    const tourney = createTourney({
-      id: 1,
-    });
-    mockGetUser({});
-    mockGetTourneys(uid);
-    mockGetRanking(uid, () => tourney);
-    const PHASE = "phase1";
-
-    const post = mockPost<Tourney>(
-      "tourney",
-      (data) => {
-        expect(data.phases[0].name).toBe(PHASE);
-        return data;
+    const tourney = createTourney({ id: 1 });
+    const { submit, text } = await render({
+      tourney,
+      check: (tourney) => {
+        expect(tourney.phases[0].name).toBe(PHASE);
+        return tourney;
       },
-      "saveTourney"
-    );
-
-    await renderPage(
-      <Routes>
-        <Route path="/" element={<MainPage />}>
-          <Route path=":uid/setting" element={<SettingPage />} />
-        </Route>
-      </Routes>,
-      `/${uid}/setting`
-    );
-    screen.getByText("Tourney");
-
-    const btns = screen.getAllByText("Add Phase");
-    await act(() => {
-      fireEvent.click(btns[0]);
     });
 
-    const input = screen.getByLabelText("Phase Name");
-    fireEvent.change(input, { target: { value: PHASE } });
+    await text({ label: "Phase Name", value: PHASE, btn: "Add Phase" });
 
-    const submit = screen.getByText("Submit");
-    await act(async () => {
-      fireEvent.submit(submit);
-    });
-
-    screen.getByText("Tourney updated");
-    expect(post).toHaveBeenCalledTimes(1);
+    await submit();
   });
 
   it("addSquad", async () => {
-    const uid = "123";
     const tourney = createTourney({
       id: 1,
       phases: [1, 2].map((i) => ({ id: i, name: `phase${i}`, squads: [] })),
     });
-    mockGetUser({});
-    mockGetTourneys(uid);
-    mockGetRanking(uid, () => tourney);
-    const SQUAD = "squad1";
 
-    const post = mockPost<Tourney>(
-      "tourney",
-      (data) => {
-        expect(data.phases[0].squads[0].name).toBe(SQUAD);
-        return data;
+    const { submit, text } = await render({
+      tourney,
+      check: (tourney) => {
+        expect(tourney.phases[0].squads[0].name).toBe(SQUAD);
+        return tourney;
       },
-      "saveTourney"
-    );
-
-    await renderPage(
-      <Routes>
-        <Route path="/" element={<MainPage />}>
-          <Route path=":uid/setting" element={<SettingPage />} />
-        </Route>
-      </Routes>,
-      `/${uid}/setting`
-    );
-    screen.getByText("Tourney");
-
-    const btns = screen.getAllByText("Add Squad");
-    await act(() => {
-      fireEvent.click(btns[0]);
     });
 
-    const input = screen.getByLabelText("Squad Name");
-    fireEvent.change(input, { target: { value: SQUAD } });
+    await text({ label: "Squad Name", value: SQUAD, btn: "Add Squad" });
 
-    const submit = screen.getByText("Submit");
-    await act(async () => {
-      fireEvent.submit(submit);
-    });
-
-    screen.getByText("Tourney updated");
-    expect(post).toHaveBeenCalledTimes(1);
+    await submit();
   });
 
   it("addPosition", async () => {
-    const uid = "123";
-
     const tourney = createTourney({
       id: 1,
       phases: [1, 2].map((i) => ({
@@ -230,52 +261,26 @@ describe("SettingPage", () => {
         })),
       })),
     });
-    mockGetUser({});
-    mockGetTourneys(uid);
-    mockGetRanking(uid, () => tourney);
 
-    const POSITION = "position1";
-
-    const post = mockPost<Tourney>(
-      "tourney",
-      (data) => {
-        expect(data.phases[0].squads[0].positions[0].name).toBe(POSITION);
-        data.phases[0].squads[0].positions[0].id = 1;
-        return data;
+    const { submit, text } = await render({
+      tourney,
+      check: (tourney) => {
+        expect(tourney.phases[0].squads[0].positions[0].name).toBe(POSITION);
+        tourney.phases[0].squads[0].positions[0].id = 1;
+        return tourney;
       },
-      "saveTourney"
-    );
-
-    await renderPage(
-      <Routes>
-        <Route path="/" element={<MainPage />}>
-          <Route path=":uid/setting" element={<SettingPage />} />
-        </Route>
-      </Routes>,
-      `/${uid}/setting`
-    );
-    screen.getByText("Tourney");
-
-    const btns = screen.getAllByText("Add Position");
-    await act(() => {
-      fireEvent.click(btns[0]);
     });
 
-    const input = screen.getByTestId("positionName");
-    fireEvent.change(input, { target: { value: POSITION } });
-
-    const submit = screen.getAllByText("Submit");
-    await act(async () => {
-      fireEvent.submit(submit[0]);
+    await text({
+      testId: "positionName",
+      value: POSITION,
+      btn: "Add Position",
     });
 
-    screen.getByText("Tourney updated");
-    expect(post).toHaveBeenCalledTimes(1);
+    await submit();
   });
 
   it("addMatch", async () => {
-    const uid = "123";
-
     const tourney = createTourney({
       id: 1,
       phases: [1, 2].map((i) => ({
@@ -289,424 +294,87 @@ describe("SettingPage", () => {
         })),
       })),
     });
-    mockGetUser({});
-    mockGetTourneys(uid);
-    mockGetRanking(uid, () => tourney);
 
-    const post = mockPost<Tourney>(
-      "tourney",
-      (data) => {
-        expect(data.phases[0].squads[0].matches[0].time).toBeDefined();
-        data.phases[0].squads[0].matches[0].id = 1;
-        return data;
+    const { submit, open } = await render({
+      tourney,
+      check: (tourney) => {
+        expect(tourney.phases[0].squads[0].matches[0].time).toBeDefined();
+        tourney.phases[0].squads[0].matches[0].id = 1;
+        return tourney;
       },
-      "saveTourney"
-    );
-
-    await renderPage(
-      <Routes>
-        <Route path="/" element={<MainPage />}>
-          <Route path=":uid/setting" element={<SettingPage />} />
-        </Route>
-      </Routes>,
-      `/${uid}/setting`
-    );
-    screen.getByText("Tourney");
-
-    const btns = screen.getAllByText("Add Match");
-    await act(() => {
-      fireEvent.click(btns[0]);
     });
 
-    const submit = screen.getAllByText("Submit");
-    await act(async () => {
-      fireEvent.submit(submit[0]);
-    });
+    await open({ btn: "Add Match" });
 
-    screen.getByText("Tourney updated");
-    expect(post).toHaveBeenCalledTimes(1);
+    await submit();
   });
 
   it("addRank", async () => {
-    const uid = "123";
+    const tourney = createTourney({ id: 1 });
 
-    const tourney = createTourney({
-      id: 1,
-    });
-    mockGetUser({});
-    mockGetTourneys(uid);
-    mockGetRanking(uid, () => tourney);
-
-    const post = mockPost<Tourney>(
-      "tourney",
-      (data) => {
-        expect(data.ranks[0].order).toBe(1);
-        data.ranks[0].id = 1;
-        return data;
+    const { submit, open } = await render({
+      tourney,
+      check: (tourney) => {
+        expect(tourney.ranks[0].order).toBe(1);
+        tourney.ranks[0].id = 1;
+        return tourney;
       },
-      "saveTourney"
-    );
-
-    await renderPage(
-      <Routes>
-        <Route path="/" element={<MainPage />}>
-          <Route path=":uid/setting" element={<SettingPage />} />
-        </Route>
-      </Routes>,
-      `/${uid}/setting`
-    );
-    screen.getByText("Tourney");
-
-    const btns = screen.getAllByText("Add Rank");
-    await act(() => {
-      fireEvent.click(btns[0]);
     });
 
-    const submit = screen.getAllByText("Submit");
-    await act(async () => {
-      fireEvent.submit(submit[0]);
-    });
+    await open({ btn: "Add Rank" });
 
-    screen.getByText("Tourney updated");
-    expect(post).toHaveBeenCalledTimes(1);
+    await submit();
   });
 
   it("deleteTourney", async () => {
-    const uid = "123";
-
-    const tourney = createTourney({
-      id: 1,
-    });
-    mockGetUser({});
-    mockGetTourneys(uid);
-    mockGetRanking(uid, () => tourney);
-
-    const del = mockDelete<void>(`tourney/${uid}`, () => {}, "removeTourney");
-
-    await renderPage(
-      <Routes>
-        <Route path="/" element={<MainPage />}>
-          <Route path=":uid/setting" element={<SettingPage />} />
-        </Route>
-      </Routes>,
-      `/${uid}/setting`
-    );
-    screen.getByText("Tourney");
-
-    const btns = screen.getAllByTestId("deleteTourney");
-    await act(() => {
-      fireEvent.click(btns[0]);
-    });
-
-    const yes = screen.getByText("Yes");
-    await act(async () => {
-      fireEvent.click(yes);
-    });
-
-    expect(del).toHaveBeenCalledTimes(1);
+    await deleteItem(`tourney/${UID}`, "removeTourney", "deleteTourney");
   });
 
   it("deleteTeam", async () => {
-    const uid = "123";
-
-    const TEAMID = 1;
-    const tourney = createTourney({
-      id: 1,
-      teams: [{ id: TEAMID, name: "team1" } as Team],
-    });
-    mockGetUser({});
-    mockGetTourneys(uid);
-    mockGetRanking(uid, () => tourney);
-
-    const del = mockDelete<void>(
-      `tourney/${uid}/teams/${TEAMID}`,
-      () => {
-        return {
-          ...tourney,
-          teams: tourney.teams.filter((t) => t.id != TEAMID),
-        };
-      },
-      "removeTourney"
+    await deleteItem(
+      `tourney/${UID}/teams/${TEAM_ID}`,
+      "removeTeam",
+      "deleteTeam"
     );
-
-    await renderPage(
-      <Routes>
-        <Route path="/" element={<MainPage />}>
-          <Route path=":uid/setting" element={<SettingPage />} />
-        </Route>
-      </Routes>,
-      `/${uid}/setting`
-    );
-    screen.getByText("Tourney");
-
-    const btns = screen.getAllByTestId("deleteTeam");
-    await act(() => {
-      fireEvent.click(btns[0]);
-    });
-
-    const yes = screen.getAllByText("Yes");
-    await act(async () => {
-      fireEvent.click(yes[1]);
-    });
-
-    expect(del).toHaveBeenCalledTimes(1);
   });
 
   it("deletePhase", async () => {
-    const uid = "123";
-
-    const PHASE_ID = 1;
-    const tourney = createTourney({
-      id: 1,
-      phases: [{ id: PHASE_ID, name: "phase1", squads: [] }],
-    });
-    mockGetUser({});
-    mockGetTourneys(uid);
-    mockGetRanking(uid, () => tourney);
-
-    const del = mockDelete<void>(
-      `tourney/${uid}/phases/${PHASE_ID}`,
-      () => {
-        return tourney;
-      },
-      "removePhase"
+    await deleteItem(
+      `tourney/${UID}/phases/${PHASE_ID}`,
+      "removePhase",
+      "deletePhase"
     );
-
-    await renderPage(
-      <Routes>
-        <Route path="/" element={<MainPage />}>
-          <Route path=":uid/setting" element={<SettingPage />} />
-        </Route>
-      </Routes>,
-      `/${uid}/setting`
-    );
-    screen.getByText("Tourney");
-
-    const btns = screen.getAllByTestId("deletePhase");
-    await act(() => {
-      fireEvent.click(btns[0]);
-    });
-
-    const yes = screen.getAllByText("Yes");
-    await act(async () => {
-      fireEvent.click(yes[0]);
-    });
-
-    expect(del).toHaveBeenCalledTimes(1);
   });
 
   it("deleteSquad", async () => {
-    const uid = "123";
-
-    const PHASE_ID = 1;
-    const SQUAD_ID = 1;
-    const tourney = createTourney({
-      id: 1,
-      phases: [
-        {
-          id: PHASE_ID,
-          name: "phase1",
-          squads: [
-            { id: SQUAD_ID, name: "squad1", positions: [], matches: [] },
-          ],
-        },
-      ],
-    });
-    mockGetUser({});
-    mockGetTourneys(uid);
-    mockGetRanking(uid, () => tourney);
-
-    const del = mockDelete<void>(
-      `tourney/${uid}/phases/${PHASE_ID}/squads/${SQUAD_ID}`,
-      () => {
-        return tourney;
-      },
-      "removeSquad"
+    await deleteItem(
+      `tourney/${UID}/phases/${PHASE_ID}/squads/${SQUAD_ID}`,
+      "removeSquad",
+      "deleteSquad"
     );
-
-    await renderPage(
-      <Routes>
-        <Route path="/" element={<MainPage />}>
-          <Route path=":uid/setting" element={<SettingPage />} />
-        </Route>
-      </Routes>,
-      `/${uid}/setting`
-    );
-    screen.getByText("Tourney");
-
-    const btns = screen.getAllByTestId("deleteSquad");
-    await act(() => {
-      fireEvent.click(btns[0]);
-    });
-
-    const yes = screen.getAllByText("Yes");
-    await act(async () => {
-      fireEvent.click(yes[0]);
-    });
-
-    expect(del).toHaveBeenCalledTimes(1);
   });
 
   it("deletePosition", async () => {
-    const uid = "123";
-
-    const TEAM_ID = 1;
-    const PHASE_ID = 1;
-    const SQUAD_ID = 1;
-    const POSITION_ID = 1;
-    const tourney = createTourney({
-      id: 1,
-      teams: [{ id: TEAM_ID } as Team],
-      phases: [
-        {
-          id: PHASE_ID,
-          name: "phase1",
-          squads: [
-            {
-              id: SQUAD_ID,
-              name: "squad1",
-              positions: [{ id: POSITION_ID, teamId: TEAM_ID } as Position],
-              matches: [],
-            },
-          ],
-        },
-      ],
-    });
-    mockGetUser({});
-    mockGetTourneys(uid);
-    mockGetRanking(uid, () => tourney);
-
-    const del = mockDelete<void>(
-      `tourney/${uid}/phases/${PHASE_ID}/squads/${SQUAD_ID}/positions/${POSITION_ID}`,
-      () => {
-        return tourney;
-      },
-      "removePosition"
+    await deleteItem(
+      `tourney/${UID}/phases/${PHASE_ID}/squads/${SQUAD_ID}/positions/${POSITION_ID}`,
+      "removePosition",
+      "deletePosition"
     );
-
-    await renderPage(
-      <Routes>
-        <Route path="/" element={<MainPage />}>
-          <Route path=":uid/setting" element={<SettingPage />} />
-        </Route>
-      </Routes>,
-      `/${uid}/setting`
-    );
-    screen.getByText("Tourney");
-
-    const btns = screen.getAllByTestId("deletePosition");
-    await act(() => {
-      fireEvent.click(btns[0]);
-    });
-
-    const yes = screen.getAllByText("Yes");
-    await act(async () => {
-      fireEvent.click(yes[0]);
-    });
-
-    expect(del).toHaveBeenCalledTimes(1);
   });
 
   it("deleteMatch", async () => {
-    const uid = "123";
-
-    const TEAM_ID = 1;
-    const PHASE_ID = 1;
-    const SQUAD_ID = 1;
-    const MATCH_ID = 1;
-    const tourney = createTourney({
-      id: 1,
-      teams: [{ id: TEAM_ID } as Team],
-      phases: [
-        {
-          id: PHASE_ID,
-          name: "phase1",
-          squads: [
-            {
-              id: SQUAD_ID,
-              name: "squad1",
-              positions: [],
-              matches: [{ id: MATCH_ID } as Match],
-            },
-          ],
-        },
-      ],
-    });
-    mockGetUser({});
-    mockGetTourneys(uid);
-    mockGetRanking(uid, () => tourney);
-
-    const del = mockDelete<void>(
-      `tourney/${uid}/phases/${PHASE_ID}/squads/${SQUAD_ID}/matches/${MATCH_ID}`,
-      () => {
-        return tourney;
-      },
-      "removeMatch"
+    await deleteItem(
+      `tourney/${UID}/phases/${PHASE_ID}/squads/${SQUAD_ID}/matches/${MATCH_ID}`,
+      "removeMatch",
+      "deleteMatch"
     );
-
-    await renderPage(
-      <Routes>
-        <Route path="/" element={<MainPage />}>
-          <Route path=":uid/setting" element={<SettingPage />} />
-        </Route>
-      </Routes>,
-      `/${uid}/setting`
-    );
-    screen.getByText("Tourney");
-
-    const btns = screen.getAllByTestId("deleteMatch");
-    await act(() => {
-      fireEvent.click(btns[0]);
-    });
-
-    const yes = screen.getAllByText("Yes");
-    await act(async () => {
-      fireEvent.click(yes[0]);
-    });
-
-    expect(del).toHaveBeenCalledTimes(1);
   });
 
   it("deleteRank", async () => {
-    const uid = "123";
-
-    const RANK_ID = 1;
-    const tourney = createTourney({
-      id: 1,
-      ranks: [{ id: RANK_ID } as Rank],
-    });
-    mockGetUser({});
-    mockGetTourneys(uid);
-    mockGetRanking(uid, () => tourney);
-
-    const del = mockDelete<void>(
-      `tourney/${uid}/ranks/${RANK_ID}`,
-      () => {
-        return tourney;
-      },
-      "removeRank"
+    await deleteItem(
+      `tourney/${UID}/ranks/${RANK_ID}`,
+      "removeRank",
+      "deleteRank"
     );
-
-    await renderPage(
-      <Routes>
-        <Route path="/" element={<MainPage />}>
-          <Route path=":uid/setting" element={<SettingPage />} />
-        </Route>
-      </Routes>,
-      `/${uid}/setting`
-    );
-    screen.getByText("Tourney");
-
-    const btns = screen.getAllByTestId("deleteRank");
-    await act(() => {
-      fireEvent.click(btns[0]);
-    });
-
-    const yes = screen.getAllByText("Yes");
-    await act(async () => {
-      fireEvent.click(yes[0]);
-    });
-
-    expect(del).toHaveBeenCalledTimes(1);
   });
 });
