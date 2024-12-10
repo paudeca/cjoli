@@ -91,8 +91,6 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
     loadRanking(ranking);
   };
 
-  console.log("DaySelected", daySelected);
-
   return (
     <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="matches">
       <div className="p-2">
@@ -101,7 +99,6 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
             <Accordion
               activeKey={daySelected}
               onSelect={(e) => {
-                console.log("Change date", e);
                 selectDay(e as string);
               }}
             >

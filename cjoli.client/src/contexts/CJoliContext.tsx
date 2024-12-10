@@ -132,7 +132,6 @@ const reducer = (state: CJoliState, action: Action) => {
 
 export const CJoliProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
-  console.log("CJoliProvider", state.daySelected);
 
   return (
     <CJoliContext.Provider

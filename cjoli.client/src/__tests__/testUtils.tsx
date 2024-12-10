@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { JSX, ComponentType, ReactNode } from "react";
 import { render, act } from "@testing-library/react";
 import { CJoliProvider } from "../contexts/CJoliContext";
