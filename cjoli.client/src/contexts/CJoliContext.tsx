@@ -103,6 +103,7 @@ const reducer = (state: CJoliState, action: Action) => {
         (acc, squad) => [...acc, ...squad.matches],
         []
       );
+      matches.sort((a, b) => (a.time > b.time ? 1 : -1));
       return {
         ...state,
         ranking,
@@ -131,6 +132,7 @@ const reducer = (state: CJoliState, action: Action) => {
 
 export const CJoliProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
+  console.log("CJoliProvider", state.daySelected);
 
   return (
     <CJoliContext.Provider

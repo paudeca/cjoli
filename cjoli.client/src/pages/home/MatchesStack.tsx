@@ -49,11 +49,6 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
     return datas;
   }, [filter, matches]);
 
-  const matchesNotDone = useMemo(
-    () => matches.filter(filter).filter((m) => !m.done),
-    [filter, matches]
-  );
-
   const keys = useMemo(() => {
     const keys = Object.keys(datas);
     keys.sort();
@@ -61,14 +56,10 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
   }, [datas]);
 
   useEffect(() => {
-    if (matchesNotDone.length > 0) {
-      const time = dayjs(matchesNotDone[0].time);
-      const date = time.format("YYYY-MM-DD");
-      selectDay(date);
-    } else {
-      keys && keys.length > 0 && selectDay(keys[0]);
+    if (keys && keys.length > 0 && !keys.includes(daySelected)) {
+      selectDay(keys[0]);
     }
-  }, [keys, selectDay, datas, matchesNotDone]);
+  }, [keys, selectDay, daySelected]);
 
   const upperFirstLetter = (value: string) => {
     return value.charAt(0).toUpperCase() + value.slice(1);
@@ -100,6 +91,8 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
     loadRanking(ranking);
   };
 
+  console.log("DaySelected", daySelected);
+
   return (
     <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="matches">
       <div className="p-2">
@@ -108,6 +101,7 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
             <Accordion
               activeKey={daySelected}
               onSelect={(e) => {
+                console.log("Change date", e);
                 selectDay(e as string);
               }}
             >
