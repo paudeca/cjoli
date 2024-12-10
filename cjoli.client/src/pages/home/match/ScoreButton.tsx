@@ -2,13 +2,13 @@ import React from "react";
 import { Spinner } from "react-bootstrap";
 import { CheckCircle, XCircle } from "react-bootstrap-icons";
 
-const ScoreButton = ({
-  action,
-  onClick,
-}: {
+interface ScoreButtonProps {
+  id: string;
   action: "remove" | "save";
   onClick: () => Promise<void>;
-}) => {
+}
+
+const ScoreButton = ({ id, action, onClick }: ScoreButtonProps) => {
   const [loading, setLoading] = React.useState(false);
   const handleClick = async () => {
     setLoading(true);
@@ -23,6 +23,7 @@ const ScoreButton = ({
           size={32}
           role="button"
           onClick={handleClick}
+          data-testid={id}
         />
       )}
       {action == "remove" && !loading && (
@@ -31,6 +32,7 @@ const ScoreButton = ({
           size={32}
           role="button"
           onClick={handleClick}
+          data-testid={id}
         />
       )}
       {loading && (

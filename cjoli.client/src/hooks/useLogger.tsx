@@ -30,7 +30,7 @@ export const useLogger = () => {
     }),
     [uid, user]
   );
-  const isTest = process.env.TEST == "true";
+  const isTest = import.meta.env.TEST;
   return useMemo(() => {
     const log = datadogLogs.logger;
     return {

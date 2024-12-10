@@ -13,7 +13,6 @@ import CJoliStack from "../../components/CJoliStack";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCJoli } from "../../hooks/useCJoli";
 import dayjs from "dayjs";
-import { useForm } from "react-hook-form";
 import React from "react";
 import { Team } from "../../models";
 import { ArrowLeft } from "react-bootstrap-icons";
@@ -25,11 +24,11 @@ import TeamTable from "./team/TeamTable";
 import TeamTime from "./team/TeamTime";
 import { useModal } from "../../hooks/useModal";
 import { Trans } from "react-i18next";
+import Select, { SingleValue } from "react-select";
 
 const TeamStack = () => {
   const { teams, getTeam, getTeamRank } = useCJoli();
   const { teamId } = useParams();
-  const { register } = useForm();
   const { isMobile } = useScreenSize();
   const [teamB, setTeamB] = React.useState<Team | undefined>(undefined);
   const { setShow: showTeam } = useModal("team");
@@ -42,6 +41,11 @@ const TeamStack = () => {
     return <>No team found</>;
   }
   const rank = getTeamRank(team);
+
+  const onChange = (v: SingleValue<{ label: string; value: number }>) => {
+    const value = v?.value;
+    value && setTeamB(getTeam(value));
+  };
 
   return (
     <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="team">
@@ -96,28 +100,13 @@ const TeamStack = () => {
                         <Badge bg="secondary">VS</Badge>
                       </Col>
                       <Col xs="auto">
-                        <Form.Select
-                          {...register("teamVS", {
-                            onChange: (
-                              e: React.FormEvent<HTMLInputElement>
-                            ) => {
-                              setTeamB(
-                                getTeam(parseInt(e.currentTarget.value))
-                              );
-                            },
-                          })}
-                        >
-                          <option value="">
-                            <Trans i18nKey="team.select">Select Team</Trans>
-                          </option>
-                          {teams
+                        <Select
+                          options={teams
                             ?.filter((t) => t.id != team.id)
-                            .map((t) => (
-                              <option key={t.id} value={t.id}>
-                                {t.name}
-                              </option>
-                            ))}
-                        </Form.Select>
+                            .map((t) => ({ value: t.id, label: t.name }))}
+                          onChange={onChange}
+                          isClearable
+                        />
                       </Col>
                     </Row>
                   </Form>

@@ -1,13 +1,14 @@
 import { screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  createMatch,
   createTourney,
   mockGetRanking,
   renderPage,
 } from "../../__tests__/testUtils";
 import HomePage from "../HomePage";
 import { Route, Routes } from "react-router-dom";
-import { Match, Tourney } from "../../models";
+import { Tourney } from "../../models";
 import WS from "jest-websocket-mock";
 
 const url = import.meta.env.VITE_API_WS;
@@ -27,8 +28,7 @@ const renderHomePage = async ({
 }) => {
   const get = mockGetRanking(
     uid,
-    () =>
-      tourney ??
+    tourney ??
       createTourney({
         id: 1,
         phases: [{ id: phaseId, name: "phase1", squads: [] }],
@@ -111,7 +111,7 @@ describe("HomePage", () => {
               id: 1,
               name: "squad1",
               positions: [],
-              matches: [{ done: true } as Match],
+              matches: [createMatch({ done: true })],
             },
           ],
         },

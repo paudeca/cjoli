@@ -45,10 +45,9 @@ export const useCJoli = (page?: TypePage) => {
   const getSquad = useCallback(
     (squadId: number) => {
       const squad = state.squads?.find((s) => s.id === squadId);
-      if (!squad) throw new Error(`squad not found with id:${squadId}`);
       return squad;
     },
-    [state.squads]
+    [state]
   );
   const getTeam = useCallback(
     (teamId: number) => state.teams?.find((t) => t.id === teamId),
@@ -71,8 +70,7 @@ export const useCJoli = (page?: TypePage) => {
   const getTeamInfo = useCallback(
     (positionId: number, defaultName?: string) => {
       const position = getPosition(positionId);
-      if (!position)
-        throw new Error(`position not found with id:${positionId}`);
+      if (!position) return { name: defaultName };
       const team = getTeam(position.teamId);
       if (!team) {
         return { name: (defaultName ?? position.name) || "noname" };

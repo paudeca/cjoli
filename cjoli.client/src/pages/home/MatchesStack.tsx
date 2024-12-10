@@ -15,7 +15,10 @@ import { useModal } from "../../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
 import { memo, useCallback, useEffect, useMemo } from "react";
 
-const MatchesStack = ({ phase }: { phase: Phase }) => {
+interface MatchesStackProps extends JSX.IntrinsicAttributes {
+  phase: Phase;
+}
+const MatchesStack = ({ phase }: MatchesStackProps) => {
   const { matches, loadRanking, daySelected, selectDay } = useCJoli();
   const uid = useUid();
   const { register, getValues } =
@@ -62,8 +65,8 @@ const MatchesStack = ({ phase }: { phase: Phase }) => {
       const time = dayjs(matchesNotDone[0].time);
       const date = time.format("YYYY-MM-DD");
       selectDay(date);
-    } else if (keys) {
-      keys && selectDay(keys[0]);
+    } else {
+      keys && keys.length > 0 && selectDay(keys[0]);
     }
   }, [keys, selectDay, datas, matchesNotDone]);
 
@@ -109,10 +112,8 @@ const MatchesStack = ({ phase }: { phase: Phase }) => {
               }}
             >
               {keys.map((key, index) => {
-                const datasOrder = datas ? datas[key] : [];
-                datasOrder.sort((a, b) =>
-                  a.time > b.time ? 1 : a.time == b.time ? 0 : -1
-                );
+                const datasOrder = datas[key];
+                datasOrder.sort((a, b) => (a.time > b.time ? 1 : -1));
                 const map = datasOrder.reduce<Record<string, Match[]>>(
                   (acc, m) => {
                     const key = dayjs(m.time).format("LT");
@@ -121,7 +122,7 @@ const MatchesStack = ({ phase }: { phase: Phase }) => {
                   {}
                 );
                 return (
-                  <Accordion.Item key={index} eventKey={key}>
+                  <Accordion.Item key={index} eventKey={key} data-testid={key}>
                     <Accordion.Header>
                       {upperFirstLetter(dayjs(key).format("dddd LL"))}
                     </Accordion.Header>

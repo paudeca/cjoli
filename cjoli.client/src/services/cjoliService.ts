@@ -119,12 +119,14 @@ export const clearSimulations = async (uid: string, ids: number[]) => {
 };
 
 export const updateEstimate = async (uid: string) => {
-  const { data } = await axios.get(`${url}/cjoli/${uid}/updateEstimate`);
+  const { data } = await axios.get<Ranking>(
+    `${url}/cjoli/${uid}/updateEstimate`
+  );
   return data;
 };
 
 export const saveUserConfig = async (uid: string, userConfig: UserConfig) => {
-  const { data } = await axios.post(
+  const { data } = await axios.post<Ranking>(
     `${url}/cjoli/${uid}/saveUserConfig`,
     userConfig
   );

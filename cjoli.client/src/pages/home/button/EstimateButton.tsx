@@ -5,7 +5,11 @@ import { useEstimate } from "../../../hooks/useEstimate";
 const EstimateButton = () => {
   const { loading, handleUpdateEstimate } = useEstimate();
   return (
-    <Button onClick={handleUpdateEstimate} disabled={loading}>
+    <Button
+      onClick={handleUpdateEstimate}
+      disabled={loading}
+      data-testid="estimateBtn"
+    >
       {!loading && <Bezier2 className="mx-1" />}
       {loading && <Spinner animation="grow" className="mx-1" size="sm" />}
     </Button>

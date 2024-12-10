@@ -34,6 +34,7 @@ const ScoreCellInput = ({
         max="100"
         {...register(id)}
         placeholder={placeholder}
+        data-testid={id}
       />
       {isConnected && tourney?.config?.hasForfeit && (
         <DropdownButton variant="outline-secondary" title="">
@@ -48,6 +49,7 @@ const ScoreCellInput = ({
                 scoreB: 0,
               })
             }
+            data-testid={`${id}.forfeit`}
           >
             <Trans i18nKey="match.forfeit">Forfeit</Trans>
           </Dropdown.Item>

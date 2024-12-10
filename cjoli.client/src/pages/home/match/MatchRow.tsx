@@ -6,8 +6,23 @@ import { FieldValues, UseFormRegister } from "react-hook-form";
 import { MatchRowProvider } from "./MatchRowContext";
 import MatchRowDesk from "./MatchRowDesk";
 import MatchRowMobile from "./MatchRowMobile";
+import styled from "@emotion/styled";
 
-interface MatchRowProps {
+export const MyScoreDiv = styled("div")<{ isMobile: boolean }>`
+  display: flex;
+  align-items: ${(props) => (props.isMobile ? "flex-end" : "center")};
+  justify-content: center;
+  flex-direction: ${(props) => (props.isMobile ? "column" : "row")};
+  & svg,
+  & .spinner-grow {
+    ${(props) =>
+      props.isMobile
+        ? "margin-top: 0.5rem !important;"
+        : "margin-left: 0.5rem !important;"}
+  }
+`;
+
+export interface MatchRowProps extends JSX.IntrinsicAttributes {
   match: Match;
   rowSpan: number;
   index: number;

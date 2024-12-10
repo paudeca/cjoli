@@ -45,7 +45,6 @@ const HomePage = () => {
   return (
     <Loading ready={!loading}>
       {allMatchesDone && <RankStack />}
-      {/*!teamId && <SummaryStack />*/}
       {phase && <RankingStack phase={phase} />}
       {phase && <MatchesStack phase={phase} />}
       {!phase && (

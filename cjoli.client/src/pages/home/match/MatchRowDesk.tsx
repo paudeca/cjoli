@@ -13,21 +13,7 @@ import dayjs from "dayjs";
 import SimulationIcon from "../../../components/SimulationIcon";
 import LeftCenterDiv from "../../../components/LeftCenterDiv";
 import TeamCell from "./TeamCell";
-import styled from "@emotion/styled";
-
-const MyScoreDiv = styled("div")<{ isMobile: boolean }>`
-  display: flex;
-  align-items: ${(props) => (props.isMobile ? "flex-end" : "center")};
-  justify-content: center;
-  flex-direction: ${(props) => (props.isMobile ? "column" : "row")};
-  & svg,
-  & .spinner-grow {
-    ${(props) =>
-      props.isMobile
-        ? "margin-top: 0.5rem !important;"
-        : "margin-left: 0.5rem !important;"}
-  }
-`;
+import { MyScoreDiv } from "./MatchRow";
 
 const CellInputDesk = () => {
   const { isConnected } = useUser();
@@ -92,7 +78,11 @@ const CellInputDesk = () => {
               register={register}
               teamB
             />
-            <ScoreButton action="save" onClick={() => saveMatch(match)} />
+            <ScoreButton
+              id={`btn-m${match.id}`}
+              action="save"
+              onClick={() => saveMatch(match)}
+            />
           </>
         )}
       </MyScoreDiv>
@@ -126,7 +116,11 @@ const CellViewDesk = () => {
         </Badge>
         <ScoreCellView match={imatch} mode="B" />
         {(isAdmin || (isConnected && isSimulation)) && (
-          <ScoreButton action="remove" onClick={() => clearMatch(match)} />
+          <ScoreButton
+            id={`btn-m${match.id}`}
+            action="remove"
+            onClick={() => clearMatch(match)}
+          />
         )}
       </MyScoreDiv>
     </td>
@@ -141,13 +135,14 @@ interface MatchRowDeskProps {
 const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
   const { getSquad } = useCJoli();
   const { match, imatch, isSimulation, done } = useMatchRow();
+  const squad = getSquad(match.squadId);
   return (
-    <tr>
+    <tr data-testid={`match-${match.id}`}>
       {index == 0 && (
         <td rowSpan={rowSpan}>{dayjs(match.time).format("LT")}</td>
       )}
       <td>
-        {getSquad(match.squadId).name}
+        {squad?.name}
         <SimulationIcon show={isSimulation} />
       </td>
       {match.location && <td>{match.location}</td>}

@@ -13,37 +13,20 @@ import CJoliTooltip from "../../../components/CJoliTooltip";
 import { Col, Row, Stack } from "react-bootstrap";
 import { BracesAsterisk } from "react-bootstrap-icons";
 import TeamCell from "./TeamCell";
-import styled from "@emotion/styled";
-
-const MyScoreDiv = styled("div")<{ isMobile: boolean }>`
-  display: flex;
-  align-items: ${(props) => (props.isMobile ? "flex-end" : "center")};
-  justify-content: center;
-  flex-direction: ${(props) => (props.isMobile ? "column" : "row")};
-  & svg,
-  & .spinner-grow {
-    ${(props) =>
-      props.isMobile
-        ? "margin-top: 0.5rem !important;"
-        : "margin-left: 0.5rem !important;"}
-  }
-`;
+import { MyScoreDiv } from "./MatchRow";
 
 const TitleMobile = () => {
   const { getSquad } = useCJoli();
   const { match, teamA, teamB, isSimulation } = useMatchRow();
+  const squad = getSquad(match.squadId);
   return (
     <tr>
       <td colSpan={2}>
         <Element name={`match-${match.id}`}>
           {teamA && teamB && (
-            <CompareButton
-              team={teamA}
-              teamB={teamB}
-              squad={getSquad(match.squadId)}
-            />
+            <CompareButton team={teamA} teamB={teamB} squad={squad} />
           )}
-          {dayjs(match.time).format("LT")} - {getSquad(match.squadId).name}
+          {dayjs(match.time).format("LT")} - {squad?.name}
           {match.location && ` - ${match.location}`}
           <SimulationIcon show={isSimulation} />
         </Element>
@@ -57,11 +40,15 @@ const CellViewMobile = () => {
   const { match, imatch, clearMatch, isSimulation } = useMatchRow();
   return (
     <td>
-      <MyScoreDiv isMobile={true}>
+      <MyScoreDiv isMobile>
         <ScoreCellView match={imatch} mode="A" />
         <ScoreCellView match={imatch} mode="B" />
         {(isAdmin || (isConnected && isSimulation)) && (
-          <ScoreButton action="remove" onClick={() => clearMatch(match)} />
+          <ScoreButton
+            id={`btn-m${match.id}`}
+            action="remove"
+            onClick={() => clearMatch(match)}
+          />
         )}
       </MyScoreDiv>
     </td>
@@ -75,7 +62,7 @@ const CellInputMobile = () => {
 
   return (
     <td>
-      <MyScoreDiv isMobile={true}>
+      <MyScoreDiv isMobile>
         {isConnected && (
           <>
             <ScoreCellInput
@@ -93,7 +80,11 @@ const CellInputMobile = () => {
               teamB
             />
 
-            <ScoreButton action="save" onClick={() => saveMatch(match)} />
+            <ScoreButton
+              id={`btn-m${match.id}`}
+              action="save"
+              onClick={() => saveMatch(match)}
+            />
           </>
         )}
         {!isConnected && (
@@ -123,7 +114,7 @@ const MatchRowMobile = () => {
   return (
     <>
       <TitleMobile />
-      <tr>
+      <tr data-testid={`match-${match.id}`}>
         <td>
           <Row>
             <Col style={{ textAlign: "left" }}>

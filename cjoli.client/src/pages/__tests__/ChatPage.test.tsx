@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, it, vi } from "vitest";
-import { initPage, renderPageWithRoute } from "../../__tests__/testUtils";
+import {
+  initPage,
+  renderPageWithRoute,
+  reset,
+  setDesktop,
+} from "../../__tests__/testUtils";
 import ChatPage from "../ChatPage";
 import { act, fireEvent, screen } from "@testing-library/react";
 import WS from "jest-websocket-mock";
@@ -38,6 +43,7 @@ const renderChatPage = async ({ uid }: { uid: string }) => {
 
 describe("ChatPage", () => {
   beforeEach(async () => {
+    reset();
     vi.resetAllMocks();
   });
   afterEach(() => {
@@ -50,7 +56,7 @@ describe("ChatPage", () => {
   });
 
   it("desktop", async () => {
-    global.innerWidth = 1200;
+    setDesktop();
 
     const uid = "123";
     await renderChatPage({ uid });

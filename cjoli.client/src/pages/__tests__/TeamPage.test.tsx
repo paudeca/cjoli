@@ -1,4 +1,6 @@
 import {
+  createPosition,
+  createTeam,
   createTourney,
   mockGetRanking,
   renderPage,
@@ -7,7 +9,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
 import TeamPage from "../TeamPage";
 import { Route, Routes } from "react-router-dom";
-import { Position, Team } from "../../models";
 import WS from "jest-websocket-mock";
 
 const UID = "123";
@@ -27,7 +28,7 @@ describe("TeamPage", () => {
   it("render", async () => {
     const tourney = createTourney({
       id: 1,
-      teams: [{ id: TEAM_ID, name: TEAM_NAME } as Team],
+      teams: [createTeam({ id: TEAM_ID, name: TEAM_NAME })],
       phases: [
         {
           id: 1,
@@ -36,14 +37,14 @@ describe("TeamPage", () => {
             {
               id: 1,
               name: "squad1",
-              positions: [{ id: 1, teamId: TEAM_ID } as Position],
+              positions: [createPosition({ id: 1, teamId: TEAM_ID })],
               matches: [],
             },
           ],
         },
       ],
     });
-    mockGetRanking(UID, () => tourney);
+    mockGetRanking(UID, tourney);
     await renderPage(
       <Routes>
         <Route path="/:uid/:teamId" element={<TeamPage />} />
@@ -56,11 +57,11 @@ describe("TeamPage", () => {
   it("refresh", async () => {
     const tourney = createTourney({
       id: 1,
-      teams: [{ id: TEAM_ID, name: TEAM_NAME } as Team],
+      teams: [createTeam({ id: TEAM_ID, name: TEAM_NAME })],
     });
     const server = new WS(`${url}/server/ws`, { jsonProtocol: true });
 
-    const get = mockGetRanking(UID, () => tourney);
+    const get = mockGetRanking(UID, tourney);
     await renderPage(
       <Routes>
         <Route path="/:uid/:teamId" element={<TeamPage />} />

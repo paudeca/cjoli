@@ -8,8 +8,6 @@ import {
 import RankPage from "../RankPage";
 import WS from "jest-websocket-mock";
 
-vi.mock("react-chartjs-2");
-
 const url = import.meta.env.VITE_API_WS;
 
 describe("RankPage", () => {
@@ -21,7 +19,8 @@ describe("RankPage", () => {
   });
   it("render", async () => {
     const uid = "123";
-    const get = mockGetRanking(uid, () =>
+    const get = mockGetRanking(
+      uid,
       createTourney({
         id: 1,
         ranks: [

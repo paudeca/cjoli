@@ -16,18 +16,26 @@ const ScrollButton = ({ to, icon, down }: ScrollButtonProps) => {
       const maxy = Math.round(
         c ? c.getBoundingClientRect().top + window.scrollY : 0
       );
-      setShow(down ? y < maxy : y > maxy);
+      setShow(down ? y <= maxy : y > maxy);
     }, document);
 
     return () => {
       scrollSpy.unmount(null, null);
     };
   }, [to, down]);
-
   return (
     <>
       {show && (
-        <Button onClick={() => scroller.scrollTo(to, {})}>{icon}</Button>
+        <>
+          Bonjour
+          <Button
+            onClick={() => scroller.scrollTo(to, {})}
+            role="button"
+            data-testid="scroll"
+          >
+            {icon}
+          </Button>
+        </>
       )}
     </>
   );

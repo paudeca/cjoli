@@ -1,6 +1,10 @@
 /* eslint-disable max-lines */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  createMatch,
+  createPosition,
+  createRank,
+  createTeam,
   createTourney,
   mockDelete,
   mockGetRanking,
@@ -10,12 +14,14 @@ import {
   mockPost,
   renderPage,
   renderPageWithRoute,
+  reset,
+  setDesktop,
 } from "../../__tests__/testUtils";
 import SettingPage from "../SettingPage";
 import { act, fireEvent, screen } from "@testing-library/react";
 import { Route, Routes } from "react-router-dom";
 import MainPage from "../MainPage";
-import { Match, Position, Rank, Team, Tourney } from "../../models";
+import { Tourney } from "../../models";
 
 const UID = "123";
 const TEAM = "team1";
@@ -42,7 +48,7 @@ const render = async ({
 }) => {
   mockGetUser({});
   mockGetTourneys(UID);
-  mockGetRanking(UID, () => tourney);
+  mockGetRanking(UID, tourney);
   init && init();
 
   const mockAxios = del
@@ -132,7 +138,7 @@ const render = async ({
 const deleteItem = async (path: string, name: string, btn: string) => {
   const tourney = createTourney({
     id: 1,
-    teams: [{ id: TEAM_ID } as Team],
+    teams: [createTeam({ id: TEAM_ID })],
     phases: [
       {
         id: PHASE_ID,
@@ -141,13 +147,13 @@ const deleteItem = async (path: string, name: string, btn: string) => {
           {
             id: SQUAD_ID,
             name: "squad1",
-            positions: [{ id: POSITION_ID, teamId: TEAM_ID } as Position],
-            matches: [{ id: MATCH_ID } as Match],
+            positions: [createPosition({ id: POSITION_ID, teamId: TEAM_ID })],
+            matches: [createMatch({ id: MATCH_ID })],
           },
         ],
       },
     ],
-    ranks: [{ id: RANK_ID } as Rank],
+    ranks: [createRank({ id: RANK_ID })],
   });
 
   const { yes } = await render({
@@ -164,6 +170,7 @@ const deleteItem = async (path: string, name: string, btn: string) => {
 describe("SettingPage", () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    reset();
   });
   it("render", async () => {
     mockGetRanking(UID);
@@ -177,7 +184,7 @@ describe("SettingPage", () => {
   });
 
   it("desktop", async () => {
-    window.innerWidth = 1200;
+    setDesktop();
     mockGetRanking(UID);
     await renderPageWithRoute(UID, <SettingPage />);
     screen.getByText("Tourney");
@@ -206,7 +213,7 @@ describe("SettingPage", () => {
         expect(tourney.teams[0].name).toBe(TEAM);
         return tourney;
       },
-      init: () => mockGetTeams([{ id: 1, name: TEAM } as Team]),
+      init: () => mockGetTeams([createTeam({ id: 1, name: TEAM })]),
     });
 
     await select("Add Team", TEAM);

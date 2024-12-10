@@ -9,7 +9,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Element } from "react-scroll";
 import { useServer } from "../../hooks/useServer";
 
-interface RankingStackProps {
+interface RankingStackProps extends JSX.IntrinsicAttributes {
   phase: Phase;
 }
 
