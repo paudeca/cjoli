@@ -27,7 +27,6 @@ const ScrollButton = ({ to, icon, down }: ScrollButtonProps) => {
     <>
       {show && (
         <>
-          Bonjour
           <Button
             onClick={() => scroller.scrollTo(to, {})}
             role="button"
