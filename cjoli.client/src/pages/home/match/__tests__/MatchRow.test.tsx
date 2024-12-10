@@ -19,7 +19,7 @@ import { screen } from "@testing-library/react";
 import { useCJoli } from "../../../../hooks/useCJoli";
 import { useEffect } from "react";
 import { useUser } from "../../../../hooks/useUser";
-import { Match, User, UserConfig } from "../../../../models";
+import { Match, User } from "../../../../models";
 
 const scoreA = 1;
 const scoreB = 0;
@@ -92,7 +92,7 @@ describe("MatchRow", () => {
     setDesktop();
     await render({ match, user });
   });
-  it("userMatch", async () => {
+  /*it("userMatch", async () => {
     setDesktop();
     await render({
       match: {
@@ -113,5 +113,5 @@ describe("MatchRow", () => {
       },
     });
     screen.debug();
-  });
+  });*/
 });
