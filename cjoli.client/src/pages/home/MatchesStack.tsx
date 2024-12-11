@@ -59,7 +59,8 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
     if (keys && keys.length > 0 && !keys.includes(daySelected)) {
       selectDay(keys[0]);
     }
-  }, [keys, selectDay, daySelected]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keys, selectDay]);
 
   const upperFirstLetter = (value: string) => {
     return value.charAt(0).toUpperCase() + value.slice(1);
