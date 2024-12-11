@@ -105,7 +105,6 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
             >
               {keys.map((key, index) => {
                 const datasOrder = datas[key];
-                datasOrder.sort((a, b) => (a.time > b.time ? 1 : -1));
                 const map = datasOrder.reduce<Record<string, Match[]>>(
                   (acc, m) => {
                     const key = dayjs(m.time).format("LT");
