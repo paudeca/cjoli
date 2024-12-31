@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using cjoli.Server.Dtos;
 using cjoli.Server.Models;
+using cjoli.Server.Models.AI;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,21 +10,25 @@ namespace cjoli.Server.Controllers
 {
 
     [ApiController]
-    [Authorize]
+    [Authorize("IsAdmin")]
     [Route("[controller]")]
     public class SettingController : ControllerBase
     {
         private readonly CJoliService _service;
-        private readonly ImportService _importService;
+        private readonly SettingService _settingService;
+        private readonly UserService _userService;
         private readonly IMapper _mapper;
         private readonly CJoliContext _context;
+        private readonly IAuthorizationService _authorizationService;
 
-        public SettingController(CJoliService service, ImportService importService, IMapper mapper, CJoliContext context)
+        public SettingController(CJoliService service, SettingService settingService, UserService userService, IAuthorizationService authorizationService, IMapper mapper, CJoliContext context)
         {
             _service = service;
-            _importService = importService;
+            _settingService = settingService;
+            _userService = userService;
             _mapper = mapper;
             _context = context;
+            _authorizationService = authorizationService;
         }
 
 
@@ -36,59 +41,75 @@ namespace cjoli.Server.Controllers
 
         [HttpPost]
         [Route("Tourney")]
-        public TourneyDto Update(TourneyDto tourney)
+        public async Task<TourneyDto> UpdateAsync(TourneyDto tourney)
         {
-            return _mapper.Map<TourneyDto>(_importService.Import(tourney, _context));
+            await _authorizationService.AuthorizeAsync(User, tourney.Uid, "EditTourney");
+            return _mapper.Map<TourneyDto>(_settingService.Import(tourney, _context));
+        }
+
+        [HttpPost]
+        [Route("User/{user}/admins")]
+        [Authorize("IsRootAdmin")]
+        public void SaveUserAdmins(int user, int[] tourneys)
+        {
+            _userService.SaveUserAdmins(user, tourneys, _context);
         }
 
         [HttpDelete]
         [Route("Tourney/{uid}")]
+        [Authorize("IsRootAdmin")]
         public void RemoveTourney(string uid)
         {
-            _importService.RemoveTourney(uid, _context);
+            _settingService.RemoveTourney(uid, _context);
         }
 
 
         [HttpDelete]
         [Route("Tourney/{uid}/teams/{teamId}")]
-        public TourneyDto RemoveTeam(string uid, int teamId)
+        public async Task<TourneyDto> RemoveTeam(string uid, int teamId)
         {
-            return _mapper.Map<TourneyDto>(_importService.RemoveTeam(uid, teamId, _context));
+            await _authorizationService.AuthorizeAsync(User, uid, "EditTourney");
+            return _mapper.Map<TourneyDto>(_settingService.RemoveTeam(uid, teamId, _context));
         }
 
         [HttpDelete]
         [Route("Tourney/{uid}/phases/{phaseId}")]
-        public TourneyDto RemovePhase(string uid, int phaseId)
+        public async Task<TourneyDto> RemovePhase(string uid, int phaseId)
         {
-            return _mapper.Map<TourneyDto>(_importService.RemovePhase(uid, phaseId, _context));
+            await _authorizationService.AuthorizeAsync(User, uid, "EditTourney");
+            return _mapper.Map<TourneyDto>(_settingService.RemovePhase(uid, phaseId, _context));
         }
 
         [HttpDelete]
         [Route("Tourney/{uid}/phases/{phaseId}/squads/{squadId}")]
-        public TourneyDto RemoveSquad(string uid, int phaseId, int squadId)
+        public async Task<TourneyDto> RemoveSquad(string uid, int phaseId, int squadId)
         {
-            return _mapper.Map<TourneyDto>(_importService.RemoveSquad(uid, phaseId, squadId, _context));
+            await _authorizationService.AuthorizeAsync(User, uid, "EditTourney");
+            return _mapper.Map<TourneyDto>(_settingService.RemoveSquad(uid, phaseId, squadId, _context));
         }
 
         [HttpDelete]
         [Route("Tourney/{uid}/phases/{phaseId}/squads/{squadId}/positions/{positionId}")]
-        public TourneyDto RemovePosition(string uid, int phaseId, int squadId, int positionId)
+        public async Task<TourneyDto> RemovePosition(string uid, int phaseId, int squadId, int positionId)
         {
-            return _mapper.Map<TourneyDto>(_importService.RemovePosition(uid, phaseId, squadId, positionId, _context));
+            await _authorizationService.AuthorizeAsync(User, uid, "EditTourney");
+            return _mapper.Map<TourneyDto>(_settingService.RemovePosition(uid, phaseId, squadId, positionId, _context));
         }
 
         [HttpDelete]
         [Route("Tourney/{uid}/phases/{phaseId}/squads/{squadId}/matches/{matchId}")]
-        public TourneyDto RemoveMatch(string uid, int phaseId, int squadId, int matchId)
+        public async Task<TourneyDto> RemoveMatch(string uid, int phaseId, int squadId, int matchId)
         {
-            return _mapper.Map<TourneyDto>(_importService.RemoveMatch(uid, phaseId, squadId, matchId, _context));
+            await _authorizationService.AuthorizeAsync(User, uid, "EditTourney");
+            return _mapper.Map<TourneyDto>(_settingService.RemoveMatch(uid, phaseId, squadId, matchId, _context));
         }
 
         [HttpDelete]
         [Route("Tourney/{uid}/ranks/{rankId}")]
-        public TourneyDto RemoveRank(string uid, int rankId)
+        public async Task<TourneyDto> RemoveRank(string uid, int rankId)
         {
-            return _mapper.Map<TourneyDto>(_importService.RemoveRank(uid, rankId, _context));
+            await _authorizationService.AuthorizeAsync(User, uid, "EditTourney");
+            return _mapper.Map<TourneyDto>(_settingService.RemoveRank(uid, rankId, _context));
         }
 
     }

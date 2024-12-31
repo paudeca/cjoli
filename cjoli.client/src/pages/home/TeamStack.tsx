@@ -32,7 +32,7 @@ const TeamStack = () => {
   const { isMobile } = useScreenSize();
   const [teamB, setTeamB] = React.useState<Team | undefined>(undefined);
   const { setShow: showTeam } = useModal("team");
-  const { isAdmin } = useUser();
+  const { isRootAdmin } = useUser();
   const navigate = useNavigate();
   const [activeKey, setActiveKey] = React.useState("general");
 
@@ -129,7 +129,7 @@ const TeamStack = () => {
               <Button variant="primary" onClick={() => navigate(-1)}>
                 <ArrowLeft /> <Trans i18nKey="button.back">Back</Trans>
               </Button>
-              {isAdmin && (
+              {isRootAdmin && (
                 <div className="ms-auto">
                   <Button variant="primary" onClick={() => showTeam(true)}>
                     <Trans i18nKey="button.edit">Edit</Trans>

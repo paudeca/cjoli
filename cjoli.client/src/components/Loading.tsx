@@ -11,18 +11,24 @@ const MyProgressBar = styled("div")`
   animation: l16 3s infinite;
   @keyframes l16 {
     0% {
-      background-position: -150% 0, -150% 0;
+      background-position:
+        -150% 0,
+        -150% 0;
     }
     66% {
-      background-position: 250% 0, -150% 0;
+      background-position:
+        250% 0,
+        -150% 0;
     }
     100% {
-      background-position: 250% 0, 250% 0;
+      background-position:
+        250% 0,
+        250% 0;
     }
   }
 `;
 
-const Waiting = ({
+const Loading = ({
   ready,
   children,
 }: {
@@ -41,4 +47,4 @@ const Waiting = ({
   );
 };
 
-export default Waiting;
+export default Loading;

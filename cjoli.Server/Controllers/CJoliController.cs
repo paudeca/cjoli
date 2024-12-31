@@ -18,16 +18,16 @@ namespace cjoli.Server.Controllers
     public class CJoliController : ControllerBase
     {
         private readonly CJoliService _service;
-        private readonly ImportService _importService;
+        private readonly SettingService _settingService;
         private readonly AIService _aiService;
         private readonly IMapper _mapper;
         private readonly CJoliContext _context;
         private readonly ILogger<CJoliController> _logger;
 
-        public CJoliController(CJoliService service, ImportService importService, AIService aiService, IMapper mapper, CJoliContext context, ILogger<CJoliController> logger)
+        public CJoliController(CJoliService service, SettingService settingService, AIService aiService, IMapper mapper, CJoliContext context, ILogger<CJoliController> logger)
         {
             _service = service;
-            _importService = importService;
+            _settingService = settingService;
             _aiService = aiService;
             _mapper = mapper;
             _context = context;
@@ -79,7 +79,7 @@ namespace cjoli.Server.Controllers
         [Route("Import")]
         public string Import(TourneyDto tourneyDto)
         {
-            var tourney = _importService.Import(tourneyDto, _context);
+            var tourney = _settingService.Import(tourneyDto, _context);
             return tourney.Uid;
         }
 

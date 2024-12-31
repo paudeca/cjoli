@@ -19,7 +19,7 @@ namespace cjoli.Server_Tests
             services.AddSingleton<CJoliService>();
             services.AddSingleton<EstimateService>();
             services.AddSingleton<UserService>();
-            services.AddSingleton<ImportService>();
+            services.AddSingleton<SettingService>();
             services.AddSingleton<AIService>();
             services.AddSingleton<ServerService>();
 

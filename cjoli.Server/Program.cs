@@ -12,6 +12,8 @@ using Serilog.Exceptions;
 using cjoli.Server.Exceptions;
 using cjoli.Server.Middlewares;
 using Serilog.Enrichers.Sensitive;
+using cjoli.Server.Authorizations;
+using Microsoft.AspNetCore.Authorization;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,7 +38,21 @@ builder.Services.AddAuthentication(opt =>
         ValidateIssuerSigningKey = true
     };
 });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(opt =>
+{
+    opt.AddPolicy("IsRootAdmin", policy =>
+    {
+        policy.RequireRole("ADMIN");
+    });
+    opt.AddPolicy("IsAdmin", policy =>
+    {
+        policy.RequireRole("ADMIN","ADMIN_LOCAL");
+    });
+    opt.AddPolicy("EditTourney", policy =>
+    {
+        policy.AddRequirements(new AdminTourneyRequirement());
+    });
+});
 
 builder.Services.AddControllers();
 builder.Services.AddCors(opt => opt.AddDefaultPolicy(b => b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
@@ -67,13 +83,15 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDataProtection();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddSingleton<CJoliService>();
-builder.Services.AddSingleton<ImportService>();
+builder.Services.AddSingleton<SettingService>();
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<EstimateService>();
 builder.Services.AddSingleton<AIService>();
 builder.Services.AddSingleton<ServerService>();
 builder.Services.AddSingleton(new OpenAIClient(builder.Configuration["OpenAIKey"]));
 builder.Services.AddSingleton<LoggerMiddleware>();
+
+builder.Services.AddSingleton<IAuthorizationHandler, AdminTourneyAuthorizationHandler>();
 
 builder.Services.AddDbContextPool<CJoliContext>(options =>
 {

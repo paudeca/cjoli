@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace cjoli.Server.Services
 {
-    public class ImportService
+    public class SettingService
     {
         private M Import<M, D>(D dto, CJoliContext context, Func<M?> select, Func<M> create, Action<M> update, List<Action<M>>? children = null)
         {

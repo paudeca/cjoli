@@ -28,24 +28,43 @@ const MySpinner = styled("div")`
   animation: l5 2s infinite;
   @keyframes l5 {
     0% {
-      background-position: 50% -50px, -40px 50%, 50% calc(100% + 50px),
+      background-position:
+        50% -50px,
+        -40px 50%,
+        50% calc(100% + 50px),
         calc(100% + 50px) 50%;
     }
     20%,
     25% {
-      background-position: 50% -50px, -50px 50%, 50% calc(100% + 50px), 50% 50%;
+      background-position:
+        50% -50px,
+        -50px 50%,
+        50% calc(100% + 50px),
+        50% 50%;
     }
     45%,
     50% {
-      background-position: 50% -50px, -50px 50%, 50% 50%, 50% 50%;
+      background-position:
+        50% -50px,
+        -50px 50%,
+        50% 50%,
+        50% 50%;
     }
     75%,
     75% {
-      background-position: 50% -50px, 50% 50%, 50% 50%, 50% 50%;
+      background-position:
+        50% -50px,
+        50% 50%,
+        50% 50%,
+        50% 50%;
     }
     95%,
     100% {
-      background-position: 50% 50%, 50% 50%, 50% 50%, 50% 50%;
+      background-position:
+        50% 50%,
+        50% 50%,
+        50% 50%,
+        50% 50%;
     }
   }
 `;
@@ -65,7 +84,7 @@ const Title = ({ title, icon }: { title: string; icon: React.ReactNode }) => {
 const SelectPage = () => {
   const { tourneys } = useCJoli("welcome");
   const { t } = useTranslation();
-  const { isAdmin } = useUser();
+  const { isRootAdmin } = useUser();
   const { setShow: showAddTourney } = useModal("addTourney");
   const { getTourneys, saveTourney } = useApi();
 
@@ -133,7 +152,7 @@ const SelectPage = () => {
                     </Row>
                   </React.Fragment>
                 ))}
-              {isAdmin && (
+              {isRootAdmin && (
                 <Row>
                   <Col>
                     <Button

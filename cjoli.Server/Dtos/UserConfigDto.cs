@@ -7,5 +7,6 @@
 
         public bool UseCustomEstimate { get; set; }
         public int FavoriteTeamId { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }

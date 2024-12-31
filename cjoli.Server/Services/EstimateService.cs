@@ -178,7 +178,7 @@ namespace cjoli.Server.Services
                     Func<Match, bool> filter = (Match m) => user == null ? !m.Done : !m.Done || m.UserMatches.Count > 0;
                     foreach (var match in squad.Matches.Where(filter))
                     {
-                        CaculateEstimate(match, scores.ScoreSquads, user, funcScore);
+                        CaculateEstimate(match, scores.ScoreSquads, user, funcScore, tourney);
                     }
                 }
             }
@@ -286,7 +286,7 @@ namespace cjoli.Server.Services
             return position;
         }
 
-        private void CaculateEstimate(Match match, IList<ScoreSquad> scores, User? user, Func<Match, Team, Team, bool, Score> calculateScore)
+        private void CaculateEstimate(Match match, IList<ScoreSquad> scores, User? user, Func<Match, Team, Team, bool, Score> calculateScore, Tourney tourney)
         {
             Position positionA = FindParentPosition(match.PositionA, scores);
             Position positionB = FindParentPosition(match.PositionB, scores);
@@ -329,7 +329,7 @@ namespace cjoli.Server.Services
                 match.Estimates.Add(estimate);
             }
 
-            estimate.User = user.IsAdmin() ? null : user;
+            estimate.User = user.IsAdmin(tourney.Uid) ? null : user;
             estimate.ScoreA = (int)Math.Round(goalA);
             estimate.ScoreB = (int)Math.Round(goalB);
 

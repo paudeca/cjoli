@@ -24,14 +24,16 @@
     "custom": "Custom",
     "useCustom": "use personal estimate",
     "menu": "Menu",
-    "setting": "Setting"
+    "setting": "Setting",
+    "admin": "Administration",
   },
   "home": {
     "tourneyNotConfigured": "Tourney not configured"
   },
   "error": {
     "invalid": "{{field}} is invalid",
-    "required": "{{field}} is required"
+    "required": "{{field}} is required",
+    "notAuthorize": "User not authorized"
   },
   "button": {
     "submit": "Submit",

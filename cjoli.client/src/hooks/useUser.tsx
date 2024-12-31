@@ -43,14 +43,22 @@ export const useUser = () => {
   );
 
   const { tourney } = useCJoli();
+  const userConfig = state.user?.configs?.find(
+    (c) => c.tourneyId == tourney?.id
+  ) || {
+    tourneyId: 0,
+    useCustomEstimate: false,
+    favoriteTeamId: 0,
+    isAdmin: false,
+  };
+  const isRootAdmin = state.user?.role === "ADMIN";
 
   return {
     ...state,
     isConnected: state.user,
-    isAdmin: state.user?.role === "ADMIN",
-    userConfig: state.user?.configs?.find(
-      (c) => c.tourneyId == tourney?.id
-    ) || { tourneyId: 0, useCustomEstimate: false, favoriteTeamId: 0 },
+    isRootAdmin,
+    isAdmin: isRootAdmin || userConfig.isAdmin,
+    userConfig,
     loadUser,
     setCountUser,
     handleSaveUserConfig,
