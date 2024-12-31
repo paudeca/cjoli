@@ -27,6 +27,7 @@ import { ArrowDown, ArrowUp } from "react-bootstrap-icons";
 import { Global, ThemeProvider } from "@emotion/react";
 import { useLogger } from "../hooks/useLogger";
 import { useGlobal } from "../styles";
+import InfoModal from "../components/InfoModal";
 
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
@@ -59,7 +60,7 @@ const MainPage = () => {
   const { register } = useServer();
   const { getUser, getTourneys } = useApi();
   const location = useLocation();
-
+  const { t } = useTranslation();
   const theme = {
     colors: {
       primary,
@@ -158,6 +159,21 @@ const MainPage = () => {
             <Toast.Body>{message}</Toast.Body>
           </Toast>
         </ToastContainer>
+        <InfoModal
+          id="blockShot"
+          title={t("match.blockShot.title", "Save Score")}
+          variant="danger"
+        >
+          <p>
+            <Trans i18nKey="match.blockShot.error">
+              Unable to record the score.
+              <br />
+              The match must end in a penalty shootout.
+              <br />
+              Please indicate a winner.
+            </Trans>
+          </p>
+        </InfoModal>
       </Loading>
     </ThemeProvider>
   );

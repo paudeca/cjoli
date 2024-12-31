@@ -1,6 +1,7 @@
-import React from "react";
+import { useState } from "react";
 import { Spinner } from "react-bootstrap";
 import { CheckCircle, XCircle } from "react-bootstrap-icons";
+import useScreenSize from "../../../hooks/useScreenSize";
 
 interface ScoreButtonProps {
   id: string;
@@ -9,7 +10,8 @@ interface ScoreButtonProps {
 }
 
 const ScoreButton = ({ id, action, onClick }: ScoreButtonProps) => {
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
+  const { isMobile } = useScreenSize();
   const handleClick = async () => {
     setLoading(true);
     await onClick();
@@ -24,6 +26,7 @@ const ScoreButton = ({ id, action, onClick }: ScoreButtonProps) => {
           role="button"
           onClick={handleClick}
           data-testid={id}
+          className={isMobile ? "mt-2" : "ms-2"}
         />
       )}
       {action == "remove" && !loading && (
@@ -33,12 +36,14 @@ const ScoreButton = ({ id, action, onClick }: ScoreButtonProps) => {
           role="button"
           onClick={handleClick}
           data-testid={id}
+          className={isMobile ? "mt-2" : "ms-2"}
         />
       )}
       {loading && (
         <Spinner
           animation="grow"
           variant={action == "remove" ? "danger" : "success"}
+          className={isMobile ? "mt-2" : "ms-2"}
         />
       )}
     </>
