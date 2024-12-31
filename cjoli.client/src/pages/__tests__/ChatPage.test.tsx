@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, it, vi } from "vitest";
 import {
+  createUser,
   initPage,
   renderPageWithRoute,
   reset,
@@ -18,7 +19,7 @@ const url = import.meta.env.VITE_API_WS;
 const InitChat = initPage(ChatPage, () => {
   const { loadUser } = useUser();
   useEffect(() => {
-    loadUser({ login: "login", password: "" });
+    loadUser(createUser({}));
   }, [loadUser]);
 });
 
