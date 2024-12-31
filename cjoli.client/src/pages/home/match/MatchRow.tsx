@@ -17,8 +17,8 @@ export const MyScoreDiv = styled("div")<{ isMobile: boolean }>`
   & .spinner-grow {
     ${(props) =>
       props.isMobile
-        ? "margin-top: 0.5rem !important;"
-        : "margin-left: 0.5rem !important;"}
+        ? "margin-topp: 0.5rem !important;"
+        : "margin-lefpt: 0.5rem !important;"}
   }
 `;
 

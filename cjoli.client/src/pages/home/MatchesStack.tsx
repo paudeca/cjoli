@@ -4,28 +4,20 @@ import CJoliStack from "../../components/CJoliStack";
 import Loading from "../../components/Loading";
 import { Match, Phase } from "../../models";
 import dayjs from "dayjs";
-import { useForm } from "react-hook-form";
-import * as cjoliService from "../../services/cjoliService";
 import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
 import MatchRow from "./match/MatchRow";
-import InfoModal from "../../components/InfoModal";
 import { useParams } from "react-router-dom";
-import { useModal } from "../../hooks/useModal";
-import { Trans, useTranslation } from "react-i18next";
+import { useMatch } from "../../hooks/useMatch";
 import { memo, useCallback, useEffect, useMemo } from "react";
 
 interface MatchesStackProps extends JSX.IntrinsicAttributes {
   phase: Phase;
 }
 const MatchesStack = ({ phase }: MatchesStackProps) => {
-  const { matches, loadRanking, daySelected, selectDay } = useCJoli();
+  const { matches, daySelected, selectDay } = useCJoli();
   const uid = useUid();
-  const { register, getValues } =
-    useForm<Record<string, { scoreA: number | ""; scoreB: number | "" }>>();
-  const { setShow } = useModal("blockShot");
   const { squadId } = useParams();
-  const { t } = useTranslation();
 
   const filter = useCallback(
     (match: Match) =>
@@ -66,31 +58,7 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
     return value.charAt(0).toUpperCase() + value.slice(1);
   };
 
-  const saveMatch = async (match: Match) => {
-    let { scoreA, scoreB } = getValues(`m${match.id}`);
-    if (scoreA == "") scoreA = 0;
-    if (scoreB == "") scoreB = 0;
-
-    if (match.forfeitA || match.forfeitB) {
-      scoreA = 0;
-      scoreB = 0;
-    }
-    if (match.shot && scoreA == scoreB) {
-      setShow(true);
-      return;
-    }
-    const ranking = await cjoliService.saveMatch(uid, {
-      ...match,
-      scoreA,
-      scoreB,
-    });
-    loadRanking(ranking);
-  };
-
-  const clearMatch = async (match: Match) => {
-    const ranking = await cjoliService.clearMatch(uid, match);
-    loadRanking(ranking);
-  };
+  const { saveMatch, clearMatch, register } = useMatch(uid);
 
   return (
     <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="matches">
@@ -150,21 +118,6 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
           </Loading>
         </CJoliCard>
       </div>
-      <InfoModal
-        id="blockShot"
-        title={t("match.blockShot.title", "Save Score")}
-        variant="danger"
-      >
-        <p>
-          <Trans i18nKey="match.blockShot.error">
-            Unable to record the score.
-            <br />
-            The match must end in a penalty shootout.
-            <br />
-            Please indicate a winner.
-          </Trans>
-        </p>
-      </InfoModal>
     </CJoliStack>
   );
 };
