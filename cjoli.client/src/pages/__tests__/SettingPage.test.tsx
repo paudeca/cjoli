@@ -46,7 +46,7 @@ const render = async ({
   init?: () => void;
   del?: { path: string; name: string };
 }) => {
-  mockGetUser({});
+  mockGetUser({ role: "ADMIN" });
   mockGetTourneys(UID);
   mockGetRanking(UID, tourney);
   init && init();

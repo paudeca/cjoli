@@ -145,7 +145,7 @@ const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
         {squad?.name}
         <SimulationIcon show={isSimulation} />
       </td>
-      {match.location && <td>{match.location}</td>}
+      <td>{match.location}</td>
       <td>
         <LeftCenterDiv>
           <TeamCell positionId={match.positionIdA} forfeit={imatch.forfeitA} />

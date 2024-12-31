@@ -10,5 +10,6 @@ namespace cjoli.Server.Models
         public required Tourney Tourney { get; set; }
         public bool UseCustomEstimate { get; set; }
         public Team? FavoriteTeam { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }

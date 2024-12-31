@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Team, Tourney } from "../models";
+import { Team, Tourney, User } from "../models";
 import Cookie from "universal-cookie";
 
 const url = import.meta.env.VITE_API_URL;
@@ -13,11 +13,6 @@ const setHeader = () => {
 };
 setHeader();
 
-export const getTourney = async (uid: string) => {
-  const { data } = await axios.get<Tourney>(`${url}/setting/tourney/${uid}`);
-  return data;
-};
-
 export const getTeams = async () => {
   const { data } = await axios.get<Team[]>(`${url}/setting/teams`);
   return data;
@@ -26,6 +21,10 @@ export const getTeams = async () => {
 export const importTourney = async (tourney: Tourney) => {
   const { data } = await axios.post<Tourney>(`${url}/setting/tourney`, tourney);
   return data;
+};
+
+export const saveUserAdminConfig = async (user: User, admins: number[]) => {
+  await axios.post<void>(`${url}/setting/user/${user.id}/admins`, admins);
 };
 
 export const removeTourney = async ({ uid }: { uid: string }) => {

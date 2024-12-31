@@ -86,7 +86,7 @@ namespace cjoli.Server_Tests
 
         protected User CreateUser(string role = "ADMIN")
         {
-            var user = new User() { Login = $"login-{role}", Password = "", Role = role };
+            var user = new User() { Login = $"login-{role}", Password = "", Source="",Role = role };
             _context.Users.Add(user);
             _context.SaveChanges();
             return user;

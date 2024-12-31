@@ -36,6 +36,11 @@ export const getUser = async () => {
   return data;
 };
 
+export const listUsers = async () => {
+  const { data } = await axios.get<User[]>(`${url}/user/list`);
+  return data;
+};
+
 export const login = async (user: User) => {
   return await axios
     .post<string>(`${url}/user/login`, user)

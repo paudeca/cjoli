@@ -13,6 +13,7 @@ import SettingPage from "./pages/SettingPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useServer } from "./hooks/useServer";
 import TeamPage from "./pages/TeamPage";
+import AdminPage from "./pages/AdminPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,6 +31,10 @@ const App = () => {
       element: <MainPage />,
       children: [
         { path: "", element: isUseDomain ? <HomePage /> : <SelectPage /> },
+        {
+          path: "admin",
+          element: <AdminPage />,
+        },
         {
           path: ":uid",
           element: <HomePage />,

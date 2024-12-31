@@ -49,7 +49,12 @@ const renderMainPage = async ({
     () =>
       mockGetUser({
         configs: [
-          { favoriteTeamId: 1, tourneyId: 1, useCustomEstimate: false },
+          {
+            favoriteTeamId: 1,
+            tourneyId: 1,
+            useCustomEstimate: false,
+            isAdmin: false,
+          },
         ],
       }),
     () => mockGetTourneys(uid),

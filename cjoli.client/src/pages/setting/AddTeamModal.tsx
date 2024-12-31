@@ -5,6 +5,8 @@ import { useToast } from "../../hooks/useToast";
 import { useQuery } from "@tanstack/react-query";
 import { useApi } from "../../hooks/useApi";
 import { useSetting } from "../../hooks/useSetting";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 interface AddTeamModalProps {
   onAddTeam: (team: Partial<Team>) => Promise<boolean>;
@@ -15,8 +17,16 @@ const AddTeamModal = ({ onAddTeam }: AddTeamModalProps) => {
   const { tourney } = useSetting();
   const { showToast } = useToast();
   const { getTeams } = useApi();
+  const navigate = useNavigate();
 
-  const { data: teams } = useQuery(getTeams());
+  const { data: teams, error } = useQuery(getTeams());
+  if (
+    axios.isAxiosError(error) &&
+    (error.request.status == 403 || error.request.status == 401)
+  ) {
+    showToast("danger", t("error.notAuthorize", "User not authorized"));
+    navigate("/");
+  }
 
   const teamsFilter = tourney.teams?.map((t) => t.id);
   const fields: Field<{ nameTeam: string | number }>[] = [

@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Storage;
 namespace cjoli.Server_Tests.Services
 {
     [Collection("CJoli")]
-    public class ImportServiceTest : IDisposable
+    public class SettingServiceTest : IDisposable
     {
-        private readonly ImportService _service;
+        private readonly SettingService _service;
         private readonly CJoliContext _context;
         private readonly IDbContextTransaction _transaction;
 
-        public ImportServiceTest(ImportService service, CJoliContext context)
+        public SettingServiceTest(SettingService service, CJoliContext context)
         {
             _service = service;
             _context = context;

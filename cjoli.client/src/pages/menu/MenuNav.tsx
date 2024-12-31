@@ -73,7 +73,7 @@ const MenuNav = () => {
     }
   };
   const [show, setShow] = React.useState(false);
-  const { isAdmin } = useUser();
+  const { isAdmin, isRootAdmin } = useUser();
 
   const { register } = useForm<UserConfig>({
     values: userConfig,
@@ -210,6 +210,11 @@ const MenuNav = () => {
                     <NavDropdown.Item onClick={() => showUpdate(true)}>
                       <Trans i18nKey="menu.update">Update</Trans>
                     </NavDropdown.Item>
+                    {isRootAdmin && (
+                      <NavDropdown.Item onClick={() => navigate(`/admin`)}>
+                        <Trans i18nKey="menu.admin">Administration</Trans>
+                      </NavDropdown.Item>
+                    )}
                     <NavDropdown.Divider />
                     <NavDropdown.Item onClick={logout}>
                       <Trans i18nKey="menu.logout">Logout</Trans>

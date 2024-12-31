@@ -23,9 +23,11 @@ import AddPhaseModal from "./setting/AddPhaseModal";
 import AddSquadModal from "./setting/AddSquadModal";
 import CJoliStack from "../components/CJoliStack";
 import { useAddSetting } from "./setting/useAddSetting";
+import { useUser } from "../hooks/useUser";
 
 const SettingPage = () => {
   const { tourney } = useCJoli("setting");
+  const { isRootAdmin } = useUser();
   const {
     getRanking,
     removeTourney,
@@ -81,15 +83,17 @@ const SettingPage = () => {
           Save
         </Button>
       </div>
-      <div className="p-2">
-        <Button
-          variant="danger"
-          onClick={() => showConfirmDeleteTourney(true, tourney)}
-          data-testid="deleteTourney"
-        >
-          <Trash3 />
-        </Button>
-      </div>
+      {isRootAdmin && (
+        <div className="p-2">
+          <Button
+            variant="danger"
+            onClick={() => showConfirmDeleteTourney(true, tourney)}
+            data-testid="deleteTourney"
+          >
+            <Trash3 />
+          </Button>
+        </div>
+      )}
     </CJoliStack>
   );
 

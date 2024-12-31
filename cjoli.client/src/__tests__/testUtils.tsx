@@ -203,6 +203,7 @@ export const createRank: (rank: Partial<Rank> & { id: number }) => Rank = (
   }) as Rank;
 
 export const createUser: (user: Partial<User>) => User = (user) => ({
+  id: user.id ?? 1,
   login: user.login ?? "login",
   password: user.password ?? "password",
   role: user.role,

@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using cjoli.Server.Dtos;
 using cjoli.Server.Exceptions;
+using cjoli.Server.Extensions;
 using cjoli.Server.Models;
 using cjoli.Server.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -45,6 +47,15 @@ namespace cjoli.Server.Controllers
             }
             return _mapper.Map<UserDto>(_service.GetUserDetail(login, _context));
         }
+
+        [HttpGet]
+        [Route("List")]
+        [Authorize("IsRootAdmin")]
+        public List<UserDto>? List()
+        {
+            return _mapper.Map<List<UserDto>>(_service.ListUsers(_context));
+        }
+
 
         [HttpPost]
         [Route("Register")]

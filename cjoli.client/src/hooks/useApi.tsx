@@ -8,7 +8,16 @@ import * as cjoliService from "../services/cjoliService";
 import * as settingService from "../services/settingService";
 import { useUser } from "./useUser";
 import { useCJoli } from "./useCJoli";
-import { Match, Phase, Position, Rank, Squad, Team, Tourney } from "../models";
+import {
+  Match,
+  Phase,
+  Position,
+  Rank,
+  Squad,
+  Team,
+  Tourney,
+  User,
+} from "../models";
 import { useNavigate } from "react-router-dom";
 
 export const mutationOptions = <
@@ -39,6 +48,18 @@ const useApiGet = () => {
     [loadUser]
   );
 
+  const listUsers = useCallback(
+    () =>
+      queryOptions({
+        queryKey: ["listUsers"],
+        queryFn: async () => {
+          const users = await cjoliService.listUsers();
+          return users;
+        },
+      }),
+    []
+  );
+
   const getTourneys = useCallback(
     ({ enabled }: { enabled?: boolean }) =>
       queryOptions({
@@ -59,6 +80,7 @@ const useApiGet = () => {
         queryKey: ["getTeams"],
         queryFn: async () => settingService.getTeams(),
         initialData: [],
+        retry: 0,
       }),
     []
   );
@@ -75,7 +97,7 @@ const useApiGet = () => {
       }),
     [loadRanking]
   );
-  return { getUser, getTourneys, getTeams, getRanking };
+  return { getUser, listUsers, getTourneys, getTeams, getRanking };
 };
 
 const useApiPost = () => {
@@ -94,7 +116,24 @@ const useApiPost = () => {
       }),
     [loadTourney]
   );
-  return { saveTourney };
+  const saveUserAdminConfig = useCallback(
+    ({ onSuccess }: { onSuccess: () => void }) =>
+      mutationOptions({
+        mutationKey: ["saveUserAdminConfig"],
+        mutationFn: async ({
+          user,
+          admins,
+        }: {
+          user: User;
+          admins: number[];
+        }) => {
+          await settingService.saveUserAdminConfig(user, admins);
+        },
+        onSuccess,
+      }),
+    []
+  );
+  return { saveTourney, saveUserAdminConfig };
 };
 
 const useApiDelete = () => {

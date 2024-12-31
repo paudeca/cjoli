@@ -68,10 +68,47 @@ type Action =
       payload: TypePage;
     };
 
+const reduceLoadRanking = (state: CJoliState, ranking: Ranking) => {
+  const tourney = ranking.tourney;
+  const teams = tourney.teams;
+  teams.sort((a, b) => (a.name > b.name ? 1 : -1));
+  const phases = tourney.phases;
+  const squads = phases.reduce<Squad[]>(
+    (acc, phase) => [...acc, ...phase.squads],
+    []
+  );
+  const positions = squads.reduce<Position[]>(
+    (acc, squad) => [...acc, ...squad.positions],
+    []
+  );
+  const matches = squads.reduce<Match[]>(
+    (acc, squad) => [...acc, ...squad.matches],
+    []
+  );
+  matches.sort((a, b) => {
+    if (a.time > b.time) return 1;
+    else if (a.time < b.time) return -1;
+    else if (a.location && b.location && a.location > b.location) return -1;
+    else return 1;
+  });
+  return {
+    ...state,
+    ranking,
+    tourney,
+    teams,
+    phases,
+    squads,
+    positions,
+    matches,
+  };
+};
+
 const reducer = (state: CJoliState, action: Action) => {
   switch (action.type) {
     case CJoliActions.LOAD_TOURNEYS: {
-      return { ...state, tourneys: action.payload };
+      const tourneys = action.payload;
+      tourneys.sort((a, b) => (a.startTime > b.startTime ? -1 : 1));
+      return { ...state, tourneys };
     }
     case CJoliActions.LOAD_TOURNEY: {
       const tourney = action.payload;
@@ -86,39 +123,7 @@ const reducer = (state: CJoliState, action: Action) => {
       };
     }
     case CJoliActions.LOAD_RANKING: {
-      const ranking = action.payload;
-      const tourney = ranking.tourney;
-      const teams = tourney.teams;
-      teams.sort((a, b) => (a.name > b.name ? 1 : -1));
-      const phases = tourney.phases;
-      const squads = phases.reduce<Squad[]>(
-        (acc, phase) => [...acc, ...phase.squads],
-        []
-      );
-      const positions = squads.reduce<Position[]>(
-        (acc, squad) => [...acc, ...squad.positions],
-        []
-      );
-      const matches = squads.reduce<Match[]>(
-        (acc, squad) => [...acc, ...squad.matches],
-        []
-      );
-      matches.sort((a, b) => {
-        if (a.time > b.time) return -1;
-        else if (a.time < b.time) return 1;
-        else if (a.location && b.location && a.location > b.location) return -1;
-        else return 1;
-      });
-      return {
-        ...state,
-        ranking,
-        tourney,
-        teams,
-        phases,
-        squads,
-        positions,
-        matches,
-      };
+      return reduceLoadRanking(state, action.payload);
     }
     case CJoliActions.SELECT_DAY: {
       return {
