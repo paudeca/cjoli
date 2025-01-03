@@ -3,6 +3,7 @@ using cjoli.Server.Dtos;
 using cjoli.Server.Exceptions;
 using cjoli.Server.Extensions;
 using cjoli.Server.Models;
+using cjoli.Server.Models.AI;
 using cjoli.Server.Services.Rules;
 using Microsoft.EntityFrameworkCore;
 
@@ -88,7 +89,6 @@ namespace cjoli.Server.Services
                 .Include(t => t.Teams).ThenInclude(t => t.Alias)
                 .FirstOrDefault(t => t.Uid == tourneyUid);
 
-            var a = tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Matches).SelectMany(m => m.UserMatches);
             if (tourney == null)
             {
                 throw new NotFoundException("Tourney", tourneyUid);
@@ -111,7 +111,7 @@ namespace cjoli.Server.Services
         {
             User? user = GetUserWithConfig(login, tourneyUid, context);
             var tourney = GetTourney(tourneyUid, user, context);
-            var scores = CalculateScores(tourney, user);
+            var scores = CalculateScores(tourney, user, context);
             return new Ranking() { Tourney = tourney, Scores = scores };
         }
 
@@ -121,6 +121,7 @@ namespace cjoli.Server.Services
             var dto = _mapper.Map<RankingDto>(ranking);
             AffectationTeams(dto);
             CalculateHistory(dto);
+            CalculateAllBetScores(dto, context);
             return dto;
         }
 
@@ -150,7 +151,7 @@ namespace cjoli.Server.Services
                 user = null;
             }
             Tourney tourney = GetTourney(uuid, user, context);
-            var scores = CalculateScores(tourney, user);
+            var scores = CalculateScores(tourney, user, context);
             _estimateService.CalculateEstimates(tourney, scores, user, context);
             if (isAdmin)
             {
@@ -158,7 +159,7 @@ namespace cjoli.Server.Services
             }
         }
 
-        private Scores CalculateScores(Tourney tourney, User? user)
+        private Scores CalculateScores(Tourney tourney, User? user, CJoliContext context)
         {
             var scoreTourney = new Score();
             var scoreSquads = new List<ScoreSquad>();
@@ -170,6 +171,7 @@ namespace cjoli.Server.Services
                     scoreSquads.Add(scoreSquad);
                 }
             }
+
             return new Scores { ScoreSquads = scoreSquads, ScoreTourney = scoreTourney };
         }
 
@@ -251,10 +253,6 @@ namespace cjoli.Server.Services
             squad.Matches.Aggregate(scores, (acc, m) =>
             {
                 var userMatch = m.UserMatches.FirstOrDefault();
-                if(userMatch!=null && m.Done)
-                {
-                    userMatch.BetScore = CalculateBetScore(m, userMatch);
-                }
                 bool useCustom = user != null && user.HasCustomEstimate();
 
                 if ((userMatch == null || !useCustom) && !m.Done)
@@ -293,36 +291,42 @@ namespace cjoli.Server.Services
             return scoreSquad;
         }
 
-        private int CalculateBetScore(Match match, UserMatch userMatch)
+        private void CalculateBetScore(Match match, UserMatch userMatch)
         {
             int score = 0;
             if(userMatch.LogTime>match.Time)
             {
-                return 0;
+                return;
             }
             if(match.ScoreA==userMatch.ScoreA && match.ScoreB==userMatch.ScoreB)
             {
-                return 10;
+                userMatch.BetScore = 10;
+                userMatch.BetPerfect = true;
+                return;
             }
             int diffMatch = match.ScoreA - match.ScoreB;
             int diffUserMatch = userMatch.ScoreA - userMatch.ScoreB;
             if(diffMatch*diffUserMatch>0 || diffMatch==diffUserMatch)
             {
+                userMatch.BetWinner = true;
                 score += 5;
             }
             if(diffMatch==diffUserMatch && diffMatch!=0)
             {
+                userMatch.BetDiff = true;
                 score += 2;
             }
             if(match.ScoreA==userMatch.ScoreA)
             {
+                userMatch.BetGoal = true;
                 score += 1;
             }
             if(match.ScoreB==userMatch.ScoreB)
             {
+                userMatch.BetGoal = true;
                 score += 1;
             }
-            return score;
+            userMatch.BetScore = score;
         }
 
 
@@ -381,7 +385,7 @@ namespace cjoli.Server.Services
                 var scoreA = new Score() { TeamId = teamA.Id };
                 var scoreB = new Score() { TeamId = teamB.Id };
 
-                IMatch match = m.Done ? m : m.UserMatch != null ? m.UserMatch : m;
+                IMatch match = m.Done ? m : m.UserMatch !=null ? m.UserMatch : m;
 
                 IRule rule = GetRule(ranking.Tourney.Rule);
                 UpdateScore(scoreA, scoreB, null, match, rule);
@@ -402,6 +406,20 @@ namespace cjoli.Server.Services
             SortTeams(scoreTeams);
             ranking.History = mapTeams;
             ranking.Scores.ScoreTeams = scoreTeams;
+        }
+
+        private void CalculateAllBetScores(RankingDto ranking, CJoliContext context)
+        {
+            var scores = context.UserMatch.Where(u => u.Match.Squad!.Phase.Tourney.Uid == ranking.Tourney.Uid && u.Match.Done)
+                .GroupBy(u => u.User).Select(kv => new BetScoreDto{
+                    User = _mapper.Map<UserDto>(kv.Key),
+                    Score = kv.Sum(u => u.BetScore),
+                    Perfect = kv.Count(u => u.BetPerfect),
+                    Winner = kv.Count(u => u.BetWinner),
+                    Diff = kv.Count(u => u.BetDiff),
+                    Goal = kv.Count(u => u.BetGoal)
+                }).OrderByDescending(s=>s.Perfect).ToList();
+            ranking.Scores.BetScores = scores;
         }
 
         public class ColumnDef
@@ -558,6 +576,7 @@ namespace cjoli.Server.Services
             Match? match = context.Match
                 .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
                 .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
+                .Include(m=>m.UserMatches)
                 .SingleOrDefault(m => m.Id == dto.Id);
             if (match == null)
             {
@@ -581,6 +600,10 @@ namespace cjoli.Server.Services
                 }
                 SaveMatchResult(match.PositionA, match.PositionB, match, match.ScoreA, match.ScoreB);
                 SaveMatchResult(match.PositionB, match.PositionA, match, match.ScoreB, match.ScoreA);
+                foreach(var userMatch in match.UserMatches)
+                {
+                    CalculateBetScore(match, userMatch);
+                }
                 /*foreach (var userMatch in context.UserMatch.Where(u => u.Match.Id == match.Id))
                 {
                     context.Remove(userMatch);
@@ -592,6 +615,7 @@ namespace cjoli.Server.Services
                 if (userMatch == null)
                 {
                     userMatch = new UserMatch() { Match = match, User = user };
+                    match.UserMatches.Add(userMatch);
                 }
                 if (dto.ForfeitA || dto.ForfeitB)
                 {
@@ -603,8 +627,6 @@ namespace cjoli.Server.Services
                 userMatch.ScoreA = dto.ScoreA;
                 userMatch.ScoreB = dto.ScoreB;
                 userMatch.LogTime = DateTime.Now;
-                match.UserMatches.Add(userMatch);
-
             }
             context.SaveChanges();
             if (isAdmin)
@@ -620,6 +642,7 @@ namespace cjoli.Server.Services
                 .Include(m => m.UserMatches.Where(u => u.User == user))
                 .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
                 .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
+                .Include(m=>m.UserMatches)
                 .SingleOrDefault(m => m.Id == dto.Id);
             if (match == null)
             {
@@ -637,6 +660,14 @@ namespace cjoli.Server.Services
                 foreach (var matchResult in match.MatchResults)
                 {
                     context.Remove(matchResult);
+                }
+                foreach(var userMatch in match.UserMatches)
+                {
+                    userMatch.BetScore = 0;
+                    userMatch.BetPerfect = false;
+                    userMatch.BetWinner = false;
+                    userMatch.BetDiff = false;
+                    userMatch.BetGoal = false;
                 }
 
             } else

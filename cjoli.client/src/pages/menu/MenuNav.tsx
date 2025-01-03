@@ -8,7 +8,6 @@ import {
   Button,
   Stack,
   Spinner,
-  Badge,
 } from "react-bootstrap";
 import styled from "@emotion/styled";
 import LoginModal from "../../modals/LoginModal";
@@ -36,6 +35,7 @@ import { Trans, useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import { useServer } from "../../hooks/useServer";
 import MenuBrand from "./MenuBrand";
+import BetScoreTotal from "./BetScoreTotal";
 
 const MyNavbar = styled(Navbar)`
   color: black;
@@ -118,10 +118,7 @@ const MenuNav = () => {
               })}
             />
             <div>
-              Score :{" "}
-              <Badge pill bg="primary">
-                +10
-              </Badge>
+              Score : <BetScoreTotal />
             </div>
           </Stack>
         )}

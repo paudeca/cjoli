@@ -1,5 +1,4 @@
 import {
-  Badge,
   Button,
   ListGroup,
   OverlayTrigger,
@@ -12,20 +11,7 @@ import { useMatchRow } from "./useMatchRow";
 import { Trans } from "react-i18next";
 import TeamName from "../../../components/TeamName";
 import ScoreMatchView from "./ScoreMatchView";
-
-const BetScoreBadge = ({ score }: { score: number }) => {
-  return (
-    <Badge
-      pill
-      bg={score >= 5 ? "success" : score >= 1 ? "warning" : "danger"}
-      text={score < 5 && score >= 1 ? "black" : "white"}
-      className="mx-2"
-      role="button"
-    >
-      +{score}
-    </Badge>
-  );
-};
+import BetScoreBadge from "../../../components/BetScoreBadge";
 
 const BetScore = ({ match }: { match: Match }) => {
   const { isSimulation } = useMatchRow();
