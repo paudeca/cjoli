@@ -27,10 +27,12 @@ const TeamName = ({
   positionId,
   teamId,
   defaultName,
+  hideFavorite,
 }: {
   positionId?: number;
   teamId?: number;
   defaultName?: string;
+  hideFavorite?: boolean;
 }) => {
   const { getTeamInfo, getTeam, findTeam } = useCJoli();
   const { userConfig, isConnected, handleSaveUserConfig } = useUser();
@@ -48,8 +50,8 @@ const TeamName = ({
   const team = positionId
     ? findTeam({ positionId })
     : teamId
-    ? getTeam(teamId)
-    : undefined;
+      ? getTeam(teamId)
+      : undefined;
 
   const fullname =
     team?.datas?.name && !isMobile ? `${name} - ${team.datas.name}` : name;
@@ -76,20 +78,26 @@ const TeamName = ({
   const color = isWhite(theme.colors.primary) ? "black" : theme.colors.primary;
   return (
     <>
-      {isConnected && team && userConfig.favoriteTeamId == team.id && (
-        <MyStarFill
-          color={theme.colors.secondary}
-          role="button"
-          onClick={() => saveFavoriteTeam(0)}
-        />
-      )}
-      {isConnected && team && userConfig.favoriteTeamId != team.id && (
-        <MyStar
-          color="grey"
-          role="button"
-          onClick={() => saveFavoriteTeam(team.id)}
-        />
-      )}
+      {!hideFavorite &&
+        isConnected &&
+        team &&
+        userConfig.favoriteTeamId == team.id && (
+          <MyStarFill
+            color={theme.colors.secondary}
+            role="button"
+            onClick={() => saveFavoriteTeam(0)}
+          />
+        )}
+      {!hideFavorite &&
+        isConnected &&
+        team &&
+        userConfig.favoriteTeamId != team.id && (
+          <MyStar
+            color="grey"
+            role="button"
+            onClick={() => saveFavoriteTeam(team.id)}
+          />
+        )}
       <img
         src={logo}
         style={{ maxWidth: "30px", maxHeight: "30px" }}

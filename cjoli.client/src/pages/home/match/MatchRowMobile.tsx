@@ -5,7 +5,6 @@ import CompareButton from "./CompareButton";
 import dayjs from "dayjs";
 import SimulationIcon from "../../../components/SimulationIcon";
 import { useUser } from "../../../hooks/useUser";
-import ScoreCellView from "./ScoreCellView";
 import ScoreButton from "./ScoreButton";
 import { useTranslation } from "react-i18next";
 import ScoreCellInput from "./ScoreCellInput";
@@ -15,6 +14,7 @@ import { BracesAsterisk } from "react-bootstrap-icons";
 import TeamCell from "./TeamCell";
 import { MyScoreDiv } from "./MatchRow";
 import BetScore from "./BetScore";
+import ScoreMatchView from "./ScoreMatchView";
 
 const TitleMobile = () => {
   const { getSquad } = useCJoli();
@@ -43,8 +43,7 @@ const CellViewMobile = () => {
   return (
     <td>
       <MyScoreDiv isMobile>
-        <ScoreCellView match={imatch} mode="A" />
-        <ScoreCellView match={imatch} mode="B" />
+        <ScoreMatchView match={imatch} />
         {(isAdmin || (isConnected && isSimulation)) && (
           <ScoreButton
             id={`btn-m${match.id}`}

@@ -50,6 +50,7 @@
   },
   "penalty": {
     "label": "Pénalités",
+    "tooltip_zero": "Aucune pénalité",
     "tooltip_one": "1 pénalité",
     "tooltip_other": "{{count}} pénalités"
   },
@@ -164,5 +165,10 @@
     "compare": "Comparer",
     "forfeit": "Forfait",
     "simulated": "Résultat simulé"
+  },
+  "betScore": {
+    "finalScore": "Score final",
+    "forecastScore": "Score estimé",
+    "point": "Points"
   }
 }

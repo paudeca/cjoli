@@ -1,7 +1,31 @@
-import { Badge } from "react-bootstrap";
+import {
+  Badge,
+  Button,
+  ListGroup,
+  OverlayTrigger,
+  Popover,
+  PopoverProps,
+} from "react-bootstrap";
 import { Match } from "../../../models";
 import { Fragment } from "react";
 import { useMatchRow } from "./useMatchRow";
+import { Trans } from "react-i18next";
+import TeamName from "../../../components/TeamName";
+import ScoreMatchView from "./ScoreMatchView";
+
+const BetScoreBadge = ({ score }: { score: number }) => {
+  return (
+    <Badge
+      pill
+      bg={score >= 5 ? "success" : score >= 1 ? "warning" : "danger"}
+      text={score < 5 && score >= 1 ? "black" : "white"}
+      className="mx-2"
+      role="button"
+    >
+      +{score}
+    </Badge>
+  );
+};
 
 const BetScore = ({ match }: { match: Match }) => {
   const { isSimulation } = useMatchRow();
@@ -10,15 +34,63 @@ const BetScore = ({ match }: { match: Match }) => {
     return <Fragment />;
   }
   const betScore = userMatch?.betScore || 0;
+
+  const imatch = match.userMatch;
+  if (!imatch) {
+    return null;
+  }
+
+  const BetScorePopover = (props: PopoverProps) => (
+    <Popover {...props} body>
+      <Popover.Header style={{ color: "black" }}>
+        <TeamName positionId={match.positionIdA} hideFavorite /> -
+        <TeamName positionId={match.positionIdB} hideFavorite />
+      </Popover.Header>
+      <Popover.Body>
+        <ListGroup className="mb-3">
+          <ListGroup.Item className="d-flex justify-content-between align-items-start">
+            <div className="ms-2 me-auto">
+              <div className="fw-bold">
+                <Trans i18nKey="betScore.finalScore">Final score</Trans>
+              </div>
+              <ScoreMatchView match={match} />
+            </div>
+          </ListGroup.Item>
+          <ListGroup.Item className="d-flex justify-content-between align-items-start">
+            <div className="ms-2 me-auto">
+              <div className="fw-bold">
+                <Trans i18nKey="betScore.forecastScore">Forecast Score</Trans>
+              </div>
+              <ScoreMatchView match={imatch} />
+            </div>
+          </ListGroup.Item>
+          <ListGroup.Item className="d-flex justify-content-between align-items-start">
+            <div className="ms-2 me-auto">
+              <div className="fw-bold">
+                <Trans i18nKey="betScore.point">Points</Trans>
+              </div>
+              <BetScoreBadge score={imatch.betScore} />
+            </div>
+          </ListGroup.Item>
+        </ListGroup>
+        <Button onClick={() => document.body.click()} size="sm">
+          <Trans i18nKey="button.close">Close</Trans>
+        </Button>
+      </Popover.Body>
+    </Popover>
+  );
+
   return (
-    <Badge
-      pill
-      bg={betScore >= 5 ? "success" : betScore >= 1 ? "warning" : "danger"}
-      text={betScore < 5 && betScore >= 1 ? "black" : "white"}
-      className="mx-2"
+    <OverlayTrigger
+      overlay={BetScorePopover}
+      trigger="click"
+      rootClose
+      placement="auto"
     >
-      +{userMatch?.betScore}
-    </Badge>
+      <span>
+        <BetScoreBadge score={betScore} />
+      </span>
+    </OverlayTrigger>
   );
 };
 

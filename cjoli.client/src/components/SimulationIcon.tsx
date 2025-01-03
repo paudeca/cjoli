@@ -1,11 +1,11 @@
-import React from "react";
 import {
   OverlayTrigger,
   Tooltip,
   Badge,
   Popover,
   Button,
-  Overlay,
+  TooltipProps,
+  PopoverProps,
 } from "react-bootstrap";
 import { Alt, Trash } from "react-bootstrap-icons";
 import ButtonLoading from "./ButtonLoading";
@@ -18,70 +18,56 @@ interface SimulationIconProps {
 }
 
 const SimulationIcon = ({ show, title, onRemove }: SimulationIconProps) => {
-  const [open, setOpen] = React.useState(false);
   const { t } = useTranslation();
-  const target = React.useRef(null);
   const handleRemove = async () => {
     if (onRemove) {
       await onRemove();
-      setOpen(false);
+      document.body.click();
     }
   };
+
+  const SimulationTooltip = (props: TooltipProps) => (
+    <Tooltip {...props}>Simulation</Tooltip>
+  );
+
+  const SimulationPopover = (props: PopoverProps) => (
+    <Popover {...props}>
+      <Popover.Header style={{ color: "black" }}>
+        {title ?? t("simulation.tooltip", "Simulation")}
+      </Popover.Header>
+      <Popover.Body>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            height: 30,
+          }}
+          className="mb-3"
+        >
+          <Trans i18nKey="simulation.removeAll">Remove all simulations</Trans>
+          <ButtonLoading variant="danger" onClick={handleRemove}>
+            <Trash />
+          </ButtonLoading>
+        </div>
+        <Button onClick={() => document.body.click()} size="sm">
+          <Trans i18nKey="button.close">Close</Trans>
+        </Button>
+      </Popover.Body>
+    </Popover>
+  );
+
   return (
     <>
-      {show && !onRemove && (
-        <OverlayTrigger overlay={<Tooltip>Simulation</Tooltip>}>
-          <Badge className="mx-2" bg="secondary">
+      {show && (
+        <OverlayTrigger
+          overlay={onRemove ? SimulationPopover : SimulationTooltip}
+          rootClose
+          trigger={onRemove ? "click" : "click"}
+        >
+          <Badge className="mx-2" bg="secondary" role="button">
             <Alt />
           </Badge>
         </OverlayTrigger>
-      )}
-      {show && onRemove && (
-        <>
-          <Badge
-            className="mx-2"
-            bg="secondary"
-            role="button"
-            ref={target}
-            onClick={() => setOpen(!open)}
-          >
-            <Alt />
-          </Badge>
-          <Overlay
-            target={target.current}
-            show={open}
-            rootClose
-            onHide={() => setOpen(false)}
-          >
-            {(props) => (
-              <Popover {...props}>
-                <Popover.Header style={{ color: "black" }}>
-                  {title ?? t("simulation.tooltip", "Simulation")}
-                </Popover.Header>
-                <Popover.Body>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      height: 30,
-                    }}
-                    className="mb-3"
-                  >
-                    <Trans i18nKey="simulation.removeAll">
-                      Remove all simulations
-                    </Trans>
-                    <ButtonLoading variant="danger" onClick={handleRemove}>
-                      <Trash />
-                    </ButtonLoading>
-                  </div>
-                  <Button onClick={() => setOpen(false)} size="sm">
-                    <Trans i18nKey="button.close">Close</Trans>
-                  </Button>
-                </Popover.Body>
-              </Popover>
-            )}
-          </Overlay>
-        </>
       )}
     </>
   );

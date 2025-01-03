@@ -8,13 +8,13 @@ import CompareButton from "./CompareButton";
 import { BracesAsterisk } from "react-bootstrap-icons";
 import ScoreCellInput from "./ScoreCellInput";
 import ScoreButton from "./ScoreButton";
-import ScoreCellView from "./ScoreCellView";
 import dayjs from "dayjs";
 import SimulationIcon from "../../../components/SimulationIcon";
 import LeftCenterDiv from "../../../components/LeftCenterDiv";
 import TeamCell from "./TeamCell";
 import { MyScoreDiv } from "./MatchRow";
 import BetScore from "./BetScore";
+import ScoreMatchView from "./ScoreMatchView";
 
 const CellInputDesk = () => {
   const { isConnected } = useUser();
@@ -107,15 +107,7 @@ const CellViewDesk = () => {
             squad={getSquad(match.squadId)}
           />
         )}
-        <ScoreCellView match={imatch} mode="A" />
-        <Badge
-          bg="light"
-          text="black"
-          style={{ backgroundColor: "rgba(0,0,0,0)" }}
-        >
-          <b>-</b>
-        </Badge>
-        <ScoreCellView match={imatch} mode="B" />
+        <ScoreMatchView match={imatch} />
         {(isAdmin || (isConnected && isSimulation)) && (
           <ScoreButton
             id={`btn-m${match.id}`}

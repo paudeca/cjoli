@@ -50,6 +50,7 @@
   },
   "penalty": {
     "label": "Penalties",
+    "tooltip_zero": "No penalty",
     "tooltip_one": "1 penalty",
     "tooltip_other": "{{count}} penalties"
   },
@@ -164,5 +165,10 @@
     "compare": "Compare",
     "forfeit": "Forfeit",
     "simulated": "Simulated result"
+  },
+  "betScore": {
+    "finalScore": "Final score",
+    "forecastScore": "Forecast score",
+    "point": "Points"
   }
 }
