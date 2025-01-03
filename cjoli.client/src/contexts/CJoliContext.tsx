@@ -86,8 +86,8 @@ const reduceLoadRanking = (state: CJoliState, ranking: Ranking) => {
     []
   );
   matches.sort((a, b) => {
-    if (a.time > b.time) return -1;
-    else if (a.time < b.time) return 1;
+    if (a.time < b.time) return -1;
+    else if (a.time > b.time) return 1;
     else if (a.location && b.location && a.location > b.location) return -1;
     else return 1;
   });

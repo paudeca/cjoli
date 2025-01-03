@@ -65,6 +65,9 @@ export const useGlobal = (theme: Theme) => {
         --bs-body-color: white;
       }
     }
+    .bg-primary {
+      background-color: ${theme.colors.primary} !important;
+    }
     .bg-secondary {
       --bs-bg-opacity: 1;
       --bs-secondary-rgb: 120, 129, 169;

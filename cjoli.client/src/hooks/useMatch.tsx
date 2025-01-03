@@ -3,6 +3,7 @@ import { Match } from "../models";
 import * as cjoliService from "../services/cjoliService";
 import { useCJoli } from "./useCJoli";
 import { useModal } from "./useModal";
+import { useUser } from "./useUser";
 
 export const useMatch = (uid: string) => {
   const { loadRanking } = useCJoli();
@@ -10,6 +11,7 @@ export const useMatch = (uid: string) => {
   const { register, getValues } =
     useForm<Record<string, { scoreA: number | ""; scoreB: number | "" }>>();
   const { setShow } = useModal("blockShot");
+  const { userConfig, isAdmin, handleSaveUserConfig } = useUser();
 
   const saveMatch = async (match: Match) => {
     let { scoreA, scoreB } = getValues(`m${match.id}`);
@@ -30,6 +32,9 @@ export const useMatch = (uid: string) => {
       scoreB,
     });
     loadRanking(ranking);
+    if (!isAdmin) {
+      handleSaveUserConfig({ ...userConfig, useCustomEstimate: true });
+    }
   };
 
   const clearMatch = async (match: Match) => {

@@ -87,6 +87,8 @@ namespace cjoli.Server.Services
                 .Include(t => t.Teams).ThenInclude(t => t.TeamDatas.Where(d => d.Tourney.Uid == tourneyUid))
                 .Include(t => t.Teams).ThenInclude(t => t.Alias)
                 .FirstOrDefault(t => t.Uid == tourneyUid);
+
+            var a = tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Matches).SelectMany(m => m.UserMatches);
             if (tourney == null)
             {
                 throw new NotFoundException("Tourney", tourneyUid);
@@ -109,7 +111,7 @@ namespace cjoli.Server.Services
         {
             User? user = GetUserWithConfig(login, tourneyUid, context);
             var tourney = GetTourney(tourneyUid, user, context);
-            var scores = CalculateScores(tourney);
+            var scores = CalculateScores(tourney, user);
             return new Ranking() { Tourney = tourney, Scores = scores };
         }
 
@@ -148,7 +150,7 @@ namespace cjoli.Server.Services
                 user = null;
             }
             Tourney tourney = GetTourney(uuid, user, context);
-            var scores = CalculateScores(tourney);
+            var scores = CalculateScores(tourney, user);
             _estimateService.CalculateEstimates(tourney, scores, user, context);
             if (isAdmin)
             {
@@ -156,7 +158,7 @@ namespace cjoli.Server.Services
             }
         }
 
-        private Scores CalculateScores(Tourney tourney)
+        private Scores CalculateScores(Tourney tourney, User? user)
         {
             var scoreTourney = new Score();
             var scoreSquads = new List<ScoreSquad>();
@@ -164,7 +166,7 @@ namespace cjoli.Server.Services
             {
                 foreach (var squad in phase.Squads)
                 {
-                    var scoreSquad = CalculateScoreSquad(squad, scoreTourney, scoreSquads);
+                    var scoreSquad = CalculateScoreSquad(squad, scoreTourney, scoreSquads, user);
                     scoreSquads.Add(scoreSquad);
                 }
             }
@@ -242,7 +244,7 @@ namespace cjoli.Server.Services
         };
 
 
-        private ScoreSquad CalculateScoreSquad(Squad squad, Score scoreTourney, List<ScoreSquad> scoreSquads)
+        private ScoreSquad CalculateScoreSquad(Squad squad, Score scoreTourney, List<ScoreSquad> scoreSquads, User? user)
         {
             IRule rule = GetRule(squad.Phase.Tourney.Rule);
             Dictionary<int, Score> scores = rule.InitScoreSquad(squad, scoreSquads);
@@ -253,8 +255,9 @@ namespace cjoli.Server.Services
                 {
                     userMatch.BetScore = CalculateBetScore(m, userMatch);
                 }
+                bool useCustom = user != null && user.HasCustomEstimate();
 
-                if (userMatch == null && !m.Done)
+                if ((userMatch == null || !useCustom) && !m.Done)
                 {
                     return acc;
                 }

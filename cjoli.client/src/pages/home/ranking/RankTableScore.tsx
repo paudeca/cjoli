@@ -15,6 +15,7 @@ import * as cjoliService from "../../../services/cjoliService";
 import InfoButton from "./InfoButton";
 import { Stack } from "react-bootstrap";
 import ButtonTeam from "../../../components/ButtonTeam";
+import { useUser } from "../../../hooks/useUser";
 
 const MyTh = styled("th")`
   ${bgSecondary}
@@ -32,6 +33,7 @@ const RankTableScore = ({ tourney, score, squad }: RankTableScoreProps) => {
   const { isMobile } = useScreenSize();
   const { t } = useTranslation();
   const uid = useUid();
+  const { userConfig } = useUser();
 
   const position = getPosition(score.positionId);
   const team = getTeam(position?.teamId || 0);
@@ -39,6 +41,8 @@ const RankTableScore = ({ tourney, score, squad }: RankTableScoreProps) => {
     .filter(
       (m) =>
         m.userMatch &&
+        !m.done &&
+        userConfig.useCustomEstimate &&
         (m.positionIdA == score.positionId || m.positionIdB == score.positionId)
     )
     .map((m) => m.userMatch!.id);

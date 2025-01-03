@@ -17,15 +17,18 @@ import BetScore from "./BetScore";
 import ScoreMatchView from "./ScoreMatchView";
 
 const CellInputDesk = () => {
-  const { isConnected } = useUser();
+  const { isConnected, isAdmin } = useUser();
   const { t } = useTranslation();
   const { getSquad } = useCJoli();
   const { match, saveMatch, register, teamA, teamB } = useMatchRow();
+  const editMode =
+    isAdmin ||
+    (isConnected && match.time > dayjs().format("YYYY-MM-DDTHH:mm:ss"));
 
   return (
     <td>
       <MyScoreDiv isMobile={false}>
-        {!isConnected && (
+        {!editMode && (
           <CJoliTooltip info={t("match.simulated", "Simulated result")}>
             <Row style={{ color: "#aaaaaa" }}>
               <Col>{match.estimate?.scoreA}</Col>
@@ -41,7 +44,7 @@ const CellInputDesk = () => {
           />
         )}
 
-        {!isConnected && (
+        {!editMode && (
           <CJoliTooltip info={t("match.simulated", "Simulated result")}>
             <Stack direction="horizontal" style={{ color: "#aaaaaa" }}>
               <Row>
@@ -56,7 +59,7 @@ const CellInputDesk = () => {
           </CJoliTooltip>
         )}
 
-        {isConnected && (
+        {editMode && (
           <>
             <ScoreCellInput
               id={`m${match.id}.scoreA`}
@@ -96,6 +99,7 @@ const CellViewDesk = () => {
   const { isConnected, isAdmin } = useUser();
   const { match, imatch, clearMatch, teamA, teamB, isSimulation } =
     useMatchRow();
+  const couldDelete = isAdmin || (isConnected && isSimulation && !match.done);
 
   return (
     <td>
@@ -108,7 +112,7 @@ const CellViewDesk = () => {
           />
         )}
         <ScoreMatchView match={imatch} />
-        {(isAdmin || (isConnected && isSimulation)) && (
+        {couldDelete && (
           <ScoreButton
             id={`btn-m${match.id}`}
             action="remove"
@@ -137,7 +141,7 @@ const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
       <td>
         <LeftCenterDiv>
           {squad?.name}
-          <SimulationIcon show={isSimulation} />
+          {!match.done && <SimulationIcon show={isSimulation} />}
           <BetScore match={match} />
         </LeftCenterDiv>
       </td>

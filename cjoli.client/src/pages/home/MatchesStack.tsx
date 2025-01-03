@@ -34,12 +34,16 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
       const date = time.format("YYYY-MM-DD");
       const list = [...(acc[date] || []), m];
       list.sort((a, b) => {
-        return a.location && b.location && a.location > b.location ? 1 : -1;
+        if (a.time < b.time) return -1;
+        else if (a.time > b.time) return 1;
+        else if (a.location && b.location && a.location > b.location) return -1;
+        else return 1;
       });
       return { ...acc, [date]: list };
     }, {});
     return datas;
   }, [filter, matches]);
+  console.log("Datas", datas);
 
   const keys = useMemo(() => {
     const keys = Object.keys(datas);

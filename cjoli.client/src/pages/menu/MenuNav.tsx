@@ -8,6 +8,7 @@ import {
   Button,
   Stack,
   Spinner,
+  Badge,
 } from "react-bootstrap";
 import styled from "@emotion/styled";
 import LoginModal from "../../modals/LoginModal";
@@ -116,6 +117,12 @@ const MenuNav = () => {
                   }),
               })}
             />
+            <div>
+              Score :{" "}
+              <Badge pill bg="primary">
+                +10
+              </Badge>
+            </div>
           </Stack>
         )}
         <Navbar.Offcanvas
