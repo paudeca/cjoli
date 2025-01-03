@@ -14,6 +14,7 @@ import { Col, Row, Stack } from "react-bootstrap";
 import { BracesAsterisk } from "react-bootstrap-icons";
 import TeamCell from "./TeamCell";
 import { MyScoreDiv } from "./MatchRow";
+import BetScore from "./BetScore";
 
 const TitleMobile = () => {
   const { getSquad } = useCJoli();
@@ -29,6 +30,7 @@ const TitleMobile = () => {
           {dayjs(match.time).format("LT")} - {squad?.name}
           {match.location && ` - ${match.location}`}
           <SimulationIcon show={isSimulation} />
+          <BetScore match={match} />
         </Element>
       </td>
     </tr>

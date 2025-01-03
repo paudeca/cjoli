@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace cjoli.Server.Models
 {
@@ -12,6 +13,9 @@ namespace cjoli.Server.Models
         public int ScoreB { get; set; }
         public bool ForfeitA { get; set; }
         public bool ForfeitB { get; set; }
+        public DateTime LogTime { get; set; }
+        [NotMapped]
+        public int BetScore { get; set; }
 
         public DateTime Time { get { return Match.Time; } }
     }

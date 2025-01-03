@@ -249,6 +249,11 @@ namespace cjoli.Server.Services
             squad.Matches.Aggregate(scores, (acc, m) =>
             {
                 var userMatch = m.UserMatches.FirstOrDefault();
+                if(userMatch!=null && m.Done)
+                {
+                    userMatch.BetScore = CalculateBetScore(m, userMatch);
+                }
+
                 if (userMatch == null && !m.Done)
                 {
                     return acc;
@@ -283,6 +288,38 @@ namespace cjoli.Server.Services
 
             var scoreSquad = new ScoreSquad() { SquadId = squad.Id, Scores = listScores };
             return scoreSquad;
+        }
+
+        private int CalculateBetScore(Match match, UserMatch userMatch)
+        {
+            int score = 0;
+            if(userMatch.LogTime>match.Time)
+            {
+                return 0;
+            }
+            if(match.ScoreA==userMatch.ScoreA && match.ScoreB==userMatch.ScoreB)
+            {
+                return 10;
+            }
+            int diffMatch = match.ScoreA - match.ScoreB;
+            int diffUserMatch = userMatch.ScoreA - userMatch.ScoreB;
+            if(diffMatch*diffUserMatch>0 || diffMatch==diffUserMatch)
+            {
+                score += 5;
+            }
+            if(diffMatch==diffUserMatch && diffMatch!=0)
+            {
+                score += 2;
+            }
+            if(match.ScoreA==userMatch.ScoreA)
+            {
+                score += 1;
+            }
+            if(match.ScoreB==userMatch.ScoreB)
+            {
+                score += 1;
+            }
+            return score;
         }
 
 
@@ -541,10 +578,10 @@ namespace cjoli.Server.Services
                 }
                 SaveMatchResult(match.PositionA, match.PositionB, match, match.ScoreA, match.ScoreB);
                 SaveMatchResult(match.PositionB, match.PositionA, match, match.ScoreB, match.ScoreA);
-                foreach (var userMatch in context.UserMatch.Where(u => u.Match.Id == match.Id))
+                /*foreach (var userMatch in context.UserMatch.Where(u => u.Match.Id == match.Id))
                 {
                     context.Remove(userMatch);
-                }
+                }*/
             }
             else
             {
@@ -562,6 +599,7 @@ namespace cjoli.Server.Services
                 }
                 userMatch.ScoreA = dto.ScoreA;
                 userMatch.ScoreB = dto.ScoreB;
+                userMatch.LogTime = DateTime.Now;
                 match.UserMatches.Add(userMatch);
 
             }
@@ -584,7 +622,8 @@ namespace cjoli.Server.Services
             {
                 throw new NotFoundException("Match", dto.Id);
             }
-            if (user.IsAdmin(uuid) && match.Done)
+            bool isAdmin = user.IsAdminWithNoCustomEstimate(uuid);
+            if (isAdmin && match.Done)
             {
                 match.Done = false;
                 match.ScoreA = 0;
@@ -597,11 +636,13 @@ namespace cjoli.Server.Services
                     context.Remove(matchResult);
                 }
 
-            }
-            UserMatch? userMatch = match.UserMatches.SingleOrDefault(u => u.User == user);
-            if (userMatch != null)
+            } else
             {
-                context.Remove(userMatch);
+                UserMatch? userMatch = match.UserMatches.SingleOrDefault(u => u.User == user);
+                if (userMatch != null)
+                {
+                    context.Remove(userMatch);
+                }
             }
             context.SaveChanges();
             if (user.IsAdmin(uuid))

@@ -14,6 +14,7 @@ import SimulationIcon from "../../../components/SimulationIcon";
 import LeftCenterDiv from "../../../components/LeftCenterDiv";
 import TeamCell from "./TeamCell";
 import { MyScoreDiv } from "./MatchRow";
+import BetScore from "./BetScore";
 
 const CellInputDesk = () => {
   const { isConnected } = useUser();
@@ -142,8 +143,11 @@ const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
         <td rowSpan={rowSpan}>{dayjs(match.time).format("LT")}</td>
       )}
       <td>
-        {squad?.name}
-        <SimulationIcon show={isSimulation} />
+        <LeftCenterDiv>
+          {squad?.name}
+          <SimulationIcon show={isSimulation} />
+          <BetScore match={match} />
+        </LeftCenterDiv>
       </td>
       <td>{match.location}</td>
       <td>

@@ -9,7 +9,7 @@ namespace cjoli.Server.Authorizations
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AdminTourneyRequirement requirement, string resource)
         {
             string role = $"ADMIN_{resource}";
-            if (context.User.IsInRole(role))
+            if (context.User.IsInRole(role) || context.User.IsInRole("ADMIN"))
             {
                 context.Succeed(requirement);
             } else
