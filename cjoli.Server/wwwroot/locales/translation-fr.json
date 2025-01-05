@@ -149,7 +149,9 @@
     "first": "1er",
     "second": "2ème",
     "third": "3ème",
-    "rankth": "{{rank}}ème"
+    "rankth": "{{rank}}ème",
+    "users": "Utilisateurs",
+    "score": "Score"
   },
   "select": {
     "live": "En direct",

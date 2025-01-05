@@ -149,7 +149,9 @@
     "first": "1st",
     "second": "2nd",
     "third": "3rd",
-    "rankth": "{{rank}}th"
+    "rankth": "{{rank}}th",
+    "users": "Users",
+    "score":  "Score"
   },
   "select": {
     "live": "Live",

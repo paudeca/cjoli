@@ -40,7 +40,7 @@ const App = () => {
           element: <HomePage />,
         },
         {
-          path: isUseDomain ? "ranking" : ":uid/ranking",
+          path: isUseDomain ? "ranking" : ":uid/ranking/:mode?",
           element: <RankPage />,
         },
         {

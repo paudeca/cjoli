@@ -118,7 +118,7 @@ const MenuNav = () => {
               })}
             />
             <div>
-              Score : <BetScoreTotal />
+              <BetScoreTotal />
             </div>
           </Stack>
         )}
