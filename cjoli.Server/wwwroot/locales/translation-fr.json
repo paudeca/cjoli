@@ -50,6 +50,7 @@
   },
   "penalty": {
     "label": "Pénalités",
+    "tooltip_zero": "Aucune pénalité",
     "tooltip_one": "1 pénalité",
     "tooltip_other": "{{count}} pénalités"
   },
@@ -148,7 +149,14 @@
     "first": "1er",
     "second": "2ème",
     "third": "3ème",
-    "rankth": "{{rank}}ème"
+    "rankth": "{{rank}}ème",
+    "users": "Utilisateurs",
+    "score": "Score",
+    "perfect": "Score exacte",
+    "winner": "Vainqueur trouvé",
+    "diff": "Différence de buts",
+    "goal": "Nombre de buts"
+
   },
   "select": {
     "live": "En direct",
@@ -164,5 +172,10 @@
     "compare": "Comparer",
     "forfeit": "Forfait",
     "simulated": "Résultat simulé"
+  },
+  "betScore": {
+    "finalScore": "Score final",
+    "forecastScore": "Score estimé",
+    "point": "Points"
   }
 }

@@ -28,9 +28,8 @@ import {
   RadialLinearScale,
   TimeScale,
   TimeSeriesScale,
+  ChartData,
 } from "chart.js";
-import { useCJoli } from "../../hooks/useCJoli";
-import { Score, ScoreSource } from "../../models";
 import useScreenSize from "../../hooks/useScreenSize";
 
 ChartJS.register(
@@ -71,7 +70,7 @@ const CHART_COLORS = {
   grey: "120, 144, 156",
 };
 
-const list = [
+export const LIST_COLORS = [
   CHART_COLORS.red,
   CHART_COLORS.orange,
   CHART_COLORS.yellow,
@@ -83,49 +82,8 @@ const list = [
   CHART_COLORS.grey,
 ];
 
-const TimeLine = ({ type }: { type: keyof Score }) => {
-  const { teams, ranking } = useCJoli();
+const TimeLine = ({ data }: { data: ChartData<"line"> }) => {
   const { isMobile } = useScreenSize();
-
-  const defintions = (teams || []).map((team, i) => {
-    return {
-      teamId: team.id,
-      label: team.name,
-      value: (s: Score) => s[type],
-      color: list[i % list.length],
-    };
-  });
-
-  const data: {
-    datasets: {
-      label: string;
-      data: {
-        x:
-          | number
-          | Date
-          | Record<string, { rank: number; max: number; min: number }>
-          | Record<number, ScoreSource>;
-        y:
-          | number
-          | Date
-          | Record<string, { rank: number; max: number; min: number }>
-          | Record<number, ScoreSource>;
-      }[];
-    }[];
-  } = {
-    datasets: defintions.map((def) => ({
-      label: def.label,
-      data: (ranking?.history || {})[def.teamId].map((s) => ({
-        x: !isMobile ? s.time : def.value(s),
-        y: !isMobile ? def.value(s) : s.time,
-      })),
-      borderWidth: 1,
-      borderColor: `rgb(${def.color})`,
-      backgroundColor: `rgba(${def.color},0.5)`,
-      cubicInterpolationMode: "monotone",
-      tension: 0.4,
-    })),
-  };
 
   return (
     <div

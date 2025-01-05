@@ -50,6 +50,7 @@
   },
   "penalty": {
     "label": "Penalties",
+    "tooltip_zero": "No penalty",
     "tooltip_one": "1 penalty",
     "tooltip_other": "{{count}} penalties"
   },
@@ -148,7 +149,13 @@
     "first": "1st",
     "second": "2nd",
     "third": "3rd",
-    "rankth": "{{rank}}th"
+    "rankth": "{{rank}}th",
+    "users": "Users",
+    "score": "Score",
+    "perfect": "Perfect",
+    "winner": "Winner",
+    "diff": "Diff",
+    "goal": "Goal"
   },
   "select": {
     "live": "Live",
@@ -164,5 +171,10 @@
     "compare": "Compare",
     "forfeit": "Forfeit",
     "simulated": "Simulated result"
+  },
+  "betScore": {
+    "finalScore": "Final score",
+    "forecastScore": "Forecast score",
+    "point": "Points"
   }
 }

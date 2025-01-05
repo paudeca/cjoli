@@ -12,8 +12,8 @@ const ScoreCellView = ({ match, mode }: ScoreCellViewProps) => {
     (mode == "B" && match.scoreA < match.scoreB)
       ? "success"
       : match.scoreA === match.scoreB
-      ? "warning"
-      : "danger";
+        ? "warning"
+        : "danger";
   if (match.forfeitA) {
     badge = mode == "A" ? "danger" : "success";
   } else if (match.forfeitB) {
@@ -22,7 +22,12 @@ const ScoreCellView = ({ match, mode }: ScoreCellViewProps) => {
   const text = badge == "warning" ? "black" : "white";
 
   return (
-    <Badge bg={badge} text={text} style={{ fontSize: "18px" }} className="my-1">
+    <Badge
+      bg={badge}
+      text={text}
+      style={{ fontSize: "18px", opacity: match.done ? 1 : 0.6 }}
+      className="my-1"
+    >
       {mode == "A" ? match.scoreA : match.scoreB}
     </Badge>
   );

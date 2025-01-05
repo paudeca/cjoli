@@ -3,6 +3,7 @@ export interface Rank {
   order: number;
   phaseId: number;
   squadId: number;
+  teamId: number;
   value: number;
   name?: string;
 }

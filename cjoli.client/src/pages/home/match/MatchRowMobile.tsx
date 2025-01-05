@@ -5,7 +5,6 @@ import CompareButton from "./CompareButton";
 import dayjs from "dayjs";
 import SimulationIcon from "../../../components/SimulationIcon";
 import { useUser } from "../../../hooks/useUser";
-import ScoreCellView from "./ScoreCellView";
 import ScoreButton from "./ScoreButton";
 import { useTranslation } from "react-i18next";
 import ScoreCellInput from "./ScoreCellInput";
@@ -14,6 +13,8 @@ import { Col, Row, Stack } from "react-bootstrap";
 import { BracesAsterisk } from "react-bootstrap-icons";
 import TeamCell from "./TeamCell";
 import { MyScoreDiv } from "./MatchRow";
+import BetScore from "./BetScore";
+import ScoreMatchView from "./ScoreMatchView";
 
 const TitleMobile = () => {
   const { getSquad } = useCJoli();
@@ -28,7 +29,8 @@ const TitleMobile = () => {
           )}
           {dayjs(match.time).format("LT")} - {squad?.name}
           {match.location && ` - ${match.location}`}
-          <SimulationIcon show={isSimulation} />
+          {!match.done && <SimulationIcon show={isSimulation} />}
+          <BetScore match={match} />
         </Element>
       </td>
     </tr>
@@ -38,12 +40,12 @@ const TitleMobile = () => {
 const CellViewMobile = () => {
   const { isConnected, isAdmin } = useUser();
   const { match, imatch, clearMatch, isSimulation } = useMatchRow();
+  const couldDelete = isAdmin || (isConnected && isSimulation && !match.done);
   return (
     <td>
       <MyScoreDiv isMobile>
-        <ScoreCellView match={imatch} mode="A" />
-        <ScoreCellView match={imatch} mode="B" />
-        {(isAdmin || (isConnected && isSimulation)) && (
+        <ScoreMatchView match={imatch} />
+        {couldDelete && (
           <ScoreButton
             id={`btn-m${match.id}`}
             action="remove"
@@ -56,14 +58,16 @@ const CellViewMobile = () => {
 };
 
 const CellInputMobile = () => {
-  const { isConnected } = useUser();
+  const { isConnected, isAdmin } = useUser();
   const { t } = useTranslation();
   const { saveMatch, register, match } = useMatchRow();
-
+  const editMode =
+    isAdmin ||
+    (isConnected && match.time > dayjs().format("YYYY-MM-DDTHH:mm:ss"));
   return (
     <td>
       <MyScoreDiv isMobile>
-        {isConnected && (
+        {editMode && (
           <>
             <ScoreCellInput
               id={`m${match.id}.scoreA`}
@@ -87,7 +91,7 @@ const CellInputMobile = () => {
             />
           </>
         )}
-        {!isConnected && (
+        {!editMode && (
           <CJoliTooltip info={t("match.simulated", "Simulated result")}>
             <Stack style={{ color: "grey" }}>
               <Row>

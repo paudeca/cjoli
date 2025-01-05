@@ -31,7 +31,7 @@ namespace cjoli.Server
                 .ForMember(x => x.PositionIdB, opt => opt.MapFrom(a => a.PositionB.Id))
                 .ForMember(x => x.SquadId, opt => opt.MapFrom(a => a.Squad != null ? a.Squad.Id : 0))
                 .ForMember(x => x.PhaseId, opt => opt.MapFrom(a => a.Squad != null && a.Squad.Phase != null ? a.Squad.Phase.Id : 0))
-                .ForMember(x => x.UserMatch, opt => opt.MapFrom(u => u.UserMatches.SingleOrDefault()))
+                .ForMember(x => x.UserMatch, opt => opt.MapFrom(m => m.UserMatches.SingleOrDefault(u=>u.Match==m && u.User!=null)))
                 .ForMember(x => x.Estimate, opt => opt.MapFrom(a => a.Estimates.OrderByDescending(s => s.User).FirstOrDefault()));
             CreateMap<UserMatch, UserMatchDto>().ForMember(x => x.Time, opt => opt.MapFrom(u => u.Match.Time));
             CreateMap<MatchEstimate, MatchEstimateDto>();
@@ -50,7 +50,6 @@ namespace cjoli.Server
                 .ForMember(x => x.Phase, opt => opt.MapFrom(r => r.Squad.Phase.Name))
                 .ForMember(x => x.Squad, opt => opt.MapFrom(r => r.Squad.Name));
 
-            CreateMap<Scores, Scores>();
             CreateMap<ScoreSquad, ScoreSquad>();
             CreateMap<Score, Score>();
 

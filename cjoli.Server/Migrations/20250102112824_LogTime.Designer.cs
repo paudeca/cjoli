@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using cjoli.Server.Models;
 
@@ -11,9 +12,11 @@ using cjoli.Server.Models;
 namespace cjoli.Server.Migrations
 {
     [DbContext(typeof(CJoliContext))]
-    partial class CJoliContextModelSnapshot : ModelSnapshot
+    [Migration("20250102112824_LogTime")]
+    partial class LogTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -498,21 +501,6 @@ namespace cjoli.Server.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("BetDiff")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("BetGoal")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("BetPerfect")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<int>("BetScore")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("BetWinner")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<bool>("ForfeitA")
                         .HasColumnType("tinyint(1)");
 
@@ -531,7 +519,7 @@ namespace cjoli.Server.Migrations
                     b.Property<int>("ScoreB")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -771,7 +759,8 @@ namespace cjoli.Server.Migrations
                     b.HasOne("cjoli.Server.Models.User", "User")
                         .WithMany("UserMatches")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Match");
 

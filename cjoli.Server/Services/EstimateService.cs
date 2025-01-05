@@ -1,4 +1,5 @@
-﻿using cjoli.Server.Extensions;
+﻿using cjoli.Server.Dtos;
+using cjoli.Server.Extensions;
 using cjoli.Server.Models;
 
 namespace cjoli.Server.Services
@@ -7,7 +8,7 @@ namespace cjoli.Server.Services
     {
 
 
-        public void CalculateEstimates(Tourney tourney, Scores scores, User? user, CJoliContext context)
+        public void CalculateEstimates(Tourney tourney, ScoresDto scores, User? user, CJoliContext context)
         {
             var userMatches = context.UserMatch.Where(u => u.User == user).ToList();
 

@@ -65,6 +65,9 @@ export const useGlobal = (theme: Theme) => {
         --bs-body-color: white;
       }
     }
+    .bg-primary {
+      background-color: ${theme.colors.primary} !important;
+    }
     .bg-secondary {
       --bs-bg-opacity: 1;
       --bs-secondary-rgb: 120, 129, 169;
@@ -76,6 +79,18 @@ export const useGlobal = (theme: Theme) => {
 
     .nav-pills {
       --bs-nav-pills-link-active-bg: ${theme.colors.primary};
+    }
+
+    :root {
+      dis--bs-border-color: red;
+    }
+
+    .nav-tabs {
+      --bs-nav-tabs-border-color: ${theme.colors.primary};
+      --bs-nav-tabs-link-hover-border-color: var(--bs-secondary-bg)
+        var(--bs-secondary-bg) ${theme.colors.primary};
+      --bs-nav-tabs-link-active-border-color: ${theme.colors.primary}
+        ${theme.colors.primary} var(--bs-body-bg);
     }
 
     .popover {

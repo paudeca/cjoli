@@ -3,4 +3,5 @@ export interface IMatch {
   scoreB: number;
   forfeitA: boolean;
   forfeitB: boolean;
+  done: boolean;
 }

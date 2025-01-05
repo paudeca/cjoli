@@ -17,6 +17,7 @@ import useScreenSize from "../../../hooks/useScreenSize";
 import * as cjoliService from "../../../services/cjoliService";
 import RankTableScore from "./RankTableScore";
 import { useServer } from "../../../hooks/useServer";
+import { useUser } from "../../../hooks/useUser";
 
 const MyTh = styled("th")`
   ${bgSecondary}
@@ -42,11 +43,12 @@ const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
   const { path } = useServer();
   const { isMobile } = useScreenSize();
   const { t } = useTranslation();
+  const { userConfig } = useUser();
 
   const scores = ranking?.scores.scoreSquads.find((s) => s.squadId == squad.id);
   const datas = scores ? scores.scores : [];
   const userMatches = squad.matches
-    .filter((m) => m.userMatch)
+    .filter((m) => m.userMatch && !m.done && userConfig.useCustomEstimate)
     .map((m) => m.userMatch!.id);
   const hasSimulation = userMatches.length > 0;
 

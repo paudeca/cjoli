@@ -14,11 +14,13 @@ interface RankingMatchesStackProps {
 
 const RankingMatchesStack = ({ phase, team }: RankingMatchesStackProps) => {
   const { matches, isTeamInMatch } = useCJoli();
-  const filterMatches = useMemo(
-    () =>
-      matches.filter((m) => m.phaseId == phase.id && isTeamInMatch(team.id, m)),
-    [isTeamInMatch, matches, phase.id, team.id]
-  );
+  const filterMatches = useMemo(() => {
+    const data = matches.filter(
+      (m) => m.phaseId == phase.id && isTeamInMatch(team.id, m)
+    );
+    data.sort((a, b) => (a.time > b.time ? 1 : -1));
+    return data;
+  }, [isTeamInMatch, matches, phase.id, team.id]);
   return (
     <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="ranking">
       <div className="p-2">

@@ -6,5 +6,6 @@ export const useMatchRow = () => {
   if (!ctx) {
     throw new Error("useMatchRow has to be used within <MatchRowProvider>");
   }
+
   return { ...ctx };
 };

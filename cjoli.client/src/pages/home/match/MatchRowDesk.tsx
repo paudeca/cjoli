@@ -8,23 +8,27 @@ import CompareButton from "./CompareButton";
 import { BracesAsterisk } from "react-bootstrap-icons";
 import ScoreCellInput from "./ScoreCellInput";
 import ScoreButton from "./ScoreButton";
-import ScoreCellView from "./ScoreCellView";
 import dayjs from "dayjs";
 import SimulationIcon from "../../../components/SimulationIcon";
 import LeftCenterDiv from "../../../components/LeftCenterDiv";
 import TeamCell from "./TeamCell";
 import { MyScoreDiv } from "./MatchRow";
+import BetScore from "./BetScore";
+import ScoreMatchView from "./ScoreMatchView";
 
 const CellInputDesk = () => {
-  const { isConnected } = useUser();
+  const { isConnected, isAdmin } = useUser();
   const { t } = useTranslation();
   const { getSquad } = useCJoli();
   const { match, saveMatch, register, teamA, teamB } = useMatchRow();
+  const editMode =
+    isAdmin ||
+    (isConnected && match.time > dayjs().format("YYYY-MM-DDTHH:mm:ss"));
 
   return (
     <td>
       <MyScoreDiv isMobile={false}>
-        {!isConnected && (
+        {!editMode && (
           <CJoliTooltip info={t("match.simulated", "Simulated result")}>
             <Row style={{ color: "#aaaaaa" }}>
               <Col>{match.estimate?.scoreA}</Col>
@@ -40,7 +44,7 @@ const CellInputDesk = () => {
           />
         )}
 
-        {!isConnected && (
+        {!editMode && (
           <CJoliTooltip info={t("match.simulated", "Simulated result")}>
             <Stack direction="horizontal" style={{ color: "#aaaaaa" }}>
               <Row>
@@ -55,7 +59,7 @@ const CellInputDesk = () => {
           </CJoliTooltip>
         )}
 
-        {isConnected && (
+        {editMode && (
           <>
             <ScoreCellInput
               id={`m${match.id}.scoreA`}
@@ -95,6 +99,7 @@ const CellViewDesk = () => {
   const { isConnected, isAdmin } = useUser();
   const { match, imatch, clearMatch, teamA, teamB, isSimulation } =
     useMatchRow();
+  const couldDelete = isAdmin || (isConnected && isSimulation && !match.done);
 
   return (
     <td>
@@ -106,16 +111,8 @@ const CellViewDesk = () => {
             squad={getSquad(match.squadId)}
           />
         )}
-        <ScoreCellView match={imatch} mode="A" />
-        <Badge
-          bg="light"
-          text="black"
-          style={{ backgroundColor: "rgba(0,0,0,0)" }}
-        >
-          <b>-</b>
-        </Badge>
-        <ScoreCellView match={imatch} mode="B" />
-        {(isAdmin || (isConnected && isSimulation)) && (
+        <ScoreMatchView match={imatch} />
+        {couldDelete && (
           <ScoreButton
             id={`btn-m${match.id}`}
             action="remove"
@@ -142,8 +139,11 @@ const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
         <td rowSpan={rowSpan}>{dayjs(match.time).format("LT")}</td>
       )}
       <td>
-        {squad?.name}
-        <SimulationIcon show={isSimulation} />
+        <LeftCenterDiv>
+          {squad?.name}
+          {!match.done && <SimulationIcon show={isSimulation} />}
+          <BetScore match={match} />
+        </LeftCenterDiv>
       </td>
       <td>{match.location}</td>
       <td>

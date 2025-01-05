@@ -1,31 +1,27 @@
 import { Card, Table } from "react-bootstrap";
 import CJoliCard from "../../components/CJoliCard";
 import { Trans } from "react-i18next";
-import LeftCenterDiv from "../../components/LeftCenterDiv";
-import TeamName from "../../components/TeamName";
-import { useCJoli } from "../../hooks/useCJoli";
-import { useCallback } from "react";
-import { Rank } from "../../models";
-import ButtonTeam from "../../components/ButtonTeam";
+import { ReactNode } from "react";
+import styled from "@emotion/styled";
+import { bgSecondary } from "../../styles";
 
-const RankTable = () => {
-  const { tourney, getRankPosition, findTeam } = useCJoli();
+const MyTh = styled("th")`
+  ${bgSecondary}
+`;
+const MyTd = MyTh.withComponent("td");
 
-  const ranks = tourney?.ranks || [];
+interface RankTableProps<T> {
+  columns: {
+    id: string;
+    label: string;
+    focus?: boolean;
+    width: string;
+    value: (val: T, index: number) => ReactNode;
+  }[];
+  datas: T[];
+}
 
-  const formatRank = useCallback((rank: Rank) => {
-    switch (rank.order) {
-      case 1:
-        return "🥇";
-      case 2:
-        return "🥈";
-      case 3:
-        return "🥉";
-      default:
-        return rank.order;
-    }
-  }, []);
-
+const RankTable = <T,>({ columns, datas }: RankTableProps<T>) => {
   return (
     <div className="p-2">
       <CJoliCard>
@@ -43,31 +39,31 @@ const RankTable = () => {
           >
             <thead>
               <tr>
-                <th style={{ width: "20%" }}>#</th>
-                <th className="w-50">
-                  <Trans i18nKey="rank.team">Team</Trans>
-                </th>
+                {columns.map((c) =>
+                  c.focus ? (
+                    <MyTh key={c.id} style={{ width: c.width }}>
+                      {c.label}
+                    </MyTh>
+                  ) : (
+                    <th key={c.id} style={{ width: c.width }}>
+                      {c.label}
+                    </th>
+                  )
+                )}
               </tr>
             </thead>
             <tbody>
-              {ranks.map((rank) => {
-                const positionId = getRankPosition(rank);
-                const team = findTeam({ positionId });
-                return (
-                  <tr key={rank.id}>
-                    <td>{formatRank(rank)}</td>
-                    <td>
-                      <LeftCenterDiv>
-                        <TeamName
-                          positionId={positionId || 0}
-                          defaultName={rank.name}
-                        />
-                        {team && <ButtonTeam team={team} />}
-                      </LeftCenterDiv>
-                    </td>
-                  </tr>
-                );
-              })}
+              {datas.map((data, i) => (
+                <tr key={i}>
+                  {columns.map((c) =>
+                    c.focus ? (
+                      <MyTd key={c.id}>{c.value(data, i)}</MyTd>
+                    ) : (
+                      <td key={c.id}>{c.value(data, i)}</td>
+                    )
+                  )}
+                </tr>
+              ))}
             </tbody>
           </Table>
         </Card.Body>

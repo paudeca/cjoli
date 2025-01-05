@@ -35,6 +35,7 @@ import { Trans, useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import { useServer } from "../../hooks/useServer";
 import MenuBrand from "./MenuBrand";
+import BetScoreTotal from "./BetScoreTotal";
 
 const MyNavbar = styled(Navbar)`
   color: black;
@@ -116,6 +117,9 @@ const MenuNav = () => {
                   }),
               })}
             />
+            <div>
+              <BetScoreTotal />
+            </div>
           </Stack>
         )}
         <Navbar.Offcanvas

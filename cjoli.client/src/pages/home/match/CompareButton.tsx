@@ -1,7 +1,6 @@
 import styled from "@emotion/styled";
-import { Overlay, Popover, Button } from "react-bootstrap";
+import { Popover, Button, OverlayTrigger, PopoverProps } from "react-bootstrap";
 import { ArrowsCollapseVertical } from "react-bootstrap-icons";
-import React from "react";
 import TeamTable from "../team/TeamTable";
 import { Squad, Team } from "../../../models";
 import { Trans } from "react-i18next";
@@ -20,42 +19,33 @@ interface CompareButtonProps {
 }
 
 const CompareButton = ({ team, teamB, squad }: CompareButtonProps) => {
-  const [open, setOpen] = React.useState(false);
-  const target = React.useRef(null);
+  const ComparePopover = (props: PopoverProps) => (
+    <Popover {...props}>
+      <Popover.Header style={{ color: "black" }}>
+        <Trans i18nKey="match.compare">Compare</Trans>
+      </Popover.Header>
+      <Popover.Body>
+        <div>
+          <TeamTable team={team} teamB={teamB} squad={squad} />
+        </div>
+        <Button onClick={() => document.body.click()} size="sm">
+          <Trans i18nKey="button.close">Close</Trans>
+        </Button>
+      </Popover.Body>
+    </Popover>
+  );
+
   return (
-    <>
-      <div ref={target} className="d-inline">
-        <MyButton
-          role="button"
-          size={20}
-          className="mx-2"
-          onClick={() => setOpen(!open)}
-        />
+    <OverlayTrigger
+      overlay={ComparePopover}
+      placement="auto"
+      rootClose
+      trigger="click"
+    >
+      <div className="d-inline">
+        <MyButton role="button" size={20} className="mx-2" />
       </div>
-      <Overlay
-        target={target.current}
-        show={open}
-        rootClose
-        onHide={() => setOpen(false)}
-        placement="auto"
-      >
-        {(props) => (
-          <Popover {...props}>
-            <Popover.Header style={{ color: "black" }}>
-              <Trans i18nKey="match.compare">Compare</Trans>
-            </Popover.Header>
-            <Popover.Body>
-              <div>
-                <TeamTable team={team} teamB={teamB} squad={squad} />
-              </div>
-              <Button onClick={() => setOpen(false)} size="sm">
-                <Trans i18nKey="button.close">Close</Trans>
-              </Button>
-            </Popover.Body>
-          </Popover>
-        )}
-      </Overlay>
-    </>
+    </OverlayTrigger>
   );
 };
 
