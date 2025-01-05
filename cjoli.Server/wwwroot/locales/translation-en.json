@@ -151,7 +151,11 @@
     "third": "3rd",
     "rankth": "{{rank}}th",
     "users": "Users",
-    "score":  "Score"
+    "score": "Score",
+    "perfect": "Perfect",
+    "winner": "Winner",
+    "diff": "Diff",
+    "goal": "Goal"
   },
   "select": {
     "live": "Live",

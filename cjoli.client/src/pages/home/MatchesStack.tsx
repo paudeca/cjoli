@@ -43,7 +43,6 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
     }, {});
     return datas;
   }, [filter, matches]);
-  console.log("Datas", datas);
 
   const keys = useMemo(() => {
     const keys = Object.keys(datas);

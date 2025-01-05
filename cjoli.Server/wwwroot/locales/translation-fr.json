@@ -151,7 +151,12 @@
     "third": "3ème",
     "rankth": "{{rank}}ème",
     "users": "Utilisateurs",
-    "score": "Score"
+    "score": "Score",
+    "perfect": "Score exacte",
+    "winner": "Vainqueur trouvé",
+    "diff": "Différence de buts",
+    "goal": "Nombre de buts"
+
   },
   "select": {
     "live": "En direct",

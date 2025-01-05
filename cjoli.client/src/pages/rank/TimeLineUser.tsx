@@ -47,18 +47,32 @@ const TimeLineUser = () => {
   });
 
   const data = {
-    datasets: defintions.map((def) => ({
-      label: def.label,
-      data: (ranking?.scores.bet.history || {})[def.userId].map((s) => ({
-        x: !isMobile ? s.time : def.value(s),
-        y: !isMobile ? def.value(s) : s.time,
-      })),
-      borderWidth: 1,
-      borderColor: `rgb(${def.color})`,
-      backgroundColor: `rgba(${def.color},0.5)`,
-      cubicInterpolationMode: "monotone",
-      tension: 0.4,
-    })),
+    datasets: defintions.map((def) => {
+      const data = (ranking?.scores.bet.history || {})[def.userId];
+      return {
+        label: def.label,
+        data: data
+          .filter((s, i) => {
+            if (i > 0) {
+              const val0 = def.value(data[i - 1]);
+              const val = def.value(s);
+              return val0 != val;
+            }
+            return true;
+          })
+          .map((s) => {
+            return {
+              x: !isMobile ? s.time : def.value(s),
+              y: !isMobile ? def.value(s) : s.time,
+            };
+          }),
+        borderWidth: 1,
+        borderColor: `rgb(${def.color})`,
+        backgroundColor: `rgba(${def.color},0.5)`,
+        cubicInterpolationMode: "monotone",
+        tension: 0.4,
+      };
+    }),
   };
 
   return (
