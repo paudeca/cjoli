@@ -1,11 +1,19 @@
 ﻿using cjoli.Server.Dtos;
 using cjoli.Server.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace cjoli.Server.Services
 {
     public class SettingService
     {
+        private readonly IMemoryCache _memoryCache;
+
+        public SettingService(IMemoryCache memoryCache)
+        {
+            _memoryCache = memoryCache;
+        }
+
         private M Import<M, D>(D dto, CJoliContext context, Func<M?> select, Func<M> create, Action<M> update, List<Action<M>>? children = null)
         {
             M? model = select();
@@ -22,7 +30,7 @@ namespace cjoli.Server.Services
 
         public Tourney Import(TourneyDto tourneyDto, CJoliContext context)
         {
-            return Import(
+            var tourney= Import(
                 dto: tourneyDto,
                 context: context,
                 select: () => context.Tourneys
@@ -53,6 +61,8 @@ namespace cjoli.Server.Services
                     (tourney)=>(tourneyDto.Ranks??[]).ForEach(r=>ImportRank(r,tourney,context))
                 ]
             );
+            _memoryCache.Remove(tourney.Uid);
+            return tourney;
         }
 
         private Team ImportTeam(TeamDto teamDto, Tourney tourney, CJoliContext context)
