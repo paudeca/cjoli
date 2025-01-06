@@ -82,6 +82,12 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddDataProtection();
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddMemoryCache(opt=>
+{
+    //opt.SizeLimit = 1024;
+});
+
+
 builder.Services.AddSingleton<CJoliService>();
 builder.Services.AddSingleton<SettingService>();
 builder.Services.AddSingleton<UserService>();
@@ -96,7 +102,7 @@ builder.Services.AddSingleton<IAuthorizationHandler, AdminTourneyAuthorizationHa
 builder.Services.AddDbContextPool<CJoliContext>(options =>
 {
     var cnx = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseMySql(cnx, ServerVersion.AutoDetect(cnx));
+    options.UseMySql(cnx, ServerVersion.AutoDetect(cnx),o=>o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
 }
 );
 

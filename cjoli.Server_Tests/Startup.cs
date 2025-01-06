@@ -5,6 +5,7 @@ using cjoli.Server.Models;
 using cjoli.Server.Services;
 using cjoli.Server_Tests.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -16,6 +17,8 @@ namespace cjoli.Server_Tests
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDataProtection();
+            //services.AddMemoryCache();
+            services.AddSingleton<IMemoryCache, MemoryCache>();
             services.AddSingleton<CJoliService>();
             services.AddSingleton<EstimateService>();
             services.AddSingleton<UserService>();

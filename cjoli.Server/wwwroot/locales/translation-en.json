@@ -25,7 +25,7 @@
     "useCustom": "use personal estimate",
     "menu": "Menu",
     "setting": "Setting",
-    "admin": "Administration",
+    "admin": "Administration"
   },
   "home": {
     "tourneyNotConfigured": "Tourney not configured"

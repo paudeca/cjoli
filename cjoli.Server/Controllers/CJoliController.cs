@@ -24,6 +24,7 @@ namespace cjoli.Server.Controllers
         private readonly CJoliContext _context;
         private readonly ILogger<CJoliController> _logger;
 
+
         public CJoliController(CJoliService service, SettingService settingService, AIService aiService, IMapper mapper, CJoliContext context, ILogger<CJoliController> logger)
         {
             _service = service;
