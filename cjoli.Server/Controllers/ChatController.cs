@@ -28,19 +28,27 @@ namespace cjoli.Server.Controllers
         [Route("{uuid}/ws")]
         public async Task Get(string uuid, [FromQuery] string lang, [FromQuery] string login)
         {
-            _logger.LogInformation($"Start a new session chat with uuid:{uuid}, lang:{lang} login:{login}");
-            using(LogContext.PushProperty("uid",uuid))
+            try
             {
-                if (HttpContext.WebSockets.IsWebSocketRequest)
+                _logger.LogInformation($"Start a new session chat with uuid:{uuid}, lang:{lang} login:{login}");
+                using (LogContext.PushProperty("uid", uuid))
                 {
-                    using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                    _logger.LogDebug("webSocket created");
-                    await Bot(webSocket, uuid, lang, login);
+                    if (HttpContext.WebSockets.IsWebSocketRequest)
+                    {
+                        using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+                        _logger.LogDebug("webSocket created");
+                        await Bot(webSocket, uuid, lang, login);
+                    }
+                    else
+                    {
+                        HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                    }
                 }
-                else
-                {
-                    HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Unable to start chat");
+                throw;
             }
         }
 
