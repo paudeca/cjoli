@@ -117,7 +117,7 @@ builder.Services.AddLogging(configure =>
     .WriteTo.DatadogLogs(builder.Configuration["DatadogKey"],
         configuration: new DatadogConfiguration() { Url = "https://http-intake.logs.datadoghq.eu" },
         service: "server",
-        host: "local")
+        host: builder.Configuration["Source"])
     .MinimumLevel.Debug()
     .Filter.ByIncludingOnly("SourceContext like 'cjoli%' OR SourceContext='Microsoft.AspNetCore.Hosting.Diagnostics'")
     .CreateLogger();
