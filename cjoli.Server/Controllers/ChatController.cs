@@ -26,7 +26,7 @@ namespace cjoli.Server.Controllers
 
         [HttpGet]
         [Route("{uuid}/ws")]
-        public async Task Get(string uuid, [FromQuery] string lang, [FromQuery] string login)
+        public async Task Get(string uuid, [FromQuery] string lang, [FromQuery] string? login)
         {
             try
             {
