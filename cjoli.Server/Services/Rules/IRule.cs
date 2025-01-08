@@ -1,4 +1,5 @@
 ﻿
+using cjoli.Server.Dtos;
 using cjoli.Server.Models;
 
 namespace cjoli.Server.Services.Rules
@@ -12,6 +13,7 @@ namespace cjoli.Server.Services.Rules
         bool HasPenalty { get; }
         bool HasForfeit { get; }
         Func<Squad, Comparison<Score>> ScoreComparison { get; }
+        Action<Match, MatchDto> ApplyForfeit { get; }
 
 
         Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads);

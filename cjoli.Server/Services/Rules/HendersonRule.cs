@@ -1,4 +1,5 @@
-﻿using cjoli.Server.Models;
+﻿using cjoli.Server.Dtos;
+using cjoli.Server.Models;
 
 namespace cjoli.Server.Services.Rules
 {
@@ -21,6 +22,7 @@ namespace cjoli.Server.Services.Rules
         public bool HasForfeit => false;
 
         public Func<Squad, Comparison<Score>> ScoreComparison => _service.DefaultScoreComparison;
+        public Action<Match, MatchDto> ApplyForfeit => _service.DefaultApplyForfeit;
 
         public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads)
         {

@@ -1,5 +1,6 @@
 ﻿
 
+using cjoli.Server.Dtos;
 using cjoli.Server.Models;
 
 namespace cjoli.Server.Services.Rules
@@ -115,6 +116,8 @@ namespace cjoli.Server.Services.Rules
 
             return 0;
         };
+
+        public Action<Match, MatchDto> ApplyForfeit => _service.DefaultApplyForfeit;
 
 
         public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads)

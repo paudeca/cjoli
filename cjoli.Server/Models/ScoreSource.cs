@@ -7,6 +7,7 @@ namespace cjoli.Server.Models
     {
         total,
         win,
+        loss,
         direct,
         goalDiff,
         goalDiffDirect,

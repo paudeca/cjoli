@@ -114,6 +114,8 @@
     "source": {
       "win": "Plus de victoires",
       "win-min": "Moins de victoires",
+      "loss": "Moins de défaites",
+      "loss-min": "Plus de défaites",
       "goalDiff": "Meilleur différence de buts",
       "goalDiff-min": "Mauvaise différence de buts",
       "goalDiffDirect": "Meilleur différence de buts (direct)",

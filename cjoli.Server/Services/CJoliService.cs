@@ -45,6 +45,8 @@ namespace cjoli.Server.Services
             _rules.Add("lyon", new LyonRule(this));
             _rules.Add("scooby", new ScoobyRule(this));
             _rules.Add("henderson", new HendersonRule(this));
+            _rules.Add("hogly", new HoglyRule(this));
+
         }
 
         private IRule GetRule(string? rule)
@@ -215,7 +217,7 @@ namespace cjoli.Server.Services
             var match = squad.Matches.OrderBy(m => m.Time).LastOrDefault(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB));
             if (match != null)
             {
-                var userMatch = match.UserMatches.SingleOrDefault();
+                var userMatch = match.UserMatches.SingleOrDefault(u=>u.User!=null);
                 IMatch m = match.Done ? match : userMatch != null ? userMatch : match;
                 if (m.ScoreA > m.ScoreB || m.ForfeitB)
                 {
@@ -261,6 +263,14 @@ namespace cjoli.Server.Services
             }
             UpdateSource(a, b, SourceType.equal, 0, true);
             return 0;
+        };
+
+        public Action<Match, MatchDto> DefaultApplyForfeit = (Match match, MatchDto dto) =>
+        {
+            match.ForfeitA = dto.ForfeitA;
+            match.ForfeitB = dto.ForfeitB;
+            match.ScoreA = 0;
+            match.ScoreB = 0;
         };
 
 
@@ -652,6 +662,7 @@ namespace cjoli.Server.Services
                 .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
                 .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
                 .Include(m=>m.UserMatches)
+                .Include(m=>m.Squad).ThenInclude(s=>s.Phase).ThenInclude(p=>p.Tourney)
                 .Include(m=>m.Estimates.Where(e=>e.User==null))
                 .SingleOrDefault(m => m.Id == dto.Id);
             if (match == null)
@@ -659,15 +670,13 @@ namespace cjoli.Server.Services
                 throw new NotFoundException("Match", dto.Id);
             }
             bool isAdmin = user.IsAdminWithNoCustomEstimate(uuid);
+            IRule rule = GetRule(match.Squad!.Phase.Tourney.Rule);
             if (isAdmin)
             {
                 match.Done = true;
                 if (dto.ForfeitA || dto.ForfeitB)
                 {
-                    match.ForfeitA = dto.ForfeitA;
-                    match.ForfeitB = dto.ForfeitB;
-                    match.ScoreA = 0;
-                    match.ScoreB = 0;
+                    rule.ApplyForfeit(match, dto);
                 }
                 else
                 {
