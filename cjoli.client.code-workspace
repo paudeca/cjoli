@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"name": "cjoli.client",
+			"path": "cjoli.client"
+		},
+		{
+			"name": "cjoli.client.common",
+			"path": "cjoli.client.common"
+		},
+		{
+			"name": "cjoli.client.bs",
+			"path": "cjoli.client.bs"
+		},
+		{
+			"name": "cjoli.client.heroui",
+			"path": "cjoli.client.heroui"
+		}
+	],
+	"settings": {
+		"workbench.editor.openPositioning": "last",
+		"editor.formatOnSave": true
+	}
+}
