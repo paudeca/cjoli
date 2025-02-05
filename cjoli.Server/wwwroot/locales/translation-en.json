@@ -1,5 +1,5 @@
 {
-  "title": "CJoli - Ice Hockey Tournament",
+  "title": "Ice Hockey",
   "lang": {
     "en": "English",
     "fr": "French",
@@ -70,7 +70,9 @@
     "form": {
       "login": "Login",
       "password": "Password",
-      "confirmPassword": "Confirm Password"
+      "confirmPassword": "Confirm Password",
+      "createAccount": "Create an account",
+      "alreadyAccount": "Already have an account? Log In"
     },
     "error": {
       "invalidLogin": "Invalid login",

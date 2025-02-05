@@ -1,5 +1,5 @@
 {
-  "title": "CJoli - Tournoi de Hockey sur Glace",
+  "title": "Hockey sur Glace",
   "lang": {
     "en": "Anglais",
     "fr": "Français",
@@ -70,7 +70,9 @@
     "form": {
       "login": "Identifiant",
       "password": "Mot de passe",
-      "confirmPassword": "Confirmer le mot de passe"
+      "confirmPassword": "Confirmer le mot de passe",
+      "createAccount": "Créer un compte",
+      "alreadyAccount": "Vous avez déjà un compte ?"
     },
     "error": {
       "invalidLogin": "Identifiant invalide",

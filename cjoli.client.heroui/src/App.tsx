@@ -5,8 +5,21 @@ import DocsPage from "@/pages/docs";
 import PricingPage from "@/pages/pricing";
 import BlogPage from "@/pages/blog";
 import AboutPage from "@/pages/about";
+import { useConfig } from "@cjoli/core";
+import { Progress } from "@heroui/react";
 
 function App() {
+  const { isLoaded } = useConfig();
+  if (!isLoaded) {
+    return (
+      <Progress
+        isIndeterminate
+        aria-label="Loading..."
+        size="sm"
+        color="primary"
+      />
+    );
+  }
   return (
     <Routes>
       <Route element={<IndexPage />} path="/" />

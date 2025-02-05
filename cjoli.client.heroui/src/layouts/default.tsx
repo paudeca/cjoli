@@ -1,12 +1,10 @@
-import { Link } from "@heroui/link";
+import { Link } from "@heroui/react";
 
 import { Navbar } from "@/components/navbar";
+import { ReactNode } from "react";
+import { Toaster } from "sonner";
 
-export default function DefaultLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+const DefaultLayout = ({ children }: { children: ReactNode }) => {
   return (
     <div className="relative flex flex-col h-screen">
       <Navbar />
@@ -24,6 +22,9 @@ export default function DefaultLayout({
           <p className="text-primary">HeroUI</p>
         </Link>
       </footer>
+      <Toaster position="top-right" />
     </div>
   );
-}
+};
+
+export default DefaultLayout;
