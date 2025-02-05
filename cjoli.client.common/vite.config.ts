@@ -12,6 +12,11 @@ export default defineConfig({
       tsconfigPath: "./tsconfig.app.json",
     }),
   ],
+  resolve: {
+    alias: {
+      "@": resolve("lib"),
+    },
+  },
   build: {
     lib: {
       entry: resolve(__dirname, "lib/main.ts"),
@@ -19,7 +24,19 @@ export default defineConfig({
     },
     copyPublicDir: false,
     rollupOptions: {
-      external: ["react", "react/jsx-runtime"],
+      external: [
+        "react",
+        "react/jsx-runtime",
+        "axios",
+        "dayjs",
+        "i18next",
+        "i18next-http-backend",
+        "i18next-browser-languagedetector",
+        "react-i18next",
+        "react-use-websocket",
+        "react-router-dom",
+        "universal-cookie",
+      ],
     },
   },
 });
