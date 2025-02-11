@@ -57,6 +57,15 @@ module.exports = {
               DEFAULT: "#A02B16",
               foreground: "#FFFFFF",
             },
+            success: {
+              DEFAULT: "#228212",
+            },
+            info: {
+              DEFAULT: "#1E43BC",
+            },
+            warning: {
+              DEFAULT: "#BC6A00",
+            },
             focus: "#202644",
           },
           layout: {

@@ -28,7 +28,10 @@
     "admin": "Administration"
   },
   "home": {
-    "tourneyNotConfigured": "Tournoi non configuré"
+    "tourneyNotConfigured": "Tournoi non configuré",
+    "ranking": "Classement",
+    "matches": "Matchs",
+    "finalRanking": "Classement final"
   },
   "error": {
     "invalid": "{{field}} est invalide",
@@ -46,7 +49,8 @@
     "edit": "Modifier",
     "yes": "Oui",
     "no": "Non",
-    "newTourney": "Nouveau Tournoi"
+    "newTourney": "Nouveau Tournoi",
+    "delete": "Supprimer"
   },
   "penalty": {
     "label": "Pénalités",
@@ -56,7 +60,7 @@
   },
   "simulation": {
     "tooltip": "Simulation",
-    "removeAll": "Supprimer toutes les simulations"
+    "removeAll": "Supprimer toutes les simulations ?"
   },
   "estimate": {
     "calculated": "Estimation calculée"
@@ -71,7 +75,7 @@
       "login": "Identifiant",
       "password": "Mot de passe",
       "confirmPassword": "Confirmer le mot de passe",
-      "createAccount": "Créer un compte",
+      "createAccount": "Vous avez besoin de créer un compte ?",
       "alreadyAccount": "Vous avez déjà un compte ?"
     },
     "error": {
