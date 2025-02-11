@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Dropdown,
   DropdownItem,
   DropdownMenu,
@@ -12,17 +13,16 @@ import { useUser } from "@cjoli/core";
 
 export const UserDropdown: FC<{
   login: ModalProps;
-  register: ModalProps;
-}> = ({ login, register }) => {
-  const { user } = useUser();
+}> = ({ login }) => {
+  const { user, logout } = useUser();
   const { t } = useTranslation();
 
-  console.log("reg", register);
   const items: {
     id: string;
     label: ReactNode;
     className?: string;
     color?: "danger";
+    onPress?: () => void;
   }[] = user
     ? [
         {
@@ -34,43 +34,36 @@ export const UserDropdown: FC<{
           ),
           className: "h-14 gap-2",
         },
-        { id: "update", label: t("menu.update", "Update") },
         { id: "admin", label: t("menu.admin", "Administration") },
         {
           id: "logout",
           label: "Logout",
           className: "text-danger",
           color: "danger",
+          onPress: logout,
         },
       ]
-    : [
-        { id: "login", label: t("menu.login", "Login") },
-        { id: "register", label: t("menu.register", "Register") },
-      ];
+    : [{ id: "login", label: t("menu.login", "Login"), onPress: login.onOpen }];
 
   return (
     <>
-      <Dropdown placement="bottom">
+      <Dropdown placement="bottom" offset={18}>
         <DropdownTrigger>
-          <User
-            as="button"
-            avatarProps={{
-              isBordered: true,
-              classNames: {
-                base: "bg-gradient-to-br from-[#FFB457] to-[#FF705B]",
-                icon: "text-primary",
-              },
+          <Avatar
+            isBordered
+            size="sm"
+            classNames={{
+              base: "bg-gradient-to-br from-[#DE8D7D] to-[#922829]",
+              icon: "text-primary",
             }}
-            className="transition-transform text-background"
-            description={user?.role}
-            name={user?.login}
+            role="button"
           />
         </DropdownTrigger>
         <DropdownMenu aria-label="Profile Actions" variant="flat" items={items}>
           {(item) => (
             <DropdownItem
               key={item.id}
-              onPress={login.onOpen}
+              onPress={item.onPress}
               className={item.className}
               color={item.color ?? "default"}
             >

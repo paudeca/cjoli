@@ -35,6 +35,9 @@
     "noImage": "No photos for the tourney"
   },
   "gallery": {
+    "ranking": "Ranking",
+    "matches": "Matches",
+    "finalRanking": "Final ranking",
     "sendPhoto": "Send your photos",
     "whatsapp": "WhatsApp",
     "qrCode": "QRCode",
@@ -60,7 +63,8 @@
     "edit": "Edit",
     "yes": "Yes",
     "no": "No",
-    "newTourney": "New Tourney"
+    "newTourney": "New Tourney",
+    "delete": "Delete"
   },
   "penalty": {
     "label": "Penalties",
@@ -70,7 +74,7 @@
   },
   "simulation": {
     "tooltip": "Simulation",
-    "removeAll": "Remove all simulations"
+    "removeAll": "Remove all simulations ?"
   },
   "estimate": {
     "calculated": "Estimate calculated"
@@ -85,7 +89,7 @@
       "login": "Login",
       "password": "Password",
       "confirmPassword": "Confirm Password",
-      "createAccount": "Create an account",
+      "createAccount": "Need to create an account? Sign up",
       "alreadyAccount": "Already have an account? Log In"
     },
     "error": {

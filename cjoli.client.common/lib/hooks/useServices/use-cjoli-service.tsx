@@ -1,6 +1,6 @@
 import axios from "axios";
 import Cookies from "universal-cookie";
-import { useConfig } from "./useConfig";
+import { useConfig } from "@/hooks";
 import {
   Match,
   Position,
@@ -13,7 +13,7 @@ import {
 
 const cookie = new Cookies();
 
-export const useService = () => {
+export const useCjoliService = () => {
   const { url } = useConfig();
   const setHeader = () => {
     const token = cookie.get("CJOLI_AUTH_TOKEN");
