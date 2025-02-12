@@ -1,13 +1,12 @@
-import { Team, useServer } from "@cjoli/core";
+import { Team, useConfig } from "@cjoli/core";
 import { FC } from "react";
 import { useNavigate } from "react-router-dom";
-import { Icon } from "@iconify/react";
 import { Button } from "@heroui/react";
 import { ChevronIcon } from "./icons";
 
 export const TeamButton: FC<{ team: Team }> = ({ team }) => {
   const navigate = useNavigate();
-  const { getPath } = useServer();
+  const { getPath } = useConfig();
 
   return (
     <Button

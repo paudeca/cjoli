@@ -1,6 +1,6 @@
 import { useToast } from "@/hooks";
 import { useCJoli, useUser } from "@cjoli/core";
-import { Button, Image } from "@heroui/react";
+import { Button } from "@heroui/react";
 import { FC, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";

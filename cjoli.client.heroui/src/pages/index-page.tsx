@@ -3,7 +3,6 @@ import { Snippet } from "@heroui/react";
 import { Code } from "@heroui/react";
 import { button as buttonStyles } from "@heroui/theme";
 
-import { siteConfig } from "@/config/site";
 import { title, subtitle } from "@/components/primitives";
 import { GithubIcon } from "@/components/icons";
 import DefaultLayout from "@/layouts/default";
@@ -32,14 +31,12 @@ const IndexPage = () => {
               radius: "full",
               variant: "shadow",
             })}
-            href={siteConfig.links.docs}
           >
             Documentation
           </Link>
           <Link
             isExternal
             className={buttonStyles({ variant: "bordered", radius: "full" })}
-            href={siteConfig.links.github}
           >
             <GithubIcon size={20} />
             GitHub

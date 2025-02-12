@@ -16,7 +16,7 @@ export const TableMatch = () => {
       <TableBody items={[{ id: 1 }]}>
         {(item) => (
           <TableRow key={item.id}>
-            {(columnKey) => <TableCell>Hello</TableCell>}
+            {(columnKey) => <TableCell>Hello:{columnKey}</TableCell>}
           </TableRow>
         )}
       </TableBody>

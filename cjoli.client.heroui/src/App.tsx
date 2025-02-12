@@ -1,30 +1,18 @@
 import { Route, Routes } from "react-router-dom";
-import { useServer } from "@cjoli/core";
+import { useConfig, useBootstrap } from "@/lib/core";
 
 import DocsPage from "@/pages/docs";
 import PricingPage from "@/pages/pricing";
 import BlogPage from "@/pages/blog";
 import AboutPage from "@/pages/about";
-import { useConfig } from "@cjoli/core";
-import { Progress } from "@heroui/react";
 import { HomePage, SelectPage } from "./pages";
 import { CJoliLoading } from "./components/cjoli-loading";
 
 const App = () => {
-  const { isLoaded } = useConfig();
-  const { getPath } = useServer();
-  if (!isLoaded) {
-    return (
-      <Progress
-        isIndeterminate
-        aria-label="Loading..."
-        size="sm"
-        color="primary"
-      />
-    );
-  }
+  const { loaded } = useBootstrap();
+  const { getPath } = useConfig();
   return (
-    <CJoliLoading loading={!isLoaded}>
+    <CJoliLoading loading={!loaded}>
       <Routes>
         <Route element={<SelectPage />} path="/" />
         <Route element={<HomePage />} path="/:uid" />

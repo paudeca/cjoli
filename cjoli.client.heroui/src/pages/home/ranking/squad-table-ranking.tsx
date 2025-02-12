@@ -1,4 +1,4 @@
-import { Phase, Score, Squad, useSquadTableRankingHomePage } from "@cjoli/core";
+import { Phase, Score, Squad, useSquadTableRankingHomePage } from "@/lib/core";
 import {
   Chip,
   getKeyValue,
@@ -156,7 +156,7 @@ export const SquadTableRanking: FC<SquadTableRankingProps> = ({
 
   return (
     <>
-      {/*createTable(columns, {
+      {createTable(columns, {
         table: "hidden md:table",
         header: (column) =>
           `text-center ${column.key == "teamId" ? "w-1/2" : "w-1/20"} ${column.color ? "bg-secondary text-background" : "text-bold"}`,
@@ -168,7 +168,7 @@ export const SquadTableRanking: FC<SquadTableRankingProps> = ({
           header: (column) =>
             `text-center ${column.key == "teamId" ? "w-4/5" : "w-1/10"} ${column.color ? "bg-secondary text-background" : "text-bold"}`,
         }
-      )*/}
+      )}
     </>
   );
 };
