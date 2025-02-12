@@ -31,6 +31,7 @@ export const CellTeamSquadTableRanking: FC<{ score: Score; squad: Squad }> = ({
 
   const handleRemove = useCallback(
     (ids: number[]) => async () => {
+      console.log("ids", ids);
       //const ranking = await cjoliService.clearSimulations(uid, ids);
       //loadRanking(ranking);
     },

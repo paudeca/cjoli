@@ -1,6 +1,6 @@
 import { Link, Tab, Tabs } from "@heroui/react";
 import { FC, useCallback, useState } from "react";
-import { Trans, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { User, useUser } from "@cjoli/core";
 import { ModalProps } from ".";
 import { useToast } from "@/hooks/use-toast";

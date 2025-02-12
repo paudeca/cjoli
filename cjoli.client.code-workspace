@@ -16,6 +16,10 @@
   "settings": {
     "workbench.editor.openPositioning": "last",
     "editor.formatOnSave": true,
-    "prettier.endOfLine": "lf"
+    "prettier.endOfLine": "lf",
+    "eslint.format.enable": true,
+    "eslint.codeActionsOnSave.mode": "all",
+    "eslint.debug": false,
+    "eslint.enable": true
   }
 }

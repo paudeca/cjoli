@@ -1,11 +1,10 @@
-import { Button, Input, Form, Progress } from "@heroui/react";
+import { Button, Input, Form } from "@heroui/react";
 import { ReactNode, useCallback, useState } from "react";
 import { Trans } from "react-i18next";
 import {
   FieldValues,
   Path,
   SubmitHandler,
-  useForm,
   UseFormReturn,
 } from "react-hook-form";
 

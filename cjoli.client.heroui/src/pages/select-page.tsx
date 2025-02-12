@@ -4,7 +4,6 @@ import { useSelectPage, useTools } from "@cjoli/core";
 import { Avatar, Card, CardBody, CardHeader, Divider } from "@heroui/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useEffect } from "react";
 
 dayjs.extend(relativeTime);
 
@@ -12,17 +11,9 @@ export const SelectPage = () => {
   const { formatDate } = useTools();
   const { datas, goTourney } = useSelectPage();
 
-  const items = datas.map((d) => ({ ...d, key: d.type }));
-  console.log("SelectPage", datas);
-  useEffect(() => {
-    console.log("load");
-  }, []);
-
-  return <div>SelectPage</div>;
-
   return (
     <DefaultLayout>
-      <CjoliAccordion items={items}>
+      <CjoliAccordion items={datas}>
         {(item) => (
           <div className="gap-4 grid grid-cols sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
             {item.tourneys.map((t) => (

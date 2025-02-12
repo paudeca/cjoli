@@ -23,7 +23,9 @@ const DefaultLayout: FC<{ children: ReactNode; page?: "home" | "ranking" }> = ({
   const { data: tourneys, isLoading } = useQuery(getTourneys({}));
 
   useEffect(() => {
-    uid && tourneys && selectTourney(tourneys.find((t) => t.uid === uid)!);
+    if (uid && tourneys) {
+      selectTourney(tourneys.find((t) => t.uid === uid)!);
+    }
   }, [uid, tourneys, selectTourney]);
 
   return (

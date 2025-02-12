@@ -1,4 +1,4 @@
-import { Phase, Squad, useServer } from "@cjoli/core";
+import { Phase, Squad, useConfig } from "@cjoli/core";
 import { Button } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { FC } from "react";
@@ -9,7 +9,7 @@ export const ButtonSquadTableRanking: FC<{
   squad: Squad;
   back?: boolean;
 }> = ({ phase, squad, back }) => {
-  const { getPath } = useServer();
+  const { getPath } = useConfig();
   const navigate = useNavigate();
 
   return (

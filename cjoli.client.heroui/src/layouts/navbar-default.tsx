@@ -15,7 +15,7 @@ import clsx from "clsx";
 import { Icon } from "@iconify/react";
 
 import { Logo } from "@/components/icons";
-import { useHeader, useServer, useUid, useUser } from "@cjoli/core";
+import { useConfig, useHeader, useUid, useUser } from "@cjoli/core";
 import { LangDropdown, UserDropdown } from "@/components/dropdowns";
 import { Trans, useTranslation } from "react-i18next";
 import { LoginModal } from "@/components/modals";
@@ -28,7 +28,7 @@ export const NavbarDefault: FC<{ page?: "home" | "ranking" }> = ({ page }) => {
   const login = useDisclosure();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { getPath } = useServer();
+  const { getPath } = useConfig();
   const uid = useUid();
 
   const label = getLabel();
