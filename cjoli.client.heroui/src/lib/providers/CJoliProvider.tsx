@@ -13,6 +13,7 @@ const initialState: CJoliState = {
     secondary: "#932829",
   },
   page: "welcome",
+  loaded: { tourneys: false },
 };
 
 const reduceLoadRanking = (state: CJoliState, ranking: Ranking) => {
@@ -54,8 +55,13 @@ const reducer = (state: CJoliState, action: CJoliAction) => {
   switch (action.type) {
     case CJoliActions.LOAD_TOURNEYS: {
       const tourneys = action.payload;
+
       tourneys.sort((a, b) => (a.startTime > b.startTime ? -1 : 1));
-      return { ...state, tourneys };
+      return {
+        ...state,
+        tourneys,
+        loaded: { ...state.loaded, tourneys: true },
+      };
     }
     case CJoliActions.LOAD_TOURNEY: {
       const tourney = action.payload;

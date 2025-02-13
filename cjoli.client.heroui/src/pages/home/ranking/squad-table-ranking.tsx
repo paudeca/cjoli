@@ -1,4 +1,4 @@
-import { Phase, Score, Squad, useSquadTableRankingHomePage } from "@/lib/core";
+import { Phase, Score, Squad } from "@/lib/core";
 import {
   Chip,
   getKeyValue,
@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { ButtonSquadTableRanking } from "./button-squad-table-ranking";
 import { SimultPopover } from "@/components/popovers/simul-popover";
 import { CellTeamSquadTableRanking } from "./cell-team-squad-table-ranking";
+import { useSquadTableRankingHomePage } from "@/hooks";
 
 interface Column {
   key: keyof Score;
@@ -45,31 +46,30 @@ export const SquadTableRanking: FC<SquadTableRankingProps> = ({
   } = useSquadTableRankingHomePage(squad);
   const { t } = useTranslation();
 
-  if (!tourney) {
-    return <Fragment />;
-  }
-
-  const renderCell = useCallback((score: Score, columnKey: string | number) => {
-    switch (columnKey) {
-      case "teamId":
-        return (
-          <div>
-            <CellTeamSquadTableRanking score={score} squad={squad} />
-            <div className="md:hidden flex justify-stretch">
-              {columns
-                .filter((c) => c.mobile)
-                .map((c) => (
-                  <div key={c.key} className="w-full border-1 text-xs">
-                    {c.label}:{getKeyValue(score, c.key)}
-                  </div>
-                ))}
+  const renderCell = useCallback(
+    (score: Score, columnKey: string | number) => {
+      switch (columnKey) {
+        case "teamId":
+          return (
+            <div>
+              <CellTeamSquadTableRanking score={score} squad={squad} />
+              <div className="md:hidden flex justify-stretch">
+                {columns
+                  .filter((c) => c.mobile)
+                  .map((c) => (
+                    <div key={c.key} className="w-full border-1 text-xs">
+                      {c.label}:{getKeyValue(score, c.key)}
+                    </div>
+                  ))}
+              </div>
             </div>
-          </div>
-        );
-      default:
-        return getKeyValue(score, columnKey);
-    }
-  }, []);
+          );
+        default:
+          return getKeyValue(score, columnKey);
+      }
+    },
+    [columns, squad]
+  );
 
   const topContent = useMemo(() => {
     let topContent;
@@ -89,11 +89,11 @@ export const SquadTableRanking: FC<SquadTableRankingProps> = ({
       );
     }
     return topContent;
-  }, []);
+  }, [phase, squad, squadId, squads]);
 
   const get = useCallback(
     (key: string | number) => columns.find((c) => c.key == key) ?? columns[0],
-    []
+    [columns]
   );
 
   const createTable = useCallback(
@@ -151,8 +151,22 @@ export const SquadTableRanking: FC<SquadTableRankingProps> = ({
         </TableBody>
       </Table>
     ),
-    []
+    [
+      datas,
+      get,
+      handleRemove,
+      hasSimulation,
+      renderCell,
+      squad,
+      t,
+      topContent,
+      userMatches,
+    ]
   );
+
+  if (!tourney) {
+    return <Fragment />;
+  }
 
   return (
     <>

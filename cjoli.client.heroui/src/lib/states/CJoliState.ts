@@ -24,4 +24,5 @@ export interface CJoliState {
     secondary: string;
   };
   page: TypePage;
+  loaded: { tourneys: boolean };
 }

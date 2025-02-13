@@ -14,36 +14,15 @@ import { link as linkStyles } from "@heroui/theme";
 import clsx from "clsx";
 import { Icon } from "@iconify/react";
 
-import { Logo } from "@/components/icons";
-import { useConfig, useHeader, useUid, useUser } from "@cjoli/core";
 import { LangDropdown, UserDropdown } from "@/components/dropdowns";
-import { Trans, useTranslation } from "react-i18next";
+import { Trans } from "react-i18next";
 import { LoginModal } from "@/components/modals";
 import { FC } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavbarDefault } from "@/hooks";
 
 export const NavbarDefault: FC<{ page?: "home" | "ranking" }> = ({ page }) => {
-  const { getLabel } = useHeader();
-  const { isConnected } = useUser();
+  const { label, navs, goTo, isConnected, logo } = useNavbarDefault();
   const login = useDisclosure();
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { getPath } = useConfig();
-  const uid = useUid();
-
-  const label = getLabel();
-
-  const navs = uid
-    ? [
-        { id: "home", label: t("menu.home", "Home"), path: "/" },
-        {
-          id: "ranking",
-          label: t("menu.ranking", "Ranking"),
-          path: "/ranking",
-        },
-      ]
-    : [];
-
   return (
     <Navbar
       maxWidth="xl"
@@ -59,7 +38,7 @@ export const NavbarDefault: FC<{ page?: "home" | "ranking" }> = ({ page }) => {
           href="/"
           color="primary"
         >
-          <Logo />
+          <img src={logo} width="60px" />
           <p className="font-bold text-primary-foreground hidden sm:flex">
             CJOLI
           </p>
@@ -80,7 +59,7 @@ export const NavbarDefault: FC<{ page?: "home" | "ranking" }> = ({ page }) => {
                   "data-[active=true]:text-primary data-[active=true]:font-medium text-primary-foreground"
                 )}
                 color="primary"
-                onPress={() => navigate(getPath(n.path))}
+                onPress={() => goTo(n.path)}
                 role="button"
               >
                 {n.label}
@@ -140,7 +119,7 @@ export const NavbarDefault: FC<{ page?: "home" | "ranking" }> = ({ page }) => {
                 color="primary"
                 size="lg"
                 role="button"
-                onPress={() => navigate(getPath(n.path))}
+                onPress={() => goTo(n.path)}
               >
                 {n.label}
               </Link>

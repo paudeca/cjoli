@@ -54,7 +54,7 @@ export const BootstrapProvider = ({
     }
   }, [url]);
 
-  const { sendJsonMessage: sendMessage, lastJsonMessage: lastMessage } =
+  /*const { sendJsonMessage: sendMessage, lastJsonMessage: lastMessage } =
     useWebSocket<MessageServer>(`${server}/server/ws`, {
       share: true,
       shouldReconnect: () => true,
@@ -70,20 +70,24 @@ export const BootstrapProvider = ({
 
   const register = useCallback(
     (type: string, callback: (value: number) => void) => {
+      console.log("Register", type, callback, lastMessage);
       if (lastMessage != null && lastMessage.type == type) {
+        console.log("execute callback", type, lastMessage.value);
         callback(lastMessage.value);
       }
     },
-    [lastMessage]
-  );
+    []
+  );*/
+  const sendMessage = () => {};
+  const register = () => {};
 
   const { setCountUser } = useUser();
 
-  useEffect(() => {
+  /*useEffect(() => {
     register("users", (value) => {
       setCountUser(value);
     });
-  }, [register, setCountUser]);
+  }, [register, setCountUser]);*/
 
   return (
     <BootstrapContext.Provider value={{ loaded, sendMessage, register }}>

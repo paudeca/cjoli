@@ -5,7 +5,7 @@ import { FC, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { StarIcon } from "./icons";
-import { CJoliImage } from "./CJoliImage";
+import { CJoliImage } from "./cjoli-image";
 
 export const TeamName: FC<{
   positionId?: number;
@@ -35,9 +35,11 @@ export const TeamName: FC<{
         ...userConfig,
         favoriteTeamId: teamId || 0,
       });
-      teamId
-        ? toast("success", t("user.favoriteSaved", "Favorite team saved"))
-        : toast("success", t("user.favoriteRemoved", "Favorite team removed"));
+      if (teamId) {
+        toast("success", t("user.favoriteSaved", "Favorite team saved"));
+      } else {
+        toast("success", t("user.favoriteRemoved", "Favorite team removed"));
+      }
     },
     [handleSaveUserConfig, userConfig, toast, t]
   );

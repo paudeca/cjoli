@@ -1,22 +1,25 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useApi } from "../useApi";
-import { useCJoli } from "../useCJoli";
-import { useUid } from "../useUid";
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo } from "react";
+import { ReactNode, useCallback, useEffect, useMemo } from "react";
 import { Phase, Score, Squad } from "@@/models";
 import { useTranslation } from "react-i18next";
-import { useUser } from "../useUser";
-import { useCjoliService } from "../useServices";
-import { useBootstrap } from "../useBootstrap";
-import { useConfig } from "../useConfig";
+import {
+  useApi,
+  useBootstrap,
+  useCJoli,
+  useCjoliService,
+  useConfig,
+  useUid,
+  useUser,
+} from "@cjoli/core";
 
-export const useHomePage = () => {
+export const useHomePage = (map: Record<string, ReactNode>) => {
   const { phases, matches } = useCJoli("home");
   const { sendMessage, register } = useBootstrap();
   const { getRanking } = useApi();
   const uid = useUid();
   const { phaseId } = useParams();
+  const { t } = useTranslation();
 
   const { refetch, isLoading } = useQuery(getRanking(uid));
 
@@ -24,22 +27,51 @@ export const useHomePage = () => {
     if (!isLoading) {
       sendMessage({ type: "selectTourney", uid });
     }
+    return () => {};
   }, [uid, isLoading, sendMessage]);
 
   useEffect(() => {
     register("updateRanking", async () => {
       refetch();
     });
+    return () => {};
   }, [refetch, register]);
 
-  let phase =
-    phases && phases.find((p) => phaseId && p.id == parseInt(phaseId));
-  if (!phase && phases && phases?.length > 0) {
-    phase = phases[0];
-  }
-  const allMatchesDone = matches.length > 0 && matches.every((m) => m.done);
+  const phase = useMemo(() => {
+    let phase =
+      phases && phases.find((p) => phaseId && p.id == parseInt(phaseId));
+    if (!phase && phases && phases?.length > 0) {
+      phase = phases[0];
+    }
+    return phase;
+  }, [phaseId, phases]);
 
-  return { allMatchesDone, isLoading, phase };
+  const items = useMemo(() => {
+    const allMatchesDone = matches.length > 0 && matches.every((m) => m.done);
+
+    return [
+      {
+        key: "final",
+        content: map.final,
+        title: t("home.finalRanking", "Final Ranking"),
+        hide: !allMatchesDone,
+      },
+      {
+        key: "ranking",
+        content: map.ranking,
+        title: t("home.ranking", "Ranking"),
+        hide: !phase,
+      },
+      {
+        key: "match",
+        content: map.match,
+        title: t("home.matches", "Matches"),
+        hide: !phase,
+      },
+    ];
+  }, [t, matches, phase, map]);
+
+  return { isConfigured: !!phase, isLoading, items };
 };
 
 export const useRankingHomePage = () => {

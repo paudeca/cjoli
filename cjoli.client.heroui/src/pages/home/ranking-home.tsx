@@ -1,6 +1,6 @@
-import { useRankingHomePage } from "@cjoli/core";
 import { Tab, Tabs } from "@heroui/react";
 import { TableRanking } from "./ranking/table-ranking";
+import { useRankingHomePage } from "@/hooks";
 
 export const RankingkHome = () => {
   const { phases, phaseId, handleClick } = useRankingHomePage();

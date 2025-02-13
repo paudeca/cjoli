@@ -6,11 +6,11 @@ import {
 } from "@heroui/react";
 import { FC, useState } from "react";
 import { Icon } from "@iconify/react";
-import { useHeader } from "@cjoli/core";
 import { useTranslation } from "react-i18next";
+import { useLangDropdown } from "@/hooks";
 
 export const LangDropdown: FC = () => {
-  const { langs, lang, saveLang } = useHeader();
+  const { langs, lang, saveLang } = useLangDropdown();
   const { t } = useTranslation();
   const [selectedKeys, setSelectedKeys] = useState(new Set([lang || "en"]));
 

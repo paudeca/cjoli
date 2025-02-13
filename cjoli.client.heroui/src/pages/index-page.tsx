@@ -5,7 +5,7 @@ import { button as buttonStyles } from "@heroui/theme";
 
 import { title, subtitle } from "@/components/primitives";
 import { GithubIcon } from "@/components/icons";
-import DefaultLayout from "@/layouts/default";
+import { DefaultLayout } from "@/layouts/default-layout";
 
 const IndexPage = () => {
   return (

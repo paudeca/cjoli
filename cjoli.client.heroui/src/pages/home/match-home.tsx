@@ -8,7 +8,6 @@ import { TableMatch } from "./match/table-match";
 export const MatchHome = () => {
   const { matches, daySelected, selectDay } = useCJoli();
   const uid = useUid();
-  console.log("uid", uid);
   const { squadId, phaseId } = useParams();
 
   const filter = useCallback(
@@ -47,7 +46,7 @@ export const MatchHome = () => {
     if (keys && keys.length > 0 && !keys.includes(daySelected)) {
       selectDay(keys[0]);
     }
-  }, [keys, selectDay]);
+  }, [keys, selectDay, daySelected]);
 
   /*const upperFirstLetter = (value: string) => {
     return value.charAt(0).toUpperCase() + value.slice(1);
