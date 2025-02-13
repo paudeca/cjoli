@@ -2,8 +2,6 @@ import * as React from "react";
 
 import { IconSvgProps } from "@/types";
 
-export const Logo = () => <img src="/logo.png" width="60px" />;
-
 export const InfoIcon = ({ size = 24, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -119,11 +117,11 @@ export const StarIcon = ({
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      height={16}
-      width={16}
+      height={size}
+      width={size}
       fill={fill}
       viewBox="0 0 24 24"
-      strokeWidth="1.5"
+      strokeWidth={strokeWidth}
       stroke={color}
       className="size-6"
       {...props}

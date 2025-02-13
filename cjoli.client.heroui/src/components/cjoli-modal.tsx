@@ -8,7 +8,7 @@ import {
 import { ReactNode } from "react";
 import { Trans } from "react-i18next";
 
-export interface FormModalProps {
+export interface CJoliModalProps {
   title?: string;
   isOpen: boolean;
   onOpenChange: () => void;
@@ -20,7 +20,7 @@ export const CJoliModal = ({
   isOpen,
   onOpenChange,
   children,
-}: FormModalProps) => {
+}: CJoliModalProps) => {
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop="blur">
       <ModalContent className="cjoli text-foreground bg-background">

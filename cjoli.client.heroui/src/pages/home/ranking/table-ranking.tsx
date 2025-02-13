@@ -1,6 +1,7 @@
-import { Phase, useTableRankingHomePage } from "@cjoli/core";
+import { Phase } from "@cjoli/core";
 import { FC } from "react";
 import { SquadTableRanking } from "./squad-table-ranking";
+import { useTableRankingHomePage } from "@/hooks";
 
 interface TableRankingProps {
   phase: Phase;

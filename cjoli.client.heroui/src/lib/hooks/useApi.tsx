@@ -23,7 +23,7 @@ export const mutationOptions = <
   TData = unknown,
   TError = DefaultError,
   TVariables = void,
-  TContext = unknown
+  TContext = unknown,
 >(
   options: UseMutationOptions<TData, TError, TVariables, TContext>
 ): UseMutationOptions<TData, TError, TVariables, TContext> => {
@@ -46,7 +46,7 @@ const useApiGet = () => {
           return user;
         },
       }),
-    [loadUser]
+    [loadUser, cjoliServices]
   );
 
   const listUsers = useCallback(
@@ -58,7 +58,7 @@ const useApiGet = () => {
           return users;
         },
       }),
-    []
+    [cjoliServices]
   );
 
   const getTourneys = useCallback(
@@ -72,7 +72,7 @@ const useApiGet = () => {
         },
         enabled,
       }),
-    [loadTourneys]
+    [loadTourneys, cjoliServices]
   );
 
   const getTeams = useCallback(
@@ -83,7 +83,7 @@ const useApiGet = () => {
         initialData: [],
         retry: 0,
       }),
-    []
+    [settingServices]
   );
 
   const getRanking = useCallback(
@@ -96,7 +96,7 @@ const useApiGet = () => {
           return ranking;
         },
       }),
-    [loadRanking]
+    [loadRanking, cjoliServices]
   );
   return { getUser, listUsers, getTourneys, getTeams, getRanking };
 };
@@ -116,7 +116,7 @@ const useApiPost = () => {
         },
         onSuccess,
       }),
-    [loadTourney]
+    [loadTourney, settingServices]
   );
   const saveUserAdminConfig = useCallback(
     ({ onSuccess }: { onSuccess: () => void }) =>
@@ -131,7 +131,7 @@ const useApiPost = () => {
         }) => await settingServices.saveUserAdminConfig(user, admins),
         onSuccess,
       }),
-    []
+    [settingServices]
   );
   return { saveTourney, saveUserAdminConfig };
 };
@@ -151,7 +151,7 @@ const useApiDelete = () => {
           return true;
         },
       }),
-    [navigate]
+    [navigate, settingServices]
   );
 
   const removeTeam = useCallback(
@@ -167,7 +167,7 @@ const useApiDelete = () => {
           return true;
         },
       }),
-    [loadTourney]
+    [loadTourney, settingServices]
   );
 
   const removePhase = useCallback(
@@ -183,7 +183,7 @@ const useApiDelete = () => {
           return true;
         },
       }),
-    [loadTourney]
+    [loadTourney, settingServices]
   );
 
   const removeSquad = useCallback(
@@ -206,7 +206,7 @@ const useApiDelete = () => {
           return true;
         },
       }),
-    [loadTourney]
+    [loadTourney, settingServices]
   );
 
   const removePosition = useCallback(
@@ -232,7 +232,7 @@ const useApiDelete = () => {
           return true;
         },
       }),
-    [loadTourney]
+    [loadTourney, settingServices]
   );
 
   const removeMatch = useCallback(
@@ -258,7 +258,7 @@ const useApiDelete = () => {
           return true;
         },
       }),
-    [loadTourney]
+    [loadTourney, settingServices]
   );
 
   const removeRank = useCallback(
@@ -274,7 +274,7 @@ const useApiDelete = () => {
           return true;
         },
       }),
-    [loadTourney]
+    [loadTourney, settingServices]
   );
 
   return {

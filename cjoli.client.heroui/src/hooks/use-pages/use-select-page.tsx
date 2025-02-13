@@ -1,12 +1,11 @@
 import { useTranslation } from "react-i18next";
-import { useCJoli } from "../useCJoli";
 import dayjs from "dayjs";
 import { useCallback, useMemo } from "react";
-import { Tourney } from "@@/models";
 import { useNavigate } from "react-router-dom";
+import { Tourney, useCJoli } from "@cjoli/core";
 
 export const useSelectPage = () => {
-  const { tourneys, selectTourney } = useCJoli("welcome");
+  const { tourneys, selectTourney, loaded } = useCJoli("welcome");
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -45,7 +44,6 @@ export const useSelectPage = () => {
 
     const datas = groups.filter((group) => group.tourneys.length > 0);
     return datas;
-    //}, [t, now, tourneys]);
   }, [now, t, tourneys]);
 
   const goTourney = useCallback(
@@ -57,5 +55,5 @@ export const useSelectPage = () => {
     [navigate, selectTourney]
   );
 
-  return { datas, goTourney };
+  return { datas, goTourney, loaded: loaded.tourneys };
 };
