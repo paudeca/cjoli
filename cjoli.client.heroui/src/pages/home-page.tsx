@@ -1,5 +1,4 @@
 import { CjoliAccordion } from "@/components";
-import { DefaultLayout } from "@/layouts/default-layout";
 import { RankingkHome } from "./home/ranking-home";
 import { Alert } from "@heroui/react";
 import { useTranslation } from "react-i18next";
@@ -11,7 +10,7 @@ import { memo } from "react";
 export const HomePage = memo(() => {
   const map = {
     final: <div>Final</div>,
-    ranking: <div>RankingkHome </div>,
+    ranking: <RankingkHome />,
     match: <MatchHome />,
   };
   const { isConfigured, isLoading, items } = useHomePage(map);
@@ -19,19 +18,17 @@ export const HomePage = memo(() => {
   console.log("HomePage");
 
   return (
-    <DefaultLayout page="home">
-      <CJoliLoading loading={isLoading}>
-        <CjoliAccordion items={items}>{(item) => item.content}</CjoliAccordion>
-        {!isConfigured && (
-          <div className="flex items-center justify-center w-full">
-            <Alert
-              title={t("home.tourneyNotConfigured", "Tourney not configured")}
-              color="danger"
-              variant="faded"
-            />
-          </div>
-        )}
-      </CJoliLoading>
-    </DefaultLayout>
+    <CJoliLoading loading={isLoading}>
+      <CjoliAccordion items={items}>{(item) => item.content}</CjoliAccordion>
+      {!isConfigured && (
+        <div className="flex items-center justify-center w-full">
+          <Alert
+            title={t("home.tourneyNotConfigured", "Tourney not configured")}
+            color="danger"
+            variant="faded"
+          />
+        </div>
+      )}
+    </CJoliLoading>
   );
 });

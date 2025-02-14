@@ -16,6 +16,7 @@ import { ButtonSquadTableRanking } from "./button-squad-table-ranking";
 import { SimultPopover } from "@/components/popovers/simul-popover";
 import { CellTeamSquadTableRanking } from "./cell-team-squad-table-ranking";
 import { useSquadTableRankingHomePage } from "@/hooks";
+import { CJoliTable } from "@/components";
 
 interface Column {
   key: keyof Score;
@@ -101,55 +102,61 @@ export const SquadTableRanking: FC<SquadTableRankingProps> = ({
       columns: Column[],
       classNames: { table: string; header: (column: Column) => string }
     ) => (
-      <Table
-        isStriped
-        isCompact
-        topContent={
-          <div>
-            {topContent}
-            {hasSimulation && (
-              <SimultPopover
-                title={`${t("rank.simulation", "Simulation")} - ${squad.name}`}
-                onRemove={handleRemove(userMatches)}
-              />
+      <>
+        <CJoliTable></CJoliTable>
+        <Table
+          isStriped
+          isCompact
+          topContent={
+            <div>
+              {topContent}
+              {hasSimulation && (
+                <SimultPopover
+                  title={`${t("rank.simulation", "Simulation")} - ${squad.name}`}
+                  onRemove={handleRemove(userMatches)}
+                />
+              )}
+            </div>
+          }
+          aria-label={`Table squad : ${squad.id}`}
+          className={classNames.table}
+        >
+          <TableHeader columns={columns}>
+            {(column) => (
+              <TableColumn
+                className={classNames.header(column)}
+                key={column.key}
+              >
+                {column.info ? (
+                  <Tooltip content={column.info} offset={12}>
+                    {column.label}
+                  </Tooltip>
+                ) : (
+                  column.label
+                )}
+              </TableColumn>
             )}
-          </div>
-        }
-        aria-label={`Table squad : ${squad.id}`}
-        className={classNames.table}
-      >
-        <TableHeader columns={columns}>
-          {(column) => (
-            <TableColumn className={classNames.header(column)} key={column.key}>
-              {column.info ? (
-                <Tooltip content={column.info} offset={12}>
-                  {column.label}
-                </Tooltip>
-              ) : (
-                column.label
-              )}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody items={datas}>
-          {(item) => (
-            <TableRow key={item.teamId}>
-              {(columnKey) => (
-                <TableCell
-                  className={`text-center px-1 ${
-                    get(columnKey).color
-                      ? `bg-secondary text-background border-b-1`
-                      : ""
-                  }
+          </TableHeader>
+          <TableBody items={datas}>
+            {(item) => (
+              <TableRow key={item.teamId}>
+                {(columnKey) => (
+                  <TableCell
+                    className={`text-center px-1 ${
+                      get(columnKey).color
+                        ? `bg-secondary text-background border-b-1`
+                        : ""
+                    }
           `}
-                >
-                  {renderCell(item, columnKey)}
-                </TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+                  >
+                    {renderCell(item, columnKey)}
+                  </TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </>
     ),
     [
       datas,

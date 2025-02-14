@@ -80,14 +80,16 @@ export const useRankingHomePage = () => {
   const navigate = useNavigate();
   const { phaseId, squadId } = useParams();
 
-  const filterPhases =
-    phases?.filter(
-      (phase: Phase) => !squadId || !phaseId || parseInt(phaseId) == phase.id
-    ) || [];
-
+  const filterPhases = useMemo(
+    () =>
+      phases?.filter(
+        (phase: Phase) => !squadId || !phaseId || parseInt(phaseId) == phase.id
+      ) || [],
+    [phaseId, phases, squadId]
+  );
   const handleClick = (phaseId: string | number) => {
-    selectDay("0");
-    navigate(getPath(`/phase/${phaseId}`));
+    //selectDay("0");
+    navigate(getPath(`/phase/${phaseId}`), { replace: true });
   };
 
   return { handleClick, phaseId, phases: filterPhases };
@@ -97,10 +99,13 @@ export const useTableRankingHomePage = (phase: Phase) => {
   const { isTeamInSquad } = useCJoli();
   const { squadId, teamId } = useParams();
 
-  const filter = teamId
-    ? (squad: Squad) => isTeamInSquad(parseInt(teamId), squad)
-    : (squad: Squad) => !squadId || parseInt(squadId) == squad.id;
-  const squads = phase.squads.filter(filter);
+  const squads = useMemo(() => {
+    const filter = teamId
+      ? (squad: Squad) => isTeamInSquad(parseInt(teamId), squad)
+      : (squad: Squad) => !squadId || parseInt(squadId) == squad.id;
+    const squads = phase.squads.filter(filter);
+    return squads;
+  }, [isTeamInSquad, phase, squadId, teamId]);
 
   return { squads };
 };
@@ -125,9 +130,13 @@ export const useSquadTableRankingHomePage = (squad: Squad) => {
   const scores = ranking?.scores.scoreSquads.find((s) => s.squadId == squad.id);
   const datas = scores ? scores.scores : [];
 
-  const userMatches = squad.matches
-    .filter((m) => m.userMatch && !m.done && userConfig.useCustomEstimate)
-    .map((m) => m.userMatch!.id);
+  const userMatches = useMemo(
+    () =>
+      squad.matches
+        .filter((m) => m.userMatch && !m.done && userConfig.useCustomEstimate)
+        .map((m) => m.userMatch!.id),
+    [squad, userConfig]
+  );
   const hasSimulation = userMatches.length > 0;
 
   const handleRemove = useCallback(

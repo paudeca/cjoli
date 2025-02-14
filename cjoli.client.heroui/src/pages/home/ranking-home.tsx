@@ -4,6 +4,7 @@ import { useRankingHomePage } from "@/hooks";
 
 export const RankingkHome = () => {
   const { phases, phaseId, handleClick } = useRankingHomePage();
+  console.log("RankingHome");
   return (
     <Tabs
       items={phases}

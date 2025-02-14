@@ -1,5 +1,4 @@
-import { useCallback, useContext, useEffect } from "react";
-import { CJoliContext } from "@@/contexts";
+import { useCallback, useEffect } from "react";
 import {
   Match,
   Phase,
@@ -10,35 +9,30 @@ import {
   Tourney,
   TypePage,
 } from "../models";
-import { CJoliActions } from "@@/actions";
+import { useAppSelector } from ".";
+import { useDispatch } from "react-redux";
+import { cjoliActions } from "../stores";
 
 export const useCJoli = (page?: TypePage) => {
-  const ctx = useContext(CJoliContext);
-  if (!ctx) {
-    throw new Error("useCJoli has to be used within <CJoliProvider>");
-  }
+  const state = useAppSelector((state) => state.cjoli);
+  const dispatch = useDispatch();
 
-  const { state, dispatch } = ctx;
   const loadTourneys = useCallback(
-    (tourneys: Tourney[]) =>
-      dispatch({ type: CJoliActions.LOAD_TOURNEYS, payload: tourneys }),
+    (tourneys: Tourney[]) => dispatch(cjoliActions.loadTourneys(tourneys)),
     [dispatch]
   );
   const selectTourney = useCallback(
-    (tourney: Tourney) =>
-      dispatch({ type: CJoliActions.SELECT_TOURNEY, payload: tourney }),
+    (tourney: Tourney) => dispatch(cjoliActions.selectTourney(tourney)),
     [dispatch]
   );
 
   const loadRanking = useCallback(
-    (ranking: Ranking) =>
-      dispatch({ type: CJoliActions.LOAD_RANKING, payload: ranking }),
+    (ranking: Ranking) => dispatch(cjoliActions.loadRanking(ranking)),
     [dispatch]
   );
 
   const loadTourney = useCallback(
-    (tourney: Tourney) =>
-      dispatch({ type: CJoliActions.LOAD_TOURNEY, payload: tourney }),
+    (tourney: Tourney) => dispatch(cjoliActions.loadTourney(tourney)),
     [dispatch]
   );
 
@@ -156,22 +150,18 @@ export const useCJoli = (page?: TypePage) => {
   );
 
   const selectDay = useCallback(
-    (day: string) => dispatch({ type: CJoliActions.SELECT_DAY, payload: day }),
+    (day: string) => dispatch(cjoliActions.selectDay(day)),
     [dispatch]
   );
 
   const setColor = useCallback(
     (primary: string, secondary: string) =>
-      dispatch({
-        type: CJoliActions.SET_COLOR,
-        payload: { primary, secondary },
-      }),
+      dispatch(cjoliActions.setColor({ primary, secondary })),
     [dispatch]
   );
 
   const selectPage = useCallback(
-    (page: TypePage) =>
-      dispatch({ type: CJoliActions.SELECT_PAGE, payload: page }),
+    (page: TypePage) => dispatch(cjoliActions.selectPage(page)),
     [dispatch]
   );
 
