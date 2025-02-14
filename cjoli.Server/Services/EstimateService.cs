@@ -12,8 +12,8 @@ namespace cjoli.Server.Services
         {
             var userMatches = context.UserMatch.Where(u => user!=null && u.User == user && u.Match!=null).ToList();
 
-            var scoreUserA = userMatches.Select(u => CreateScore(u.Match.PositionA, u.Match.PositionB, u.ScoreA, u.ScoreB, u.Match, scores.ScoreSquads));
-            var scoreUserB = userMatches.Select(u => CreateScore(u.Match.PositionB, u.Match.PositionA, u.ScoreB, u.ScoreA, u.Match, scores.ScoreSquads));
+            var scoreUserA = userMatches.Where(u => u.Match != null).Select(u => CreateScore(u.Match.PositionA, u.Match.PositionB, u.ScoreA, u.ScoreB, u.Match, scores.ScoreSquads));
+            var scoreUserB = userMatches.Where(u => u.Match != null).Select(u => CreateScore(u.Match.PositionB, u.Match.PositionA, u.ScoreB, u.ScoreA, u.Match, scores.ScoreSquads));
             var scoreUsers = scoreUserA.Concat(scoreUserB).ToList();
 
             var queryMatch = context.MatchResult.Where(r => r.Match.Squad!.Phase.Tourney.Category == tourney.Category);
