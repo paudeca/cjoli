@@ -44,7 +44,7 @@ export const MatchHome = () => {
 
   useEffect(() => {
     if (keys && keys.length > 0 && !keys.includes(daySelected)) {
-      selectDay(keys[0]);
+      ///selectDay(keys[0]);
     }
   }, [keys, selectDay, daySelected]);
 

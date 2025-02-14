@@ -1,6 +1,6 @@
 import { BootstrapContext } from "@@/contexts";
-import { useUser, useConfig, useUid } from "@@/hooks";
-import { useCallback, useEffect, useState } from "react";
+import { useConfig } from "@@/hooks";
+import { useEffect, useState } from "react";
 import i18n from "i18next";
 import Backend, { HttpBackendOptions } from "i18next-http-backend";
 import LanguageDetector from "i18next-browser-languagedetector";
@@ -14,8 +14,6 @@ import "dayjs/locale/fr";
 import "dayjs/locale/pt";
 import "dayjs/locale/es";
 import "dayjs/locale/de";
-import useWebSocket from "react-use-websocket";
-import { MessageServer } from "../models";
 
 dayjs.locale("fr");
 
@@ -28,9 +26,8 @@ export const BootstrapProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { url, server } = useConfig();
+  const { url } = useConfig();
   const [loaded, setLoaded] = useState(false);
-  const uid = useUid();
 
   useEffect(() => {
     if (!i18n.isInitialized && !i18n.isInitializing) {
@@ -54,40 +51,8 @@ export const BootstrapProvider = ({
     }
   }, [url]);
 
-  /*const { sendJsonMessage: sendMessage, lastJsonMessage: lastMessage } =
-    useWebSocket<MessageServer>(`${server}/server/ws`, {
-      share: true,
-      shouldReconnect: () => true,
-      reconnectAttempts: 100,
-      reconnectInterval: (count: number) =>
-        Math.min(Math.pow(2, count) * 1000, 60000), //max 60s interval
-      onOpen: () => {
-        if (uid) {
-          sendMessage({ type: "selectTourney", uid });
-        }
-      },
-    });
-
-  const register = useCallback(
-    (type: string, callback: (value: number) => void) => {
-      console.log("Register", type, callback, lastMessage);
-      if (lastMessage != null && lastMessage.type == type) {
-        console.log("execute callback", type, lastMessage.value);
-        callback(lastMessage.value);
-      }
-    },
-    []
-  );*/
   const sendMessage = () => {};
   const register = () => {};
-
-  const { setCountUser } = useUser();
-
-  /*useEffect(() => {
-    register("users", (value) => {
-      setCountUser(value);
-    });
-  }, [register, setCountUser]);*/
 
   return (
     <BootstrapContext.Provider value={{ loaded, sendMessage, register }}>

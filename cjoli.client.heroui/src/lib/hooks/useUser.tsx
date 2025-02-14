@@ -1,24 +1,22 @@
-import { useCallback, useContext } from "react";
-import { UserContext } from "@@/contexts/UserContext";
+import { useCallback } from "react";
 import { User, UserConfig } from "@@/models";
 import { useCJoli } from "./useCJoli";
-import { UserActions } from "@@/actions";
 import { useCjoliService } from "./useServices";
 import { useUid } from "./useUid";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from ".";
+import { userActions } from "@@/stores/user-slice";
 
 export const useUser = () => {
-  const ctx = useContext(UserContext);
   const { loadRanking } = useCJoli();
   const uid = useUid();
   const service = useCjoliService();
-  if (!ctx) {
-    throw new Error("useUser has to be used within <UserProvider>");
-  }
 
-  const { state, dispatch } = ctx;
+  const dispatch = useDispatch();
+  const state = useAppSelector((state) => state.user);
 
   const loadUser = useCallback(
-    (user?: User) => dispatch({ type: UserActions.LOAD_USER, payload: user }),
+    (user?: User) => dispatch(userActions.loadUser(user)),
     [dispatch]
   );
 
@@ -60,8 +58,7 @@ export const useUser = () => {
   );
 
   const setCountUser = useCallback(
-    (count: number) =>
-      dispatch({ type: UserActions.COUNT_USER, payload: count }),
+    (count: number) => dispatch(userActions.setCountUser(count)),
     [dispatch]
   );
 
@@ -70,6 +67,7 @@ export const useUser = () => {
       try {
         const ranking = await service.saveUserConfig(uid, userConfig);
         loadRanking(ranking);
+        //TODO use slice redux
         const configs =
           state.user?.configs?.map((c) =>
             c.tourneyId == userConfig.tourneyId ? userConfig : c

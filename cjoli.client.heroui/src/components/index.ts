@@ -4,6 +4,7 @@ export * from "./cjoli-image";
 export * from "./cjoli-loading";
 export * from "./cjoli-modal";
 export * from "./cjoli-popover";
+export * from "./cjoli-table";
 export * from "./dropdowns";
 export * from "./modals";
 export * from "./popovers";
