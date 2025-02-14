@@ -10,7 +10,7 @@ namespace cjoli.Server.Services
 
         public void CalculateEstimates(Tourney tourney, ScoresDto scores, User? user, CJoliContext context)
         {
-            var userMatches = context.UserMatch.Where(u => u.User == user).ToList();
+            var userMatches = context.UserMatch.Where(u => user!=null && u.User == user).ToList();
 
             var scoreUserA = userMatches.Select(u => CreateScore(u.Match.PositionA, u.Match.PositionB, u.ScoreA, u.ScoreB, u.Match, scores.ScoreSquads));
             var scoreUserB = userMatches.Select(u => CreateScore(u.Match.PositionB, u.Match.PositionA, u.ScoreB, u.ScoreA, u.Match, scores.ScoreSquads));
