@@ -23,10 +23,12 @@ namespace cjoli.Server.Services
         private readonly IServiceProvider _service;
         private readonly ILogger<CJoliService> _logger;
         private readonly IMemoryCache _memoryCache;
+        private readonly IConfiguration _configuration;
+
 
         private readonly Dictionary<string, IRule> _rules = new Dictionary<string, IRule>();
 
-        public CJoliService(EstimateService estimateService, ServerService serverService, UserService userService, IMapper mapper, IServiceProvider service, ILogger<CJoliService> logger, IMemoryCache memoryCache)
+        public CJoliService(EstimateService estimateService, ServerService serverService, UserService userService, IMapper mapper, IServiceProvider service, ILogger<CJoliService> logger, IMemoryCache memoryCache, IConfiguration configuration)
         {
             _estimateService = estimateService;
             _serverService = serverService;
@@ -35,6 +37,7 @@ namespace cjoli.Server.Services
             _service = service;
             _logger = logger;
             _memoryCache = memoryCache;
+            _configuration = configuration;
 
             _rules.Add("simple", new SimpleRule(this));
             _rules.Add("simple210", new Simple210Rule(this));
@@ -154,7 +157,10 @@ namespace cjoli.Server.Services
                 AffectationTeams(dto);
                 CalculateHistory(dto);
                 CalculateAllBetScores(dto, user, context);
-                map.Add(loginKey, dto);
+                if(!map!.ContainsKey(loginKey))
+                {
+                    map.Add(loginKey, dto);
+                }
             }
             _logger.LogInformation($"Time[CreateRanking]:{sw.ElapsedMilliseconds}ms");
             return map![loginKey];
@@ -441,9 +447,10 @@ namespace cjoli.Server.Services
 
         private void CalculateAllBetScores(RankingDto ranking, User? user, CJoliContext context)
         {
+            var source = _configuration["Source"];
             int tourneyId = ranking.Tourney.Id;
             var query = context.UserMatch
-                .Where(u => u.Match.Squad!.Phase.Tourney.Id == tourneyId && u.Match.Done)
+                .Where(u => u.Match.Squad!.Phase.Tourney.Id == tourneyId && u.Match.Done && u.User!.Source == source)
                 .Include(u => u.User).ThenInclude(u => u!=null?u.Configs:null);
             var scores = query
                 .GroupBy(u => u.User).Select(kv =>                
