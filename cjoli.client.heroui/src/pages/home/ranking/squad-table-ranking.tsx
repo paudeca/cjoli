@@ -16,7 +16,13 @@ import { ButtonSquadTableRanking } from "./button-squad-table-ranking";
 import { SimultPopover } from "@/components/popovers/simul-popover";
 import { CellTeamSquadTableRanking } from "./cell-team-squad-table-ranking";
 import { useSquadTableRankingHomePage } from "@/hooks";
-import { CJoliTable } from "@/components";
+import {
+  CJoliTable,
+  CJoliTableBody,
+  CJoliTableColumn,
+  CJoliTableHeader,
+  CJoliTableRow,
+} from "@/components";
 
 interface Column {
   key: keyof Score;
@@ -103,7 +109,14 @@ export const SquadTableRanking: FC<SquadTableRankingProps> = ({
       classNames: { table: string; header: (column: Column) => string }
     ) => (
       <>
-        <CJoliTable></CJoliTable>
+        <CJoliTable>
+          <CJoliTableHeader columns={columns}>
+            {(column) => <CJoliTableColumn>{column.label}</CJoliTableColumn>}
+          </CJoliTableHeader>
+          <CJoliTableBody items={datas}>
+            {(item) => <CJoliTableRow></CJoliTableRow>}
+          </CJoliTableBody>
+        </CJoliTable>
         <Table
           isStriped
           isCompact
