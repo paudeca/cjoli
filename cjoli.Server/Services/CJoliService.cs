@@ -450,7 +450,7 @@ namespace cjoli.Server.Services
             var source = _configuration["Source"];
             int tourneyId = ranking.Tourney.Id;
             var query = context.UserMatch
-                .Where(u => u.Match.Squad!.Phase.Tourney.Id == tourneyId && u.Match.Done && u.User!.Source == source)
+                .Where(u => u.Match.Squad!.Phase.Tourney.Id == tourneyId && u.Match.Done && (u.User!.Source == source || u.User==null))
                 .Include(u => u.User).ThenInclude(u => u!=null?u.Configs:null);
             var scores = query
                 .GroupBy(u => u.User).Select(kv =>                
