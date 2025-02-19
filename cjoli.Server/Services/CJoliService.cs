@@ -149,7 +149,7 @@ namespace cjoli.Server.Services
             Stopwatch sw = Stopwatch.StartNew();
             string loginKey = login ?? "anonymous";
             var map = _memoryCache.GetOrCreate(tourneyUid, entry => new Dictionary<string, RankingDto>());
-            if(!map!.ContainsKey(loginKey))
+            if(!map!.ContainsKey(loginKey) || true)
             {
                 User? user = GetUserWithConfig(login, tourneyUid, context);
                 var ranking = GetRanking(tourneyUid, user, context);
@@ -159,6 +159,10 @@ namespace cjoli.Server.Services
                 CalculateAllBetScores(dto, user, context);
                 if(!map!.ContainsKey(loginKey))
                 {
+                    map.Add(loginKey, dto);
+                } else
+                {
+                    map.Remove(loginKey);
                     map.Add(loginKey, dto);
                 }
             }
