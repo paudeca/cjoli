@@ -673,11 +673,13 @@ namespace cjoli.Server.Services
 
         public void SaveMatch(MatchDto dto, string login, string uuid, CJoliContext context)
         {
+            var source = _configuration["Source"];
+
             User user = GetUserWithConfigMatch(login, uuid, context);
             Match? match = context.Match
                 .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
                 .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
-                .Include(m=>m.UserMatches).ThenInclude(u=>u.User)
+                .Include(m=>m.UserMatches.Where(u=>u.User==null || u.User.Source==source)).ThenInclude(u=>u.User)
                 .Include(m=>m.Squad).ThenInclude(s=>s.Phase).ThenInclude(p=>p.Tourney)
                 .Include(m=>m.Estimates.Where(e=>e.User==null))
                 .SingleOrDefault(m => m.Id == dto.Id);
