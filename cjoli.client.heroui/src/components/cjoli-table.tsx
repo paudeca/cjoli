@@ -15,6 +15,17 @@ export const CJoliTableColumn = ({ children }: CJoliTableColumn) => {
   );
 };
 
+interface CJoliTableCellProps {
+  children: ReactNode;
+}
+export const CJoliTableCell = ({ children }: CJoliTableCellProps) => {
+  return (
+    <td className="relative align-middle whitespace-normal text-small font-normal">
+      {children}
+    </td>
+  );
+};
+
 interface CJoliTableHeaderProps<T> {
   columns: T[];
   children: (column: T) => ReactElement;
@@ -33,10 +44,18 @@ export const CJoliTableHeader = <T extends { key: string; label: string }>({
   );
 };
 
-export const CJoliTableRow = () => {
+interface CJoliTableRowProps<T> {
+  columns: T[];
+  children: (column: T) => ReactNode;
+}
+
+export const CJoliTableRow = <T,>({
+  columns,
+  children,
+}: CJoliTableRowProps<T>) => {
   return (
     <tr className="group/tr outline-none" role="row">
-      ROW
+      {columns.map((c) => children(c))}
     </tr>
   );
 };
@@ -80,7 +99,10 @@ export const CJoliTableBody = <T,>({
 };
 
 interface CJoliTableProps<T> {
-  children: [ReactElement<CJoliTableHeaderProps<T>>, ReactElement];
+  children: [
+    ReactElement<CJoliTableHeaderProps<T>>,
+    ReactElement<CJoliTableBodyProps<T>>,
+  ];
 }
 
 export const CJoliTable = <T,>({ children }: CJoliTableProps<T>) => {
