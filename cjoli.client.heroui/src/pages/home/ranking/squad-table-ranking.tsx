@@ -19,6 +19,7 @@ import { useSquadTableRankingHomePage } from "@/hooks";
 import {
   CJoliTable,
   CJoliTableBody,
+  CJoliTableCell,
   CJoliTableColumn,
   CJoliTableHeader,
   CJoliTableRow,
@@ -114,7 +115,15 @@ export const SquadTableRanking: FC<SquadTableRankingProps> = ({
             {(column) => <CJoliTableColumn>{column.label}</CJoliTableColumn>}
           </CJoliTableHeader>
           <CJoliTableBody items={datas}>
-            {(item) => <CJoliTableRow></CJoliTableRow>}
+            {(item) => (
+              <CJoliTableRow columns={columns}>
+                {(column) => (
+                  <CJoliTableCell>
+                    {renderCell(item, column.key)}
+                  </CJoliTableCell>
+                )}
+              </CJoliTableRow>
+            )}
           </CJoliTableBody>
         </CJoliTable>
         <Table
@@ -160,7 +169,7 @@ export const SquadTableRanking: FC<SquadTableRankingProps> = ({
                         ? `bg-secondary text-background border-b-1`
                         : ""
                     }
-          `}
+                  `}
                   >
                     {renderCell(item, columnKey)}
                   </TableCell>
