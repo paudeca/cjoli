@@ -193,7 +193,9 @@ namespace cjoli.Server.Services
         {
             var scoreTourney = new Score();
             var scoreSquads = new List<ScoreSquad>();
-            foreach (var phase in tourney.Phases)
+            var phases = tourney.Phases;
+            phases.Sort((a, b) => a.Id < b.Id ? -1 : 1);
+            foreach (var phase in phases)
             {
                 foreach (var squad in phase.Squads)
                 {

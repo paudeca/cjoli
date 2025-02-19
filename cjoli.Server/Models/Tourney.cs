@@ -21,7 +21,7 @@ namespace cjoli.Server.Models
         public IRule? Config { get; set; }
 
         public IList<Team> Teams { get; set; } = new List<Team>();
-        public IList<Phase> Phases { get; set; } = new List<Phase>();
+        public List<Phase> Phases { get; set; } = new List<Phase>();
         public IList<Rank> Ranks { get; set; } = new List<Rank>();
         public IList<TeamData> TeamDatas { get; set; } = new List<TeamData>();
     }
