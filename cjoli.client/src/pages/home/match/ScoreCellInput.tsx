@@ -21,7 +21,7 @@ const ScoreCellInput = ({
   saveMatch,
   register,
 }: ScoreCellInputProps) => {
-  const { isConnected } = useUser();
+  const { isAdmin } = useUser();
   const { tourney } = useCJoli();
   const placeholder = teamA
     ? match.estimate?.scoreA.toString()
@@ -36,7 +36,7 @@ const ScoreCellInput = ({
         placeholder={placeholder}
         data-testid={id}
       />
-      {isConnected && tourney?.config?.hasForfeit && (
+      {isAdmin && tourney?.config?.hasForfeit && (
         <DropdownButton variant="outline-secondary" title="">
           <Dropdown.Item
             href="#"

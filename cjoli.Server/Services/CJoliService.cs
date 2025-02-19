@@ -160,6 +160,10 @@ namespace cjoli.Server.Services
                 if(!map!.ContainsKey(loginKey))
                 {
                     map.Add(loginKey, dto);
+                } else
+                {
+                    map.Remove(loginKey);
+                    map.Add(loginKey, dto);
                 }
             }
             _logger.LogInformation($"Time[CreateRanking]:{sw.ElapsedMilliseconds}ms");
@@ -189,7 +193,9 @@ namespace cjoli.Server.Services
         {
             var scoreTourney = new Score();
             var scoreSquads = new List<ScoreSquad>();
-            foreach (var phase in tourney.Phases)
+            var phases = tourney.Phases;
+            phases.Sort((a, b) => a.Id < b.Id ? -1 : 1);
+            foreach (var phase in phases)
             {
                 foreach (var squad in phase.Squads)
                 {
@@ -268,7 +274,7 @@ namespace cjoli.Server.Services
                 }
             }
             UpdateSource(a, b, SourceType.equal, 0, true);
-            return 0;
+            return positionA.Value<positionB.Value?-1:1;
         };
 
         public Action<Match, MatchDto> DefaultApplyForfeit = (Match match, MatchDto dto) =>
@@ -283,10 +289,10 @@ namespace cjoli.Server.Services
         private ScoreSquad CalculateScoreSquad(Squad squad, Score scoreTourney, List<ScoreSquad> scoreSquads, User? user)
         {
             IRule rule = GetRule(squad.Phase.Tourney.Rule);
-            Dictionary<int, Score> scores = rule.InitScoreSquad(squad, scoreSquads);
+            Dictionary<int, Score> scores = rule.InitScoreSquad(squad, scoreSquads, user);
             squad.Matches.Aggregate(scores, (acc, m) =>
             {
-                var userMatch = m.UserMatches.FirstOrDefault();
+                var userMatch = m.UserMatches.OrderByDescending(u=>u.LogTime).FirstOrDefault(u => u.User == user);
                 bool useCustom = user != null && user.HasCustomEstimate();
 
                 if ((userMatch == null || !useCustom) && !m.Done)
@@ -375,6 +381,9 @@ namespace cjoli.Server.Services
                 {
                     var positionParent = positions.Single(p => p.Id == score.PositionId);
                     position.TeamId = positionParent.TeamId;
+                } else
+                {
+                    position.TeamId = 0;
                 }
             }
             var matches = ranking.Tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Matches);
@@ -664,11 +673,13 @@ namespace cjoli.Server.Services
 
         public void SaveMatch(MatchDto dto, string login, string uuid, CJoliContext context)
         {
+            var source = _configuration["Source"];
+
             User user = GetUserWithConfigMatch(login, uuid, context);
             Match? match = context.Match
                 .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
                 .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
-                .Include(m=>m.UserMatches)
+                .Include(m=>m.UserMatches.Where(u=>u.User==null || u.User.Source==source)).ThenInclude(u=>u.User)
                 .Include(m=>m.Squad).ThenInclude(s=>s.Phase).ThenInclude(p=>p.Tourney)
                 .Include(m=>m.Estimates.Where(e=>e.User==null))
                 .SingleOrDefault(m => m.Id == dto.Id);
@@ -735,7 +746,7 @@ namespace cjoli.Server.Services
 
         private void UpsertUserMatch(MatchDto dto, Match match, User? user)
         {
-            UserMatch? userMatch = match.UserMatches.SingleOrDefault(u => u.User == user);
+            UserMatch? userMatch = match.UserMatches.OrderByDescending(u=>u.LogTime).FirstOrDefault(u => u.User == user);
             if (userMatch == null)
             {
                 userMatch = new UserMatch() { Match = match, User = user };
@@ -792,8 +803,8 @@ namespace cjoli.Server.Services
             }
             else
             {
-                UserMatch? userMatch = match.UserMatches.SingleOrDefault(u => u.User == user);
-                if (userMatch != null)
+                List<UserMatch> userMatches = match.UserMatches.Where(u => u.User == user).ToList();
+                foreach(var userMatch in userMatches)
                 {
                     context.Remove(userMatch);
                 }

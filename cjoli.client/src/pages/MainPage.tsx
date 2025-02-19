@@ -90,7 +90,7 @@ const MainPage = () => {
         team.datas?.secondaryColor ?? team.secondaryColor ?? "#932829"
       );
     }
-  }, [teams, userConfig, setColor]);
+  }, [teams, userConfig.favoriteTeamId, setColor]);
 
   useEffect(() => {
     if (!init) {

@@ -49,7 +49,7 @@ export const useUser = () => {
       user?.configs?.find((c) => c.tourneyId == tourney?.id) || {
         tourneyId: 0,
         useCustomEstimate: false,
-        favoriteTeamId: 0,
+        favoriteTeamId: uid == "hogly2025" ? 34 : 0,
         isAdmin: false,
       }
     );
