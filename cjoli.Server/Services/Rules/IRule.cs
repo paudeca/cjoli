@@ -16,6 +16,6 @@ namespace cjoli.Server.Services.Rules
         Action<Match, MatchDto> ApplyForfeit { get; }
 
 
-        Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads);
+        Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads, User? user);
     }
 }

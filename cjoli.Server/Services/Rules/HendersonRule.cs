@@ -24,7 +24,7 @@ namespace cjoli.Server.Services.Rules
         public Func<Squad, Comparison<Score>> ScoreComparison => _service.DefaultScoreComparison;
         public Action<Match, MatchDto> ApplyForfeit => _service.DefaultApplyForfeit;
 
-        public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads)
+        public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads, User? user)
         {
             var mapPositions = squad.Positions.Where(p => p.ParentPosition != null).ToDictionary(p => p.Id, p =>
             {
@@ -44,7 +44,7 @@ namespace cjoli.Server.Services.Rules
             Dictionary<int, Score> initScores = positionIds.ToDictionary(p => p, p => new Score() { PositionId = p });
             matches.Aggregate(initScores, (acc, m) =>
             {
-                var userMatch = m.UserMatches.FirstOrDefault();
+                var userMatch = m.UserMatches.OrderByDescending(u=>u.LogTime).FirstOrDefault(u=>u.User==user);
                 if (userMatch == null && !m.Done)
                 {
                     return acc;

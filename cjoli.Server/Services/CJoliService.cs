@@ -272,7 +272,7 @@ namespace cjoli.Server.Services
                 }
             }
             UpdateSource(a, b, SourceType.equal, 0, true);
-            return 0;
+            return positionA.Value<positionB.Value?-1:1;
         };
 
         public Action<Match, MatchDto> DefaultApplyForfeit = (Match match, MatchDto dto) =>
@@ -287,10 +287,10 @@ namespace cjoli.Server.Services
         private ScoreSquad CalculateScoreSquad(Squad squad, Score scoreTourney, List<ScoreSquad> scoreSquads, User? user)
         {
             IRule rule = GetRule(squad.Phase.Tourney.Rule);
-            Dictionary<int, Score> scores = rule.InitScoreSquad(squad, scoreSquads);
+            Dictionary<int, Score> scores = rule.InitScoreSquad(squad, scoreSquads, user);
             squad.Matches.Aggregate(scores, (acc, m) =>
             {
-                var userMatch = m.UserMatches.FirstOrDefault();
+                var userMatch = m.UserMatches.OrderByDescending(u=>u.LogTime).FirstOrDefault(u => u.User == user);
                 bool useCustom = user != null && user.HasCustomEstimate();
 
                 if ((userMatch == null || !useCustom) && !m.Done)
@@ -379,6 +379,9 @@ namespace cjoli.Server.Services
                 {
                     var positionParent = positions.Single(p => p.Id == score.PositionId);
                     position.TeamId = positionParent.TeamId;
+                } else
+                {
+                    position.TeamId = 0;
                 }
             }
             var matches = ranking.Tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Matches);
@@ -739,7 +742,7 @@ namespace cjoli.Server.Services
 
         private void UpsertUserMatch(MatchDto dto, Match match, User? user)
         {
-            UserMatch? userMatch = match.UserMatches.SingleOrDefault(u => u.User == user);
+            UserMatch? userMatch = match.UserMatches.OrderByDescending(u=>u.LogTime).FirstOrDefault(u => u.User == user);
             if (userMatch == null)
             {
                 userMatch = new UserMatch() { Match = match, User = user };
@@ -796,8 +799,8 @@ namespace cjoli.Server.Services
             }
             else
             {
-                UserMatch? userMatch = match.UserMatches.SingleOrDefault(u => u.User == user);
-                if (userMatch != null)
+                List<UserMatch> userMatches = match.UserMatches.Where(u => u.User == user).ToList();
+                foreach(var userMatch in userMatches)
                 {
                     context.Remove(userMatch);
                 }
