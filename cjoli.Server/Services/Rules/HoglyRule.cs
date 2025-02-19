@@ -1,6 +1,7 @@
 ﻿
 
 using cjoli.Server.Dtos;
+using cjoli.Server.Extensions;
 using cjoli.Server.Models;
 
 namespace cjoli.Server.Services.Rules
@@ -82,7 +83,8 @@ namespace cjoli.Server.Services.Rules
             matches.Aggregate(initScores, (acc, m) =>
             {
                 var userMatch = m.UserMatches.OrderByDescending(u=>u.LogTime).FirstOrDefault(u=>u.User==user);
-                if (userMatch == null && !m.Done)
+                bool useCustom = user != null && user.HasCustomEstimate();
+                if ((userMatch == null || !useCustom) && !m.Done)
                 {
                     return acc;
                 }

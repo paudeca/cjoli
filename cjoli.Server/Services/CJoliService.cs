@@ -149,7 +149,7 @@ namespace cjoli.Server.Services
             Stopwatch sw = Stopwatch.StartNew();
             string loginKey = login ?? "anonymous";
             var map = _memoryCache.GetOrCreate(tourneyUid, entry => new Dictionary<string, RankingDto>());
-            if(!map!.ContainsKey(loginKey) || true)
+            if(!map!.ContainsKey(loginKey))
             {
                 User? user = GetUserWithConfig(login, tourneyUid, context);
                 var ranking = GetRanking(tourneyUid, user, context);
