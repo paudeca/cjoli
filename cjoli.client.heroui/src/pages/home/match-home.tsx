@@ -42,6 +42,16 @@ export const MatchHome = () => {
     return keys;
   }, [datas]);
 
+  const map = useMemo(() => {
+    return keys.reduce<Record<string, Record<string, Match[]>>>((acc, k) => {
+      const m = datas[k].reduce<Record<string, Match[]>>((acc, m) => {
+        const key = dayjs(m.time).format("LT");
+        return { ...acc, [key]: [...(acc[key] || []), m] };
+      }, {});
+      return { ...acc, [k]: m };
+    }, {});
+  }, [datas, keys]);
+
   useEffect(() => {
     if (keys && keys.length > 0 && !keys.includes(daySelected)) {
       ///selectDay(keys[0]);
@@ -55,10 +65,11 @@ export const MatchHome = () => {
   //const { saveMatch, clearMatch, register } = useMatch(uid);
 
   const items = keys.map((k) => ({ key: k, title: k }));
+  console.log("MAP", map);
 
   return (
     <CjoliAccordion items={items}>
-      {(item) => <TableMatch key={item.key} />}
+      {(item) => <TableMatch key={item.key} datas={map[item.key]} />}
     </CjoliAccordion>
   );
 };

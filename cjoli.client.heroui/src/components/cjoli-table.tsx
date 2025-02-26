@@ -1,14 +1,22 @@
-import { Children, ReactElement, ReactNode } from "react";
+import { ReactElement, ReactNode } from "react";
 
 interface CJoliTableColumn {
   children: ReactNode;
+  key: string | number;
+  className?: string;
+  colSpan?: number;
 }
 
-export const CJoliTableColumn = ({ children }: CJoliTableColumn) => {
+export const CJoliTableColumn = ({
+  children,
+  className,
+  colSpan,
+}: CJoliTableColumn) => {
   return (
     <th
-      className="group/th px-3 h-10 align-middle bg-default-100 whitespace-nowrap text-tinify font-semibold first:rounded-s-large last:rounded-e-large"
+      className={`group/th px-3 h-10 align-middle bg-default-100 whitespace-nowrap text-tiny font-semibold first:rounded-tl-large last:rounded-tr-large ${className}`}
       role="columnheader"
+      colSpan={colSpan ?? 1}
     >
       {children}
     </th>
@@ -17,10 +25,23 @@ export const CJoliTableColumn = ({ children }: CJoliTableColumn) => {
 
 interface CJoliTableCellProps {
   children: ReactNode;
+  key: string | number;
+  className?: string;
+  rowSpan?: number;
+  colSpan?: number;
 }
-export const CJoliTableCell = ({ children }: CJoliTableCellProps) => {
+export const CJoliTableCell = ({
+  children,
+  className,
+  rowSpan,
+  colSpan,
+}: CJoliTableCellProps) => {
   return (
-    <td className="relative align-middle whitespace-normal text-small font-normal">
+    <td
+      className={`relative align-middle whitespace-normal text-small font-normal ${className}`}
+      rowSpan={rowSpan ?? 1}
+      colSpan={colSpan ?? 1}
+    >
       {children}
     </td>
   );
@@ -40,6 +61,7 @@ export const CJoliTableHeader = <T extends { key: string; label: string }>({
       <tr className="group/tr" role="row">
         {columns.map((c) => children(c))}
       </tr>
+      <tr className="w-px h-px block" tabIndex={-1} />
     </thead>
   );
 };
@@ -47,6 +69,7 @@ export const CJoliTableHeader = <T extends { key: string; label: string }>({
 interface CJoliTableRowProps<T> {
   columns: T[];
   children: (column: T) => ReactNode;
+  key: string | number;
 }
 
 export const CJoliTableRow = <T,>({
@@ -54,7 +77,7 @@ export const CJoliTableRow = <T,>({
   children,
 }: CJoliTableRowProps<T>) => {
   return (
-    <tr className="group/tr outline-none" role="row">
+    <tr className={`group/tr outline-none even:bg-default-100`} role="row">
       {columns.map((c) => children(c))}
     </tr>
   );
@@ -69,45 +92,28 @@ export const CJoliTableBody = <T,>({
   items,
   children,
 }: CJoliTableBodyProps<T>) => {
-  return (
-    <tbody role="rowgroup">
-      {items.map((i) => children(i))}
-      <tr className="group/tr outline-none" role="row">
-        <td
-          className="relative align-middle whitespace-normal text-small font-normal"
-          rowSpan={2}
-        >
-          B
-        </td>
-        <td
-          className="relative align-middle whitespace-normal text-small font-normal"
-          colSpan={2}
-        >
-          C
-        </td>
-      </tr>
-      <tr className="group/tr outline-none" role="row">
-        <td className="relative align-middle whitespace-normal text-small font-normal">
-          D
-        </td>
-        <td className="relative align-middle whitespace-normal text-small font-normal">
-          E
-        </td>
-      </tr>
-    </tbody>
-  );
+  return <tbody role="rowgroup">{items.map((i) => children(i))}</tbody>;
 };
 
 interface CJoliTableProps<T> {
-  children: [
-    ReactElement<CJoliTableHeaderProps<T>>,
-    ReactElement<CJoliTableBodyProps<T>>,
-  ];
+  children:
+    | [
+        ReactElement<CJoliTableHeaderProps<T>>,
+        ReactElement<CJoliTableBodyProps<T>>,
+      ]
+    | ReactElement<CJoliTableBodyProps<T>>;
+  topContent?: ReactNode;
+  className?: string;
 }
 
-export const CJoliTable = <T,>({ children }: CJoliTableProps<T>) => {
+export const CJoliTable = <T,>({
+  children,
+  topContent,
+  className,
+}: CJoliTableProps<T>) => {
   return (
-    <div className="flex-col relative gap-4 w-full">
+    <div className={`flex-col relative gap-4 w-full ${className}`}>
+      {topContent}
       <div className="p-4 z-0 flex flex-col relative justify-between gap-4 bg-content1 overflow-auto rounded-large shadow-small w-full">
         <table className="min-w-full h-auto table-auto w-full" role="grid">
           {children}

@@ -113,7 +113,6 @@ export const useTableRankingHomePage = (phase: Phase) => {
 interface Column {
   key: keyof Score;
   label: string;
-  color?: boolean;
   info?: string;
   mobile?: boolean;
 }
@@ -154,7 +153,6 @@ export const useSquadTableRankingHomePage = (squad: Squad) => {
       {
         key: "total",
         label: "PTS",
-        color: true,
         info: t("rank.total", "Points"),
       },
       {
