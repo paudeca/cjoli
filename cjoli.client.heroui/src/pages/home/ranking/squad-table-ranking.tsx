@@ -1,15 +1,5 @@
 import { Phase, Score, Squad } from "@/lib/core";
-import {
-  Chip,
-  getKeyValue,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Tooltip,
-} from "@heroui/react";
+import { Chip, getKeyValue, Tooltip } from "@heroui/react";
 import { FC, Fragment, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { ButtonSquadTableRanking } from "./button-squad-table-ranking";
@@ -28,7 +18,6 @@ import {
 interface Column {
   key: keyof Score;
   label: string;
-  color?: boolean;
   info?: string;
   mobile?: boolean;
 }
@@ -96,101 +85,71 @@ export const SquadTableRanking: FC<SquadTableRankingProps> = ({
         </Chip>
       );
     }
-    return topContent;
-  }, [phase, squad, squadId, squads]);
-
-  const get = useCallback(
-    (key: string | number) => columns.find((c) => c.key == key) ?? columns[0],
-    [columns]
-  );
+    return (
+      <div className="py-4">
+        {topContent}
+        {hasSimulation && (
+          <SimultPopover
+            title={`${t("rank.simulation", "Simulation")} - ${squad.name}`}
+            onRemove={handleRemove(userMatches)}
+          />
+        )}
+      </div>
+    );
+  }, [
+    phase,
+    squad,
+    squadId,
+    squads,
+    handleRemove,
+    t,
+    hasSimulation,
+    userMatches,
+  ]);
 
   const createTable = useCallback(
     (
       columns: Column[],
-      classNames: { table: string; header: (column: Column) => string }
+      classNames: {
+        table: string;
+        header: (column: Column) => string;
+        cell: (column: Column) => string;
+      }
     ) => (
-      <>
-        <CJoliTable>
-          <CJoliTableHeader columns={columns}>
-            {(column) => <CJoliTableColumn>{column.label}</CJoliTableColumn>}
-          </CJoliTableHeader>
-          <CJoliTableBody items={datas}>
-            {(item) => (
-              <CJoliTableRow columns={columns}>
-                {(column) => (
-                  <CJoliTableCell>
-                    {renderCell(item, column.key)}
-                  </CJoliTableCell>
-                )}
-              </CJoliTableRow>
-            )}
-          </CJoliTableBody>
-        </CJoliTable>
-        <Table
-          isStriped
-          isCompact
-          topContent={
-            <div>
-              {topContent}
-              {hasSimulation && (
-                <SimultPopover
-                  title={`${t("rank.simulation", "Simulation")} - ${squad.name}`}
-                  onRemove={handleRemove(userMatches)}
-                />
+      <CJoliTable className={classNames.table} topContent={topContent}>
+        <CJoliTableHeader columns={columns}>
+          {(column) => (
+            <CJoliTableColumn
+              key={column.key}
+              className={classNames.header(column)}
+            >
+              {column.info ? (
+                <Tooltip content={column.info} offset={12}>
+                  {column.label}
+                </Tooltip>
+              ) : (
+                column.label
               )}
-            </div>
-          }
-          aria-label={`Table squad : ${squad.id}`}
-          className={classNames.table}
-        >
-          <TableHeader columns={columns}>
-            {(column) => (
-              <TableColumn
-                className={classNames.header(column)}
-                key={column.key}
-              >
-                {column.info ? (
-                  <Tooltip content={column.info} offset={12}>
-                    {column.label}
-                  </Tooltip>
-                ) : (
-                  column.label
-                )}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody items={datas}>
-            {(item) => (
-              <TableRow key={item.teamId}>
-                {(columnKey) => (
-                  <TableCell
-                    className={`text-center px-1 ${
-                      get(columnKey).color
-                        ? `bg-secondary text-background border-b-1`
-                        : ""
-                    }
-                  `}
-                  >
-                    {renderCell(item, columnKey)}
-                  </TableCell>
-                )}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </>
+            </CJoliTableColumn>
+          )}
+        </CJoliTableHeader>
+        <CJoliTableBody items={datas}>
+          {(item) => (
+            <CJoliTableRow key={item.positionId} columns={columns}>
+              {(column) => (
+                <CJoliTableCell
+                  key={column.key}
+                  className={classNames.cell(column)}
+                >
+                  {renderCell(item, column.key)}
+                </CJoliTableCell>
+              )}
+            </CJoliTableRow>
+          )}
+        </CJoliTableBody>
+      </CJoliTable>
     ),
-    [
-      datas,
-      get,
-      handleRemove,
-      hasSimulation,
-      renderCell,
-      squad,
-      t,
-      topContent,
-      userMatches,
-    ]
+    [datas, renderCell, topContent]
   );
 
   if (!tourney) {
@@ -202,14 +161,26 @@ export const SquadTableRanking: FC<SquadTableRankingProps> = ({
       {createTable(columns, {
         table: "hidden md:table",
         header: (column) =>
-          `text-center ${column.key == "teamId" ? "w-1/2" : "w-1/20"} ${column.color ? "bg-secondary text-background" : "text-bold"}`,
+          `text-center ${column.key == "teamId" ? "w-1/2" : "w-1/20"} ${column.key == "total" ? "bg-secondary text-background" : "text-bold"}`,
+        cell: (column) =>
+          `text-center px-1 ${
+            column.key == "total"
+              ? `bg-secondary text-background border-b-1`
+              : ""
+          }`,
       })}
       {createTable(
         columns.filter((c) => !c.mobile),
         {
           table: "sm:table md:hidden",
           header: (column) =>
-            `text-center ${column.key == "teamId" ? "w-4/5" : "w-1/10"} ${column.color ? "bg-secondary text-background" : "text-bold"}`,
+            `text-center ${column.key == "teamId" ? "w-4/5" : "w-1/10"} ${column.key == "total" ? "bg-secondary text-background" : "text-bold"}`,
+          cell: (column) =>
+            `text-center px-1 ${
+              column.key == "total"
+                ? `bg-secondary text-background border-b-1`
+                : ""
+            }`,
         }
       )}
     </>
