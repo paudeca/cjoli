@@ -58,10 +58,13 @@ const TeamName = ({
 
   const saveFavoriteTeam = React.useCallback(
     async (teamId?: number) => {
-      await handleSaveUserConfig({
-        ...userConfig,
-        favoriteTeamId: teamId || 0,
-      });
+      isConnected &&
+        (await handleSaveUserConfig({
+          ...userConfig,
+          favoriteTeamId: teamId || 0,
+        }));
+      !isConnected &&
+        localStorage.setItem("favoriteTeamId", (teamId || 0) + "");
       teamId
         ? showToast("success", t("user.favoriteSaved", "Favorite team saved"))
         : showToast(
@@ -79,7 +82,7 @@ const TeamName = ({
   return (
     <>
       {!hideFavorite &&
-        isConnected &&
+        //isConnected &&
         team &&
         userConfig.favoriteTeamId == team.id && (
           <MyStarFill
@@ -89,7 +92,7 @@ const TeamName = ({
           />
         )}
       {!hideFavorite &&
-        isConnected &&
+        //isConnected &&
         team &&
         userConfig.favoriteTeamId != team.id && (
           <MyStar

@@ -45,11 +45,16 @@ export const useUser = () => {
   const { tourney } = useCJoli();
 
   const findConfig = (user?: User) => {
+    const localTeam = localStorage.getItem("favoriteTeamId");
     return (
       user?.configs?.find((c) => c.tourneyId == tourney?.id) || {
         tourneyId: 0,
         useCustomEstimate: false,
-        favoriteTeamId: uid == "hogly2025" ? 34 : 0,
+        favoriteTeamId: localTeam
+          ? parseInt(localTeam)
+          : uid == "hogly2025"
+            ? 34
+            : 0,
         isAdmin: false,
       }
     );
