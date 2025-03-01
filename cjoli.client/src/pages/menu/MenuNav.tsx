@@ -4,7 +4,6 @@ import {
   Offcanvas,
   Nav,
   NavDropdown,
-  Form,
   Stack,
   ToggleButton,
 } from "react-bootstrap";
@@ -25,9 +24,7 @@ import { useNavigate } from "react-router-dom";
 import useScreenSize from "../../hooks/useScreenSize";
 import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { UserConfig } from "../../models";
+import React from "react";
 import { useModal } from "../../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
 import dayjs from "dayjs";
@@ -77,13 +74,7 @@ const MenuNav = () => {
     userConfig: { useCustomEstimate },
   } = useUser();
 
-  const { register } = useForm<UserConfig>({
-    values: userConfig,
-  });
-
   const tourneyLabel = uid && tourney?.name;
-
-  const [checked, setChecked] = useState(false);
 
   return (
     <MyNavbar
