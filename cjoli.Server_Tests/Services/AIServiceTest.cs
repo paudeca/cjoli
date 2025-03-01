@@ -1,5 +1,7 @@
-﻿using Azure;
+﻿using AutoMapper;
+using Azure;
 using Azure.AI.OpenAI;
+using cjoli.Server.Dtos;
 using cjoli.Server.Models;
 using cjoli.Server.Services;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -13,12 +15,14 @@ namespace cjoli.Server_Tests.Services
         private readonly AIService _service;
         private readonly IDbContextTransaction _transaction;
         private readonly Mock<Response<ChatCompletions>> _response;
+        private readonly IMapper _mapper;
 
-        public AIServiceTest(AIService service, CJoliContext context, Mock<Response<ChatCompletions>> response) : base(context)
+        public AIServiceTest(AIService service, CJoliContext context, Mock<Response<ChatCompletions>> response, IMapper mapper) : base(context)
         {
             _service = service;
             _transaction = _context.Database.BeginTransaction();
             _response = response;
+            _mapper = mapper;
         }
 
         public void Dispose()
@@ -50,7 +54,9 @@ namespace cjoli.Server_Tests.Services
             _context.SaveChanges();
             SetResponse("myMessage");
 
-            var session = _service.CreateSessionForChat(tourney.Uid, "fr", null, _context);
+
+            RankingDto dto = new RankingDto() { Scores=null,Tourney=null};
+            var session = _service.CreateSessionForChat(tourney.Uid, "fr", null, dto, _context) ;
 
             var called = false;
             session.OnReply += (sender, m) =>
