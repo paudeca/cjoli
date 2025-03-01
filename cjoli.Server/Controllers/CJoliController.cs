@@ -157,16 +157,6 @@ namespace cjoli.Server.Controllers
         }
 
 
-        [HttpGet]
-        [Authorize]
-        [Route("{uuid}/UpdateEstimate")]
-        public RankingDto UpdateEstimate(string uuid)
-        {
-            var login = GetLogin();
-            _service.UpdateEstimate(uuid, login!, _context);
-            return GetRanking(uuid);
-        }
-
         [HttpPost]
         [Authorize]
         [Route("{uuid}/SaveUserConfig")]

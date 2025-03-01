@@ -2,14 +2,11 @@ import { beforeEach, describe, it, vi, expect, Mock, afterEach } from "vitest";
 import { fireEvent, screen } from "@testing-library/react";
 import {
   createMatch,
-  createRanking,
   createTeam,
   createTourney,
-  mockGet,
   mockGetRanking,
   mockGetTourneys,
   mockGetUser,
-  mockPost,
   renderPage,
   reset,
   setDesktop,
@@ -21,7 +18,6 @@ import { Team } from "../../models";
 import HomePage from "../HomePage";
 import dayjs from "dayjs";
 import WS from "jest-websocket-mock";
-import { act } from "react-dom/test-utils";
 
 const url = import.meta.env.VITE_API_WS;
 
@@ -233,20 +229,6 @@ describe("MainPage", async () => {
     const { check } = await renderMainPage({ uid });
     fireEvent.click(screen.getByText("Chat with BotAI"));
     expect(mockNavigate).toHaveBeenCalledTimes(1);
-    check();
-  });
-  it("estimateButton", async () => {
-    const uid = "123";
-    const { check } = await renderMainPage({
-      uid,
-      call: () =>
-        mockGet("updateEstimate", createRanking({}), "updateEstimate"),
-    });
-    mockPost("saveUserConfig", () => createRanking({}), "saveUserConfig");
-    await act(async () => {
-      fireEvent.click(screen.getByTestId("estimateBtn"));
-    });
-    screen.getByText("Estimate calculated");
     check();
   });
 });

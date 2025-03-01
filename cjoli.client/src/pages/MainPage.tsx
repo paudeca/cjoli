@@ -9,9 +9,7 @@ import { useUser } from "../hooks/useUser";
 import { useCJoli } from "../hooks/useCJoli";
 import useUid from "../hooks/useUid";
 import ChatButton from "./home/button/ChatButton";
-import EstimateButton from "./home/button/EstimateButton";
 import ButtonFixed from "../components/ButtonFixed";
-import useScreenSize from "../hooks/useScreenSize";
 import { useToast } from "../hooks/useToast";
 import { Trans, useTranslation } from "react-i18next";
 import dayjs from "dayjs";
@@ -36,7 +34,6 @@ dayjs.extend(duration);
 let init = false;
 
 const MainPage = () => {
-  const { isConnected } = useUser();
   const logger = useLogger();
   const {
     state: { show, type, message },
@@ -53,7 +50,6 @@ const MainPage = () => {
   } = useCJoli();
   const uid = useUid();
   const { pathname } = useLocation();
-  const { isMobile } = useScreenSize();
   const isOnChat = pathname.endsWith("chat");
   const { i18n } = useTranslation();
   const { setCountUser, userConfig } = useUser();
@@ -129,7 +125,6 @@ const MainPage = () => {
         <Outlet />
         <ButtonFixed>
           <Stack gap={1}>
-            {uid && !isOnChat && isMobile && isConnected && <EstimateButton />}
             {isHomePage && (
               <ScrollButton to="ranking" icon={<ArrowUp />} down={false} />
             )}
