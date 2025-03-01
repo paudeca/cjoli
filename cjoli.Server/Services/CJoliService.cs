@@ -171,7 +171,7 @@ namespace cjoli.Server.Services
             return map![loginKey];
         }
 
-        public void UpdateEstimate(string uuid, string login, CJoliContext context)
+        private void UpdateEstimate(string uuid, string login, CJoliContext context)
         {
             User? user = GetUserWithConfig(login, uuid, context);
 
@@ -747,10 +747,7 @@ namespace cjoli.Server.Services
             }
             context.SaveChanges();
             ClearCache(uuid, user);
-            if (isAdmin)
-            {
-                RunThread((CJoliContext context)=> UpdateEstimate(uuid, login, context));
-            }
+            RunThread((CJoliContext context) => UpdateEstimate(uuid, login, context));
         }
 
         private void RunThread(Action<CJoliContext> callback)

@@ -189,27 +189,6 @@ namespace cjoli.Server_Tests.Services
         }
 
 
-
-        [Theory]
-        [InlineData("USER")]
-        [InlineData("ADMIN")]
-        public void UpdateEstimate(string role)
-        {
-            //Arrange
-            var tourney = CreateTourney();
-            var user = CreateUser(role);
-            _service.ClearCache(tourney.Uid, user);
-
-            var match = Match(tourney);
-            Assert.Empty(match.Estimates);
-            //Act
-            _service.UpdateEstimate(tourney.Uid, user.Login, _context);
-            //Assert
-            var estimate = Assert.Single(match.Estimates);
-            Assert.Equal(0, estimate.ScoreA);
-            Assert.Equal(0, estimate.ScoreB);
-        }
-
         [Fact]
         public void AfftectationTeams_Ok()
         {

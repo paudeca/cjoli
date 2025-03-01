@@ -5,9 +5,8 @@ import {
   Nav,
   NavDropdown,
   Form,
-  Button,
   Stack,
-  Spinner,
+  ToggleButton,
 } from "react-bootstrap";
 import styled from "@emotion/styled";
 import LoginModal from "../../modals/LoginModal";
@@ -15,7 +14,7 @@ import RegisterModal from "../../modals/RegisterModal";
 import UpdateModal from "../../modals/UpdateModal";
 import * as cjoliService from "../../services/cjoliService";
 import {
-  Bezier2,
+  Controller,
   GearWide,
   House,
   ListOl,
@@ -26,9 +25,8 @@ import { useNavigate } from "react-router-dom";
 import useScreenSize from "../../hooks/useScreenSize";
 import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useEstimate } from "../../hooks/useEstimate";
 import { UserConfig } from "../../models";
 import { useModal } from "../../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
@@ -60,7 +58,6 @@ const MenuNav = () => {
   const { setShow: showUpdate } = useModal("update");
   const navigate = useNavigate();
   const { isMobile } = useScreenSize();
-  const { loading, handleUpdateEstimate } = useEstimate();
   const { t, i18n } = useTranslation();
   const [lang, setLang] = React.useState(i18n.resolvedLanguage);
 
@@ -74,13 +71,19 @@ const MenuNav = () => {
     }
   };
   const [show, setShow] = React.useState(false);
-  const { isAdmin, isRootAdmin } = useUser();
+  const {
+    isAdmin,
+    isRootAdmin,
+    userConfig: { useCustomEstimate },
+  } = useUser();
 
   const { register } = useForm<UserConfig>({
     values: userConfig,
   });
 
   const tourneyLabel = uid && tourney?.name;
+
+  const [checked, setChecked] = useState(false);
 
   return (
     <MyNavbar
@@ -92,31 +95,23 @@ const MenuNav = () => {
         <MenuBrand setShow={setShow} />
         {user && tourneyLabel && (
           <Stack direction="horizontal" gap={3}>
-            <Button onClick={handleUpdateEstimate} disabled={loading}>
-              {isMobile
-                ? t("menu.refresh", "Refresh")
-                : t("menu.refreshEstimate", "Refresh estimate")}
-              {!loading && <Bezier2 className="mx-2" size={20} />}
-              {loading && (
-                <Spinner animation="grow" className="mx-2" size="sm" />
-              )}
-            </Button>
-            <Form.Check
-              type="switch"
-              label={
-                isMobile
-                  ? t("menu.custom", "Custom")
-                  : t("menu.useCustom", "Use custom")
+            <ToggleButton
+              className="mb-2"
+              id="toggle-check"
+              type="checkbox"
+              variant="outline-primary"
+              checked={useCustomEstimate}
+              value="1"
+              onChange={(e) =>
+                handleSaveUserConfig({
+                  ...userConfig,
+                  useCustomEstimate: e.currentTarget.checked,
+                })
               }
-              role="button"
-              {...register("useCustomEstimate", {
-                onChange: (e: React.FormEvent<HTMLInputElement>) =>
-                  handleSaveUserConfig({
-                    ...userConfig,
-                    useCustomEstimate: e.currentTarget.checked,
-                  }),
-              })}
-            />
+            >
+              <Controller className="mx-2" />
+              Simulation
+            </ToggleButton>
             <div>
               <BetScoreTotal />
             </div>
