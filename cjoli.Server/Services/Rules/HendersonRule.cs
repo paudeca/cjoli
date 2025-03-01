@@ -19,6 +19,8 @@ namespace cjoli.Server.Services.Rules
 
         public int Forfeit => 0;
 
+        public double GoalFor => 0;
+
         public bool HasPenalty => false;
         public bool HasForfeit => false;
 
@@ -74,6 +76,12 @@ namespace cjoli.Server.Services.Rules
             });
             return scores;
         }
+
+        public double Total(CJoliService.ScoreType type, double total, int score)
+        {
+            return _service.Total(type, this, total, score);
+        }
+
 
     }
 }

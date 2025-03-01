@@ -23,7 +23,7 @@ namespace cjoli.Server.Models
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public SourceType Type { get; set; }
-        public int Value { get; set; }
+        public double Value { get; set; }
         public bool Winner { get; set; }
     }
 }

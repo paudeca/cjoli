@@ -39,13 +39,14 @@ const InfoButton = ({ score, squad }: InfoButtonProps) => {
     return <></>;
   }
   const {
-    config: { win, neutral, loss },
+    config: { win, neutral, loss, goalFor },
   } = tourney;
 
   const details = [
     { label: "V", value: score.win, pts: win },
     { label: "N", value: score.neutral, pts: neutral },
     { label: "D", value: score.loss, pts: loss },
+    { label: "G", value: score.goalFor, pts: goalFor },
   ];
   let i = 0;
   const result = details.reduce((acc, d) => {

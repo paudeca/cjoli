@@ -9,3 +9,4 @@
 /cjoli.client/coverage
 /cjoli.Server/Properties/PublishProfiles/CJoli - Zip Deploy.pubxml.user
 /cjoli.Server/Properties/PublishProfiles/CJoli - Zip Deploy.pubxml.user
+*/node_modules/
