@@ -119,6 +119,15 @@ namespace cjoli.Server.Controllers
             _userService.RemoveUser(userId, _context);
         }
 
+        [HttpDelete]
+        [Route("Tourney/{uid}/phases/{phaseId}/events/{eventId}")]
+        public async Task<TourneyDto> RemoveEvent(string uid, int phaseId, int eventId)
+        {
+            await _authorizationService.AuthorizeAsync(User, uid, "EditTourney");
+            return _mapper.Map<TourneyDto>(_settingService.RemoveEvent(uid, phaseId, eventId, _context));
+        }
+
+
 
     }
 }

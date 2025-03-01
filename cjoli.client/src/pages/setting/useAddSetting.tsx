@@ -3,6 +3,7 @@ import { useApi } from "../../hooks/useApi";
 import { useToast } from "../../hooks/useToast";
 import { useCallback } from "react";
 import {
+  EventPhase,
   Match,
   Phase,
   Position,
@@ -138,6 +139,32 @@ export const useAddSetting = () => {
     [doSaveTourney]
   );
 
+  const addEvent = useCallback(
+    async ({
+      tourney,
+      phase,
+      event,
+    }: {
+      tourney: Tourney;
+      phase: Phase;
+      event: EventPhase;
+    }) => {
+      const newPhase = {
+        ...phase,
+        events: [...phase.events, event],
+      };
+      const phases = tourney.phases.map((p) =>
+        p.id == phase.id ? newPhase : p
+      );
+      doSaveTourney({
+        ...tourney,
+        phases,
+      });
+      return true;
+    },
+    [doSaveTourney]
+  );
+
   return {
     doSaveTourney,
     addTeam,
@@ -146,5 +173,6 @@ export const useAddSetting = () => {
     addPosition,
     addMatch,
     addRank,
+    addEvent,
   };
 };

@@ -31,7 +31,7 @@ const renderHomePage = async ({
     tourney ??
       createTourney({
         id: 1,
-        phases: [{ id: phaseId, name: "phase1", squads: [] }],
+        phases: [{ id: phaseId, name: "phase1", squads: [], events: [] }],
       })
   );
   await renderPage(
@@ -114,6 +114,7 @@ describe("HomePage", () => {
               matches: [createMatch({ done: true })],
             },
           ],
+          events: [],
         },
       ],
     });

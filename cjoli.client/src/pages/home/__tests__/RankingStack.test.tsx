@@ -11,13 +11,18 @@ import { useCJoli } from "../../../hooks/useCJoli";
 import { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 
-const phase = { id: 1, name: "name", squads: [] };
+const phase = { id: 1, name: "name", squads: [], events: [] };
 
 describe("RankingStack", () => {
   it("render", async () => {
     const tourney = createTourney({
       id: 1,
-      phases: [1, 2].map((i) => ({ id: i, name: `phase${i}`, squads: [] })),
+      phases: [1, 2].map((i) => ({
+        id: i,
+        name: `phase${i}`,
+        squads: [],
+        events: [],
+      })),
     });
     const ranking = createRanking({ tourney });
     const Page = initPage(RankingStack, () => {
@@ -34,7 +39,12 @@ describe("RankingStack", () => {
   it("filterSquad", async () => {
     const tourney = createTourney({
       id: 1,
-      phases: [1, 2].map((i) => ({ id: i, name: `phase${i}`, squads: [] })),
+      phases: [1, 2].map((i) => ({
+        id: i,
+        name: `phase${i}`,
+        squads: [],
+        events: [],
+      })),
     });
     const ranking = createRanking({ tourney });
     const Page = initPage(RankingStack, () => {
@@ -56,7 +66,12 @@ describe("RankingStack", () => {
   it("selectPhase", async () => {
     const tourney = createTourney({
       id: 1,
-      phases: [1, 2].map((i) => ({ id: i, name: `phase${i}`, squads: [] })),
+      phases: [1, 2].map((i) => ({
+        id: i,
+        name: `phase${i}`,
+        squads: [],
+        events: [],
+      })),
     });
     const ranking = createRanking({ tourney });
     const Page = initPage(RankingStack, () => {

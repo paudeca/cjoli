@@ -22,7 +22,7 @@ const AddPhaseModal = ({ onAddPhase, fieldLabel }: AddPhaseModalProps) => {
   ];
 
   const onSubmit = async ({ value }: { value: string }) => {
-    if (!(await onAddPhase({ id: 0, name: value, squads: [] }))) {
+    if (!(await onAddPhase({ id: 0, name: value, squads: [], events: [] }))) {
       showToast("danger", t("team.error.add", "Unable to add item"));
       return false;
     }

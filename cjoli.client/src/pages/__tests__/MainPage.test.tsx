@@ -173,6 +173,7 @@ describe("MainPage", async () => {
               ],
             },
           ],
+          events: [],
         },
       ],
     });
@@ -205,6 +206,7 @@ describe("MainPage", async () => {
               matches: [createMatch({ phaseId, squadId })],
             },
           ],
+          events: [],
         },
       ],
     });
