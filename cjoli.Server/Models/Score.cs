@@ -11,7 +11,7 @@
         public int Win { get; set; }
         public int Neutral { get; set; }
         public int Loss { get; set; }
-        public int Total { get; set; }
+        public double Total { get; set; }
         public int GoalFor { get; set; }
         public int GoalAgainst { get; set; }
         public int GoalDiff { get; set; }

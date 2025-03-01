@@ -49,6 +49,7 @@ namespace cjoli.Server.Services
             _rules.Add("scooby", new ScoobyRule(this));
             _rules.Add("henderson", new HendersonRule(this));
             _rules.Add("hogly", new HoglyRule(this));
+            _rules.Add("nordcup", new NordCupRule(this));
 
         }
 
@@ -207,7 +208,7 @@ namespace cjoli.Server.Services
             return new ScoresDto { ScoreSquads = scoreSquads, ScoreTourney = scoreTourney, Bet=new BetDto() };
         }
 
-        public static void UpdateSource(Score a, Score b, SourceType type, int value, bool positive)
+        public static void UpdateSource(Score a, Score b, SourceType type, double value, bool positive)
         {
             a.Sources.Add(b.PositionId, new ScoreSource { Type = type, Value = value, Winner = (positive && value >= 0) || (!positive && value < 0) });
             b.Sources.Add(a.PositionId, new ScoreSource { Type = type, Value = -value, Winner = (positive && -value >= 0) || (!positive && -value < 0) });
@@ -596,6 +597,30 @@ namespace cjoli.Server.Services
             });
         }
 
+        public enum ScoreType
+        {
+            Win,
+            Loss,
+            Neutral,
+            Forfeit
+        }
+
+        public double Total(ScoreType type, IRule rule, double total, int score)
+        {
+            switch(type)
+            {
+                case ScoreType.Win:
+                    return total + rule.Win;
+                case ScoreType.Loss:
+                    return total + rule.Loss;
+                case ScoreType.Neutral:
+                    return total + rule.Neutral;
+                case ScoreType.Forfeit:
+                    return total + rule.Forfeit;
+            }
+            return total;
+        }
+
         public void UpdateScore(Score scoreA, Score scoreB, Score? scoreTourney, IMatch match, IRule rule)
         {
             scoreA.Time = match.Time;
@@ -614,8 +639,8 @@ namespace cjoli.Server.Services
                 scoreA.Win++;
                 scoreB.Loss++;
 
-                scoreA.Total += rule.Win;
-                scoreB.Total += match.ForfeitB ? rule.Forfeit : rule.Loss;
+                scoreA.Total = rule.Total(ScoreType.Win,scoreA.Total,match.ScoreA);
+                scoreB.Total = rule.Total(match.ForfeitB ? ScoreType.Forfeit : ScoreType.Loss, scoreB.Total, match.ScoreB);
 
                 if (scoreTourney != null)
                 {
@@ -631,8 +656,8 @@ namespace cjoli.Server.Services
                 scoreA.Loss++;
                 scoreB.Win++;
 
-                scoreA.Total += match.ForfeitA ? rule.Forfeit : rule.Loss;
-                scoreB.Total += rule.Win;
+                scoreA.Total = rule.Total(match.ForfeitA ? ScoreType.Forfeit : ScoreType.Loss, scoreA.Total, match.ScoreA);
+                scoreB.Total = rule.Total(ScoreType.Win, scoreB.Total, match.ScoreB);
 
                 if (scoreTourney != null)
                 {
@@ -647,8 +672,8 @@ namespace cjoli.Server.Services
                 scoreA.Neutral++;
                 scoreB.Neutral++;
 
-                scoreA.Total += rule.Neutral;
-                scoreB.Total += rule.Neutral;
+                scoreA.Total = rule.Total(ScoreType.Neutral, scoreA.Total, match.ScoreA); 
+                scoreB.Total = rule.Total(ScoreType.Neutral, scoreB.Total, match.ScoreB);
 
                 if (scoreTourney != null)
                 {
