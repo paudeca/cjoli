@@ -1,5 +1,6 @@
 import React, { Dispatch } from "react";
 import {
+  EventPhase,
   Match,
   Phase,
   Position,
@@ -21,6 +22,7 @@ interface CJoliState {
   squads?: Squad[];
   positions?: Position[];
   matches: Match[];
+  events: EventPhase[];
   daySelected: string;
   theme: {
     primary: string;
@@ -37,6 +39,7 @@ export const CJoliContext = React.createContext<{
 const initialState: CJoliState = {
   daySelected: dayjs().format("YYYY-MM-DD"),
   matches: [],
+  events: [],
   theme: {
     primary: "#202644",
     secondary: "#932829",
@@ -77,6 +80,10 @@ const reduceLoadRanking = (state: CJoliState, ranking: Ranking) => {
     (acc, phase) => [...acc, ...phase.squads],
     []
   );
+  const events = phases.reduce<EventPhase[]>(
+    (acc, phase) => [...acc, ...phase.events],
+    []
+  );
   const positions = squads.reduce<Position[]>(
     (acc, squad) => [...acc, ...squad.positions],
     []
@@ -100,6 +107,7 @@ const reduceLoadRanking = (state: CJoliState, ranking: Ranking) => {
     squads,
     positions,
     matches,
+    events,
   };
 };
 

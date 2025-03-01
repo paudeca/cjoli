@@ -87,7 +87,6 @@ const MenuNav = () => {
         {user && tourneyLabel && (
           <Stack direction="horizontal" gap={3}>
             <ToggleButton
-              className="mb-2"
               id="toggle-check"
               type="checkbox"
               variant="outline-primary"

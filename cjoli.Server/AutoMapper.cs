@@ -35,6 +35,9 @@ namespace cjoli.Server
                 .ForMember(x => x.Estimate, opt => opt.MapFrom(a => a.Estimates.OrderByDescending(s => s.User).FirstOrDefault()));
             CreateMap<UserMatch, UserMatchDto>().ForMember(x => x.Time, opt => opt.MapFrom(u => u.Match.Time));
             CreateMap<MatchEstimate, MatchEstimateDto>();
+            CreateMap<Event,  EventDto>()
+                .ForMember(x => x.PositionIds, opt => opt.MapFrom(a => a.Positions.Select(p=>p.Id)))
+                .ForMember(x => x.SquadIds, opt => opt.MapFrom(a => a.Positions.GroupBy(p=>p.Squad).Select(s=>s.Key.Id)));
 
             CreateMap<Team, TeamDto>()
                 .ForMember(x => x.Datas, opt => opt.MapFrom(t => t.TeamDatas.SingleOrDefault()))

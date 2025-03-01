@@ -2,7 +2,7 @@ import { Table, Accordion } from "react-bootstrap";
 import CJoliCard from "../../components/CJoliCard";
 import CJoliStack from "../../components/CJoliStack";
 import Loading from "../../components/Loading";
-import { Match, Phase } from "../../models";
+import { EventPhase, Match, Phase } from "../../models";
 import dayjs from "dayjs";
 import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
@@ -10,12 +10,16 @@ import MatchRow from "./match/MatchRow";
 import { useParams } from "react-router-dom";
 import { useMatch } from "../../hooks/useMatch";
 import { memo, useCallback, useEffect, useMemo } from "react";
+import EventRow from "./match/EventRow";
+
+type MatchEvent = (Match | EventPhase) & { type: string; location?: string };
 
 interface MatchesStackProps extends JSX.IntrinsicAttributes {
   phase: Phase;
 }
 const MatchesStack = ({ phase }: MatchesStackProps) => {
   const { matches, daySelected, selectDay } = useCJoli();
+  const { events } = phase;
   const uid = useUid();
   const { squadId } = useParams();
 
@@ -26,10 +30,21 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
     [phase, squadId]
   );
 
-  const datas = useMemo(() => {
-    const matchesFiltered = matches.filter(filter);
+  const filterEvent = useCallback(
+    (event: EventPhase) =>
+      !squadId ||
+      event.positionIds.length == 0 ||
+      event.squadIds.includes(parseInt(squadId)),
+    [squadId]
+  );
 
-    const datas = matchesFiltered.reduce<Record<string, Match[]>>((acc, m) => {
+  const datas = useMemo(() => {
+    const filtered: MatchEvent[] = [
+      ...matches.filter(filter).map((m) => ({ ...m, type: "match" })),
+      ...events.filter(filterEvent).map((e) => ({ ...e, type: "event" })),
+    ];
+
+    const datas = filtered.reduce<Record<string, MatchEvent[]>>((acc, m) => {
       const time = dayjs(m.time);
       const date = time.format("YYYY-MM-DD");
       const list = [...(acc[date] || []), m];
@@ -42,7 +57,7 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
       return { ...acc, [date]: list };
     }, {});
     return datas;
-  }, [filter, matches]);
+  }, [filter, matches, events]);
 
   const keys = useMemo(() => {
     const keys = Object.keys(datas);
@@ -76,7 +91,7 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
             >
               {keys.map((key, index) => {
                 const datasOrder = datas[key];
-                const map = datasOrder.reduce<Record<string, Match[]>>(
+                const map = datasOrder.reduce<Record<string, MatchEvent[]>>(
                   (acc, m) => {
                     const key = dayjs(m.time).format("LT");
                     return { ...acc, [key]: [...(acc[key] || []), m] };
@@ -97,18 +112,27 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
                       >
                         <tbody>
                           {Object.keys(map).map((k) =>
-                            map[k].map((match, i) => {
-                              return (
-                                <MatchRow
-                                  key={match.id}
-                                  index={i}
-                                  match={match}
-                                  rowSpan={map[k].length}
-                                  saveMatch={saveMatch}
-                                  clearMatch={clearMatch}
-                                  register={register}
-                                />
-                              );
+                            map[k].map((me, i) => {
+                              if (me.type == "match") {
+                                return (
+                                  <MatchRow
+                                    key={me.id}
+                                    index={i}
+                                    match={me as Match}
+                                    rowSpan={map[k].length}
+                                    saveMatch={saveMatch}
+                                    clearMatch={clearMatch}
+                                    register={register}
+                                  />
+                                );
+                              } else {
+                                return (
+                                  <EventRow
+                                    key={me.id}
+                                    event={me as EventPhase}
+                                  />
+                                );
+                              }
                             })
                           )}
                         </tbody>

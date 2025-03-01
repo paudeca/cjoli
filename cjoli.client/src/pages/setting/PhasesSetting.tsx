@@ -13,6 +13,7 @@ import { useModal } from "../../hooks/useModal";
 import SquadsSetting from "./SquadsSetting";
 import { useSetting } from "../../hooks/useSetting";
 import { Phase } from "../../models";
+import EventsSetting from "./EventsSetting";
 
 const PhasesSetting = () => {
   const { tourney, register } = useSetting();
@@ -58,6 +59,7 @@ const PhasesSetting = () => {
               </Form.Group>
 
               <SquadsSetting indexPhase={i} />
+              <EventsSetting indexPhase={i} />
             </Tab>
           ))}
         </Tabs>

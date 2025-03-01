@@ -18,6 +18,7 @@ import { TeamData } from "./TeamData";
 import { User } from "./User";
 import { UserConfig } from "./UserConfig";
 import { UserMatch } from "./UserMatch";
+import { EventPhase } from "./EventPhase";
 
 type TypePage = "welcome" | "home" | "team" | "ranking" | "setting";
 
@@ -43,4 +44,5 @@ export type {
   User,
   UserConfig,
   UserMatch,
+  EventPhase,
 };
