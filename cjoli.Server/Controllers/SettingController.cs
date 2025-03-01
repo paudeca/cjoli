@@ -112,5 +112,13 @@ namespace cjoli.Server.Controllers
             return _mapper.Map<TourneyDto>(_settingService.RemoveRank(uid, rankId, _context));
         }
 
+        [HttpDelete]
+        [Route("users/{userId}")]
+        public void RemoveUser(int userId)
+        {
+            _userService.RemoveUser(userId, _context);
+        }
+
+
     }
 }

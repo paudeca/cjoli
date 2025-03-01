@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import {
   DefaultError,
   queryOptions,
@@ -276,6 +277,20 @@ const useApiDelete = () => {
     [loadTourney]
   );
 
+  const removeUser = useCallback(
+    () =>
+      mutationOptions({
+        mutationKey: ["removeUser"],
+        mutationFn: async (user: User) => {
+          await settingService.removeUser({
+            userId: user.id,
+          });
+          return true;
+        },
+      }),
+    []
+  );
+
   return {
     removeTourney,
     removeTeam,
@@ -284,6 +299,7 @@ const useApiDelete = () => {
     removePosition,
     removeMatch,
     removeRank,
+    removeUser,
   };
 };
 

@@ -119,3 +119,7 @@ export const removeRank = async ({
   );
   return data;
 };
+
+export const removeUser = async ({ userId }: { userId: number }) => {
+  await axios.delete<void>(`${url}/setting/users/${userId}`);
+};
