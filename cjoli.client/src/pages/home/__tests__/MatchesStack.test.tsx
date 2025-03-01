@@ -64,6 +64,7 @@ const tourney = createTourney({
           ],
         },
       ],
+      events: [],
     },
   ],
 });
@@ -110,7 +111,7 @@ describe("MatchesStack", () => {
   });
 
   it("render", async () => {
-    const phase = { id: 1, name: "name", squads: [] };
+    const phase = { id: 1, name: "name", squads: [], events: [] };
     const Page = initPage(MatchesStack, () => {
       const { loadRanking } = useCJoli();
       useEffect(() => {
@@ -123,7 +124,7 @@ describe("MatchesStack", () => {
   });
 
   it("filterSquad", async () => {
-    const phase = { id: 1, name: "name", squads: [] };
+    const phase = { id: 1, name: "name", squads: [], events: [] };
     const Page = initPage(MatchesStack, () => {
       const { loadRanking } = useCJoli();
       useEffect(() => {
@@ -193,7 +194,7 @@ describe("MatchesStack", () => {
   });
 
   it("selectDay", async () => {
-    const phase = { id: 1, name: "name", squads: [] };
+    const phase = { id: 1, name: "name", squads: [], events: [] };
     const Page = initPage(MatchesStack, () => {
       const { loadRanking } = useCJoli();
       useEffect(() => {

@@ -151,6 +151,7 @@ const deleteItem = async (path: string, name: string, btn: string) => {
             matches: [createMatch({ id: MATCH_ID })],
           },
         ],
+        events: [],
       },
     ],
     ranks: [createRank({ id: RANK_ID })],
@@ -238,7 +239,12 @@ describe("SettingPage", () => {
   it("addSquad", async () => {
     const tourney = createTourney({
       id: 1,
-      phases: [1, 2].map((i) => ({ id: i, name: `phase${i}`, squads: [] })),
+      phases: [1, 2].map((i) => ({
+        id: i,
+        name: `phase${i}`,
+        squads: [],
+        events: [],
+      })),
     });
 
     const { submit, text } = await render({
@@ -266,6 +272,7 @@ describe("SettingPage", () => {
           positions: [],
           matches: [],
         })),
+        events: [],
       })),
     });
 
@@ -299,6 +306,7 @@ describe("SettingPage", () => {
           positions: [],
           matches: [],
         })),
+        events: [],
       })),
     });
 

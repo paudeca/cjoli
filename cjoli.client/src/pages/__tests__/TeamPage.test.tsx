@@ -41,6 +41,7 @@ describe("TeamPage", () => {
               matches: [],
             },
           ],
+          events: [],
         },
       ],
     });
