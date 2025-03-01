@@ -167,5 +167,12 @@ namespace cjoli.Server.Services
             context.SaveChanges();
         }
 
+        public void RemoveUser(int userId, CJoliContext context)
+        {
+            User user = context.Users.Single(u => u.Id == userId);
+            context.Remove(user);
+            context.SaveChanges();
+        }
+
     }
 }

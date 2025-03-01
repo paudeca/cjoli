@@ -316,7 +316,5 @@ namespace cjoli.Server.Services
             return tourney;
         }
 
-
-
     }
 }

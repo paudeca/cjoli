@@ -6,6 +6,7 @@ import {
   Container,
   Form,
   Row,
+  Stack,
 } from "react-bootstrap";
 import CJoliStack from "../components/CJoliStack";
 import CJoliCard from "../components/CJoliCard";
@@ -17,14 +18,19 @@ import Select, { MultiValue } from "react-select";
 import { useState } from "react";
 import { User } from "../models";
 import { useToast } from "../hooks/useToast";
+import ConfirmationModal from "../modals/ConfirmationModal";
+import { useModal } from "../hooks/useModal";
 
 const AdminPage = () => {
   const { listUsers } = useApi();
   const { tourneys } = useCJoli();
   const { isLoading, data: users } = useQuery(listUsers());
   const [datas, setDatas] = useState<Record<number, number[]>>({});
-  const { saveUserAdminConfig } = useApi();
+  const { saveUserAdminConfig, removeUser } = useApi();
   const { showToast } = useToast();
+  const { setShowWithData: showConfirmDeleteUser } =
+    useModal<User>("confirmDeleteUser");
+  const { mutateAsync: doRemoveUser } = useMutation(removeUser());
 
   const { mutate: saveAdmins } = useMutation(
     saveUserAdminConfig({
@@ -72,16 +78,24 @@ const AdminPage = () => {
                                   onChange={onChange(u)}
                                 />
                               </Form.Group>
-                              <Button
-                                onClick={() => {
-                                  saveAdmins({
-                                    user: u,
-                                    admins: datas[u.id] || adminTourneys,
-                                  });
-                                }}
-                              >
-                                Save
-                              </Button>
+                              <Stack direction="horizontal" gap={3}>
+                                <Button
+                                  onClick={() => {
+                                    saveAdmins({
+                                      user: u,
+                                      admins: datas[u.id] || adminTourneys,
+                                    });
+                                  }}
+                                >
+                                  Save
+                                </Button>
+                                <Button
+                                  variant="danger"
+                                  onClick={() => showConfirmDeleteUser(true, u)}
+                                >
+                                  Delete User
+                                </Button>
+                              </Stack>
                             </Accordion.Body>
                           </Accordion.Item>
                         );
@@ -93,6 +107,14 @@ const AdminPage = () => {
             </Col>
           </Row>
         </Card>
+        <ConfirmationModal<User>
+          id="confirmDeleteUser"
+          title="Delete User"
+          onConfirm={doRemoveUser}
+          message={(user) =>
+            `Are you sure you want to remove this user '${user.login}' ?`
+          }
+        />
       </Container>
     </Loading>
   );
