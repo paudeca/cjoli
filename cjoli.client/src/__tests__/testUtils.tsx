@@ -128,6 +128,7 @@ export const createTourney = ({
     neutral: 1,
     loss: 0,
     forfeit: 0,
+    goalFor: 0,
   },
   rule: "simple",
 });
