@@ -1,0 +1,183 @@
+{
+  "title": "CJoli - IJshockeytoernooi",
+  "lang": {
+    "en": "Engels",
+    "fr": "Frans",
+    "pt": "Portugees",
+    "es": "Spaans",
+    "de": "Duits",
+    "nl": "Nederlands"
+  },
+  "user": {
+    "guest": "Gast",
+    "favoriteSaved": "Favoriete team opgeslagen",
+    "favoriteRemoved": "Favoriete team verwijderd"
+  },
+  "menu": {
+    "home": "Home",
+    "ranking": "Ranglijst",
+    "login": "Inloggen",
+    "register": "Registreren",
+    "update": "Bijwerken",
+    "logout": "Uitloggen",
+    "refresh": "Vernieuwen",
+    "refreshEstimate": "Schatting vernieuwen",
+    "custom": "Aangepast",
+    "useCustom": "Gebruik persoonlijke schatting",
+    "menu": "Menu",
+    "setting": "Instellingen",
+    "admin": "Administratie"
+  },
+  "home": {
+    "tourneyNotConfigured": "Toernooi niet geconfigureerd"
+  },
+  "error": {
+    "invalid": "{{field}} is ongeldig",
+    "required": "{{field}} is verplicht",
+    "notAuthorize": "Gebruiker niet geautoriseerd"
+  },
+  "button": {
+    "submit": "Verzenden",
+    "cancel": "Annuleren",
+    "close": "Sluiten",
+    "save": "Opslaan",
+    "send": "Versturen",
+    "botAI": "Chat met BotAI",
+    "back": "Terug",
+    "edit": "Bewerken",
+    "yes": "Ja",
+    "no": "Nee",
+    "newTourney": "Nieuw toernooi"
+  },
+  "penalty": {
+    "label": "Strafpunten",
+    "tooltip_zero": "Geen straf",
+    "tooltip_one": "1 strafpunt",
+    "tooltip_other": "{{count}} strafpunten"
+  },
+  "simulation": {
+    "tooltip": "Simulatie",
+    "removeAll": "Alle simulaties verwijderen"
+  },
+  "estimate": {
+    "calculated": "Schatting berekend"
+  },
+  "login": {
+    "title": {
+      "login": "Inloggen",
+      "register": "Registreren",
+      "update": "Bijwerken"
+    },
+    "form": {
+      "login": "Gebruikersnaam",
+      "password": "Wachtwoord",
+      "confirmPassword": "Bevestig wachtwoord"
+    },
+    "error": {
+      "invalidLogin": "Ongeldige inloggegevens",
+      "register": "Kan account niet registreren",
+      "update": "Kan account niet bijwerken"
+    },
+    "success": {
+      "register": "Account aangemaakt",
+      "update": "Account bijgewerkt"
+    }
+  },
+  "team": {
+    "title": "{{team}} bewerken",
+    "position": "Positie",
+    "youngest": "Jongste",
+    "select": "Selecteer team",
+    "chart": {
+      "general": "Algemeen",
+      "timeline": "Tijdlijn"
+    },
+    "form": {
+      "logo": "Logo",
+      "youngest": "Jongste (datum)",
+      "name": "Naam",
+      "shortName": "Korte naam",
+      "fullName": "Volledige naam",
+      "alias": "Alias",
+      "primaryColor": "Primaire kleur",
+      "secondaryColor": "Secundaire kleur"
+    },
+    "error": {
+      "update": "Kan team niet bijwerken"
+    }
+  },
+  "ranking": {
+    "rank": "Rang",
+    "calculation": "Berekening",
+    "equality": "Gelijkheid",
+    "victory": "Overwinning",
+    "defeat": "Nederlaag",
+    "source": {
+      "win": "Meer overwinningen",
+      "win-min": "Minder overwinningen",
+      "loss": "Minder nederlagen",
+      "loss-min": "Meer nederlagen",
+      "goalDiff": "Beste doelsaldo",
+      "goalDiff-min": "Slechtste doelsaldo",
+      "goalDiffDirect": "Beste doelsaldo (direct)",
+      "goalDiffDirect-min": "Slechtste doelsaldo (direct)",
+      "goalFor": "Meeste gescoorde doelpunten",
+      "goalFormin": "Minste gescoorde doelpunten",
+      "goalForDirect": "Meeste gescoorde doelpunten (direct)",
+      "goalForDirect-min": "Minste gescoorde doelpunten (direct)",
+      "goalAgainst": "Meeste tegendoelpunten",
+      "goalAgainst-min": "Minste tegendoelpunten",
+      "goalAgainstDirect": "Meeste tegendoelpunten (direct)",
+      "goalAgainstDirect-min": "Minste tegendoelpunten (direct)",
+      "youngest": "Jongste",
+      "equal": "Gelijk"
+    }
+  },
+  "message": "Bericht",
+  "rank": {
+    "title": "Ranglijst",
+    "ranking": "Ranglijst",
+    "team": "Team",
+    "total": "Punten",
+    "game": "Wedstrijden gespeeld",
+    "win": "Overwinningen",
+    "neutral": "Gelijke spelen",
+    "loss": "Nederlagen",
+    "goalFor": "Doelpunten voor",
+    "goalAgainst": "Doelpunten tegen",
+    "shutOut": "Nul gehouden",
+    "goalDiff": "Doelsaldo",
+    "penalty": "Strafpunten",
+    "simulation": "Simulatie",
+    "first": "1e",
+    "second": "2e",
+    "third": "3e",
+    "rankth": "{{rank}}e",
+    "users": "Gebruikers",
+    "score": "Score",
+    "perfect": "Perfect",
+    "winner": "Winnaar",
+    "diff": "Verschil",
+    "goal": "Doelpunt"
+  },
+  "select": {
+    "live": "Live",
+    "coming": "Binnenkort...",
+    "past": "Verleden",
+    "addTourney": "Toernooi toevoegen"
+  },
+  "match": {
+    "blockShot": {
+      "title": "Score opslaan",
+      "error": "Kan de score niet registreren.<br/>De wedstrijd moet eindigen in een penalty shootout.<br/>Geef een winnaar aan."
+    },
+    "compare": "Vergelijken",
+    "forfeit": "Verlies door opgave",
+    "simulated": "Gesimuleerd resultaat"
+  },
+  "betScore": {
+    "finalScore": "Eindscore",
+    "forecastScore": "Voorspelde score",
+    "point": "Punten"
+  }
+}

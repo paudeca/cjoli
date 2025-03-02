@@ -43,6 +43,7 @@ const langs = [
   { key: "pt", icon: "🇵🇹" },
   { key: "es", icon: "🇪🇸" },
   { key: "de", icon: "🇩🇪" },
+  { key: "nl", icon: "🇳🇱" },
 ];
 
 const MenuNav = () => {

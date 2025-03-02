@@ -25,7 +25,7 @@ namespace cjoli.Server.Services.Rules
 
         public double GoalFor => 0.1;
 
-        public bool HasPenalty => false;
+        public bool HasPenalty => true;
         public bool HasForfeit => false;
 
         public Func<Squad, Comparison<Score>> ScoreComparison => _service.DefaultScoreComparison;

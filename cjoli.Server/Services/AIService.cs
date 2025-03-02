@@ -23,7 +23,8 @@ namespace cjoli.Server.Services
             { "en", "anglais" },
             { "pt", "portugais" },
             { "es", "espagnol" },
-            { "de", "allemand" }
+            { "de", "allemand" },
+            { "nl", "hollandais" }
         };
 
         public AIService(IMapper mapper, OpenAIClient openAIClient)
