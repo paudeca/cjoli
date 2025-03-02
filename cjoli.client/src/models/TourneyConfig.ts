@@ -6,4 +6,5 @@ export interface TourneyConfig {
   goalFor: number;
   hasPenalty: boolean;
   hasForfeit: boolean;
+  hasYoungest: boolean;
 }

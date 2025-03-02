@@ -304,15 +304,15 @@ namespace cjoli.Server.Services
                 IMatch match = m.Done ? m : userMatch!;
                 var scoreA = scores[m.PositionA.Id];
                 var scoreB = scores[m.PositionB.Id];
-                UpdateScore(scoreA, scoreB, scoreTourney, match, rule);
+                UpdateScore(scoreA, scoreB, scoreTourney, match, m, rule);
                 return scores;
             });
             var listScores = scores.Select(kv => kv.Value).OrderByDescending(x => x.Total).ToList();
             listScores = listScores.Select(s =>
             {
                 Position? position = squad.Positions.Single(p => p.Id == s.PositionId);
-                s.Total -= position.Penalty;
-                s.Penalty = position.Penalty;
+                s.Total = Math.Round(s.Total - position.Penalty,1);
+                //s.Penalty = position.Penalty;
                 return s;
             }).ToList();
 
@@ -436,7 +436,7 @@ namespace cjoli.Server.Services
                 IMatch match = m.Done ? m : m.UserMatch !=null ? m.UserMatch : m;
 
                 IRule rule = GetRule(ranking.Tourney.Rule);
-                UpdateScore(scoreA, scoreB, null, match, rule);
+                UpdateScore(scoreA, scoreB, null, match, m, rule);
 
                 if (listA.Count > 0)
                 {
@@ -571,6 +571,11 @@ namespace cjoli.Server.Services
                 Val=(Score s)=>s.GoalDiff,
                 Reverse=false,
             },
+            new ColumnDef{
+                Type="penalty",
+                Val=(Score s)=>s.Penalty,
+                Reverse=true,
+            },
             };
             listScores.ForEach(score =>
             {
@@ -622,13 +627,15 @@ namespace cjoli.Server.Services
             return total;
         }
 
-        public void UpdateScore(Score scoreA, Score scoreB, Score? scoreTourney, IMatch match, IRule rule)
+        public void UpdateScore(Score scoreA, Score scoreB, Score? scoreTourney, IMatch match, IPenalty penalty, IRule rule)
         {
             scoreA.Time = match.Time;
             scoreB.Time = match.Time;
 
             scoreA.Game++;
             scoreB.Game++;
+            scoreA.Penalty += penalty.PenaltyA;
+            scoreB.Penalty += penalty.PenaltyB;
             if (scoreTourney != null)
             {
                 scoreTourney.Game++;
@@ -750,6 +757,27 @@ namespace cjoli.Server.Services
             ClearCache(uuid, user);
             RunThread((CJoliContext context) => UpdateEstimate(uuid, login, context));
         }
+
+        public void UpdateMatch(MatchDto dto, string login, string uuid, CJoliContext context)
+        {
+            var source = _configuration["Source"];
+
+            User user = GetUserWithConfigMatch(login, uuid, context);
+            Match? match = context.Match.SingleOrDefault(m => m.Id == dto.Id);
+            if (match == null)
+            {
+                throw new NotFoundException("Match", dto.Id);
+            }
+            bool isAdmin = user.IsAdminWithNoCustomEstimate(uuid);
+            if (isAdmin)
+            {
+                match.PenaltyA = dto.PenaltyA;
+                match.PenaltyB = dto.PenaltyB;
+            }
+            context.SaveChanges();
+            ClearCache(uuid, user);
+        }
+
 
         private void RunThread(Action<CJoliContext> callback)
         {

@@ -27,7 +27,7 @@ import { Trans } from "react-i18next";
 import Select, { SingleValue } from "react-select";
 
 const TeamStack = () => {
-  const { teams, getTeam, getTeamRank } = useCJoli();
+  const { teams, getTeam, getTeamRank, tourney } = useCJoli();
   const { teamId } = useParams();
   const { isMobile } = useScreenSize();
   const [teamB, setTeamB] = React.useState<Team | undefined>(undefined);
@@ -61,10 +61,12 @@ const TeamStack = () => {
                     <Trans i18nKey="team.position">Position</Trans>:{" "}
                     {rank?.order}
                   </Stack>
-                  <Stack>
-                    <Trans i18nKey="team.youngest">Youngest</Trans>:
-                    {team.youngest ? dayjs(team.youngest).format("L") : "-"}
-                  </Stack>
+                  {tourney?.config.hasYoungest && (
+                    <Stack>
+                      <Trans i18nKey="team.youngest">Youngest</Trans>:
+                      {team.youngest ? dayjs(team.youngest).format("L") : "-"}
+                    </Stack>
+                  )}
                 </Card.Subtitle>
               </Stack>
             </Stack>

@@ -2,7 +2,7 @@
 
 namespace cjoli.Server.Dtos
 {
-    public class MatchDto : IMatch
+    public class MatchDto : IMatch, IPenalty
     {
         public int Id { get; set; }
         public bool Done { get; set; }
@@ -24,5 +24,7 @@ namespace cjoli.Server.Dtos
         public UserMatchDto? UserMatch { get; set; }
         public List<PhaseDto> Phases { get; set; } = new List<PhaseDto>();
         public MatchEstimateDto? Estimate { get; set; }
+        public int PenaltyA { get; set; }
+        public int PenaltyB { get; set; }
     }
 }

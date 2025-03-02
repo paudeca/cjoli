@@ -100,6 +100,21 @@ namespace cjoli.Server.Controllers
 
         [HttpPost]
         [Authorize]
+        [Route("{uuid}/UpdateMatch")]
+        public RankingDto UpdateMatch([FromRoute] string uuid, [FromBody] MatchDto match)
+        {
+            using (LogContext.PushProperty("uid", uuid))
+            {
+                var login = GetLogin();
+                _service.UpdateMatch(match, login!, uuid, _context);
+                _logger.LogInformationWithData("SaveMatch", match);
+                return GetRanking(uuid);
+            }
+        }
+
+
+        [HttpPost]
+        [Authorize]
         [Route("{uuid}/ClearMatch")]
         public RankingDto ClearMatch([FromRoute] string uuid, [FromBody] MatchDto match)
         {
@@ -125,15 +140,6 @@ namespace cjoli.Server.Controllers
                 return GetRanking(uuid);
             }
         }
-
-        /*[HttpPost]
-        [Authorize]
-        [Route("{uuid}/ApplySimulations")]
-        public RankingDto ApplySimulations([FromRoute] string uuid)
-        {
-            var login = GetLogin();
-            return _service.ApplySimulations(uuid, login!, _context);
-        }*/
 
 
         [HttpPost]

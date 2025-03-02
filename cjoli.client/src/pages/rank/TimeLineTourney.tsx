@@ -10,10 +10,10 @@ import { ChartData } from "chart.js";
 const TimeLineTourney = () => {
   const [type, setType] = useState<keyof Score>("total");
   const { t } = useTranslation();
-  const { teams, ranking } = useCJoli();
+  const { teams, ranking, tourney } = useCJoli();
   const { isMobile } = useScreenSize();
 
-  const options = [
+  let options = [
     { id: "total", label: t("rank.total", "Points") },
     { id: "game", label: t("rank.game", "Games played") },
     { id: "win", label: t("rank.win", "Victories") },
@@ -24,6 +24,12 @@ const TimeLineTourney = () => {
     { id: "shutOut", label: t("rank.shutOut", "ShutOut") },
     { id: "goalDiff", label: t("rank.goalDiff", "Goal average") },
   ];
+  if (tourney?.config.hasPenalty) {
+    options = [
+      ...options,
+      { id: "penalty", label: t("rank.penalty", "Penalties") },
+    ];
+  }
 
   const defintions = (teams || []).map((team, i) => {
     return {

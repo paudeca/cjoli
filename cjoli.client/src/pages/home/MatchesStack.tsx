@@ -76,7 +76,7 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
     return value.charAt(0).toUpperCase() + value.slice(1);
   };
 
-  const { saveMatch, clearMatch, register } = useMatch(uid);
+  const { saveMatch, updateMatch, clearMatch, register } = useMatch(uid);
 
   return (
     <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="matches">
@@ -121,6 +121,7 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
                                     match={me as Match}
                                     rowSpan={map[k].length}
                                     saveMatch={saveMatch}
+                                    updateMatch={updateMatch}
                                     clearMatch={clearMatch}
                                     register={register}
                                   />

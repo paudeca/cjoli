@@ -14,6 +14,7 @@ namespace cjoli.Server.Services.Rules
         double GoalFor { get; }
         bool HasPenalty { get; }
         bool HasForfeit { get; }
+        bool HasYoungest { get; }
         Func<Squad, Comparison<Score>> ScoreComparison { get; }
         Action<Match, MatchDto> ApplyForfeit { get; }
 

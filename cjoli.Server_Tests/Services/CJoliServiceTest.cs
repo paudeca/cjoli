@@ -272,7 +272,7 @@ namespace cjoli.Server_Tests.Services
             var scoreA = new Score();
             var scoreB = new Score();
             //Act
-            _service.UpdateScore(scoreA, scoreB, null, match, new ScoobyRule(_service));
+            _service.UpdateScore(scoreA, scoreB, null, match, match, new ScoobyRule(_service));
             //Assert
             Assert.Equal(1, scoreA.Game);
             Assert.Equal(1, scoreA.Win);

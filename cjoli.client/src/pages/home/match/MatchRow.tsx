@@ -27,6 +27,7 @@ export interface MatchRowProps extends JSX.IntrinsicAttributes {
   rowSpan: number;
   index: number;
   saveMatch: (match: Match) => Promise<void>;
+  updateMatch: (match: Match) => Promise<void>;
   clearMatch: (match: Match) => Promise<void>;
   register: UseFormRegister<FieldValues>;
 }
@@ -36,6 +37,7 @@ const MatchRow = ({
   rowSpan,
   index,
   saveMatch,
+  updateMatch,
   clearMatch,
   register,
 }: MatchRowProps) => {
@@ -60,6 +62,7 @@ const MatchRow = ({
       match={match}
       imatch={imatch}
       saveMatch={saveMatch}
+      updateMatch={updateMatch}
       clearMatch={clearMatch}
       register={register}
       teamA={teamA}
