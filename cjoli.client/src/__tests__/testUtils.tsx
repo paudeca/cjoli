@@ -124,6 +124,7 @@ export const createTourney = ({
   config: config ?? {
     hasPenalty: false,
     hasForfeit: false,
+    hasYoungest: false,
     win: 2,
     neutral: 1,
     loss: 0,

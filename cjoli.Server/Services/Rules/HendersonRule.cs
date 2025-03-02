@@ -27,6 +27,7 @@ namespace cjoli.Server.Services.Rules
 
 
         public Func<Squad, Comparison<Score>> ScoreComparison => _service.DefaultScoreComparison;
+
         public Action<Match, MatchDto> ApplyForfeit => _service.DefaultApplyForfeit;
 
         public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads, User? user)

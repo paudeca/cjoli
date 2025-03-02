@@ -130,7 +130,9 @@
       "goalAgainstDirect": "More goals conceded (direct)",
       "goalAgainstDirect-min": "Fewer goals conceded (direct)",
       "youngest": "Youngest",
-      "equal": "Equal"
+      "equal": "Equal",
+      "penalty": "Fewer penalties",
+      "penalty-min": "More penalties"
     }
   },
   "message": "Message",
