@@ -6,8 +6,9 @@ import { Col, Row } from "react-bootstrap";
 
 interface EventRowProps {
   event: EventPhase;
+  hasLocation: boolean;
 }
-const EventRow = ({ event }: EventRowProps) => {
+const EventRow = ({ event, hasLocation }: EventRowProps) => {
   const extra = event.positionIds.map((positionId) => (
     <TeamName key={positionId} positionId={positionId} hideFavorite />
   ));
@@ -26,7 +27,7 @@ const EventRow = ({ event }: EventRowProps) => {
       {!isMobile && (
         <>
           <td>{time}</td>
-          <td colSpan={5}>{content}</td>
+          <td colSpan={hasLocation ? 5 : 4}>{content}</td>
         </>
       )}
       {isMobile && (
