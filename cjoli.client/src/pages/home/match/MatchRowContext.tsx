@@ -13,6 +13,7 @@ interface MatchRowProps {
   teamB?: Team;
   done: boolean;
   isSimulation: boolean;
+  hasLocation: boolean;
 }
 
 export const MatchRowContext = React.createContext<MatchRowProps | null>(null);
@@ -29,6 +30,7 @@ export const MatchRowProvider = ({
   done,
   isSimulation,
   children,
+  hasLocation,
 }: MatchRowProps & {
   children: ReactNode;
 }) => {
@@ -45,6 +47,7 @@ export const MatchRowProvider = ({
         teamB,
         done,
         isSimulation,
+        hasLocation,
       }}
     >
       {children}

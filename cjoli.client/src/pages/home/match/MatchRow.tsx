@@ -30,6 +30,7 @@ export interface MatchRowProps extends JSX.IntrinsicAttributes {
   updateMatch: (match: Match) => Promise<void>;
   clearMatch: (match: Match) => Promise<void>;
   register: UseFormRegister<FieldValues>;
+  hasLocation: boolean;
 }
 
 const MatchRow = ({
@@ -40,6 +41,7 @@ const MatchRow = ({
   updateMatch,
   clearMatch,
   register,
+  hasLocation,
 }: MatchRowProps) => {
   const { findTeam } = useCJoli();
   const { isMobile } = useScreenSize();
@@ -69,6 +71,7 @@ const MatchRow = ({
       teamB={teamB}
       done={done}
       isSimulation={isSimulation}
+      hasLocation={hasLocation}
     >
       {isMobile && <MatchRowMobile />}
       {!isMobile && <MatchRowDesk index={index} rowSpan={rowSpan} />}

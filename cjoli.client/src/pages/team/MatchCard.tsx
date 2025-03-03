@@ -92,7 +92,9 @@ const MatchCard = ({ match }: MatchCardProps) => {
           </Stack>
         )}
       </Card.Body>
-      <Card.Footer className="text-muted">{match.location}</Card.Footer>
+      {match.location && (
+        <Card.Footer className="text-muted">{match.location}</Card.Footer>
+      )}
     </Card>
   );
 };

@@ -134,7 +134,7 @@ interface MatchRowDeskProps {
 
 const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
   const { getSquad } = useCJoli();
-  const { match, imatch, isSimulation, done } = useMatchRow();
+  const { match, imatch, isSimulation, done, hasLocation } = useMatchRow();
   const squad = getSquad(match.squadId);
   return (
     <tr data-testid={`match-${match.id}`}>
@@ -148,7 +148,7 @@ const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
           <BetScore match={match} />
         </LeftCenterDiv>
       </td>
-      <td>{match.location}</td>
+      {hasLocation && <td>{match.location}</td>}
       <td>
         <LeftCenterDiv>
           <TeamCell

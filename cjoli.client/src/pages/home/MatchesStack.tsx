@@ -57,7 +57,7 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
       return { ...acc, [date]: list };
     }, {});
     return datas;
-  }, [filter, matches, events]);
+  }, [filter, filterEvent, matches, events]);
 
   const keys = useMemo(() => {
     const keys = Object.keys(datas);
@@ -77,6 +77,11 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
   };
 
   const { saveMatch, updateMatch, clearMatch, register } = useMatch(uid);
+
+  const hasLocation = useMemo(
+    () => matches.some((m) => !!m.location),
+    [matches]
+  );
 
   return (
     <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="matches">
@@ -124,6 +129,7 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
                                     updateMatch={updateMatch}
                                     clearMatch={clearMatch}
                                     register={register}
+                                    hasLocation={hasLocation}
                                   />
                                 );
                               } else {
@@ -131,6 +137,7 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
                                   <EventRow
                                     key={me.id}
                                     event={me as EventPhase}
+                                    hasLocation={hasLocation}
                                   />
                                 );
                               }
