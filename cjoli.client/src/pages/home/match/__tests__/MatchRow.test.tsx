@@ -76,6 +76,7 @@ const render = async ({ match, user }: { match: Match; user: User }) => {
           saveMatch={async () => {}}
           updateMatch={async () => {}}
           clearMatch={async () => {}}
+          hasLocation
         />
       </tbody>
     </table>
