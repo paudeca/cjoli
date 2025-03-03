@@ -15,4 +15,6 @@ export interface Match extends IMatch {
   phaseId: number;
   userMatch?: UserMatch;
   estimate?: { scoreA: number; scoreB: number };
+  penaltyA: number;
+  penaltyB: number;
 }

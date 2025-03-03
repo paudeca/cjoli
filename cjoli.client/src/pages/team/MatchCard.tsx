@@ -17,7 +17,7 @@ interface MatchCardProps {
 const MatchCard = ({ match }: MatchCardProps) => {
   const { isAdmin, isConnected, userConfig } = useUser();
   const uid = useUid();
-  const { saveMatch, clearMatch, register } = useMatch(uid);
+  const { saveMatch, updateMatch, clearMatch, register } = useMatch(uid);
 
   const hasUserMatch =
     match.userMatch && (!isAdmin || (isAdmin && userConfig.useCustomEstimate));
@@ -33,7 +33,6 @@ const MatchCard = ({ match }: MatchCardProps) => {
   return (
     <Card>
       <Card.Header>
-        {" "}
         <SimulationIcon show={isSimulation} />
         {dayjs(match.time).format("dddd LL LT")}
       </Card.Header>
@@ -47,6 +46,7 @@ const MatchCard = ({ match }: MatchCardProps) => {
                 id={`m${match.id}.scoreA`}
                 match={match}
                 saveMatch={saveMatch}
+                updateMatch={updateMatch}
                 register={register}
                 teamA
               />
@@ -63,6 +63,7 @@ const MatchCard = ({ match }: MatchCardProps) => {
                 id={`m${match.id}.scoreB`}
                 match={match}
                 saveMatch={saveMatch}
+                updateMatch={updateMatch}
                 register={register}
                 teamB
               />

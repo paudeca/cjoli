@@ -16,7 +16,8 @@ namespace cjoli.Server.Models
         goalAgainst,
         goalAgainstDirect,
         youngest,
-        equal
+        equal,
+        penalty,
     }
 
     public class ScoreSource

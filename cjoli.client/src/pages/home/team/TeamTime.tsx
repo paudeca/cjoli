@@ -73,11 +73,11 @@ const CHART_COLORS = {
 };
 
 const TeamTime = () => {
-  const { ranking } = useCJoli();
+  const { ranking, tourney } = useCJoli();
   const { teamId } = useParams();
   const { isMobile } = useScreenSize();
 
-  const defintions = [
+  let defintions = [
     {
       label: "PTS",
       value: (s: Score) => s.total,
@@ -124,6 +124,16 @@ const TeamTime = () => {
       color: CHART_COLORS.brown,
     },
   ];
+  if (tourney?.config.hasPenalty) {
+    defintions = [
+      ...defintions,
+      {
+        label: "P",
+        value: (s: Score) => s.penalty,
+        color: CHART_COLORS.grey,
+      },
+    ];
+  }
 
   const data: {
     datasets: {

@@ -61,7 +61,7 @@ const RankTableScore = ({ tourney, score, squad }: RankTableScoreProps) => {
     <>
       <tr>
         <td rowSpan={isMobile ? 2 : 1}>{score.rank}</td>
-        <td colSpan={isMobile ? 7 : 1}>
+        <td colSpan={isMobile ? 8 : 1}>
           <Stack direction="horizontal">
             <LeftCenterDiv className="mx-auto">
               <TeamName positionId={score.positionId} />
@@ -88,6 +88,7 @@ const RankTableScore = ({ tourney, score, squad }: RankTableScoreProps) => {
             <td>{score.goalFor}</td>
             <td>{score.goalAgainst}</td>
             <td>{score.shutOut}</td>
+            <td>{score.penalty}</td>
             <td>{score.goalDiff}</td>
           </>
         )}
@@ -122,6 +123,11 @@ const RankTableScore = ({ tourney, score, squad }: RankTableScoreProps) => {
           <td className="w-25">
             <CJoliTooltip info={t("rank.goalAgainst", "Goals against")}>
               BC:{score.goalAgainst}
+            </CJoliTooltip>
+          </td>
+          <td className="w-25">
+            <CJoliTooltip info={t("rank.penalty", "Penalties")}>
+              P:{score.penalty}
             </CJoliTooltip>
           </td>
           <td className="w-25">

@@ -130,7 +130,9 @@
       "goalAgainstDirect": "Plus de buts encaissés (direct)",
       "goalAgainstDirect-min": "Moins de buts encaissés (direct)",
       "youngest": "Le plus jeune",
-      "equal": "Identique"
+      "equal": "Identique",
+      "penalty": "Moins de pénalités",
+      "penalty-min": "Plus de pénalités"
     }
   },
   "message": "Message",

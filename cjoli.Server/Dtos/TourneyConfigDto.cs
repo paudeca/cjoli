@@ -11,5 +11,6 @@
 
         public bool HasPenalty { get; set; }
         public bool HasForfeit { get; set; }
+        public bool HasYoungest { get; set; }
     }
 }

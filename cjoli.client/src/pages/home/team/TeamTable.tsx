@@ -169,6 +169,8 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
         label: "PEN",
         description: t("rank.penalty", "Penalties"),
         callScore: (s: Score) => s.penalty,
+        getInfo: (s: Score) =>
+          average(s.penalty, s.game) + formatRank(s.ranks?.penalty?.rank),
         up: false,
         active: true,
         needTeam: false,

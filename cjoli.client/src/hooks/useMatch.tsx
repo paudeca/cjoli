@@ -37,10 +37,15 @@ export const useMatch = (uid: string) => {
     }
   };
 
+  const updateMatch = async (match: Match) => {
+    const ranking = await cjoliService.updateMatch(uid, match);
+    loadRanking(ranking);
+  };
+
   const clearMatch = async (match: Match) => {
     const ranking = await cjoliService.clearMatch(uid, match);
     loadRanking(ranking);
   };
 
-  return { saveMatch, clearMatch, register };
+  return { saveMatch, updateMatch, clearMatch, register };
 };

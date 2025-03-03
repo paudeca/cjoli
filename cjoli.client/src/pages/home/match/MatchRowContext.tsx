@@ -6,6 +6,7 @@ interface MatchRowProps {
   match: Match;
   imatch: IMatch;
   saveMatch: (match: Match) => Promise<void>;
+  updateMatch: (match: Match) => Promise<void>;
   clearMatch: (match: Match) => Promise<void>;
   register: UseFormRegister<FieldValues>;
   teamA?: Team;
@@ -20,6 +21,7 @@ export const MatchRowProvider = ({
   match,
   imatch,
   saveMatch,
+  updateMatch,
   clearMatch,
   register,
   teamA,
@@ -36,6 +38,7 @@ export const MatchRowProvider = ({
         match,
         imatch,
         saveMatch,
+        updateMatch,
         clearMatch,
         register,
         teamA,

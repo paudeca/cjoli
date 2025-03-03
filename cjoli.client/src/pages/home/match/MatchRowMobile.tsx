@@ -60,7 +60,7 @@ const CellViewMobile = () => {
 const CellInputMobile = () => {
   const { isConnected, isAdmin } = useUser();
   const { t } = useTranslation();
-  const { saveMatch, register, match } = useMatchRow();
+  const { saveMatch, updateMatch, register, match } = useMatchRow();
   const editMode =
     isAdmin ||
     (isConnected && match.time > dayjs().format("YYYY-MM-DDTHH:mm:ss"));
@@ -73,6 +73,7 @@ const CellInputMobile = () => {
               id={`m${match.id}.scoreA`}
               match={match}
               saveMatch={saveMatch}
+              updateMatch={updateMatch}
               register={register}
               teamA
             />
@@ -80,6 +81,7 @@ const CellInputMobile = () => {
               id={`m${match.id}.scoreB`}
               match={match}
               saveMatch={saveMatch}
+              updateMatch={updateMatch}
               register={register}
               teamB
             />
@@ -125,6 +127,7 @@ const MatchRowMobile = () => {
               <TeamCell
                 positionId={match.positionIdA}
                 forfeit={imatch.forfeitA}
+                penalty={match.penaltyA}
               />
             </Col>
           </Row>
@@ -133,6 +136,7 @@ const MatchRowMobile = () => {
               <TeamCell
                 positionId={match.positionIdB}
                 forfeit={imatch.forfeitB}
+                penalty={match.penaltyB}
               />
             </Col>
           </Row>

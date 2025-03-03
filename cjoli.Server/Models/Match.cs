@@ -2,7 +2,7 @@
 
 namespace cjoli.Server.Models
 {
-    public class Match : IMatch
+    public class Match : IMatch, IPenalty
     {
         [Key]
         public int Id { get; set; }
@@ -17,6 +17,8 @@ namespace cjoli.Server.Models
         public string? Location { get; set; }
         public DateTime Time { get; set; }
         public Squad? Squad { get; set; }
+        public int PenaltyA { get; set; }
+        public int PenaltyB { get; set; }
 
         public IList<MatchEstimate> Estimates { get; set; } = new List<MatchEstimate>();
         public IList<UserMatch> UserMatches { get; set; } = new List<UserMatch>();
