@@ -11,6 +11,7 @@ export interface Tourney {
   category: string;
   startTime: Date;
   endTime: Date;
+  displayTime?: Date;
   phases: Phase[];
   teams: Team[];
   ranks: Rank[];

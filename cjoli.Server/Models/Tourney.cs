@@ -13,6 +13,7 @@ namespace cjoli.Server.Models
         public required string Name { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
+        public DateTime? DisplayTime { get; set; }
         public string? Season { get; set; }
         public string? Category { get; set; }
         public string? Rule { get; set; }

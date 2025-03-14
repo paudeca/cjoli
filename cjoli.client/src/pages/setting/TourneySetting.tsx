@@ -32,6 +32,10 @@ const TourneySetting = () => {
             <Form.Label>End Time</Form.Label>
             <Form.Control type="datetime-local" {...register("endTime")} />
           </Form.Group>
+          <Form.Group as={Col} lg={3} xs={12} controlId="displayTime">
+            <Form.Label>Display Time</Form.Label>
+            <Form.Control type="datetime-local" {...register("displayTime")} />
+          </Form.Group>
         </Row>
         <Row className="mb-3">
           <Form.Group as={Col} lg={3} xs={12} controlId="rule">

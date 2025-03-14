@@ -129,6 +129,10 @@ namespace cjoli.Server.Services
         private Ranking GetRanking(string tourneyUid, User? user, CJoliContext context)
         {
             var tourney = GetTourney(tourneyUid, user, context);
+            if(tourney.DisplayTime > DateTime.Now && !user.IsAdmin(tourneyUid))
+            {
+                tourney = new Tourney() { Uid = tourney.Uid, Name = tourney.Name };
+            }
             var scores = CalculateScores(tourney, user, context);
             return new Ranking() { Tourney = tourney, Scores = scores };
         }
