@@ -1,6 +1,15 @@
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { Match, Phase, Position, Rank, Squad, Team, Tourney } from "../models";
+import {
+  EventPhase,
+  Match,
+  Phase,
+  Position,
+  Rank,
+  Squad,
+  Team,
+  Tourney,
+} from "../models";
 import useUid from "../hooks/useUid";
 import TourneySetting from "./setting/TourneySetting";
 import TeamsSetting from "./setting/TeamsSetting";
@@ -24,6 +33,7 @@ import AddSquadModal from "./setting/AddSquadModal";
 import CJoliStack from "../components/CJoliStack";
 import { useAddSetting } from "./setting/useAddSetting";
 import { useUser } from "../hooks/useUser";
+import AddEventModal from "./setting/AddEventModal";
 
 const SettingPage = () => {
   const { tourney } = useCJoli("setting");
@@ -37,6 +47,7 @@ const SettingPage = () => {
     removePosition,
     removeMatch,
     removeRank,
+    removeEvent,
   } = useApi();
   const uid = useUid();
   const { register, handleSubmit, setValue, control } = useForm<Tourney>({
@@ -58,6 +69,7 @@ const SettingPage = () => {
     addPosition,
     addMatch,
     addRank,
+    addEvent,
   } = useAddSetting();
 
   const { mutateAsync: doRemoveTourney } = useMutation(removeTourney(uid));
@@ -67,6 +79,7 @@ const SettingPage = () => {
   const { mutateAsync: doRemovePosition } = useMutation(removePosition(uid));
   const { mutateAsync: doRemoveMatch } = useMutation(removeMatch(uid));
   const { mutateAsync: doRemoveRank } = useMutation(removeRank(uid));
+  const { mutateAsync: doRemoveEvent } = useMutation(removeEvent(uid));
 
   const submit = async (tourney: Tourney) => {
     await doSaveTourney(tourney);
@@ -142,6 +155,11 @@ const SettingPage = () => {
                 <AddRankModal
                   onAddRank={(rank) => addRank({ tourney, rank })}
                 />
+                <AddEventModal
+                  onAddEvent={(event, phase) =>
+                    addEvent({ tourney, phase, event })
+                  }
+                />
 
                 <ConfirmationModal
                   id="confirmDeleteTourney"
@@ -160,7 +178,7 @@ const SettingPage = () => {
                   title="Remove Team"
                   onConfirm={doRemoveTeam}
                   message={(team) =>
-                    `Are you sure you want to remove this team &apos;${team.name}&apos;?`
+                    `Are you sure you want to remove this team '${team.name}'?`
                   }
                 />
                 <ConfirmationModal<Phase>
@@ -168,7 +186,7 @@ const SettingPage = () => {
                   title="Remove Phase"
                   onConfirm={doRemovePhase}
                   message={(phase) =>
-                    `Are you sure you want to remove this Phase &apos;${phase.name}&apos;?`
+                    `Are you sure you want to remove this Phase '${phase.name}'?`
                   }
                 />
                 <ConfirmationModal<{ squad: Squad; phase: Phase }>
@@ -209,6 +227,14 @@ const SettingPage = () => {
                   onConfirm={doRemoveRank}
                   message={(rank) =>
                     `Are you sure you want to remove this rank '${rank.value}'?`
+                  }
+                />
+                <ConfirmationModal<{ event: EventPhase; phase: Phase }>
+                  id="confirmDeleteEvent"
+                  title="Remove Event"
+                  onConfirm={doRemoveEvent}
+                  message={({ event }) =>
+                    `Are you sure you want to remove this event '${event.name}'?`
                   }
                 />
               </Col>

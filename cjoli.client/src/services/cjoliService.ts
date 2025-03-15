@@ -110,6 +110,11 @@ export const saveMatch = async (uid: string, match: Match) => {
   return data;
 };
 
+export const updateMatch = async (uid: string, match: Match) => {
+  const { data } = await axios.post(`${url}/cjoli/${uid}/updateMatch`, match);
+  return data;
+};
+
 export const clearMatch = async (uid: string, match: Match) => {
   const { data } = await axios.post(`${url}/cjoli/${uid}/clearMatch`, match);
   return data;

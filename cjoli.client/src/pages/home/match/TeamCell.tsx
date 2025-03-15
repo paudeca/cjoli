@@ -1,13 +1,16 @@
 import { Badge } from "react-bootstrap";
 import TeamName from "../../../components/TeamName";
 import { Trans } from "react-i18next";
+import PenaltyBadge from "../../../components/PenaltyBadge";
 
 const TeamCell = ({
   positionId,
   forfeit,
+  penalty,
 }: {
   positionId: number;
   forfeit: boolean;
+  penalty: number;
 }) => {
   return (
     <>
@@ -17,6 +20,7 @@ const TeamCell = ({
           <Trans i18nKey="match.forfeit">Forfeit</Trans>
         </Badge>
       )}
+      <PenaltyBadge penalty={penalty} />
     </>
   );
 };

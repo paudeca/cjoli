@@ -7,6 +7,7 @@ import "dayjs/locale/fr";
 import "dayjs/locale/pt";
 import "dayjs/locale/es";
 import "dayjs/locale/de";
+import "dayjs/locale/nl";
 
 import dayjs from "dayjs";
 dayjs.locale("fr");

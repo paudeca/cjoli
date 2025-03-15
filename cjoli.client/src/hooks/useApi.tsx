@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import {
   DefaultError,
   queryOptions,
@@ -9,6 +10,7 @@ import * as settingService from "../services/settingService";
 import { useUser } from "./useUser";
 import { useCJoli } from "./useCJoli";
 import {
+  EventPhase,
   Match,
   Phase,
   Position,
@@ -276,6 +278,43 @@ const useApiDelete = () => {
     [loadTourney]
   );
 
+  const removeUser = useCallback(
+    () =>
+      mutationOptions({
+        mutationKey: ["removeUser"],
+        mutationFn: async (user: User) => {
+          await settingService.removeUser({
+            userId: user.id,
+          });
+          return true;
+        },
+      }),
+    []
+  );
+
+  const removeEvent = useCallback(
+    (uid: string) =>
+      mutationOptions({
+        mutationKey: ["removeEvent", uid],
+        mutationFn: async ({
+          event,
+          phase,
+        }: {
+          event: EventPhase;
+          phase: Phase;
+        }) => {
+          const tourney = await settingService.removeEvent({
+            uid,
+            phaseId: phase.id,
+            eventId: event.id,
+          });
+          loadTourney(tourney);
+          return true;
+        },
+      }),
+    [loadTourney]
+  );
+
   return {
     removeTourney,
     removeTeam,
@@ -284,6 +323,8 @@ const useApiDelete = () => {
     removePosition,
     removeMatch,
     removeRank,
+    removeUser,
+    removeEvent,
   };
 };
 

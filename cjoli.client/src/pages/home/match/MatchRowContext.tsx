@@ -6,12 +6,14 @@ interface MatchRowProps {
   match: Match;
   imatch: IMatch;
   saveMatch: (match: Match) => Promise<void>;
+  updateMatch: (match: Match) => Promise<void>;
   clearMatch: (match: Match) => Promise<void>;
   register: UseFormRegister<FieldValues>;
   teamA?: Team;
   teamB?: Team;
   done: boolean;
   isSimulation: boolean;
+  hasLocation: boolean;
 }
 
 export const MatchRowContext = React.createContext<MatchRowProps | null>(null);
@@ -20,6 +22,7 @@ export const MatchRowProvider = ({
   match,
   imatch,
   saveMatch,
+  updateMatch,
   clearMatch,
   register,
   teamA,
@@ -27,6 +30,7 @@ export const MatchRowProvider = ({
   done,
   isSimulation,
   children,
+  hasLocation,
 }: MatchRowProps & {
   children: ReactNode;
 }) => {
@@ -36,12 +40,14 @@ export const MatchRowProvider = ({
         match,
         imatch,
         saveMatch,
+        updateMatch,
         clearMatch,
         register,
         teamA,
         teamB,
         done,
         isSimulation,
+        hasLocation,
       }}
     >
       {children}

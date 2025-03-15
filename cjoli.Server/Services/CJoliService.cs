@@ -49,6 +49,7 @@ namespace cjoli.Server.Services
             _rules.Add("scooby", new ScoobyRule(this));
             _rules.Add("henderson", new HendersonRule(this));
             _rules.Add("hogly", new HoglyRule(this));
+            _rules.Add("nordcup", new NordCupRule(this));
 
         }
 
@@ -102,6 +103,7 @@ namespace cjoli.Server.Services
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(
                     m => m.Estimates.Where(s => user != null && user.HasCustomEstimate() ? s.User == user : s.User == null)
                  )
+                .Include(t => t.Phases).ThenInclude(p => p.Events).ThenInclude(e => e.Positions)
                 .Include(t => t.Teams).ThenInclude(t => t.TeamDatas.Where(d => d.Tourney.Uid == tourneyUid))
                 .Include(t => t.Teams).ThenInclude(t => t.Alias)
                 .FirstOrDefault(t => t.Uid == tourneyUid);
@@ -127,6 +129,10 @@ namespace cjoli.Server.Services
         private Ranking GetRanking(string tourneyUid, User? user, CJoliContext context)
         {
             var tourney = GetTourney(tourneyUid, user, context);
+            if(tourney.DisplayTime > DateTime.Now && !user.IsAdmin(tourneyUid))
+            {
+                tourney = new Tourney() { Uid = tourney.Uid, Name = tourney.Name };
+            }
             var scores = CalculateScores(tourney, user, context);
             return new Ranking() { Tourney = tourney, Scores = scores };
         }
@@ -170,7 +176,7 @@ namespace cjoli.Server.Services
             return map![loginKey];
         }
 
-        public void UpdateEstimate(string uuid, string login, CJoliContext context)
+        private void UpdateEstimate(string uuid, string login, CJoliContext context)
         {
             User? user = GetUserWithConfig(login, uuid, context);
 
@@ -207,7 +213,7 @@ namespace cjoli.Server.Services
             return new ScoresDto { ScoreSquads = scoreSquads, ScoreTourney = scoreTourney, Bet=new BetDto() };
         }
 
-        public static void UpdateSource(Score a, Score b, SourceType type, int value, bool positive)
+        public static void UpdateSource(Score a, Score b, SourceType type, double value, bool positive)
         {
             a.Sources.Add(b.PositionId, new ScoreSource { Type = type, Value = value, Winner = (positive && value >= 0) || (!positive && value < 0) });
             b.Sources.Add(a.PositionId, new ScoreSource { Type = type, Value = -value, Winner = (positive && -value >= 0) || (!positive && -value < 0) });
@@ -302,15 +308,15 @@ namespace cjoli.Server.Services
                 IMatch match = m.Done ? m : userMatch!;
                 var scoreA = scores[m.PositionA.Id];
                 var scoreB = scores[m.PositionB.Id];
-                UpdateScore(scoreA, scoreB, scoreTourney, match, rule);
+                UpdateScore(scoreA, scoreB, scoreTourney, match, m, rule);
                 return scores;
             });
             var listScores = scores.Select(kv => kv.Value).OrderByDescending(x => x.Total).ToList();
             listScores = listScores.Select(s =>
             {
                 Position? position = squad.Positions.Single(p => p.Id == s.PositionId);
-                s.Total -= position.Penalty;
-                s.Penalty = position.Penalty;
+                s.Total = Math.Round(s.Total - position.Penalty,1);
+                //s.Penalty = position.Penalty;
                 return s;
             }).ToList();
 
@@ -434,7 +440,7 @@ namespace cjoli.Server.Services
                 IMatch match = m.Done ? m : m.UserMatch !=null ? m.UserMatch : m;
 
                 IRule rule = GetRule(ranking.Tourney.Rule);
-                UpdateScore(scoreA, scoreB, null, match, rule);
+                UpdateScore(scoreA, scoreB, null, match, m, rule);
 
                 if (listA.Count > 0)
                 {
@@ -569,6 +575,11 @@ namespace cjoli.Server.Services
                 Val=(Score s)=>s.GoalDiff,
                 Reverse=false,
             },
+            new ColumnDef{
+                Type="penalty",
+                Val=(Score s)=>s.Penalty,
+                Reverse=true,
+            },
             };
             listScores.ForEach(score =>
             {
@@ -596,13 +607,39 @@ namespace cjoli.Server.Services
             });
         }
 
-        public void UpdateScore(Score scoreA, Score scoreB, Score? scoreTourney, IMatch match, IRule rule)
+        public enum ScoreType
+        {
+            Win,
+            Loss,
+            Neutral,
+            Forfeit
+        }
+
+        public double Total(ScoreType type, IRule rule, double total, int score)
+        {
+            switch(type)
+            {
+                case ScoreType.Win:
+                    return total + rule.Win;
+                case ScoreType.Loss:
+                    return total + rule.Loss;
+                case ScoreType.Neutral:
+                    return total + rule.Neutral;
+                case ScoreType.Forfeit:
+                    return total + rule.Forfeit;
+            }
+            return total;
+        }
+
+        public void UpdateScore(Score scoreA, Score scoreB, Score? scoreTourney, IMatch match, IPenalty penalty, IRule rule)
         {
             scoreA.Time = match.Time;
             scoreB.Time = match.Time;
 
             scoreA.Game++;
             scoreB.Game++;
+            scoreA.Penalty += penalty.PenaltyA;
+            scoreB.Penalty += penalty.PenaltyB;
             if (scoreTourney != null)
             {
                 scoreTourney.Game++;
@@ -614,8 +651,8 @@ namespace cjoli.Server.Services
                 scoreA.Win++;
                 scoreB.Loss++;
 
-                scoreA.Total += rule.Win;
-                scoreB.Total += match.ForfeitB ? rule.Forfeit : rule.Loss;
+                scoreA.Total = rule.Total(ScoreType.Win,scoreA.Total,match.ScoreA);
+                scoreB.Total = rule.Total(match.ForfeitB ? ScoreType.Forfeit : ScoreType.Loss, scoreB.Total, match.ScoreB);
 
                 if (scoreTourney != null)
                 {
@@ -631,8 +668,8 @@ namespace cjoli.Server.Services
                 scoreA.Loss++;
                 scoreB.Win++;
 
-                scoreA.Total += match.ForfeitA ? rule.Forfeit : rule.Loss;
-                scoreB.Total += rule.Win;
+                scoreA.Total = rule.Total(match.ForfeitA ? ScoreType.Forfeit : ScoreType.Loss, scoreA.Total, match.ScoreA);
+                scoreB.Total = rule.Total(ScoreType.Win, scoreB.Total, match.ScoreB);
 
                 if (scoreTourney != null)
                 {
@@ -647,8 +684,8 @@ namespace cjoli.Server.Services
                 scoreA.Neutral++;
                 scoreB.Neutral++;
 
-                scoreA.Total += rule.Neutral;
-                scoreB.Total += rule.Neutral;
+                scoreA.Total = rule.Total(ScoreType.Neutral, scoreA.Total, match.ScoreA); 
+                scoreB.Total = rule.Total(ScoreType.Neutral, scoreB.Total, match.ScoreB);
 
                 if (scoreTourney != null)
                 {
@@ -722,11 +759,29 @@ namespace cjoli.Server.Services
             }
             context.SaveChanges();
             ClearCache(uuid, user);
+            RunThread((CJoliContext context) => UpdateEstimate(uuid, login, context));
+        }
+
+        public void UpdateMatch(MatchDto dto, string login, string uuid, CJoliContext context)
+        {
+            var source = _configuration["Source"];
+
+            User user = GetUserWithConfigMatch(login, uuid, context);
+            Match? match = context.Match.SingleOrDefault(m => m.Id == dto.Id);
+            if (match == null)
+            {
+                throw new NotFoundException("Match", dto.Id);
+            }
+            bool isAdmin = user.IsAdminWithNoCustomEstimate(uuid);
             if (isAdmin)
             {
-                RunThread((CJoliContext context)=> UpdateEstimate(uuid, login, context));
+                match.PenaltyA = dto.PenaltyA;
+                match.PenaltyB = dto.PenaltyB;
             }
+            context.SaveChanges();
+            ClearCache(uuid, user);
         }
+
 
         private void RunThread(Action<CJoliContext> callback)
         {

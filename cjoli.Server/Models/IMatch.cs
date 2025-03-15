@@ -8,4 +8,10 @@
         public bool ForfeitB { get; set; }
         public DateTime Time { get; }
     }
+
+    public interface IPenalty
+    {
+        public int PenaltyA { get; set; }
+        public int PenaltyB { get; set; }
+    }
 }

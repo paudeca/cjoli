@@ -22,6 +22,21 @@ namespace cjoli.Server.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("EventPosition", b =>
+                {
+                    b.Property<int>("EventsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PositionsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("EventsId", "PositionsId");
+
+                    b.HasIndex("PositionsId");
+
+                    b.ToTable("EventPosition");
+                });
+
             modelBuilder.Entity("TeamTourney", b =>
                 {
                     b.Property<int>("TeamsId")
@@ -35,6 +50,31 @@ namespace cjoli.Server.Migrations
                     b.HasIndex("TourneysId");
 
                     b.ToTable("TeamTourney");
+                });
+
+            modelBuilder.Entity("cjoli.Server.Models.Event", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("PhaseId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PhaseId");
+
+                    b.ToTable("Event");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Match", b =>
@@ -56,6 +96,12 @@ namespace cjoli.Server.Migrations
 
                     b.Property<string>("Location")
                         .HasColumnType("longtext");
+
+                    b.Property<int>("PenaltyA")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PenaltyB")
+                        .HasColumnType("int");
 
                     b.Property<int>("PositionAId")
                         .HasColumnType("int");
@@ -397,6 +443,9 @@ namespace cjoli.Server.Migrations
                     b.Property<string>("Category")
                         .HasColumnType("longtext");
 
+                    b.Property<DateTime?>("DisplayTime")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime(6)");
 
@@ -543,6 +592,21 @@ namespace cjoli.Server.Migrations
                     b.ToTable("UserMatch");
                 });
 
+            modelBuilder.Entity("EventPosition", b =>
+                {
+                    b.HasOne("cjoli.Server.Models.Event", null)
+                        .WithMany()
+                        .HasForeignKey("EventsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("cjoli.Server.Models.Position", null)
+                        .WithMany()
+                        .HasForeignKey("PositionsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("TeamTourney", b =>
                 {
                     b.HasOne("cjoli.Server.Models.Team", null)
@@ -556,6 +620,13 @@ namespace cjoli.Server.Migrations
                         .HasForeignKey("TourneysId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("cjoli.Server.Models.Event", b =>
+                {
+                    b.HasOne("cjoli.Server.Models.Phase", null)
+                        .WithMany("Events")
+                        .HasForeignKey("PhaseId");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Match", b =>
@@ -789,6 +860,8 @@ namespace cjoli.Server.Migrations
 
             modelBuilder.Entity("cjoli.Server.Models.Phase", b =>
                 {
+                    b.Navigation("Events");
+
                     b.Navigation("Squads");
                 });
 

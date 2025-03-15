@@ -119,3 +119,22 @@ export const removeRank = async ({
   );
   return data;
 };
+
+export const removeUser = async ({ userId }: { userId: number }) => {
+  await axios.delete<void>(`${url}/setting/users/${userId}`);
+};
+
+export const removeEvent = async ({
+  uid,
+  phaseId,
+  eventId,
+}: {
+  uid: string;
+  phaseId: number;
+  eventId: number;
+}) => {
+  const { data } = await axios.delete<Tourney>(
+    `${url}/setting/tourney/${uid}/phases/${phaseId}/events/${eventId}`
+  );
+  return data;
+};

@@ -20,7 +20,8 @@ const CellInputDesk = () => {
   const { isConnected, isAdmin } = useUser();
   const { t } = useTranslation();
   const { getSquad } = useCJoli();
-  const { match, saveMatch, register, teamA, teamB } = useMatchRow();
+  const { match, saveMatch, updateMatch, register, teamA, teamB } =
+    useMatchRow();
   const editMode =
     isAdmin ||
     (isConnected && match.time > dayjs().format("YYYY-MM-DDTHH:mm:ss"));
@@ -65,6 +66,7 @@ const CellInputDesk = () => {
               id={`m${match.id}.scoreA`}
               match={match}
               saveMatch={saveMatch}
+              updateMatch={updateMatch}
               register={register}
               teamA
             />
@@ -79,6 +81,7 @@ const CellInputDesk = () => {
               id={`m${match.id}.scoreB`}
               match={match}
               saveMatch={saveMatch}
+              updateMatch={updateMatch}
               register={register}
               teamB
             />
@@ -131,7 +134,7 @@ interface MatchRowDeskProps {
 
 const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
   const { getSquad } = useCJoli();
-  const { match, imatch, isSimulation, done } = useMatchRow();
+  const { match, imatch, isSimulation, done, hasLocation } = useMatchRow();
   const squad = getSquad(match.squadId);
   return (
     <tr data-testid={`match-${match.id}`}>
@@ -145,17 +148,25 @@ const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
           <BetScore match={match} />
         </LeftCenterDiv>
       </td>
-      <td>{match.location}</td>
+      {hasLocation && <td>{match.location}</td>}
       <td>
         <LeftCenterDiv>
-          <TeamCell positionId={match.positionIdA} forfeit={imatch.forfeitA} />
+          <TeamCell
+            positionId={match.positionIdA}
+            forfeit={imatch.forfeitA}
+            penalty={match.penaltyA}
+          />
         </LeftCenterDiv>
       </td>
       {!done && <CellInputDesk />}
       {done && <CellViewDesk />}
       <td>
         <LeftCenterDiv>
-          <TeamCell positionId={match.positionIdB} forfeit={imatch.forfeitB} />
+          <TeamCell
+            positionId={match.positionIdB}
+            forfeit={imatch.forfeitB}
+            penalty={match.penaltyB}
+          />
         </LeftCenterDiv>
       </td>
     </tr>

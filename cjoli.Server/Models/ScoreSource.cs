@@ -16,14 +16,15 @@ namespace cjoli.Server.Models
         goalAgainst,
         goalAgainstDirect,
         youngest,
-        equal
+        equal,
+        penalty,
     }
 
     public class ScoreSource
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public SourceType Type { get; set; }
-        public int Value { get; set; }
+        public double Value { get; set; }
         public bool Winner { get; set; }
     }
 }

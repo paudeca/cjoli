@@ -124,10 +124,12 @@ export const createTourney = ({
   config: config ?? {
     hasPenalty: false,
     hasForfeit: false,
+    hasYoungest: false,
     win: 2,
     neutral: 1,
     loss: 0,
     forfeit: 0,
+    goalFor: 0,
   },
   rule: "simple",
 });
@@ -184,6 +186,7 @@ export const createPhase: (phase: Partial<Phase> & { id: number }) => Phase = (
   id: phase.id,
   name: phase.name ?? `phase${phase.id}`,
   squads: phase.squads ?? [],
+  events: [],
 });
 
 export const createSquad: (squad: Partial<Squad> & { id: number }) => Squad = (

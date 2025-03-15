@@ -96,7 +96,7 @@ const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
         <thead>
           <tr>
             <th rowSpan={isMobile ? 2 : 1}>#</th>
-            <th colSpan={isMobile ? 7 : 1} className="w-50">
+            <th colSpan={isMobile ? 8 : 1} className="w-50">
               <Trans i18nKey="rank.team">Team</Trans>
             </th>
             <MyTh rowSpan={isMobile ? 2 : 1}>
@@ -137,6 +137,11 @@ const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
                 <th>
                   <CJoliTooltip info={t("rank.shutOut", "ShutOut")}>
                     BL
+                  </CJoliTooltip>
+                </th>
+                <th>
+                  <CJoliTooltip info={t("rank.penalty", "Penalty")}>
+                    P
                   </CJoliTooltip>
                 </th>
                 <th>

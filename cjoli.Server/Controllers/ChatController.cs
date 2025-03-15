@@ -13,12 +13,14 @@ namespace cjoli.Server.Controllers
     public class ChatController : ControllerBase
     {
         private readonly AIService _service;
+        private readonly CJoliService _cjoliService;
         private readonly CJoliContext _context;
         private readonly ILogger _logger;
 
-        public ChatController(AIService service, CJoliContext context, ILogger<ChatController> logger)
+        public ChatController(AIService service, CJoliService cjoliService, CJoliContext context, ILogger<ChatController> logger)
         {
             _service = service;
+            _cjoliService = cjoliService;
             _context = context;
             _logger = logger;
         }
@@ -54,7 +56,8 @@ namespace cjoli.Server.Controllers
 
         private async Task Bot(WebSocket webSocket, string uuid, string lang, string login)
         {
-            var session = _service.CreateSessionForChat(uuid, lang, login, _context);
+            var dto = _cjoliService.CreateRanking(uuid, login, _context);
+            var session = _service.CreateSessionForChat(uuid, lang, login, dto, _context);
             session.OnReply += async (sender, e) => { await SendMessage(e.Message, webSocket); };
             await _service.PromptMessage(session);
 

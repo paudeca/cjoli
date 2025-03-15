@@ -13,10 +13,12 @@ namespace cjoli.Server.Services
     public class UserService
     {
         private readonly IConfiguration _configuration;
+        private readonly AIService _aiService;
         private readonly ILogger<UserService> _logger;
-        public UserService(IConfiguration configuration, ILogger<UserService> logger)
+        public UserService(IConfiguration configuration, AIService aiService, ILogger<UserService> logger)
         {
             _configuration = configuration;
+            _aiService = aiService;
             _logger = logger;
         }
 
@@ -26,6 +28,12 @@ namespace cjoli.Server.Services
             {
                 throw new IllegalArgumentException("Password");
             }
+            var invalidLogin = _aiService.CheckLogin(userDto.Login, context).Result;
+            if(invalidLogin=="true")
+            {
+                throw new IllegalArgumentException("Login");
+            }
+
             User? user = context.Users.SingleOrDefault(u => u.Login == userDto.Login);
             if (user != null)
             {
@@ -156,6 +164,13 @@ namespace cjoli.Server.Services
                 }
                 config.IsAdmin = true;
             });
+            context.SaveChanges();
+        }
+
+        public void RemoveUser(int userId, CJoliContext context)
+        {
+            User user = context.Users.Single(u => u.Id == userId);
+            context.Remove(user);
             context.SaveChanges();
         }
 

@@ -21,8 +21,11 @@ namespace cjoli.Server.Services.Rules
 
         public int Forfeit => 0;
 
+        public double GoalFor => 0;
+
         public bool HasPenalty => false;
         public bool HasForfeit => false;
+        public bool HasYoungest => false;
 
         public Func<Squad, Comparison<Score>> ScoreComparison => _service.DefaultScoreComparison;
 
@@ -32,5 +35,11 @@ namespace cjoli.Server.Services.Rules
         {
             return squad.Positions.ToDictionary(p => p.Id, p => new Score() { PositionId = p.Id, TeamId = p.Team?.Id ?? 0 });
         }
+
+        public double Total(CJoliService.ScoreType type, double total, int score)
+        {
+            return _service.Total(type, this, total, score);
+        }
+
     }
 }

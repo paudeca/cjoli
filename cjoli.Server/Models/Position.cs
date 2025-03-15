@@ -13,5 +13,6 @@ namespace cjoli.Server.Models
         public Team? Team { get; set; }
         public Squad? Squad { get; set; }
         public ParentPosition? ParentPosition { get; set; }
+        public IList<Event> Events { get; set; } = new List<Event>();
     }
 }

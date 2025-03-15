@@ -100,6 +100,21 @@ namespace cjoli.Server.Controllers
 
         [HttpPost]
         [Authorize]
+        [Route("{uuid}/UpdateMatch")]
+        public RankingDto UpdateMatch([FromRoute] string uuid, [FromBody] MatchDto match)
+        {
+            using (LogContext.PushProperty("uid", uuid))
+            {
+                var login = GetLogin();
+                _service.UpdateMatch(match, login!, uuid, _context);
+                _logger.LogInformationWithData("SaveMatch", match);
+                return GetRanking(uuid);
+            }
+        }
+
+
+        [HttpPost]
+        [Authorize]
         [Route("{uuid}/ClearMatch")]
         public RankingDto ClearMatch([FromRoute] string uuid, [FromBody] MatchDto match)
         {
@@ -126,15 +141,6 @@ namespace cjoli.Server.Controllers
             }
         }
 
-        /*[HttpPost]
-        [Authorize]
-        [Route("{uuid}/ApplySimulations")]
-        public RankingDto ApplySimulations([FromRoute] string uuid)
-        {
-            var login = GetLogin();
-            return _service.ApplySimulations(uuid, login!, _context);
-        }*/
-
 
         [HttpPost]
         [Authorize]
@@ -157,16 +163,6 @@ namespace cjoli.Server.Controllers
         }
 
 
-        [HttpGet]
-        [Authorize]
-        [Route("{uuid}/UpdateEstimate")]
-        public RankingDto UpdateEstimate(string uuid)
-        {
-            var login = GetLogin();
-            _service.UpdateEstimate(uuid, login!, _context);
-            return GetRanking(uuid);
-        }
-
         [HttpPost]
         [Authorize]
         [Route("{uuid}/SaveUserConfig")]
@@ -182,7 +178,8 @@ namespace cjoli.Server.Controllers
         public async Task<string?> Prompt(string uuid, [FromQuery] string lang)
         {
             var login = GetLogin();
-            return await _aiService.Prompt(uuid, lang, login, _context);
+            var dto = _service.CreateRanking(uuid, login, _context);
+            return await _aiService.Prompt(uuid, lang, login, dto, _context);
         }
 
 
