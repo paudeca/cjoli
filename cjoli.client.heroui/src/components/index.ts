@@ -6,5 +6,6 @@ export * from "./cjoli-modal";
 export * from "./cjoli-popover";
 export * from "./cjoli-table";
 export * from "./dropdowns";
+export * from "./inputs";
 export * from "./modals";
 export * from "./popovers";

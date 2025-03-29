@@ -38,7 +38,7 @@ export const CJoliTableCell = ({
 }: CJoliTableCellProps) => {
   return (
     <td
-      className={`relative align-middle whitespace-normal text-small font-normal ${className}`}
+      className={`py-1 px-3 relative align-middle whitespace-normal text-small font-normal ${className}`}
       rowSpan={rowSpan ?? 1}
       colSpan={colSpan ?? 1}
     >
@@ -52,7 +52,7 @@ interface CJoliTableHeaderProps<T> {
   children: (column: T) => ReactElement;
 }
 
-export const CJoliTableHeader = <T extends { key: string; label: string }>({
+export const CJoliTableHeader = <T extends { key: string | number }>({
   columns,
   children,
 }: CJoliTableHeaderProps<T>) => {
@@ -69,7 +69,6 @@ export const CJoliTableHeader = <T extends { key: string; label: string }>({
 interface CJoliTableRowProps<T> {
   columns: T[];
   children: (column: T) => ReactNode;
-  key: string | number;
 }
 
 export const CJoliTableRow = <T,>({
@@ -112,7 +111,7 @@ export const CJoliTable = <T,>({
   className,
 }: CJoliTableProps<T>) => {
   return (
-    <div className={`flex-col relative gap-4 w-full ${className}`}>
+    <div className={`flex-col relative gap-4 w-full select-none ${className}`}>
       {topContent}
       <div className="p-4 z-0 flex flex-col relative justify-between gap-4 bg-content1 overflow-auto rounded-large shadow-small w-full">
         <table className="min-w-full h-auto table-auto w-full" role="grid">

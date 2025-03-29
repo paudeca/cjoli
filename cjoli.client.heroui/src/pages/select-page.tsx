@@ -14,7 +14,9 @@ export const SelectPage = () => {
 
   return (
     <CJoliLoading loading={!loaded}>
-      <CjoliAccordion items={datas}>
+      <CjoliAccordion
+        items={datas.map((d) => ({ ...d, defaultExpanded: true }))}
+      >
         {(item) => (
           <div className="gap-4 grid grid-cols sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
             {item.tourneys.map((t) => (

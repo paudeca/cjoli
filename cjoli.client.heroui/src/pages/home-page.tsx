@@ -15,7 +15,6 @@ export const HomePage = memo(() => {
   };
   const { isConfigured, isLoading, items } = useHomePage(map);
   const { t } = useTranslation();
-  console.log("HomePage");
 
   return (
     <CJoliLoading loading={isLoading}>

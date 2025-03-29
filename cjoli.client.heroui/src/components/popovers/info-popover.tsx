@@ -11,11 +11,11 @@ export const InfoPopover: FC<{ score: Score; squad: Squad }> = ({
   squad,
 }) => {
   const { getTeamInfo, tourney, getScoreFromPosition } = useCJoli();
+  const { t } = useTranslation();
+
   if (!tourney) {
     return <></>;
   }
-
-  const { t } = useTranslation();
 
   const { name, logo } = getTeamInfo(score.positionId);
 

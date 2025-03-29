@@ -149,11 +149,6 @@ export const useCJoli = (page?: TypePage) => {
     [state]
   );
 
-  const selectDay = useCallback(
-    (day: string) => dispatch(cjoliActions.selectDay(day)),
-    [dispatch]
-  );
-
   const setColor = useCallback(
     (primary: string, secondary: string) =>
       dispatch(cjoliActions.setColor({ primary, secondary })),
@@ -188,7 +183,6 @@ export const useCJoli = (page?: TypePage) => {
     isTeamInSquad,
     isTeamInMatch,
     getScoreForTeam,
-    selectDay,
     getScoreFromPosition,
     getScoreFromSquad,
     setColor,

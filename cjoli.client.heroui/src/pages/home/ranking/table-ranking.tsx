@@ -9,7 +9,6 @@ interface TableRankingProps {
 
 export const TableRanking: FC<TableRankingProps> = ({ phase }) => {
   const { squads } = useTableRankingHomePage(phase);
-  console.log("TableRanking", phase.name);
   return (
     <>
       {squads.map((squad) => (

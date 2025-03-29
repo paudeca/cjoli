@@ -18,7 +18,6 @@ export interface CJoliState {
   squads?: Squad[];
   positions?: Position[];
   matches: Match[];
-  daySelected: string;
   theme: {
     primary: string;
     secondary: string;

@@ -1,10 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CJoliState } from "../states";
-import dayjs from "dayjs";
 import { Match, Position, Ranking, Squad, Tourney, TypePage } from "../models";
 
 const initialState: CJoliState = {
-  daySelected: dayjs().format("YYYY-MM-DD"),
   matches: [],
   theme: {
     primary: "#202644",
@@ -55,9 +53,6 @@ export const cjoliSlice = createSlice({
         else if (a.location && b.location && a.location > b.location) return -1;
         else return 1;
       });
-    },
-    selectDay: (state, action: PayloadAction<string>) => {
-      state.daySelected = action.payload;
     },
     setColor: (
       state,

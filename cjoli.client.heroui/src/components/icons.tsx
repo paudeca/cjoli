@@ -22,6 +22,27 @@ export const InfoIcon = ({ size = 24, ...props }) => (
   </svg>
 );
 
+export const CompareIcon = ({ size = 24, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    height={size}
+    width={size}
+    strokeWidth="1.5"
+    stroke="currentColor"
+    className="size-6"
+    {...props}
+    style={{ transform: "rotate(90deg)" }}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M4.499 11.998h15m-7.5-6.75h.008v.008h-.008v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM12 18.751h.007v.007H12v-.007Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+    />
+  </svg>
+);
+
 export const ChevronUpIcon = ({ size = 24, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -63,6 +84,25 @@ export const ChevronDownIcon = ({ size = 24, ...props }) => (
       strokeLinecap="round"
       strokeLinejoin="round"
       d="m4.5 5.25 7.5 7.5 7.5-7.5m-15 6 7.5 7.5 7.5-7.5"
+    />
+  </svg>
+);
+
+export const ChevronDownOneIcon = ({ size = 24, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    strokeWidth="1.5"
+    stroke="currentColor"
+    {...props}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="m19.5 8.25-7.5 7.5-7.5-7.5"
     />
   </svg>
 );
@@ -149,6 +189,74 @@ export const ChevronIcon = ({ ...props }) => (
       strokeLinecap="round"
       strokeLinejoin="round"
       d="m8.25 4.5 7.5 7.5-7.5 7.5"
+    />
+  </svg>
+);
+
+export const MinusIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className="size-6"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+    />
+  </svg>
+);
+
+export const PlusIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className="size-6"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+    />
+  </svg>
+);
+
+export const CheckIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className="size-6"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+    />
+  </svg>
+);
+
+export const CancelIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className="size-6"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
     />
   </svg>
 );

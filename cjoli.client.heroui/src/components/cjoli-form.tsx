@@ -50,7 +50,7 @@ export const CJoliForm = <T extends FieldValues>({
     reset,
     watch,
     formState: { errors },
-  } = form; //useForm<T>();
+  } = form;
 
   const [running, setRunning] = useState(false);
   const submit: SubmitHandler<T> = useCallback(async (data) => {

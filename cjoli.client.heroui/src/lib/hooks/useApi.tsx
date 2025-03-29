@@ -33,7 +33,7 @@ export const mutationOptions = <
 const useApiGet = () => {
   const { loadTourneys, loadRanking } = useCJoli();
   const { loadUser } = useUser();
-  const cjoliServices = useCjoliService();
+  const cjoliService = useCjoliService();
   const settingServices = useSettingService();
 
   const getUser = useCallback(
@@ -41,12 +41,12 @@ const useApiGet = () => {
       queryOptions({
         queryKey: ["getUser"],
         queryFn: async () => {
-          const user = await cjoliServices.getUser();
+          const user = await cjoliService.getUser();
           loadUser(user);
           return user;
         },
       }),
-    [loadUser, cjoliServices]
+    [loadUser, cjoliService]
   );
 
   const listUsers = useCallback(
@@ -54,11 +54,11 @@ const useApiGet = () => {
       queryOptions({
         queryKey: ["listUsers"],
         queryFn: async () => {
-          const users = await cjoliServices.listUsers();
+          const users = await cjoliService.listUsers();
           return users;
         },
       }),
-    [cjoliServices]
+    [cjoliService]
   );
 
   const getTourneys = useCallback(
@@ -66,13 +66,13 @@ const useApiGet = () => {
       queryOptions({
         queryKey: ["getTourneys"],
         queryFn: async () => {
-          const tourneys = await cjoliServices.getTourneys();
+          const tourneys = await cjoliService.getTourneys();
           loadTourneys(tourneys);
           return tourneys;
         },
         enabled,
       }),
-    [loadTourneys, cjoliServices]
+    [loadTourneys, cjoliService]
   );
 
   const getTeams = useCallback(
@@ -91,32 +91,33 @@ const useApiGet = () => {
       queryOptions({
         queryKey: ["getRanking", uid],
         queryFn: async () => {
-          const ranking = await cjoliServices.getRanking(uid);
+          const ranking = await cjoliService.getRanking(uid);
           loadRanking(ranking);
           return ranking;
         },
       }),
-    [loadRanking, cjoliServices]
+    [loadRanking, cjoliService]
   );
   return { getUser, listUsers, getTourneys, getTeams, getRanking };
 };
 
 const useApiPost = () => {
-  const { loadTourney } = useCJoli();
-  const settingServices = useSettingService();
+  const { loadTourney, loadRanking } = useCJoli();
+  const settingService = useSettingService();
+  const cjoliService = useCjoliService();
 
   const saveTourney = useCallback(
     ({ onSuccess }: { onSuccess?: () => void }) =>
       mutationOptions({
         mutationKey: ["addTourney"],
         mutationFn: async (tourney: Tourney) => {
-          const t = await settingServices.importTourney(tourney);
+          const t = await settingService.importTourney(tourney);
           loadTourney(t);
           return t;
         },
         onSuccess,
       }),
-    [loadTourney, settingServices]
+    [loadTourney, settingService]
   );
   const saveUserAdminConfig = useCallback(
     ({ onSuccess }: { onSuccess: () => void }) =>
@@ -128,12 +129,55 @@ const useApiPost = () => {
         }: {
           user: User;
           admins: number[];
-        }) => await settingServices.saveUserAdminConfig(user, admins),
+        }) => await settingService.saveUserAdminConfig(user, admins),
         onSuccess,
       }),
-    [settingServices]
+    [settingService]
   );
-  return { saveTourney, saveUserAdminConfig };
+  const saveMatchOptions = useCallback(
+    (uid: string) =>
+      mutationOptions({
+        mutationKey: ["saveMatch", uid],
+        mutationFn: async (match: Match) => {
+          const ranking = await cjoliService.saveMatch(uid, match);
+          loadRanking(ranking);
+          return ranking;
+        },
+      }),
+    [cjoliService, loadRanking]
+  );
+  const updateMatchOptions = useCallback(
+    (uid: string) =>
+      mutationOptions({
+        mutationKey: ["updateMatch", uid],
+        mutationFn: async (match: Match) => {
+          const ranking = await cjoliService.updateMatch(uid, match);
+          loadRanking(ranking);
+          return ranking;
+        },
+      }),
+    [cjoliService, loadRanking]
+  );
+  const clearMatchOptions = useCallback(
+    (uid: string) =>
+      mutationOptions({
+        mutationKey: ["clearMatch", uid],
+        mutationFn: async (match: Match) => {
+          const ranking = await cjoliService.clearMatch(uid, match);
+          loadRanking(ranking);
+          return ranking;
+        },
+      }),
+    [cjoliService, loadRanking]
+  );
+
+  return {
+    saveTourney,
+    saveUserAdminConfig,
+    saveMatchOptions,
+    updateMatchOptions,
+    clearMatchOptions,
+  };
 };
 
 const useApiDelete = () => {

@@ -55,18 +55,21 @@ export const useHomePage = (map: Record<string, ReactNode>) => {
         content: map.final,
         title: t("home.finalRanking", "Final Ranking"),
         hide: !allMatchesDone,
+        defaultExpanded: true,
       },
       {
         key: "ranking",
         content: map.ranking,
         title: t("home.ranking", "Ranking"),
         hide: !phase,
+        defaultExpanded: false,
       },
       {
         key: "match",
         content: map.match,
         title: t("home.matches", "Matches"),
         hide: !phase,
+        defaultExpanded: true,
       },
     ];
   }, [t, matches, phase, map]);
@@ -75,7 +78,7 @@ export const useHomePage = (map: Record<string, ReactNode>) => {
 };
 
 export const useRankingHomePage = () => {
-  const { phases, selectDay } = useCJoli();
+  const { phases } = useCJoli();
   const { getPath } = useConfig();
   const navigate = useNavigate();
   const { phaseId, squadId } = useParams();
@@ -88,7 +91,6 @@ export const useRankingHomePage = () => {
     [phaseId, phases, squadId]
   );
   const handleClick = (phaseId: string | number) => {
-    //selectDay("0");
     navigate(getPath(`/phase/${phaseId}`), { replace: true });
   };
 

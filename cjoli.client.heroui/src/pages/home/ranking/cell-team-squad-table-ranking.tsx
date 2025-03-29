@@ -1,6 +1,6 @@
 import { InfoPopover } from "@/components/popovers";
 import { SimultPopover } from "@/components/popovers/simul-popover";
-import { TeamButton } from "@/components/team-button";
+import { TeamButton } from "@/components/buttons";
 import { TeamName } from "@/components/team-name";
 import { Score, Squad, useCJoli, useUser } from "@cjoli/core";
 import { FC, useCallback } from "react";
