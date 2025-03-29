@@ -30,12 +30,12 @@ export const CJoliPopover: FC<{
     >
       <PopoverTrigger>{trigger}</PopoverTrigger>
       <PopoverContent className="bg-transparent p-0">
-        <Card className="max-w-[400px]">
+        <Card className="max-w-[600px]">
           <CardHeader className="flex gap-3 bg-primary text-background">
             {title}
           </CardHeader>
           <Divider />
-          <CardBody>{body}</CardBody>
+          <CardBody className="p-0">{body}</CardBody>
           <Divider />
           <CardFooter className="grid grid-cols-2 gap-4 justify-items-end">
             {footer ? (

@@ -111,7 +111,15 @@ export const useCjoliService = () => {
   };
 
   const saveMatch = async (uid: string, match: Match) => {
-    const { data } = await axios.post(`${url}/cjoli/${uid}/saveMatch`, match);
+    const { data } = await axios.post<Ranking>(
+      `${url}/cjoli/${uid}/saveMatch`,
+      match
+    );
+    return data;
+  };
+
+  const updateMatch = async (uid: string, match: Match) => {
+    const { data } = await axios.post(`${url}/cjoli/${uid}/updateMatch`, match);
     return data;
   };
 
@@ -160,6 +168,7 @@ export const useCjoliService = () => {
     login,
     logout,
     saveMatch,
+    updateMatch,
     clearMatch,
     clearSimulations,
     updateEstimate,

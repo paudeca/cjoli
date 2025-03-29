@@ -6,6 +6,7 @@ import { BootstrapProvider, ConfigProvider } from "@cjoli/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider as ReduxProvider } from "react-redux";
 import { store } from "@cjoli/core";
+import { ToastProvider } from "@heroui/react";
 
 declare module "@react-types/shared" {
   interface RouterConfig {
@@ -37,6 +38,7 @@ export const Provider = ({ children }: { children: React.ReactNode }) => {
           </BootstrapProvider>
         </ConfigProvider>
       </ReduxProvider>
+      <ToastProvider />
     </HeroUIProvider>
   );
 };

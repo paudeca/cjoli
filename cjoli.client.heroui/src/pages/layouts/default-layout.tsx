@@ -2,7 +2,6 @@ import { Badge } from "@heroui/react";
 
 import { NavbarDefault } from "./navbar-default";
 import { FC, memo } from "react";
-import { Toaster } from "sonner";
 import { Icon } from "@iconify/react";
 import { CJoliLoading } from "@/components/cjoli-loading";
 import { useDefaultLayout } from "@/hooks";
@@ -43,7 +42,6 @@ export const DefaultLayout: FC = memo(() => {
           <CountUser />
         </footer>
       </div>
-      <Toaster position="top-right" />
     </CJoliLoading>
   );
 });

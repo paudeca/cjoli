@@ -4,6 +4,7 @@ import {
   ModalContent,
   ModalFooter,
   Button,
+  ModalHeader,
 } from "@heroui/react";
 import { ReactNode } from "react";
 import { Trans } from "react-i18next";
@@ -22,18 +23,19 @@ export const CJoliModal = ({
   children,
 }: CJoliModalProps) => {
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop="blur">
+    <Modal
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      backdrop="blur"
+      size="md"
+    >
       <ModalContent className="cjoli text-foreground bg-background">
         {(onClose) => (
           <>
+            {title && <ModalHeader>{title}</ModalHeader>}
             <ModalBody>
               <div className="flex h-full w-full items-center justify-center">
-                <div className="flex w-full max-w-sm flex-col gap-2 rounded-large py-8 px-0">
-                  {title && (
-                    <p className="pb-4 text-left text-3xl font-semibold">
-                      {title}
-                    </p>
-                  )}
+                <div className="flex w-full flex-col gap-2 rounded-large py-8 px-0">
                   {children}
                 </div>
               </div>

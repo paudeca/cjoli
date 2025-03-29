@@ -1,14 +1,18 @@
-import { CjoliAccordion } from "@/components";
-import { Match, useCJoli, useUid } from "@cjoli/core";
+import { CjoliAccordion, CJoliModal } from "@/components";
+import { Match, useCJoli } from "@cjoli/core";
 import dayjs from "dayjs";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { TableMatch } from "./match/table-match";
+import { useMatch } from "@/lib/hooks/useMatch";
+import { Trans, useTranslation } from "react-i18next";
+import { FormProvider } from "react-hook-form";
+import { MatchProvider } from "./match/match-context";
 
 export const MatchHome = () => {
-  const { matches, daySelected, selectDay } = useCJoli();
-  const uid = useUid();
+  const { matches } = useCJoli();
   const { squadId, phaseId } = useParams();
+  const { t } = useTranslation();
 
   const filter = useCallback(
     (match: Match) =>
@@ -28,8 +32,8 @@ export const MatchHome = () => {
       list.sort((a, b) => {
         if (a.time < b.time) return -1;
         else if (a.time > b.time) return 1;
-        else if (a.location && b.location && a.location > b.location) return -1;
-        else return 1;
+        else if (a.location && b.location && a.location > b.location) return 1;
+        else return -1;
       });
       return { ...acc, [date]: list };
     }, {});
@@ -52,24 +56,46 @@ export const MatchHome = () => {
     }, {});
   }, [datas, keys]);
 
-  useEffect(() => {
-    if (keys && keys.length > 0 && !keys.includes(daySelected)) {
-      ///selectDay(keys[0]);
-    }
-  }, [keys, selectDay, daySelected]);
+  const { saveMatch, updateMatch, clearMatch, form, blockShotModal } =
+    useMatch();
 
-  /*const upperFirstLetter = (value: string) => {
-    return value.charAt(0).toUpperCase() + value.slice(1);
-  };*/
+  const items = useMemo(() => {
+    const upperFirstLetter = (value: string) => {
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    };
 
-  //const { saveMatch, clearMatch, register } = useMatch(uid);
-
-  const items = keys.map((k) => ({ key: k, title: k }));
-  console.log("MAP", map);
+    const today = dayjs().format("YYYY-MM-DD");
+    const daySelected = keys.some((k) => k == today) ? today : keys[0];
+    return keys.map((k) => ({
+      key: k,
+      title: upperFirstLetter(dayjs(k).format("dddd LL")),
+      defaultExpanded: daySelected == k,
+    }));
+  }, [keys]);
 
   return (
-    <CjoliAccordion items={items}>
-      {(item) => <TableMatch key={item.key} datas={map[item.key]} />}
-    </CjoliAccordion>
+    <FormProvider {...form}>
+      <MatchProvider
+        saveMatch={saveMatch}
+        updateMatch={updateMatch}
+        clearMatch={clearMatch}
+      >
+        <CjoliAccordion items={items} mode="single" variant="light" colorHeader>
+          {(item) => <TableMatch key={item.key} datas={map[item.key]} />}
+        </CjoliAccordion>
+        <CJoliModal
+          {...blockShotModal}
+          title={t("match.blockShot.title", "Save Score")}
+        >
+          <Trans i18nKey="match.blockShot.error">
+            Unable to record the score.
+            <br />
+            The match must end in a penalty shootout.
+            <br />
+            Please indicate a winner.
+          </Trans>
+        </CJoliModal>
+      </MatchProvider>
+    </FormProvider>
   );
 };

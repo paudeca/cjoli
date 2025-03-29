@@ -61,6 +61,7 @@ export const TeamName: FC<{
           radius="full"
           variant="light"
           onPress={() => saveFavoriteTeam(!isFavorite ? team.id : 0)}
+          tabIndex={-1}
         >
           <StarIcon
             fill={isFavorite ? "#D1B100" : "none"}
