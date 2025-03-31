@@ -39,6 +39,8 @@ namespace cjoli.Server.Services
                 m.MediaUrl = url;
                 m.MediaName = name;
                 answer = await GenerateAnswer(uuid, tourney, message.From,"L'utilisateur a envoyé une image", false, context);
+
+                //await _twilioService.SendMessage(body: "A new image from 0645802109 has been uploaded, please validate it.", from: message.To, to: "whatsapp:+33664256757", tourney: tourney);
             }
             else if(message.Body!=null)
             {
