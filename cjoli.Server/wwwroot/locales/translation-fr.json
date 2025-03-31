@@ -26,7 +26,8 @@
     "useCustom": "utiliser l'estimation personnelle",
     "menu": "Menu",
     "setting": "Paramètres",
-    "admin": "Administration"
+    "admin": "Administration",
+    "gallery": "Photos"
   },
   "home": {
     "tourneyNotConfigured": "Tournoi non configuré",
