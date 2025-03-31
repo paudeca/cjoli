@@ -67,7 +67,7 @@ namespace cjoli.Server.Controllers
 
         [HttpDelete]
         [Route("{uid}/Message/{msgId}")]
-        [Authorize("IsRootAdmin")]
+        [Authorize("IsAdmin")]
         public async void DeleteMessage(string uid, int msgId)
         {
             await _authorizationService.AuthorizeAsync(User, uid, "EditTourney");
