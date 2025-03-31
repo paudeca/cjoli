@@ -57,6 +57,8 @@ const RankTableScore = ({ tourney, score, squad }: RankTableScoreProps) => {
     [loadRanking, uid]
   );
 
+  const dis = true;
+
   return (
     <>
       <tr>
@@ -70,7 +72,7 @@ const RankTableScore = ({ tourney, score, squad }: RankTableScoreProps) => {
                 title={`${t("rank.simulation", "Simulation")} - ${name}`}
                 onRemove={handleRemove(userMatches)}
               />
-              {tourney.config?.hasPenalty && (
+              {tourney.config?.hasPenalty && !dis && (
                 <PenaltyIcon positionId={score.positionId} />
               )}
               {team && <ButtonTeam team={team} />}
