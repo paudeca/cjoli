@@ -9,7 +9,6 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "@emotion/react";
 import { useParams } from "react-router-dom";
 import { useColor } from "../hooks/useColor";
-import useScreenSize from "../hooks/useScreenSize";
 
 const MyStar = styled(Star)`
   ${zoomIcon}
@@ -41,7 +40,6 @@ const TeamName = ({
   const theme = useTheme();
   const { teamId: currentTeamId } = useParams();
   const { isWhite } = useColor();
-  const { isMobile } = useScreenSize();
 
   const { name, logo } = positionId
     ? getTeamInfo(positionId, defaultName)
@@ -53,8 +51,7 @@ const TeamName = ({
       ? getTeam(teamId)
       : undefined;
 
-  const fullname =
-    team?.datas?.name && !isMobile ? `${name} - ${team.datas.name}` : name;
+  const fullname = team?.datas?.name ? `${name} - ${team.datas.name}` : name;
 
   const saveFavoriteTeam = React.useCallback(
     async (teamId?: number) => {
