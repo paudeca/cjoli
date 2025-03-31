@@ -5,7 +5,7 @@ import TeamName from "../../../components/TeamName";
 import { useCJoli } from "../../../hooks/useCJoli";
 import useScreenSize from "../../../hooks/useScreenSize";
 import { Score, Squad, Tourney } from "../../../models";
-import PenaltyIcon from "../../../components/PenaltyIcon";
+//import PenaltyIcon from "../../../components/PenaltyIcon";
 import useUid from "../../../hooks/useUid";
 import CJoliTooltip from "../../../components/CJoliTooltip";
 import styled from "@emotion/styled";
@@ -34,6 +34,7 @@ const RankTableScore = ({ tourney, score, squad }: RankTableScoreProps) => {
   const { t } = useTranslation();
   const uid = useUid();
   const { userConfig } = useUser();
+  console.log("tourney", tourney?.id);
 
   const position = getPosition(score.positionId);
   const team = getTeam(position?.teamId || 0);
@@ -57,8 +58,6 @@ const RankTableScore = ({ tourney, score, squad }: RankTableScoreProps) => {
     [loadRanking, uid]
   );
 
-  const dis = true;
-
   return (
     <>
       <tr>
@@ -72,9 +71,9 @@ const RankTableScore = ({ tourney, score, squad }: RankTableScoreProps) => {
                 title={`${t("rank.simulation", "Simulation")} - ${name}`}
                 onRemove={handleRemove(userMatches)}
               />
-              {tourney.config?.hasPenalty && !dis && (
+              {/*tourney.config?.hasPenalty && (
                 <PenaltyIcon positionId={score.positionId} />
-              )}
+              )*/}
               {team && <ButtonTeam team={team} />}
             </LeftCenterDiv>
             {position && <InfoButton score={score} squad={squad} />}
