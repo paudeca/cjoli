@@ -58,7 +58,7 @@ namespace cjoli.Server.Controllers
 
         [HttpPost]
         [Route("{uid}/Message")]
-        [Authorize("IsRootAdmin")]
+        [Authorize("IsAdmin")]
         public async void UpdateMessage(string uid, MessageDto message)
         {
             await _authorizationService.AuthorizeAsync(User, uid, "EditTourney");
