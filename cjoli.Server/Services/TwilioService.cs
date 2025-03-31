@@ -19,8 +19,8 @@ namespace cjoli.Server.Services
 
         public TwilioService(IConfiguration configuration) {
             _configuration = configuration;
-            _accountSid = _configuration["Twilio:AccountSid"]!;
-            _authToken = _configuration["Twilio:AuthToken"]!;
+            _accountSid = _configuration["TwilioAccountSid"]!;
+            _authToken = _configuration["TwilioAuthToken"]!;
             TwilioClient.Init(_accountSid, _authToken);
         }
         public async Task<Stream> LoadMedia(string urlMedia)
