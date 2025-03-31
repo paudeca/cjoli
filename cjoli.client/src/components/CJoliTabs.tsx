@@ -1,7 +1,8 @@
+import { ReactNode } from "react";
 import { Nav } from "react-bootstrap";
 
 interface CJoliTabsProps {
-  tabs: { id: string; label: string }[];
+  tabs: { id: string; label: ReactNode }[];
   onSelect: (key: string | null) => void;
   defaultKey?: string;
 }

@@ -29,7 +29,13 @@
     "admin": "Administration"
   },
   "home": {
-    "tourneyNotConfigured": "Tourney not configured"
+    "tourneyNotConfigured": "Tourney not configured",
+    "noImage": "No photos for the tourney"
+  },
+  "gallery": {
+    "sendPhoto": "Send your best photos:",
+    "whatsapp": "WhatsApp",
+    "qrCode": "QRCode"
   },
   "error": {
     "invalid": "{{field}} is invalid",

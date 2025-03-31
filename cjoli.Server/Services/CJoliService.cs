@@ -28,7 +28,15 @@ namespace cjoli.Server.Services
 
         private readonly Dictionary<string, IRule> _rules = new Dictionary<string, IRule>();
 
-        public CJoliService(EstimateService estimateService, ServerService serverService, UserService userService, IMapper mapper, IServiceProvider service, ILogger<CJoliService> logger, IMemoryCache memoryCache, IConfiguration configuration)
+        public CJoliService(
+            EstimateService estimateService,
+            ServerService serverService,
+            UserService userService,
+            IMapper mapper,
+            IServiceProvider service,
+            ILogger<CJoliService> logger,
+            IMemoryCache memoryCache,
+            IConfiguration configuration)
         {
             _estimateService = estimateService;
             _serverService = serverService;
@@ -106,6 +114,7 @@ namespace cjoli.Server.Services
                 .Include(t => t.Phases).ThenInclude(p => p.Events).ThenInclude(e => e.Positions)
                 .Include(t => t.Teams).ThenInclude(t => t.TeamDatas.Where(d => d.Tourney.Uid == tourneyUid))
                 .Include(t => t.Teams).ThenInclude(t => t.Alias)
+                //.Include(t => t.Messages.Where(m=>m.MessageType=="image").OrderByDescending(m=>m.Time))
                 .FirstOrDefault(t => t.Uid == tourneyUid);
 
             if (tourney == null)
@@ -174,6 +183,25 @@ namespace cjoli.Server.Services
             }
             _logger.LogInformation($"Time[CreateRanking]:{sw.ElapsedMilliseconds}ms");
             return map![loginKey];
+        }
+
+        public GalleryDto CreateGallery(string uuid, int page, string? login, bool waiting, CJoliContext context)
+        {
+            User? user = GetUserWithConfig(login, uuid, context);
+            bool isAdmin = user.IsAdmin(uuid);
+            if(!isAdmin)
+            {
+                waiting = false;
+            }
+
+
+            var query = context.Messages.Where(m=>m.Tourney.Uid== uuid && m.MessageType=="image").OrderByDescending(m=>m.Time);
+            int countWaiting = query.Where(m => !m.IsPublished).Count();
+            int count = query.Where(m=>m.IsPublished == !waiting).Count();
+            int pageSize = 12;
+            List<Message> messages = query.Where(m=>m.IsPublished == !waiting).Skip(pageSize * page).Take(pageSize).ToList();
+            var m = _mapper.Map<List<MessageDto>>(messages);
+            return new GalleryDto() { Page = page, PageSize = pageSize, Total=count, TotalWaiting=countWaiting, Messages = m };
         }
 
         private void UpdateEstimate(string uuid, string login, CJoliContext context)

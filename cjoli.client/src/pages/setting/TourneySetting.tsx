@@ -42,6 +42,10 @@ const TourneySetting = () => {
             <Form.Label>Rule</Form.Label>
             <Form.Control {...register("rule")} />
           </Form.Group>
+          <Form.Group as={Col} lg={3} xs={12} controlId="whatsappNumber">
+            <Form.Label>WhatsappNumber</Form.Label>
+            <Form.Control {...register("whatsappNumber")} />
+          </Form.Group>
         </Row>
       </Card.Body>
     </Card>

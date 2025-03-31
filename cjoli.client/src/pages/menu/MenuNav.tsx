@@ -16,6 +16,7 @@ import {
   Controller,
   GearWide,
   House,
+  Images,
   ListOl,
   PersonSquare,
 } from "react-bootstrap-icons";
@@ -141,6 +142,15 @@ const MenuNav = () => {
                   >
                     <ListOl size={30} className="mx-2" />
                     <Trans i18nKey="menu.ranking">Ranking</Trans>
+                  </Nav.Link>
+                  <Nav.Link
+                    onClick={() => {
+                      navigate(`${path}gallery`);
+                      setShow(false);
+                    }}
+                  >
+                    <Images size={30} className="mx-2" />
+                    <Trans i18nKey="menu.gallery">Gallery</Trans>
                   </Nav.Link>
                   {isAdmin && (
                     <Nav.Link

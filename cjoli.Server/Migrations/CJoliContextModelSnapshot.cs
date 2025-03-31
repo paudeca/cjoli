@@ -213,6 +213,62 @@ namespace cjoli.Server.Migrations
                     b.ToTable("MatchResult");
                 });
 
+            modelBuilder.Entity("cjoli.Server.Models.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Destination")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("From")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("MediaContentType")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("MediaName")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("MediaUrl")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("MessageId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("MessageType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("To")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("TourneyId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TourneyId");
+
+                    b.ToTable("Messages");
+                });
+
             modelBuilder.Entity("cjoli.Server.Models.ParentPosition", b =>
                 {
                     b.Property<int>("Id")
@@ -466,6 +522,9 @@ namespace cjoli.Server.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
+                    b.Property<string>("WhatsAppNumber")
+                        .HasColumnType("longtext");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Uid")
@@ -699,6 +758,17 @@ namespace cjoli.Server.Migrations
                     b.Navigation("TeamAgainst");
                 });
 
+            modelBuilder.Entity("cjoli.Server.Models.Message", b =>
+                {
+                    b.HasOne("cjoli.Server.Models.Tourney", "Tourney")
+                        .WithMany("Messages")
+                        .HasForeignKey("TourneyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tourney");
+                });
+
             modelBuilder.Entity("cjoli.Server.Models.ParentPosition", b =>
                 {
                     b.HasOne("cjoli.Server.Models.Position", "Position")
@@ -896,6 +966,8 @@ namespace cjoli.Server.Migrations
 
             modelBuilder.Entity("cjoli.Server.Models.Tourney", b =>
                 {
+                    b.Navigation("Messages");
+
                     b.Navigation("Phases");
 
                     b.Navigation("Ranks");

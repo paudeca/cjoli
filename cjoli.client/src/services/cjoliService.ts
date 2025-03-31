@@ -7,6 +7,7 @@ import {
   Tourney,
   UserConfig,
   Position,
+  Gallery,
 } from "../models";
 import Cookie from "universal-cookie";
 
@@ -145,5 +146,16 @@ export const saveUserConfig = async (uid: string, userConfig: UserConfig) => {
 
 export const prompt = async (uid: string, lang: string) => {
   const { data } = await axios.get(`${url}/cjoli/${uid}/prompt?lang=${lang}`);
+  return data;
+};
+
+export const getGallery = async (
+  uid: string,
+  page: number,
+  waiting: boolean
+) => {
+  const { data } = await axios.get<Gallery>(
+    `${url}/cjoli/${uid}/gallery/${page}${waiting ? "?waiting=true" : ""}`
+  );
   return data;
 };

@@ -1,3 +1,4 @@
+import { Message } from "./Message";
 import { Phase } from "./Phase";
 import { Rank } from "./Rank";
 import { Team } from "./Team";
@@ -17,4 +18,6 @@ export interface Tourney {
   ranks: Rank[];
   rule: string;
   config: TourneyConfig;
+  messages: Message[];
+  whatsappNumber?: string;
 }
