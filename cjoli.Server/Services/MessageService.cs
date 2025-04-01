@@ -4,6 +4,8 @@ using cjoli.Server.Models.AI;
 using cjoli.Server.Models.Twilio;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Text.Json;
+using Twilio.Rest.Api.V2010.Account;
 
 namespace cjoli.Server.Services
 {
@@ -13,12 +15,22 @@ namespace cjoli.Server.Services
         private readonly StorageService _storageService;
         private readonly CJoliService _cjoliService;
         private readonly AIService _aiService;
+        private readonly ILogger<MessageService> _logger;
+        private readonly IConfiguration _configuration;
 
-        public MessageService(TwilioService twilioService, StorageService storageService, CJoliService cjoliService, AIService aIService) {
+        public MessageService(
+            TwilioService twilioService,
+            StorageService storageService,
+            CJoliService cjoliService,
+            AIService aIService,
+            ILogger<MessageService> logger,
+            IConfiguration configuration) {
             _twilioService = twilioService;
             _storageService = storageService;
             _cjoliService = cjoliService;
             _aiService = aIService;
+            _logger = logger;
+            _configuration = configuration;
         }
 
         public async Task InboundMessage(string uuid, MessageTwilio message, CJoliContext context)
@@ -40,7 +52,23 @@ namespace cjoli.Server.Services
                 m.MediaName = name;
                 answer = await GenerateAnswer(uuid, tourney, message.From,"L'utilisateur a envoyé une image", false, context);
 
-                //await _twilioService.SendMessage(body: "A new image from 0645802109 has been uploaded, please validate it.", from: message.To, to: "whatsapp:+33664256757", tourney: tourney);
+
+                if(!string.IsNullOrEmpty(tourney.WhatsappNotif))
+                {
+                    try
+                    {
+                        string variables = JsonSerializer.Serialize(new Dictionary<string, string> { { "1", message.From } });
+                        string contentSid = _configuration["TwilioNotifContentSid"]!;
+                        foreach (string notif in tourney.WhatsappNotif.Split(';'))
+                        {
+                            await _twilioService.SendMessageTemplate(contentSid: contentSid, contentVariables: variables, from: message.To, to: $"whatsapp:{notif}");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError(e,"Unable to send notif");
+                    }
+                }
             }
             else if(message.Body!=null)
             {

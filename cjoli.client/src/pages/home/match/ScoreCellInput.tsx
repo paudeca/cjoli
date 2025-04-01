@@ -24,13 +24,15 @@ const ScoreCellInput = ({
   updateMatch,
   register,
 }: ScoreCellInputProps) => {
-  const { isAdmin } = useUser();
+  const { isAdmin, userConfig } = useUser();
   const { tourney } = useCJoli();
   const placeholder = teamA
     ? match.estimate?.scoreA.toString()
     : match.estimate?.scoreB.toString();
   const hasOption =
-    isAdmin && (tourney?.config?.hasForfeit || tourney?.config?.hasPenalty);
+    isAdmin &&
+    (tourney?.config?.hasForfeit || tourney?.config?.hasPenalty) &&
+    !userConfig.useCustomEstimate;
   return (
     <InputGroup size="sm" style={{ width: "80px" }}>
       <Form.Control
@@ -46,6 +48,7 @@ const ScoreCellInput = ({
           variant="outline-secondary"
           title=""
           autoClose="outside"
+          tabIndex={-1}
         >
           {tourney.config.hasForfeit && (
             <Dropdown.Item

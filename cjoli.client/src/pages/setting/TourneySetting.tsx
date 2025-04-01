@@ -46,6 +46,10 @@ const TourneySetting = () => {
             <Form.Label>WhatsappNumber</Form.Label>
             <Form.Control {...register("whatsappNumber")} />
           </Form.Group>
+          <Form.Group as={Col} lg={6} xs={12} controlId="whatsappNotif">
+            <Form.Label>WhatsappNotif</Form.Label>
+            <Form.Control {...register("whatsappNotif")} />
+          </Form.Group>
         </Row>
       </Card.Body>
     </Card>

@@ -58,6 +58,7 @@ namespace cjoli.Server.Services
                     tourney.DisplayTime = tourneyDto.DisplayTime ?? tourney.DisplayTime;
                     tourney.Rule = tourneyDto.Rule ?? tourney.Rule;
                     tourney.WhatsappNumber = tourneyDto.WhatsappNumber ?? tourney.WhatsappNumber;
+                    tourney.WhatsappNotif = tourneyDto.WhatsappNotif ?? tourney.WhatsappNotif;
 
                 },
                 children: [

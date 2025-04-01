@@ -20,4 +20,5 @@ export interface Tourney {
   config: TourneyConfig;
   messages: Message[];
   whatsappNumber?: string;
+  whatsappNotif?: string;
 }

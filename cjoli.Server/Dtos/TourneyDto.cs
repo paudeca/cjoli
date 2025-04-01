@@ -13,6 +13,7 @@
         public string? Rule { get; set; }
         public TourneyConfigDto? Config { get; set; }
         public string? WhatsappNumber { get; set; }
+        public string? WhatsappNotif { get; set; }
 
 
         public List<PhaseDto> Phases { get; set; } = new List<PhaseDto>();

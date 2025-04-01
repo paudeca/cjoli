@@ -11,6 +11,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace cjoli.Server.Services
 {
+
     public class TwilioService
     {
         private readonly IConfiguration _configuration;
@@ -31,6 +32,12 @@ namespace cjoli.Server.Services
 
            return await http.GetStreamAsync(urlMedia);
         }
+
+        public async Task SendMessageTemplate(string contentSid, string contentVariables, string from, string to)
+        {
+            await MessageResource.CreateAsync(contentSid: contentSid, contentVariables:contentVariables, from: from, to: to);
+        }
+
 
         public async Task<Message> SendMessage(string body, string from, string to, Tourney tourney)
         {
