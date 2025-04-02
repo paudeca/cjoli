@@ -67,7 +67,14 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
 
   useEffect(() => {
     if (keys && keys.length > 0 && !keys.includes(daySelected)) {
-      selectDay(keys[0]);
+      let i = 0;
+      while (
+        !datas[keys[i]].some((me) => me.type == "match") &&
+        i < keys.length
+      ) {
+        i++;
+      }
+      selectDay(keys[i]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keys, selectDay]);
