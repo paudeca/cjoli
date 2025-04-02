@@ -14,10 +14,13 @@ import UpdateModal from "../../modals/UpdateModal";
 import * as cjoliService from "../../services/cjoliService";
 import {
   Controller,
+  DoorOpen,
+  FilePerson,
   GearWide,
   House,
   Images,
   ListOl,
+  PencilSquare,
   PersonSquare,
 } from "react-bootstrap-icons";
 import { useUser } from "../../hooks/useUser";
@@ -123,6 +126,18 @@ const MenuNav = () => {
           </Offcanvas.Header>
           <Offcanvas.Body>
             <Nav className="justify-content-end flex-grow-1 pe-3">
+              {!user && (
+                <>
+                  <Nav.Link onClick={() => showLogin(true)}>
+                    <FilePerson size={30} className="mx-2" />
+                    <Trans i18nKey="menu.login">Login</Trans>
+                  </Nav.Link>
+                  <Nav.Link onClick={() => showRegister(true)}>
+                    <PencilSquare size={30} className="mx-2" />
+                    <Trans i18nKey="menu.register">Register</Trans>
+                  </Nav.Link>
+                </>
+              )}
               {uid && (
                 <>
                   <Nav.Link
@@ -165,6 +180,13 @@ const MenuNav = () => {
                   )}
                 </>
               )}
+              {user && (
+                <Nav.Link onClick={logout}>
+                  <DoorOpen size={30} className="mx-2" />
+                  <Trans i18nKey="menu.logout">Logout</Trans>
+                </Nav.Link>
+              )}
+
               <NavDropdown
                 title={langs.find((l) => l.key == lang)?.icon || "🇬🇧"}
               >
