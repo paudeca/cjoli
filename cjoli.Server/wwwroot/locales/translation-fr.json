@@ -38,6 +38,10 @@
     "whatsapp": "WhatsApp",
     "qrCode": "QRCode"
   },
+  "event": {
+    "friendly": "🤝 Match amical",
+    "resurfacing": "🚛 Surfaçage"
+  },
   "error": {
     "invalid": "{{field}} est invalide",
     "required": "{{field}} est requis",

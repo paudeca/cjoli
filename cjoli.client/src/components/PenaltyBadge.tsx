@@ -12,7 +12,7 @@ interface PenaltyBadgeProps {
 }
 
 const PenaltyBadge = ({ penalty }: PenaltyBadgeProps) => {
-  if (penalty == 0) {
+  if (!penalty || penalty == 0) {
     return <Fragment />;
   }
   return (

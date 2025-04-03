@@ -111,7 +111,7 @@ namespace cjoli.Server.Services
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(
                     m => m.Estimates.Where(s => user != null && user.HasCustomEstimate() ? s.User == user : s.User == null)
                  )
-                .Include(t => t.Phases).ThenInclude(p => p.Events).ThenInclude(e => e.Positions)
+                .Include(t => t.Phases).ThenInclude(p => p.Events.OrderBy(e => e.Time)).ThenInclude(e => e.Positions)
                 .Include(t => t.Teams).ThenInclude(t => t.TeamDatas.Where(d => d.Tourney.Uid == tourneyUid))
                 .Include(t => t.Teams).ThenInclude(t => t.Alias)
                 //.Include(t => t.Messages.Where(m=>m.MessageType=="image").OrderByDescending(m=>m.Time))
@@ -939,6 +939,15 @@ namespace cjoli.Server.Services
                 throw new NotFoundException("User", login ?? "no login");
             }
             _userService.SaveUserConfig(tourney, user, dto, context);
+            ClearCache(uuid, user);
+        }
+
+        public void UpdateEvent(string uuid, string? login, EventDto dto, CJoliContext context)
+        {
+            User? user = GetUserWithConfig(login, uuid, context);
+            Event evt = context.Event.Single(e => e.Id == dto.Id);
+            evt.Datas = dto.Datas;
+            context.SaveChanges();
             ClearCache(uuid, user);
         }
 

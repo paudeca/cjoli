@@ -198,6 +198,20 @@ namespace cjoli.Server.Controllers
             return await _aiService.Prompt(uuid, lang, login, dto, _context);
         }
 
+        [HttpPost]
+        [Authorize("IsAdmin")]
+        [Route("{uuid}/UpdateEvent")]
+        public RankingDto UpdatEvent([FromRoute] string uuid, [FromBody] EventDto dto)
+        {
+            using (LogContext.PushProperty("uid", uuid))
+            {
+                var login = GetLogin();
+                _service.UpdateEvent(uuid, login, dto, _context);
+                return GetRanking(uuid);
+            }
+        }
+
+
 
     }
 }

@@ -5,10 +5,13 @@
     "fr": "Francês",
     "pt": "Português",
     "es": "Espanhol",
-    "de": "Alemão"
+    "de": "Alemão",
+    "nl": "Holandês"
   },
   "user": {
-    "guest": "Convidado"
+    "guest": "Convidado",
+    "favoriteSaved": "Equipe favorita salva",
+    "favoriteRemoved": "Equipe favorita removida"
   },
   "menu": {
     "home": "Início",
@@ -17,16 +20,32 @@
     "register": "Registrar",
     "update": "Atualizar",
     "logout": "Sair",
-    "active": "Ativo",
     "refresh": "Atualizar",
     "refreshEstimate": "Atualizar estimativa",
     "custom": "Personalizado",
-    "useCustom": "Usar personalizado",
-    "menu": "Menu"
+    "useCustom": "Usar estimativa pessoal",
+    "menu": "Menu",
+    "setting": "Configurações",
+    "admin": "Administração",
+    "gallery": "Fotos"
+  },
+  "home": {
+    "tourneyNotConfigured": "Torneio não configurado",
+    "noImage": "Nenhuma foto do torneio"
+  },
+  "gallery": {
+    "sendPhoto": "Envie suas melhores fotos:",
+    "whatsapp": "WhatsApp",
+    "qrCode": "Código QR"
+  },
+  "event": {
+    "friendly": "🤝 Partida amistosa",
+    "resurfacing": "🚛 Manutenção do gelo"
   },
   "error": {
     "invalid": "{{field}} é inválido",
-    "required": "{{field}} é obrigatório"
+    "required": "{{field}} é obrigatório",
+    "notAuthorize": "Usuário não autorizado"
   },
   "button": {
     "submit": "Enviar",
@@ -36,12 +55,16 @@
     "send": "Enviar",
     "botAI": "Conversar com BotAI",
     "back": "Voltar",
-    "edit": "Editar"
+    "edit": "Editar",
+    "yes": "Sim",
+    "no": "Não",
+    "newTourney": "Novo Torneio"
   },
   "penalty": {
-    "label": "Penalidades",
-    "tooltip_one": "1 penalidade",
-    "tooltip_other": "{{count}} penalidades"
+    "label": "Punições",
+    "tooltip_zero": "Nenhuma punição",
+    "tooltip_one": "1 punição",
+    "tooltip_other": "{{count}} punições"
   },
   "simulation": {
     "tooltip": "Simulação",
@@ -57,7 +80,7 @@
       "update": "Atualizar"
     },
     "form": {
-      "login": "Nome de usuário",
+      "login": "Usuário",
       "password": "Senha",
       "confirmPassword": "Confirmar senha"
     },
@@ -81,11 +104,46 @@
       "timeline": "Linha do tempo"
     },
     "form": {
-      "logo": "Logotipo",
-      "youngest": "Mais jovem (data)"
+      "logo": "Logo",
+      "youngest": "Mais jovem (data)",
+      "name": "Nome",
+      "shortName": "Nome curto",
+      "fullName": "Nome completo",
+      "alias": "Apelido",
+      "primaryColor": "Cor primária",
+      "secondaryColor": "Cor secundária"
     },
     "error": {
       "update": "Não foi possível atualizar a equipe"
+    }
+  },
+  "ranking": {
+    "rank": "Posição",
+    "calculation": "Cálculo",
+    "equality": "Igualdade",
+    "victory": "Vitória",
+    "defeat": "Derrota",
+    "source": {
+      "win": "Mais vitórias",
+      "win-min": "Menos vitórias",
+      "loss": "Menos derrotas",
+      "loss-min": "Mais derrotas",
+      "goalDiff": "Melhor saldo de gols",
+      "goalDiff-min": "Pior saldo de gols",
+      "goalDiffDirect": "Melhor saldo de gols (direto)",
+      "goalDiffDirect-min": "Pior saldo de gols (direto)",
+      "goalFor": "Mais gols marcados",
+      "goalFormin": "Menos gols marcados",
+      "goalForDirect": "Mais gols marcados (direto)",
+      "goalForDirect-min": "Menos gols marcados (direto)",
+      "goalAgainst": "Mais gols sofridos",
+      "goalAgainst-min": "Menos gols sofridos",
+      "goalAgainstDirect": "Mais gols sofridos (direto)",
+      "goalAgainstDirect-min": "Menos gols sofridos (direto)",
+      "youngest": "Mais jovem",
+      "equal": "Igual",
+      "penalty": "Menos punições",
+      "penalty-min": "Mais punições"
     }
   },
   "message": "Mensagem",
@@ -96,30 +154,43 @@
     "total": "Pontos",
     "game": "Jogos disputados",
     "win": "Vitórias",
-    "neutral": "Jogos empatados",
+    "neutral": "Empates",
     "loss": "Derrotas",
-    "goalFor": "Gols feitos",
-    "goalAgainst": "Gols sofridos",
+    "goalFor": "Gols a favor",
+    "goalAgainst": "Gols contra",
     "shutOut": "Sem sofrer gols",
     "goalDiff": "Saldo de gols",
-    "penalty": "Penalidades",
+    "penalty": "Punições",
     "simulation": "Simulação",
     "first": "1º",
     "second": "2º",
     "third": "3º",
-    "rankth": "{{rank}}º"
+    "rankth": "{{rank}}º",
+    "users": "Usuários",
+    "score": "Pontuação",
+    "perfect": "Perfeito",
+    "winner": "Vencedor",
+    "diff": "Diferença",
+    "goal": "Gol"
   },
   "select": {
     "live": "Ao vivo",
-    "coming": "Próximos...",
-    "past": "Passados"
+    "coming": "Em breve...",
+    "past": "Passado",
+    "addTourney": "Adicionar torneio"
   },
   "match": {
     "blockShot": {
-      "title": "Registrar Pontuação",
-      "error": "Não foi possível registrar a pontuação.<br/>O jogo deve terminar em uma disputa de pênaltis.<br/>Por favor, indique um vencedor."
+      "title": "Salvar placar",
+      "error": "Não foi possível registrar o placar.<br/>A partida deve terminar em uma disputa de pênaltis.<br/>Indique um vencedor."
     },
     "compare": "Comparar",
-    "forfeit": "Desistência"
+    "forfeit": "Desistência",
+    "simulated": "Resultado simulado"
+  },
+  "betScore": {
+    "finalScore": "Placar final",
+    "forecastScore": "Placar previsto",
+    "point": "Pontos"
   }
 }

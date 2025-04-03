@@ -235,16 +235,18 @@ namespace cjoli.Server.Services
                 select: () => phase.Events.SingleOrDefault(e => e.Id == eventDto.Id),
                 create: () =>
                 {
-                    var e = new Event() { Name = eventDto.Name};
+                    var e = new Event() { Name = eventDto.Name, EventType = eventDto.EventType};
                     phase.Events.Add(e);
                     return e;
                 },
                 update: e =>
                 {
                     e.Name = eventDto.Name;
+                    e.EventType = eventDto.EventType;
                     e.Time = eventDto.Time;
                     var positions = phase.Squads.SelectMany(s => s.Positions.Where(p=>eventDto.PositionIds.Contains(p.Id))).ToList();
                     e.Positions = positions;
+                    e.Datas = eventDto.Datas ?? e.Datas;
                 }
             );
         }

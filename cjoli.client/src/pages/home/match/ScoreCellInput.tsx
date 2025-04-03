@@ -32,7 +32,8 @@ const ScoreCellInput = ({
   const hasOption =
     isAdmin &&
     (tourney?.config?.hasForfeit || tourney?.config?.hasPenalty) &&
-    !userConfig.useCustomEstimate;
+    !userConfig.useCustomEstimate &&
+    !match.isEvent;
   return (
     <InputGroup size="sm" style={{ width: "80px" }}>
       <Form.Control

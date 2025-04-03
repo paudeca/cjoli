@@ -1,14 +1,17 @@
 {
-  "title": "CJoli - Eishockeyturnier",
+  "title": "CJoli - Eishockey-Turnier",
   "lang": {
     "en": "Englisch",
     "fr": "Französisch",
     "pt": "Portugiesisch",
     "es": "Spanisch",
-    "de": "Deutsch"
+    "de": "Deutsch",
+    "nl": "Niederländisch"
   },
   "user": {
-    "guest": "Gast"
+    "guest": "Gast",
+    "favoriteSaved": "Lieblingsteam gespeichert",
+    "favoriteRemoved": "Lieblingsteam entfernt"
   },
   "menu": {
     "home": "Startseite",
@@ -17,16 +20,32 @@
     "register": "Registrieren",
     "update": "Aktualisieren",
     "logout": "Abmelden",
-    "active": "Aktiv",
     "refresh": "Aktualisieren",
     "refreshEstimate": "Schätzung aktualisieren",
     "custom": "Benutzerdefiniert",
-    "useCustom": "Benutzerdefiniert verwenden",
-    "menu": "Menü"
+    "useCustom": "Persönliche Schätzung verwenden",
+    "menu": "Menü",
+    "setting": "Einstellungen",
+    "admin": "Verwaltung",
+    "gallery": "Fotos"
+  },
+  "home": {
+    "tourneyNotConfigured": "Turnier nicht konfiguriert",
+    "noImage": "Keine Fotos für das Turnier"
+  },
+  "gallery": {
+    "sendPhoto": "Senden Sie Ihre besten Fotos:",
+    "whatsapp": "WhatsApp",
+    "qrCode": "QR-Code"
+  },
+  "event": {
+    "friendly": "🤝 Freundschaftsspiel",
+    "resurfacing": "🚛 Eisaufbereitung"
   },
   "error": {
     "invalid": "{{field}} ist ungültig",
-    "required": "{{field}} ist erforderlich"
+    "required": "{{field}} ist erforderlich",
+    "notAuthorize": "Benutzer nicht autorisiert"
   },
   "button": {
     "submit": "Absenden",
@@ -34,12 +53,16 @@
     "close": "Schließen",
     "save": "Speichern",
     "send": "Senden",
-    "botAI": "Mit BotAI chatten",
+    "botAI": "Chat mit BotAI",
     "back": "Zurück",
-    "edit": "Bearbeiten"
+    "edit": "Bearbeiten",
+    "yes": "Ja",
+    "no": "Nein",
+    "newTourney": "Neues Turnier"
   },
   "penalty": {
     "label": "Strafen",
+    "tooltip_zero": "Keine Strafe",
     "tooltip_one": "1 Strafe",
     "tooltip_other": "{{count}} Strafen"
   },
@@ -57,14 +80,14 @@
       "update": "Aktualisieren"
     },
     "form": {
-      "login": "Benutzername",
+      "login": "Anmeldung",
       "password": "Passwort",
       "confirmPassword": "Passwort bestätigen"
     },
     "error": {
       "invalidLogin": "Ungültige Anmeldung",
-      "register": "Konto kann nicht registriert werden",
-      "update": "Konto kann nicht aktualisiert werden"
+      "register": "Konto konnte nicht registriert werden",
+      "update": "Konto konnte nicht aktualisiert werden"
     },
     "success": {
       "register": "Konto erstellt",
@@ -78,48 +101,96 @@
     "select": "Team auswählen",
     "chart": {
       "general": "Allgemein",
-      "timeline": "Zeitleiste"
+      "timeline": "Zeitverlauf"
     },
     "form": {
       "logo": "Logo",
-      "youngest": "Jüngster (Datum)"
+      "youngest": "Jüngster (Datum)",
+      "name": "Name",
+      "shortName": "Kurzname",
+      "fullName": "Vollständiger Name",
+      "alias": "Alias",
+      "primaryColor": "Primärfarbe",
+      "secondaryColor": "Sekundärfarbe"
     },
     "error": {
-      "update": "Team kann nicht aktualisiert werden"
+      "update": "Team konnte nicht aktualisiert werden"
+    }
+  },
+  "ranking": {
+    "rank": "Rang",
+    "calculation": "Berechnung",
+    "equality": "Gleichstand",
+    "victory": "Sieg",
+    "defeat": "Niederlage",
+    "source": {
+      "win": "Mehr Siege",
+      "win-min": "Weniger Siege",
+      "loss": "Weniger Niederlagen",
+      "loss-min": "Mehr Niederlagen",
+      "goalDiff": "Beste Tordifferenz",
+      "goalDiff-min": "Schlechte Tordifferenz",
+      "goalDiffDirect": "Beste Tordifferenz (direkt)",
+      "goalDiffDirect-min": "Schlechte Tordifferenz (direkt)",
+      "goalFor": "Mehr erzielte Tore",
+      "goalFormin": "Weniger erzielte Tore",
+      "goalForDirect": "Mehr erzielte Tore (direkt)",
+      "goalForDirect-min": "Weniger erzielte Tore (direkt)",
+      "goalAgainst": "Mehr kassierte Tore",
+      "goalAgainst-min": "Weniger kassierte Tore",
+      "goalAgainstDirect": "Mehr kassierte Tore (direkt)",
+      "goalAgainstDirect-min": "Weniger kassierte Tore (direkt)",
+      "youngest": "Jüngster",
+      "equal": "Gleich",
+      "penalty": "Weniger Strafen",
+      "penalty-min": "Mehr Strafen"
     }
   },
   "message": "Nachricht",
   "rank": {
     "title": "Rangliste",
-    "ranking": "Rang",
+    "ranking": "Rangliste",
     "team": "Team",
     "total": "Punkte",
-    "game": "Spiele gespielt",
+    "game": "Gespielte Spiele",
     "win": "Siege",
     "neutral": "Unentschieden",
     "loss": "Niederlagen",
     "goalFor": "Erzielte Tore",
     "goalAgainst": "Kassierte Tore",
-    "shutOut": "Zu-Null-Spiele",
+    "shutOut": "Zu-Null-Sieg",
     "goalDiff": "Torverhältnis",
     "penalty": "Strafen",
     "simulation": "Simulation",
     "first": "1.",
     "second": "2.",
     "third": "3.",
-    "rankth": "{{rank}}."
+    "rankth": "{{rank}}.",
+    "users": "Benutzer",
+    "score": "Punkte",
+    "perfect": "Perfekt",
+    "winner": "Gewinner",
+    "diff": "Differenz",
+    "goal": "Tor"
   },
   "select": {
     "live": "Live",
-    "coming": "Kommend...",
-    "past": "Vergangene"
+    "coming": "Demnächst...",
+    "past": "Vergangen",
+    "addTourney": "Turnier hinzufügen"
   },
   "match": {
     "blockShot": {
-      "title": "Punktzahl speichern",
-      "error": "Punktzahl kann nicht erfasst werden.<br/>Das Spiel muss mit einem Elfmeterschießen enden.<br/>Bitte gib einen Gewinner an."
+      "title": "Ergebnis speichern",
+      "error": "Ergebnis konnte nicht gespeichert werden.<br/>Das Spiel muss mit einem Penalty-Schießen enden.<br/>Bitte geben Sie einen Gewinner an."
     },
     "compare": "Vergleichen",
-    "forfeit": "Aufgeben"
+    "forfeit": "Spielaufgabe",
+    "simulated": "Simuliertes Ergebnis"
+  },
+  "betScore": {
+    "finalScore": "Endstand",
+    "forecastScore": "Prognose-Ergebnis",
+    "point": "Punkte"
   }
 }

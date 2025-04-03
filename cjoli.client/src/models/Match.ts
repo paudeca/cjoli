@@ -1,3 +1,4 @@
+import { EventPhase } from "./EventPhase";
 import { IMatch } from "./IMatch";
 import { UserMatch } from "./UserMatch";
 
@@ -17,4 +18,6 @@ export interface Match extends IMatch {
   estimate?: { scoreA: number; scoreB: number };
   penaltyA: number;
   penaltyB: number;
+  isEvent?: boolean;
+  event?: EventPhase;
 }

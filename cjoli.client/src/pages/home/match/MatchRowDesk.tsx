@@ -24,7 +24,9 @@ const CellInputDesk = () => {
     useMatchRow();
   const editMode =
     isAdmin ||
-    (isConnected && match.time > dayjs().format("YYYY-MM-DDTHH:mm:ss"));
+    (isConnected &&
+      !match.isEvent &&
+      match.time > dayjs().format("YYYY-MM-DDTHH:mm:ss"));
 
   return (
     <td>
@@ -136,6 +138,7 @@ const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
   const { getSquad } = useCJoli();
   const { match, imatch, isSimulation, done, hasLocation } = useMatchRow();
   const squad = getSquad(match.squadId);
+  const { t } = useTranslation();
   return (
     <tr data-testid={`match-${match.id}`}>
       {index == 0 && (
@@ -143,7 +146,9 @@ const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
       )}
       <td>
         <LeftCenterDiv>
-          {squad?.name}
+          {!match.isEvent
+            ? squad?.name
+            : t("event.friendly", "🤝 Friendly match")}
           {!match.done && <SimulationIcon show={isSimulation} />}
           <BetScore match={match} />
         </LeftCenterDiv>

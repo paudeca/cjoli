@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { Match } from "../models";
+import { EventPhase, Match } from "../models";
 import * as cjoliService from "../services/cjoliService";
 import { useCJoli } from "./useCJoli";
 import { useModal } from "./useModal";
@@ -26,11 +26,17 @@ export const useMatch = (uid: string) => {
       setShow(true);
       return;
     }
-    const ranking = await cjoliService.saveMatch(uid, {
-      ...match,
-      scoreA,
-      scoreB,
-    });
+    const ranking = !match.isEvent
+      ? await cjoliService.saveMatch(uid, {
+          ...match,
+          scoreA,
+          scoreB,
+        })
+      : await cjoliService.updateEvent(uid, match.event!, {
+          scoreA,
+          scoreB,
+          done: true,
+        });
     loadRanking(ranking);
     if (!isAdmin) {
       handleSaveUserConfig({ ...userConfig, useCustomEstimate: true });
@@ -38,14 +44,27 @@ export const useMatch = (uid: string) => {
   };
 
   const updateMatch = async (match: Match) => {
-    const ranking = await cjoliService.updateMatch(uid, match);
-    loadRanking(ranking);
+    if (!match.isEvent) {
+      const ranking = await cjoliService.updateMatch(uid, match);
+      loadRanking(ranking);
+    }
   };
 
   const clearMatch = async (match: Match) => {
-    const ranking = await cjoliService.clearMatch(uid, match);
+    const ranking = !match.isEvent
+      ? await cjoliService.clearMatch(uid, match)
+      : await cjoliService.updateEvent(uid, match.event!, {
+          scoreA: 0,
+          scoreB: 0,
+          done: false,
+        });
     loadRanking(ranking);
   };
 
-  return { saveMatch, updateMatch, clearMatch, register };
+  const updateEvent = async (event: EventPhase, params: object) => {
+    const ranking = await cjoliService.updateEvent(uid, event, params);
+    loadRanking(ranking);
+  };
+
+  return { saveMatch, updateMatch, clearMatch, register, updateEvent };
 };

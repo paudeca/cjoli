@@ -8,6 +8,7 @@ import {
   UserConfig,
   Position,
   Gallery,
+  EventPhase,
 } from "../models";
 import Cookie from "universal-cookie";
 
@@ -118,6 +119,18 @@ export const updateMatch = async (uid: string, match: Match) => {
 
 export const clearMatch = async (uid: string, match: Match) => {
   const { data } = await axios.post(`${url}/cjoli/${uid}/clearMatch`, match);
+  return data;
+};
+
+export const updateEvent = async (
+  uid: string,
+  event: EventPhase,
+  params: object
+) => {
+  const { data } = await axios.post(`${url}/cjoli/${uid}/updateEvent`, {
+    ...event,
+    datas: JSON.stringify(params),
+  });
   return data;
 };
 

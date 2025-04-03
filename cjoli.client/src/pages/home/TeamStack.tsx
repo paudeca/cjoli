@@ -24,7 +24,7 @@ import TeamTable from "./team/TeamTable";
 import TeamTime from "./team/TeamTime";
 import { useModal } from "../../hooks/useModal";
 import { Trans } from "react-i18next";
-import Select, { SingleValue } from "react-select";
+import TeamSelect from "../../components/TeamSelect";
 
 const TeamStack = () => {
   const { teams, getTeam, getTeamRank, tourney } = useCJoli();
@@ -41,11 +41,6 @@ const TeamStack = () => {
     return <>No team found</>;
   }
   const rank = getTeamRank(team);
-
-  const onChange = (v: SingleValue<{ label: string; value: number }>) => {
-    const value = v?.value;
-    value && setTeamB(getTeam(value));
-  };
 
   return (
     <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="team">
@@ -94,20 +89,19 @@ const TeamStack = () => {
               <Card className="p-2">
                 <Stack className="py-3">
                   <Form className="mx-auto">
-                    <Row className="align-items-center">
+                    <Row
+                      className={`align-items-center ${!isMobile ? "flex-nowrap" : ""}`}
+                    >
                       <Col xs="auto">
                         <Form.Label as="h4">{team?.name}</Form.Label>
                       </Col>
                       <Col xs="auto">
                         <Badge bg="secondary">VS</Badge>
                       </Col>
-                      <Col xs="auto">
-                        <Select
-                          options={teams
-                            ?.filter((t) => t.id != team.id)
-                            .map((t) => ({ value: t.id, label: t.name }))}
-                          onChange={onChange}
-                          isClearable
+                      <Col xs={12}>
+                        <TeamSelect
+                          teams={teams?.filter((t) => t.id != team?.id) ?? []}
+                          onChangeTeam={(team) => setTeamB(team)}
                         />
                       </Col>
                     </Row>

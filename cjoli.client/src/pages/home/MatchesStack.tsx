@@ -139,6 +139,41 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
                                     hasLocation={hasLocation}
                                   />
                                 );
+                              } else if (
+                                me.type == "event" &&
+                                (me as EventPhase).eventType == "Friendly"
+                              ) {
+                                const event = me as EventPhase;
+                                console.log("Event", event);
+                                const { scoreA, scoreB, done } = event.datas
+                                  ? JSON.parse(event.datas)
+                                  : { scoreA: 0, scoreB: 0, done: false };
+                                const match = {
+                                  isEvent: true,
+                                  event,
+                                  id: event.id,
+                                  time: event.time,
+                                  done,
+                                  positionIdA: event.positionIds[0],
+                                  positionIdB: event.positionIds[1],
+                                  squadId: 0,
+                                  phaseId: phase.id,
+                                  scoreA,
+                                  scoreB,
+                                } as Match;
+                                return (
+                                  <MatchRow
+                                    key={me.id}
+                                    index={i}
+                                    match={match}
+                                    rowSpan={map[k].length}
+                                    saveMatch={saveMatch}
+                                    updateMatch={updateMatch}
+                                    clearMatch={clearMatch}
+                                    register={register}
+                                    hasLocation={hasLocation}
+                                  />
+                                );
                               } else {
                                 return (
                                   <EventRow

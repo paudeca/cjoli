@@ -20,6 +20,7 @@ const TitleMobile = () => {
   const { getSquad } = useCJoli();
   const { match, teamA, teamB, isSimulation } = useMatchRow();
   const squad = getSquad(match.squadId);
+  const { t } = useTranslation();
   return (
     <tr>
       <td colSpan={2}>
@@ -27,7 +28,10 @@ const TitleMobile = () => {
           {teamA && teamB && (
             <CompareButton team={teamA} teamB={teamB} squad={squad} />
           )}
-          {dayjs(match.time).format("LT")} - {squad?.name}
+          {dayjs(match.time).format("LT")} -{" "}
+          {!match.isEvent
+            ? squad?.name
+            : t("event.friendly", "🤝 Friendly match")}
           {match.location && ` - ${match.location}`}
           {!match.done && <SimulationIcon show={isSimulation} />}
           <BetScore match={match} />
@@ -63,7 +67,9 @@ const CellInputMobile = () => {
   const { saveMatch, updateMatch, register, match } = useMatchRow();
   const editMode =
     isAdmin ||
-    (isConnected && match.time > dayjs().format("YYYY-MM-DDTHH:mm:ss"));
+    (isConnected &&
+      !match.isEvent &&
+      match.time > dayjs().format("YYYY-MM-DDTHH:mm:ss"));
   return (
     <td>
       <MyScoreDiv isMobile>

@@ -12,7 +12,7 @@ import { useModal } from "../../hooks/useModal";
 import { EventPhase, Phase, Position } from "../../models";
 import dayjs from "dayjs";
 import { Trash3 } from "react-bootstrap-icons";
-import Select, { MultiValue } from "react-select";
+import Select, { MultiValue, SingleValue } from "react-select";
 import { useCallback } from "react";
 
 interface EventsSettingProps {
@@ -41,12 +41,29 @@ const EventsSetting = ({ indexPhase }: EventsSettingProps) => {
     .reduce<Position[]>((acc, s) => [...acc, ...s.positions], [])
     .map((p) => ({ label: getLabel(p) ?? p.id.toString(), value: p.id }));
 
+  const types = [
+    { value: "Info", label: "Info" },
+    { value: "Resurfacing", label: "Resurfacing" },
+    { value: "Lunch", label: "Lunch" },
+    { value: "Friendly", label: "Friendly" },
+    { value: "Competition", label: "Competition" },
+  ];
+
   const onChange =
     (index: number) => (val: MultiValue<{ label: string; value: number }>) => {
       const values = val.map((v) => v.value);
       setValue(
         `phases.${indexPhase}.events.${index}.positionIds`,
         values.map((v) => v)
+      );
+    };
+
+  const onChangeType =
+    (index: number) => (v: SingleValue<{ label: string; value: string }>) => {
+      const value = v?.value as string;
+      setValue(
+        `phases.${indexPhase}.events.${index}.eventType`,
+        value as "Info" | "Resurfacing" | "Lunch" | "Friendly" | "Competition"
       );
     };
 
@@ -66,6 +83,16 @@ const EventsSetting = ({ indexPhase }: EventsSettingProps) => {
                 {e.name} - {dayjs(e.time).format()}
               </Accordion.Header>
               <Accordion.Body>
+                <Row>
+                  <Form.Group className="mb-3" as={Col}>
+                    <Form.Label>Type</Form.Label>
+                    <Select
+                      options={types}
+                      defaultValue={types.filter((t) => e.eventType == t.value)}
+                      onChange={onChangeType(i)}
+                    />
+                  </Form.Group>
+                </Row>
                 <Row>
                   <Form.Group as={Col} lg={6} xs={12} controlId="name">
                     <Form.Label>Name</Form.Label>

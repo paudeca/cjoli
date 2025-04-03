@@ -14,7 +14,7 @@
     "favoriteRemoved": "Favoriete team verwijderd"
   },
   "menu": {
-    "home": "Home",
+    "home": "Start",
     "ranking": "Ranglijst",
     "login": "Inloggen",
     "register": "Registreren",
@@ -26,10 +26,21 @@
     "useCustom": "Gebruik persoonlijke schatting",
     "menu": "Menu",
     "setting": "Instellingen",
-    "admin": "Administratie"
+    "admin": "Administratie",
+    "gallery": "Foto's"
   },
   "home": {
-    "tourneyNotConfigured": "Toernooi niet geconfigureerd"
+    "tourneyNotConfigured": "Toernooi niet geconfigureerd",
+    "noImage": "Geen foto's voor het toernooi"
+  },
+  "gallery": {
+    "sendPhoto": "Stuur je beste foto's:",
+    "whatsapp": "WhatsApp",
+    "qrCode": "QR-code"
+  },
+  "event": {
+    "friendly": "🤝 Vriendschappelijke wedstrijd",
+    "resurfacing": "🚛 IJsonderhoud"
   },
   "error": {
     "invalid": "{{field}} is ongeldig",
@@ -42,12 +53,12 @@
     "close": "Sluiten",
     "save": "Opslaan",
     "send": "Versturen",
-    "botAI": "Chat met BotAI",
+    "botAI": "Chatten met BotAI",
     "back": "Terug",
     "edit": "Bewerken",
     "yes": "Ja",
     "no": "Nee",
-    "newTourney": "Nieuw toernooi"
+    "newTourney": "Nieuw Toernooi"
   },
   "penalty": {
     "label": "Strafpunten",
@@ -74,7 +85,7 @@
       "confirmPassword": "Bevestig wachtwoord"
     },
     "error": {
-      "invalidLogin": "Ongeldige inloggegevens",
+      "invalidLogin": "Ongeldige login",
       "register": "Kan account niet registreren",
       "update": "Kan account niet bijwerken"
     },
@@ -87,7 +98,7 @@
     "title": "{{team}} bewerken",
     "position": "Positie",
     "youngest": "Jongste",
-    "select": "Selecteer team",
+    "select": "Team selecteren",
     "chart": {
       "general": "Algemeen",
       "timeline": "Tijdlijn"
@@ -121,16 +132,18 @@
       "goalDiff-min": "Slechtste doelsaldo",
       "goalDiffDirect": "Beste doelsaldo (direct)",
       "goalDiffDirect-min": "Slechtste doelsaldo (direct)",
-      "goalFor": "Meeste gescoorde doelpunten",
-      "goalFormin": "Minste gescoorde doelpunten",
-      "goalForDirect": "Meeste gescoorde doelpunten (direct)",
-      "goalForDirect-min": "Minste gescoorde doelpunten (direct)",
-      "goalAgainst": "Meeste tegendoelpunten",
-      "goalAgainst-min": "Minste tegendoelpunten",
-      "goalAgainstDirect": "Meeste tegendoelpunten (direct)",
-      "goalAgainstDirect-min": "Minste tegendoelpunten (direct)",
+      "goalFor": "Meer gescoorde doelpunten",
+      "goalFormin": "Minder gescoorde doelpunten",
+      "goalForDirect": "Meer gescoorde doelpunten (direct)",
+      "goalForDirect-min": "Minder gescoorde doelpunten (direct)",
+      "goalAgainst": "Meer tegendoelpunten",
+      "goalAgainst-min": "Minder tegendoelpunten",
+      "goalAgainstDirect": "Meer tegendoelpunten (direct)",
+      "goalAgainstDirect-min": "Minder tegendoelpunten (direct)",
       "youngest": "Jongste",
-      "equal": "Gelijk"
+      "equal": "Gelijk",
+      "penalty": "Minder strafpunten",
+      "penalty-min": "Meer strafpunten"
     }
   },
   "message": "Bericht",
@@ -139,13 +152,13 @@
     "ranking": "Ranglijst",
     "team": "Team",
     "total": "Punten",
-    "game": "Wedstrijden gespeeld",
+    "game": "Gespeelde wedstrijden",
     "win": "Overwinningen",
     "neutral": "Gelijke spelen",
     "loss": "Nederlagen",
     "goalFor": "Doelpunten voor",
     "goalAgainst": "Doelpunten tegen",
-    "shutOut": "Nul gehouden",
+    "shutOut": "Geen tegendoelpunten",
     "goalDiff": "Doelsaldo",
     "penalty": "Strafpunten",
     "simulation": "Simulatie",
@@ -169,7 +182,7 @@
   "match": {
     "blockShot": {
       "title": "Score opslaan",
-      "error": "Kan de score niet registreren.<br/>De wedstrijd moet eindigen in een penalty shootout.<br/>Geef een winnaar aan."
+      "error": "Kan de score niet opslaan.<br/>De wedstrijd moet eindigen in een penalty shootout.<br/>Geef een winnaar aan."
     },
     "compare": "Vergelijken",
     "forfeit": "Verlies door opgave",
