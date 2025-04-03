@@ -13,7 +13,7 @@ const ImageModal = () => {
       style={{ color: "black" }}
       size="lg"
     >
-      <img className="w-100 h-100" src={data} />
+      <img className="w-100 h-100" src={data} onClick={() => setShow(false)} />
     </Modal>
   );
 };
