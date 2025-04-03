@@ -48,7 +48,7 @@ const GalleryPage = () => {
 
   const [page, setPage] = useState(gallery?.page ?? 0);
   const { isLoading, refetch } = useQuery(
-    getGallery(uid, page, mode == "waiting")
+    getGallery(uid, page, mode == "waiting", false)
   );
 
   const { mutate: doUpdateMessage } = useMutation(

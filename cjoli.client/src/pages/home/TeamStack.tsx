@@ -26,9 +26,14 @@ import { useModal } from "../../hooks/useModal";
 import { Trans } from "react-i18next";
 import TeamSelect from "../../components/TeamSelect";
 
-const TeamStack = () => {
+interface TeamStackProps {
+  teamId?: number;
+  modeCast?: boolean;
+}
+
+const TeamStack = ({ teamId, modeCast }: TeamStackProps) => {
   const { teams, getTeam, getTeamRank, tourney } = useCJoli();
-  const { teamId } = useParams();
+  const { teamId: teamIdParam } = useParams();
   const { isMobile } = useScreenSize();
   const [teamB, setTeamB] = React.useState<Team | undefined>(undefined);
   const { setShow: showTeam } = useModal("team");
@@ -36,7 +41,7 @@ const TeamStack = () => {
   const navigate = useNavigate();
   const [activeKey, setActiveKey] = React.useState("general");
 
-  const team = getTeam(parseInt(teamId!));
+  const team = getTeam(teamId ?? parseInt(teamIdParam!));
   if (!team) {
     return <>No team found</>;
   }
@@ -67,24 +72,26 @@ const TeamStack = () => {
             </Stack>
           </Card.Header>
           <Card.Body>
-            <Nav variant="underline" defaultActiveKey={activeKey}>
-              <Nav.Item>
-                <Nav.Link
-                  eventKey="general"
-                  onClick={() => setActiveKey("general")}
-                >
-                  <Trans i18nKey="team.chart.general">General</Trans>
-                </Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link
-                  eventKey="timeline"
-                  onClick={() => setActiveKey("timeline")}
-                >
-                  <Trans i18nKey="team.chart.timeline">Timeline</Trans>
-                </Nav.Link>
-              </Nav.Item>
-            </Nav>
+            {!modeCast && (
+              <Nav variant="underline" defaultActiveKey={activeKey}>
+                <Nav.Item>
+                  <Nav.Link
+                    eventKey="general"
+                    onClick={() => setActiveKey("general")}
+                  >
+                    <Trans i18nKey="team.chart.general">General</Trans>
+                  </Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link
+                    eventKey="timeline"
+                    onClick={() => setActiveKey("timeline")}
+                  >
+                    <Trans i18nKey="team.chart.timeline">Timeline</Trans>
+                  </Nav.Link>
+                </Nav.Item>
+              </Nav>
+            )}
             {activeKey == "general" && (
               <Card className="p-2">
                 <Stack className="py-3">
@@ -95,15 +102,21 @@ const TeamStack = () => {
                       <Col xs="auto">
                         <Form.Label as="h4">{team?.name}</Form.Label>
                       </Col>
-                      <Col xs="auto">
-                        <Badge bg="secondary">VS</Badge>
-                      </Col>
-                      <Col xs={12}>
-                        <TeamSelect
-                          teams={teams?.filter((t) => t.id != team?.id) ?? []}
-                          onChangeTeam={(team) => setTeamB(team)}
-                        />
-                      </Col>
+                      {!modeCast && (
+                        <>
+                          <Col xs="auto">
+                            <Badge bg="secondary">VS</Badge>
+                          </Col>
+                          <Col xs={12}>
+                            <TeamSelect
+                              teams={
+                                teams?.filter((t) => t.id != team?.id) ?? []
+                              }
+                              onChangeTeam={(team) => setTeamB(team)}
+                            />
+                          </Col>
+                        </>
+                      )}
                     </Row>
                   </Form>
                 </Stack>
@@ -121,18 +134,20 @@ const TeamStack = () => {
               </Card>
             )}
 
-            <Stack direction="horizontal" className="p-3">
-              <Button variant="primary" onClick={() => navigate(-1)}>
-                <ArrowLeft /> <Trans i18nKey="button.back">Back</Trans>
-              </Button>
-              {isRootAdmin && (
-                <div className="ms-auto">
-                  <Button variant="primary" onClick={() => showTeam(true)}>
-                    <Trans i18nKey="button.edit">Edit</Trans>
-                  </Button>
-                </div>
-              )}
-            </Stack>
+            {!modeCast && (
+              <Stack direction="horizontal" className="p-3">
+                <Button variant="primary" onClick={() => navigate(-1)}>
+                  <ArrowLeft /> <Trans i18nKey="button.back">Back</Trans>
+                </Button>
+                {isRootAdmin && (
+                  <div className="ms-auto">
+                    <Button variant="primary" onClick={() => showTeam(true)}>
+                      <Trans i18nKey="button.edit">Edit</Trans>
+                    </Button>
+                  </div>
+                )}
+              </Stack>
+            )}
           </Card.Body>
         </CJoliCard>
       </div>

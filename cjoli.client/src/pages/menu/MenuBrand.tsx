@@ -17,7 +17,7 @@ interface MenuBrandProps {
 }
 
 const MenuBrand = ({ setShow }: MenuBrandProps) => {
-  const { tourney, teams } = useCJoli();
+  const { tourney, teams, isCastPage } = useCJoli();
   const { userConfig, countUser } = useUser();
   const navigate = useNavigate();
   const uid = useUid();
@@ -58,22 +58,26 @@ const MenuBrand = ({ setShow }: MenuBrandProps) => {
           </Col>
         )}
         {tourneyLabel && <Col>{tourneyLabel}</Col>}
-        <Col>
-          <Badge
-            bg="secondary"
-            className="d-flex menu"
-            style={{ maxWidth: 60 }}
-            data-testid="countUser"
-          >
-            {countUser}
-            <Person />
-          </Badge>
-        </Col>
-        <Col className="d-flex justify-content-end">
-          <Navbar.Toggle aria-controls="menu" onClick={() => setShow(true)}>
-            <ThreeDotsVertical />
-          </Navbar.Toggle>
-        </Col>
+        {!isCastPage && (
+          <Col>
+            <Badge
+              bg="secondary"
+              className="d-flex menu"
+              style={{ maxWidth: 60 }}
+              data-testid="countUser"
+            >
+              {countUser}
+              <Person />
+            </Badge>
+          </Col>
+        )}
+        {!isCastPage && (
+          <Col className="d-flex justify-content-end">
+            <Navbar.Toggle aria-controls="menu" onClick={() => setShow(true)}>
+              <ThreeDotsVertical />
+            </Navbar.Toggle>
+          </Col>
+        )}
       </Row>
     </Navbar.Brand>
   );

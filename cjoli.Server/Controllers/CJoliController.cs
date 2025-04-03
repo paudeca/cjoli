@@ -77,10 +77,10 @@ namespace cjoli.Server.Controllers
 
         [HttpGet]
         [Route("{uuid}/Gallery/{page}")]
-        public GalleryDto GetGallery(string uuid,int page,[FromQuery] bool waiting)
+        public GalleryDto GetGallery(string uuid,int page,[FromQuery] bool waiting, [FromQuery] bool random)
         {
             string? login = GetLogin();
-            return _service.CreateGallery(uuid, page, login, waiting, _context);
+            return _service.CreateGallery(uuid, page, login, waiting, random, _context);
         }
 
 

@@ -210,5 +210,6 @@ export const useCJoli = (page?: TypePage) => {
     setColor,
     selectPage,
     isHomePage: state.page == "home",
+    isCastPage: state.page == "cast",
   };
 };

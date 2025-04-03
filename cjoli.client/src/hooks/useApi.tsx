@@ -102,11 +102,17 @@ const useApiGet = () => {
   );
 
   const getGallery = useCallback(
-    (uid: string, page: number, waiting: boolean) =>
+    // eslint-disable-next-line max-params
+    (uid: string, page: number, waiting: boolean, random: boolean) =>
       queryOptions({
-        queryKey: ["getGallery", uid, page, waiting],
+        queryKey: ["getGallery", uid, page, waiting, random],
         queryFn: async () => {
-          const gallery = await cjoliService.getGallery(uid, page, waiting);
+          const gallery = await cjoliService.getGallery(
+            uid,
+            page,
+            waiting,
+            random
+          );
           loadGallery(gallery);
           return gallery;
         },

@@ -185,7 +185,7 @@ namespace cjoli.Server.Services
             return map![loginKey];
         }
 
-        public GalleryDto CreateGallery(string uuid, int page, string? login, bool waiting, CJoliContext context)
+        public GalleryDto CreateGallery(string uuid, int page, string? login, bool waiting, bool random, CJoliContext context)
         {
             User? user = GetUserWithConfig(login, uuid, context);
             bool isAdmin = user.IsAdmin(uuid);
@@ -199,7 +199,17 @@ namespace cjoli.Server.Services
             int countWaiting = query.Where(m => !m.IsPublished).Count();
             int count = query.Where(m=>m.IsPublished == !waiting).Count();
             int pageSize = 12;
-            List<Message> messages = query.Where(m=>m.IsPublished == !waiting).Skip(pageSize * page).Take(pageSize).ToList();
+            List<Message> messages;
+            if(random && count> pageSize)
+            {
+                Random rand = new Random();
+                int skipper = rand.Next(0, count - pageSize);
+                messages = query.Where(m => m.IsPublished == !waiting).Skip(skipper).Take(pageSize).ToList();
+            }
+            else
+            {
+                messages = query.Where(m => m.IsPublished == !waiting).Skip(pageSize * page).Take(pageSize).ToList();
+            }
             var m = _mapper.Map<List<MessageDto>>(messages);
             return new GalleryDto() { Page = page, PageSize = pageSize, Total=count, TotalWaiting=countWaiting, Messages = m };
         }

@@ -165,10 +165,12 @@ export const prompt = async (uid: string, lang: string) => {
 export const getGallery = async (
   uid: string,
   page: number,
-  waiting: boolean
+  waiting: boolean,
+  random: boolean
+  // eslint-disable-next-line max-params
 ) => {
   const { data } = await axios.get<Gallery>(
-    `${url}/cjoli/${uid}/gallery/${page}${waiting ? "?waiting=true" : ""}`
+    `${url}/cjoli/${uid}/gallery/${page}${waiting ? "?waiting=true" : ""}${random ? "?random=true" : ""}`
   );
   return data;
 };

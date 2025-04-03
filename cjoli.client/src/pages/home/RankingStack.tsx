@@ -11,9 +11,10 @@ import { useServer } from "../../hooks/useServer";
 
 interface RankingStackProps extends JSX.IntrinsicAttributes {
   phase: Phase;
+  modeCast?: boolean;
 }
 
-const RankingStack = ({ phase }: RankingStackProps) => {
+const RankingStack = ({ phase, modeCast }: RankingStackProps) => {
   const { phases, selectDay } = useCJoli();
   const { path } = useServer();
   const navigate = useNavigate();
@@ -35,17 +36,19 @@ const RankingStack = ({ phase }: RankingStackProps) => {
         <CJoliCard>
           <Element name="ranking">
             <Loading ready={!!phases && !!phase}>
-              <Card.Header>
-                <Nav variant="underline" activeKey={`${phase?.id}`}>
-                  {filterPhases.map((phase) => (
-                    <Nav.Item key={phase.id}>
-                      <Nav.Link onClick={() => handleClick(phase)}>
-                        {phase.name}
-                      </Nav.Link>
-                    </Nav.Item>
-                  ))}
-                </Nav>
-              </Card.Header>
+              {!modeCast && (
+                <Card.Header>
+                  <Nav variant="underline" activeKey={`${phase?.id}`}>
+                    {filterPhases.map((phase) => (
+                      <Nav.Item key={phase.id}>
+                        <Nav.Link onClick={() => handleClick(phase)}>
+                          {phase.name}
+                        </Nav.Link>
+                      </Nav.Item>
+                    ))}
+                  </Nav>
+                </Card.Header>
+              )}
               <RankTable phase={phase} />
             </Loading>
           </Element>

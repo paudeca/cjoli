@@ -16,8 +16,9 @@ type MatchEvent = (Match | EventPhase) & { type: string; location?: string };
 
 interface MatchesStackProps extends JSX.IntrinsicAttributes {
   phase: Phase;
+  modeCast?: boolean;
 }
-const MatchesStack = ({ phase }: MatchesStackProps) => {
+const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
   const { matches, daySelected, selectDay } = useCJoli();
   const { events } = phase;
   const uid = useUid();
@@ -96,10 +97,11 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
         <CJoliCard>
           <Loading ready={!!matches}>
             <Accordion
-              activeKey={daySelected}
+              activeKey={!modeCast ? daySelected : keys}
               onSelect={(e) => {
                 selectDay(e as string);
               }}
+              alwaysOpen={modeCast}
             >
               {keys.map((key, index) => {
                 const datasOrder = datas[key];
@@ -137,6 +139,7 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
                                     clearMatch={clearMatch}
                                     register={register}
                                     hasLocation={hasLocation}
+                                    modeCast={modeCast}
                                   />
                                 );
                               } else if (
@@ -144,7 +147,6 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
                                 (me as EventPhase).eventType == "Friendly"
                               ) {
                                 const event = me as EventPhase;
-                                console.log("Event", event);
                                 const { scoreA, scoreB, done } = event.datas
                                   ? JSON.parse(event.datas)
                                   : { scoreA: 0, scoreB: 0, done: false };
@@ -172,6 +174,7 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
                                     clearMatch={clearMatch}
                                     register={register}
                                     hasLocation={hasLocation}
+                                    modeCast={modeCast}
                                   />
                                 );
                               } else {
@@ -180,6 +183,7 @@ const MatchesStack = ({ phase }: MatchesStackProps) => {
                                     key={me.id}
                                     event={me as EventPhase}
                                     hasLocation={hasLocation}
+                                    modeCast={modeCast}
                                   />
                                 );
                               }

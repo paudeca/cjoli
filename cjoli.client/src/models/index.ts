@@ -22,7 +22,14 @@ import { UserConfig } from "./UserConfig";
 import { UserMatch } from "./UserMatch";
 import { EventPhase } from "./EventPhase";
 
-type TypePage = "welcome" | "home" | "team" | "ranking" | "setting" | "gallery";
+type TypePage =
+  | "welcome"
+  | "home"
+  | "team"
+  | "ranking"
+  | "setting"
+  | "gallery"
+  | "cast";
 
 export type {
   Gallery,

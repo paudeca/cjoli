@@ -15,6 +15,7 @@ import { useServer } from "./hooks/useServer";
 import TeamPage from "./pages/TeamPage";
 import AdminPage from "./pages/AdminPage";
 import GalleryPage from "./pages/GalleryPage";
+import CastPage from "./pages/CastPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -71,7 +72,7 @@ const App = () => {
         },
         {
           path: isUseDomain ? "cast" : ":uid/cast",
-          element: <HomePage />,
+          element: <CastPage />,
         },
         {
           path: isUseDomain ? "gallery/:mode?" : ":uid/gallery/:mode?",

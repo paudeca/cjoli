@@ -15,9 +15,10 @@ import { useUser } from "../../../hooks/useUser";
 interface EventRowProps {
   event: EventPhase;
   hasLocation: boolean;
+  modeCast?: boolean;
 }
 // eslint-disable-next-line complexity
-const EventRow = ({ event, hasLocation }: EventRowProps) => {
+const EventRow = ({ event, hasLocation, modeCast }: EventRowProps) => {
   const { teams } = useCJoli();
   const { t } = useTranslation();
   const uid = useUid();
@@ -52,7 +53,7 @@ const EventRow = ({ event, hasLocation }: EventRowProps) => {
 
   const [selected, setSelected] = useState(datas);
 
-  const editMode = isAdmin && !datas.done;
+  const editMode = isAdmin && !datas.done && !modeCast;
 
   let competition = null;
   if (event.eventType == "Competition") {
@@ -99,7 +100,7 @@ const EventRow = ({ event, hasLocation }: EventRowProps) => {
             {!editMode && <TeamName teamId={datas.third!} hideFavorite />}
           </Col>
         </Row>
-        {isAdmin && (
+        {isAdmin && !modeCast && (
           <Row className="mt-2">
             <Col xs={{ offset: 10 }}>
               {!datas.done && (

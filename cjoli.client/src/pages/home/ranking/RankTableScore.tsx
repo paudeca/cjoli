@@ -28,13 +28,12 @@ interface RankTableScoreProps {
   score: Score;
   squad: Squad;
 }
-const RankTableScore = ({ tourney, score, squad }: RankTableScoreProps) => {
+const RankTableScore = ({ score, squad }: RankTableScoreProps) => {
   const { getTeam, getPosition, getTeamInfo, loadRanking } = useCJoli();
   const { isMobile } = useScreenSize();
   const { t } = useTranslation();
   const uid = useUid();
   const { userConfig } = useUser();
-  console.log("tourney", tourney?.id);
 
   const position = getPosition(score.positionId);
   const team = getTeam(position?.teamId || 0);

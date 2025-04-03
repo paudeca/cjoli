@@ -46,6 +46,7 @@ const MainPage = () => {
     teams,
     setColor,
     isHomePage,
+    isCastPage,
     daySelected,
   } = useCJoli();
   const uid = useUid();
@@ -123,21 +124,23 @@ const MainPage = () => {
       <Loading ready={!isLoading}>
         <MenuNav />
         <Outlet />
-        <ButtonFixed>
-          <Stack gap={1}>
-            {isHomePage && (
-              <ScrollButton to="ranking" icon={<ArrowUp />} down={false} />
-            )}
-            {nextMatch && (
-              <ScrollButton
-                to={`match-${nextMatch.id}`}
-                icon={<ArrowDown />}
-                down
-              />
-            )}
-            {uid && !isOnChat && <ChatButton />}
-          </Stack>
-        </ButtonFixed>
+        {!isCastPage && (
+          <ButtonFixed>
+            <Stack gap={1}>
+              {isHomePage && (
+                <ScrollButton to="ranking" icon={<ArrowUp />} down={false} />
+              )}
+              {nextMatch && (
+                <ScrollButton
+                  to={`match-${nextMatch.id}`}
+                  icon={<ArrowDown />}
+                  down
+                />
+              )}
+              {uid && !isOnChat && <ChatButton />}
+            </Stack>
+          </ButtonFixed>
+        )}
         <ToastContainer position="top-end" className="position-fixed">
           <Toast
             onClose={hideToast}
