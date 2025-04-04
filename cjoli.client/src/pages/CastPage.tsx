@@ -31,6 +31,12 @@ const CastPage = () => {
     }
   }, [gallery]);
 
+  useEffect(() => {
+    return () => {
+      clearTimeout(idleTime);
+    };
+  }, []);
+
   useQuery({
     ...getRanking(uid),
     refetchInterval: 10000,
