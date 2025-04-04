@@ -13,7 +13,7 @@ import CJoliStack from "../../components/CJoliStack";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCJoli } from "../../hooks/useCJoli";
 import dayjs from "dayjs";
-import React from "react";
+import React, { useEffect } from "react";
 import { Team } from "../../models";
 import { ArrowLeft } from "react-bootstrap-icons";
 import useScreenSize from "../../hooks/useScreenSize";
@@ -26,20 +26,29 @@ import { useModal } from "../../hooks/useModal";
 import { Trans } from "react-i18next";
 import TeamSelect from "../../components/TeamSelect";
 
-interface TeamStackProps {
+interface TeamStackProps extends JSX.IntrinsicAttributes {
   teamId?: number;
+  teamIdB?: number;
   modeCast?: boolean;
 }
 
-const TeamStack = ({ teamId, modeCast }: TeamStackProps) => {
+const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
   const { teams, getTeam, getTeamRank, tourney } = useCJoli();
   const { teamId: teamIdParam } = useParams();
   const { isMobile } = useScreenSize();
-  const [teamB, setTeamB] = React.useState<Team | undefined>(undefined);
+  const [teamB, setTeamB] = React.useState<Team | undefined>(
+    teamIdB ? getTeam(teamIdB) : undefined
+  );
   const { setShow: showTeam } = useModal("team");
   const { isRootAdmin } = useUser();
   const navigate = useNavigate();
   const [activeKey, setActiveKey] = React.useState("general");
+
+  useEffect(() => {
+    if (teamIdB) {
+      setTeamB(getTeam(teamIdB));
+    }
+  }, [teamIdB, setTeamB, getTeam]);
 
   const team = getTeam(teamId ?? parseInt(teamIdParam!));
   if (!team) {
@@ -102,20 +111,21 @@ const TeamStack = ({ teamId, modeCast }: TeamStackProps) => {
                       <Col xs="auto">
                         <Form.Label as="h4">{team?.name}</Form.Label>
                       </Col>
+                      <Col xs="auto">
+                        <Badge bg="secondary">VS</Badge>
+                      </Col>
                       {!modeCast && (
-                        <>
-                          <Col xs="auto">
-                            <Badge bg="secondary">VS</Badge>
-                          </Col>
-                          <Col xs={12}>
-                            <TeamSelect
-                              teams={
-                                teams?.filter((t) => t.id != team?.id) ?? []
-                              }
-                              onChangeTeam={(team) => setTeamB(team)}
-                            />
-                          </Col>
-                        </>
+                        <Col xs={12}>
+                          <TeamSelect
+                            teams={teams?.filter((t) => t.id != team?.id) ?? []}
+                            onChangeTeam={(team) => setTeamB(team)}
+                          />
+                        </Col>
+                      )}
+                      {modeCast && (
+                        <Col xs={12}>
+                          <Form.Label as="h4">{teamB?.name}</Form.Label>
+                        </Col>
                       )}
                     </Row>
                   </Form>

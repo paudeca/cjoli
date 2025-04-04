@@ -27,7 +27,8 @@
     "menu": "Menu",
     "setting": "Paramètres",
     "admin": "Administration",
-    "gallery": "Photos"
+    "gallery": "Photos",
+    "cast": "Diaporama"
   },
   "home": {
     "tourneyNotConfigured": "Tournoi non configuré",

@@ -34,7 +34,7 @@ const render = async (team?: Team) => {
   });
   const ranking = createRanking({ tourney, history: { 1: [] } });
 
-  const Page = initPage(TeamStack as any, () => {
+  const Page = initPage(TeamStack, () => {
     const { loadRanking } = useCJoli();
     const { loadUser } = useUser();
     useEffect(() => {

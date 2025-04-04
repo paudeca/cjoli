@@ -27,7 +27,8 @@
     "menu": "Menu",
     "setting": "Setting",
     "admin": "Administration",
-    "gallery": "Photos"
+    "gallery": "Photos",
+    "cast": "Slideshow"
   },
   "home": {
     "tourneyNotConfigured": "Tourney not configured",
