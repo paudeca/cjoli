@@ -10,6 +10,8 @@ import MatchesStack from "./home/MatchesStack";
 import useScreenSize from "../hooks/useScreenSize";
 import TeamStack from "./home/TeamStack";
 
+let idleTime = 0;
+
 const CastPage = () => {
   const { gallery, phases, teams } = useCJoli("cast");
   const { getGallery, getRanking } = useApi();
@@ -83,8 +85,8 @@ const CastPage = () => {
     [] as { type: TypePage; content: ReactNode }[]
   );
 
-  const scrollDown = (delay: number) =>
-    window.setTimeout(() => {
+  const scrollDown = (delay: number) => {
+    idleTime = window.setTimeout(() => {
       window.scrollTo({
         top: window.scrollY + screen.height,
         behavior: "smooth",
@@ -93,6 +95,7 @@ const CastPage = () => {
         scrollDown(delay);
       }
     }, delay);
+  };
 
   return (
     <Loading ready={!isLoading}>
@@ -106,6 +109,9 @@ const CastPage = () => {
               interval={10000}
               pause={false}
               onSlide={(eventKey) => {
+                if (idleTime) {
+                  clearTimeout(idleTime);
+                }
                 if (items[eventKey].type == "ranking") {
                   if (teams) {
                     const team =
