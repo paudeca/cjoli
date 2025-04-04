@@ -103,7 +103,7 @@ const CastPage = () => {
               fade={false}
               wrap
               slide={false}
-              interval={10000}
+              interval={null}
               pause={false}
               onSlide={(eventKey) => {
                 if (items[eventKey].type == "ranking") {

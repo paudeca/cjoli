@@ -19,7 +19,7 @@ interface MatchesStackProps extends JSX.IntrinsicAttributes {
   modeCast?: boolean;
 }
 const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
-  const { matches, daySelected, selectDay } = useCJoli();
+  const { matches, daySelected, selectDay, isCastPage } = useCJoli();
   const { events } = phase;
   const uid = useUid();
   const { squadId } = useParams();
@@ -92,7 +92,11 @@ const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
   );
 
   return (
-    <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="matches">
+    <CJoliStack
+      gap={0}
+      className={`${isCastPage ? "col-md-10" : "col-md-8"} mx-auto mt-5`}
+      data-testid="matches"
+    >
       <div className="p-2">
         <CJoliCard>
           <Loading ready={!!matches}>

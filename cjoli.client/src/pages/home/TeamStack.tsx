@@ -33,7 +33,7 @@ interface TeamStackProps extends JSX.IntrinsicAttributes {
 }
 
 const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
-  const { teams, getTeam, getTeamRank, tourney } = useCJoli();
+  const { teams, getTeam, getTeamRank, tourney, isCastPage } = useCJoli();
   const { teamId: teamIdParam } = useParams();
   const { isMobile } = useScreenSize();
   const [teamB, setTeamB] = React.useState<Team | undefined>(
@@ -57,7 +57,11 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
   const rank = getTeamRank(team);
 
   return (
-    <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="team">
+    <CJoliStack
+      gap={0}
+      className={`${isCastPage ? "col-md-10" : "col-md-8"} mx-auto mt-5`}
+      data-testid="team"
+    >
       <div className="p-2">
         <CJoliCard>
           <Card.Header>
