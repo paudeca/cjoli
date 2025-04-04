@@ -27,16 +27,25 @@ namespace cjoli.Server.Controllers
         private readonly CJoliService _service;
         private readonly SettingService _settingService;
         private readonly AIService _aiService;
+        private readonly MessageService _messageService;
         private readonly IMapper _mapper;
         private readonly CJoliContext _context;
         private readonly ILogger<CJoliController> _logger;
 
 
-        public CJoliController(CJoliService service, SettingService settingService, AIService aiService, IMapper mapper, CJoliContext context, ILogger<CJoliController> logger)
+        public CJoliController(
+            CJoliService service,
+            SettingService settingService,
+            AIService aiService,
+            MessageService messageService,
+            IMapper mapper,
+            CJoliContext context,
+            ILogger<CJoliController> logger)
         {
             _service = service;
             _settingService = settingService;
             _aiService = aiService;
+            _messageService = messageService;
             _mapper = mapper;
             _context = context;
             _logger = logger;
@@ -211,7 +220,29 @@ namespace cjoli.Server.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("{uuid}/Upload")]
+        public async Task<IActionResult> OnPostUploadAsync([FromRoute] string uuid,List<IFormFile> files)
+        {
+            long size = files.Sum(f => f.Length);
 
+            foreach (var formFile in files)
+            {
+                if (formFile.Length > 0)
+                {
+                    var filePath = Path.GetTempFileName();
+
+                    using (var stream = System.IO.File.Create(filePath))
+                    {
+                        await formFile.CopyToAsync(stream);
+                        stream.Position = 0;
+                        await _messageService.UploadImage(stream, "image/png", uuid, _context);
+                    }
+                }
+            }
+
+            return Ok(new { count = files.Count, size });
+        }
 
     }
 }

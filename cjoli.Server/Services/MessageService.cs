@@ -137,5 +137,55 @@ namespace cjoli.Server.Services
             tourney.Messages.Add(m);
             return m;
         }
+
+        public async Task UploadImage(Stream stream, string contentType, string uuid, CJoliContext context)
+        {
+            Tourney? tourney = context.Tourneys.SingleOrDefault(t => t.Uid == uuid);
+            if (tourney == null)
+            {
+                throw new NotFoundException("Tourney", uuid);
+            }
+
+            string messageId = Guid.NewGuid().ToString();
+            string name = $"{DateTime.Now.ToString("yyyy-MM-dd")}/{messageId}";
+            string url = await _storageService.SaveBlob(stream, uuid, name, contentType);
+
+            Message m = new Message()
+            {
+                MessageId = messageId,
+                From = "user",
+                To = "cjoli",
+                MessageType = "image",
+                MediaUrl = url,
+                MediaContentType = contentType,
+                Time = DateTime.Now,
+                Tourney = tourney,
+                IsPublished = false,
+                Destination = "inbound"
+            };
+            tourney.Messages.Add(m);
+
+            if (!string.IsNullOrEmpty(tourney.WhatsappNotif) && !string.IsNullOrEmpty(tourney.WhatsappNumber))
+            {
+                try
+                {
+                    string variables = JsonSerializer.Serialize(new Dictionary<string, string> { { "1", m.From } });
+                    string contentSid = _configuration["TwilioNotifContentSid"]!;
+                    foreach (string notif in tourney.WhatsappNotif.Split(';'))
+                    {
+                        await _twilioService.SendMessageTemplate(contentSid: contentSid, contentVariables: variables, from: $"whatsapp:{tourney.WhatsappNumber}", to: $"whatsapp:{notif}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "Unable to send notif");
+                }
+            }
+
+
+            context.SaveChanges();
+        }
+
+
     }
 }

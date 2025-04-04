@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import {
   Alert,
   Badge,
@@ -28,6 +29,23 @@ import ConfirmationModal from "../modals/ConfirmationModal";
 import { Message } from "../models";
 import { Trans } from "react-i18next";
 import { QrCode, Whatsapp } from "react-bootstrap-icons";
+import { FilePond, registerPlugin } from "react-filepond";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
+
+import "filepond/dist/filepond.min.css";
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
+
+registerPlugin(
+  FilePondPluginImagePreview,
+  FilePondPluginFileValidateType,
+  FilePondPluginFileValidateSize,
+  FilePondPluginImageExifOrientation
+);
+
+const url = import.meta.env.VITE_API_URL;
 
 /* eslint-disable complexity */
 /* eslint-disable max-lines-per-function */
@@ -45,6 +63,7 @@ const GalleryPage = () => {
   const { isAdmin } = useUser();
   const { mode } = useParams();
   const navigate = useNavigate();
+  const uuid = useUid();
 
   const [page, setPage] = useState(gallery?.page ?? 0);
   const { isLoading, refetch } = useQuery(
@@ -82,6 +101,8 @@ const GalleryPage = () => {
   const whatsapp = tourney?.whatsappNumber
     ? tourney?.whatsappNumber.replace("+", "")
     : undefined;
+
+  const [files, setFiles] = useState<string[]>([]);
 
   return (
     <Loading ready={!isLoading}>
@@ -152,6 +173,22 @@ const GalleryPage = () => {
                     </Col>
                   </Row>
                 )}
+                <Row>
+                  <Col>
+                    <FilePond
+                      files={files}
+                      onupdatefiles={setFiles as any}
+                      allowMultiple={true}
+                      maxFiles={3}
+                      server={`${url}/cjoli/${uuid}/upload`}
+                      name="files" /* sets the file input name, it's filepond by default */
+                      labelIdle="Upload your picture"
+                      credits={false}
+                      acceptedFileTypes={["image/png", "image/jpeg"]}
+                      maxFileSize="2MB"
+                    />
+                  </Col>
+                </Row>
                 {messages.length == 0 && (
                   <Row>
                     <Col>
