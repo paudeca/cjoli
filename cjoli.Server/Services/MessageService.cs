@@ -160,7 +160,6 @@ namespace cjoli.Server.Services
             stream.Position = 0;
             streamSized.Position = 0;
 
-            await _storageService.SaveBlob(stream, uuid, name+"-2", contentType);
             string url = await _storageService.SaveBlob(streamSized, uuid, name, contentType);
 
             Message m = new Message()

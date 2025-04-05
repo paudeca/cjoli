@@ -222,6 +222,7 @@ namespace cjoli.Server.Controllers
 
         [HttpPost]
         [Route("{uuid}/Upload")]
+        [RequestSizeLimit(10_000_000)]
         public async Task<IActionResult> OnPostUploadAsync([FromRoute] string uuid,List<IFormFile> files)
         {
             long size = files.Sum(f => f.Length);
