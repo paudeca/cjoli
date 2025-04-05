@@ -33,6 +33,7 @@ export const useServer = () => {
   const uidDomain = host.split(".")[0];
   const isUseDomain =
     uidDomain &&
+    uidDomain != "61c140aa187f" &&
     uidDomain != "www" &&
     uidDomain != "cjoli-hockey" &&
     !uidDomain.startsWith("localhost");

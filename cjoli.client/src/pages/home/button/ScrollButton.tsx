@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { scroller, scrollSpy } from "react-scroll";
+import useScreenSize from "../../../hooks/useScreenSize";
 
 interface ScrollButtonProps {
   to: string;
@@ -9,6 +10,7 @@ interface ScrollButtonProps {
 }
 const ScrollButton = ({ to, icon, down }: ScrollButtonProps) => {
   const [show, setShow] = useState(true);
+  const { isMobile } = useScreenSize();
   useEffect(() => {
     scrollSpy.mount(document);
     scrollSpy.addSpyHandler((_x: number, y: number) => {
@@ -31,6 +33,7 @@ const ScrollButton = ({ to, icon, down }: ScrollButtonProps) => {
             onClick={() => scroller.scrollTo(to, {})}
             role="button"
             data-testid="scroll"
+            variant={isMobile ? "primary" : "light"}
           >
             {icon}
           </Button>

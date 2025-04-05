@@ -55,6 +55,7 @@ namespace cjoli.Server
 
             CreateMap<ScoreSquad, ScoreSquad>();
             CreateMap<Score, Score>();
+            CreateMap<Message, MessageDto>();
 
             CreateMap<User, UserDto>().ForMember(x => x.Password, opt => opt.Ignore());
             CreateMap<UserConfig, UserConfigDto>()

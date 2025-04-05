@@ -12,6 +12,7 @@ import { useCJoli } from "./useCJoli";
 import {
   EventPhase,
   Match,
+  Message,
   Phase,
   Position,
   Rank,
@@ -34,7 +35,7 @@ export const mutationOptions = <
 };
 
 const useApiGet = () => {
-  const { loadTourneys, loadRanking } = useCJoli();
+  const { loadTourneys, loadRanking, loadGallery } = useCJoli();
   const { loadUser } = useUser();
 
   const getUser = useCallback(
@@ -99,7 +100,26 @@ const useApiGet = () => {
       }),
     [loadRanking]
   );
-  return { getUser, listUsers, getTourneys, getTeams, getRanking };
+
+  const getGallery = useCallback(
+    // eslint-disable-next-line max-params
+    (uid: string, page: number, waiting: boolean, random: boolean) =>
+      queryOptions({
+        queryKey: ["getGallery", uid, page, waiting, random],
+        queryFn: async () => {
+          const gallery = await cjoliService.getGallery(
+            uid,
+            page,
+            waiting,
+            random
+          );
+          loadGallery(gallery);
+          return gallery;
+        },
+      }),
+    []
+  );
+  return { getUser, listUsers, getTourneys, getTeams, getRanking, getGallery };
 };
 
 const useApiPost = () => {
@@ -135,7 +155,30 @@ const useApiPost = () => {
       }),
     []
   );
-  return { saveTourney, saveUserAdminConfig };
+  const updateMessage = useCallback(
+    ({ uid, onSuccess }: { uid: string; onSuccess: () => void }) =>
+      mutationOptions({
+        mutationKey: ["updateMessage", uid],
+        mutationFn: async (message: Message) => {
+          await settingService.updateMessage({ uid, message });
+        },
+        onSuccess,
+      }),
+    []
+  );
+  const deleteMessage = useCallback(
+    ({ uid, onSuccess }: { uid: string; onSuccess: () => void }) =>
+      mutationOptions({
+        mutationKey: ["deleteMessage", uid],
+        mutationFn: async (message: Message) => {
+          await settingService.deleteMessage({ uid, message });
+        },
+        onSuccess,
+      }),
+    []
+  );
+
+  return { saveTourney, saveUserAdminConfig, updateMessage, deleteMessage };
 };
 
 const useApiDelete = () => {

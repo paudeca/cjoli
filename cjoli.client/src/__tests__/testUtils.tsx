@@ -132,6 +132,7 @@ export const createTourney = ({
     goalFor: 0,
   },
   rule: "simple",
+  messages: [],
 });
 
 export const createScore: () => Score = () => ({

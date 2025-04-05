@@ -8,10 +8,12 @@ namespace cjoli.Server.Services
     public class SettingService
     {
         private readonly IMemoryCache _memoryCache;
+        private readonly StorageService _storageService;
 
-        public SettingService(IMemoryCache memoryCache)
+        public SettingService(IMemoryCache memoryCache, StorageService storageService)
         {
             _memoryCache = memoryCache;
+            _storageService = storageService;
         }
 
         private M Import<M, D>(D dto, CJoliContext context, Func<M?> select, Func<M> create, Action<M> update, List<Action<M>>? children = null)
@@ -55,6 +57,8 @@ namespace cjoli.Server.Services
                     tourney.EndTime = tourneyDto.EndTime != DateTime.MinValue ? tourneyDto.EndTime : tourney.EndTime;
                     tourney.DisplayTime = tourneyDto.DisplayTime ?? tourney.DisplayTime;
                     tourney.Rule = tourneyDto.Rule ?? tourney.Rule;
+                    tourney.WhatsappNumber = tourneyDto.WhatsappNumber ?? tourney.WhatsappNumber;
+                    tourney.WhatsappNotif = tourneyDto.WhatsappNotif ?? tourney.WhatsappNotif;
 
                 },
                 children: [
@@ -231,16 +235,18 @@ namespace cjoli.Server.Services
                 select: () => phase.Events.SingleOrDefault(e => e.Id == eventDto.Id),
                 create: () =>
                 {
-                    var e = new Event() { Name = eventDto.Name};
+                    var e = new Event() { Name = eventDto.Name, EventType = eventDto.EventType};
                     phase.Events.Add(e);
                     return e;
                 },
                 update: e =>
                 {
                     e.Name = eventDto.Name;
+                    e.EventType = eventDto.EventType;
                     e.Time = eventDto.Time;
                     var positions = phase.Squads.SelectMany(s => s.Positions.Where(p=>eventDto.PositionIds.Contains(p.Id))).ToList();
                     e.Positions = positions;
+                    e.Datas = eventDto.Datas ?? e.Datas;
                 }
             );
         }
@@ -278,6 +284,25 @@ namespace cjoli.Server.Services
                 .Include(t => t.Ranks.OrderBy(r => r.Order))
                 .Single(t => t.Uid == uid);
         }
+
+        public void UpdateMessage(MessageDto dto, CJoliContext context)
+        {
+            Message message = context.Messages.Single(m => m.Id == dto.Id);
+            message.IsPublished = dto.IsPublished;
+            context.SaveChanges();
+        }
+
+        public void DeleteMessage(int msgId, string uid, CJoliContext context)
+        {
+            Message message = context.Messages.Single(m => m.Id == msgId);
+            if(message.MediaName!=null)
+            {
+                _storageService.DeleteBlob(uid, message.MediaName);
+            }
+            context.Messages.Remove(message);
+            context.SaveChanges();
+        }
+
 
         public void RemoveTourney(string uid, CJoliContext context)
         {

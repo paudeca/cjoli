@@ -19,13 +19,15 @@ namespace cjoli.Server.Controllers
         private readonly IMapper _mapper;
         private readonly CJoliContext _context;
         private readonly ILogger<UserController> _logger;
+        private readonly MessageService _messageService;
 
-        public UserController(UserService service, IMapper mapper, CJoliContext context, ILogger<UserController> logger)
+        public UserController(UserService service, IMapper mapper, CJoliContext context, ILogger<UserController> logger, MessageService messageService)
         {
             _service = service;
             _mapper = mapper;
             _context = context;
             _logger = logger;
+            _messageService = messageService;
         }
 
         private string? GetLogin()
@@ -76,6 +78,7 @@ namespace cjoli.Server.Controllers
             }
             string token = _service.Login(userDto.Login, userDto.Password, _context);
             _logger.LogDebug("User connected");
+            _messageService.CleanMessage(_context);
             return Results.Ok(token);
         }
 

@@ -26,10 +26,23 @@
     "useCustom": "utiliser l'estimation personnelle",
     "menu": "Menu",
     "setting": "Paramètres",
-    "admin": "Administration"
+    "admin": "Administration",
+    "gallery": "Photos",
+    "cast": "Diaporama"
   },
   "home": {
-    "tourneyNotConfigured": "Tournoi non configuré"
+    "tourneyNotConfigured": "Tournoi non configuré",
+    "noImage": "Aucune photo pour le tournoi"
+  },
+  "gallery": {
+    "sendPhoto": "Envoyez-nous vos photos",
+    "whatsapp": "WhatsApp",
+    "qrCode": "QRCode",
+    "selectImage": "Cliquez pour sélectionner votre image"
+  },
+  "event": {
+    "friendly": "🤝 Match amical",
+    "resurfacing": "🚛 Surfaçage"
   },
   "error": {
     "invalid": "{{field}} est invalide",

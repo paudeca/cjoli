@@ -20,6 +20,7 @@ const TitleMobile = () => {
   const { getSquad } = useCJoli();
   const { match, teamA, teamB, isSimulation } = useMatchRow();
   const squad = getSquad(match.squadId);
+  const { t } = useTranslation();
   return (
     <tr>
       <td colSpan={2}>
@@ -27,7 +28,10 @@ const TitleMobile = () => {
           {teamA && teamB && (
             <CompareButton team={teamA} teamB={teamB} squad={squad} />
           )}
-          {dayjs(match.time).format("LT")} - {squad?.name}
+          {dayjs(match.time).format("LT")} -{" "}
+          {!match.isEvent
+            ? squad?.name
+            : t("event.friendly", "🤝 Friendly match")}
           {match.location && ` - ${match.location}`}
           {!match.done && <SimulationIcon show={isSimulation} />}
           <BetScore match={match} />
@@ -39,8 +43,9 @@ const TitleMobile = () => {
 
 const CellViewMobile = () => {
   const { isConnected, isAdmin } = useUser();
-  const { match, imatch, clearMatch, isSimulation } = useMatchRow();
-  const couldDelete = isAdmin || (isConnected && isSimulation && !match.done);
+  const { match, imatch, clearMatch, isSimulation, modeCast } = useMatchRow();
+  const couldDelete =
+    !modeCast && (isAdmin || (isConnected && isSimulation && !match.done));
   return (
     <td>
       <MyScoreDiv isMobile>
@@ -60,10 +65,13 @@ const CellViewMobile = () => {
 const CellInputMobile = () => {
   const { isConnected, isAdmin } = useUser();
   const { t } = useTranslation();
-  const { saveMatch, updateMatch, register, match } = useMatchRow();
+  const { saveMatch, updateMatch, register, match, modeCast } = useMatchRow();
   const editMode =
-    isAdmin ||
-    (isConnected && match.time > dayjs().format("YYYY-MM-DDTHH:mm:ss"));
+    !modeCast &&
+    (isAdmin ||
+      (isConnected &&
+        !match.isEvent &&
+        match.time > dayjs().format("YYYY-MM-DDTHH:mm:ss")));
   return (
     <td>
       <MyScoreDiv isMobile>
@@ -95,18 +103,20 @@ const CellInputMobile = () => {
         )}
         {!editMode && (
           <CJoliTooltip info={t("match.simulated", "Simulated result")}>
-            <Stack style={{ color: "grey" }}>
+            <Stack style={{ color: "#aaaaaa" }}>
               <Row>
-                <Col>{match.estimate?.scoreA}</Col>
+                <Col>{!modeCast ? match.estimate?.scoreA : 0}</Col>
               </Row>
               <Row>
-                <Col>{match.estimate?.scoreB}</Col>
+                <Col>{!modeCast ? match.estimate?.scoreB : 0}</Col>
               </Row>
-              <Row>
-                <Col>
-                  <BracesAsterisk size={10} />
-                </Col>
-              </Row>
+              {!modeCast && (
+                <Row>
+                  <Col>
+                    <BracesAsterisk size={10} />
+                  </Col>
+                </Row>
+              )}
             </Stack>
           </CJoliTooltip>
         )}

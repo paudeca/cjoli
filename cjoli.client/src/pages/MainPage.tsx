@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import { ToastContainer, Toast, Stack } from "react-bootstrap";
+import { ToastContainer, Toast, Stack, Button } from "react-bootstrap";
 import { Outlet, useLocation } from "react-router-dom";
 import Loading from "../components/Loading";
 import MenuNav from "./menu/MenuNav";
@@ -21,11 +21,15 @@ import { useServer } from "../hooks/useServer";
 import { useApi } from "../hooks/useApi";
 import ScrollButton from "./home/button/ScrollButton";
 import { Match } from "../models";
-import { ArrowDown, ArrowUp } from "react-bootstrap-icons";
+import { ArrowDown, ArrowUp, Upload } from "react-bootstrap-icons";
 import { Global, ThemeProvider } from "@emotion/react";
 import { useLogger } from "../hooks/useLogger";
 import { useGlobal } from "../styles";
 import InfoModal from "../components/InfoModal";
+import ImageModal from "../modals/ImageModal";
+import UploadImageModal from "../modals/UploadImageModal";
+import { useModal } from "../hooks/useModal";
+import useScreenSize from "../hooks/useScreenSize";
 
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
@@ -46,6 +50,7 @@ const MainPage = () => {
     teams,
     setColor,
     isHomePage,
+    isCastPage,
     daySelected,
   } = useCJoli();
   const uid = useUid();
@@ -63,6 +68,7 @@ const MainPage = () => {
       secondary,
     },
   };
+  const { isMobile } = useScreenSize();
 
   useQuery(getUser());
 
@@ -116,6 +122,7 @@ const MainPage = () => {
   }, [location.pathname, logger]);
 
   const style = useGlobal(theme);
+  const { setShow: showUploadImage } = useModal("uploadImage");
 
   return (
     <ThemeProvider theme={theme}>
@@ -123,21 +130,32 @@ const MainPage = () => {
       <Loading ready={!isLoading}>
         <MenuNav />
         <Outlet />
-        <ButtonFixed>
-          <Stack gap={1}>
-            {isHomePage && (
-              <ScrollButton to="ranking" icon={<ArrowUp />} down={false} />
-            )}
-            {nextMatch && (
-              <ScrollButton
-                to={`match-${nextMatch.id}`}
-                icon={<ArrowDown />}
-                down
-              />
-            )}
-            {uid && !isOnChat && <ChatButton />}
-          </Stack>
-        </ButtonFixed>
+        {!isCastPage && (
+          <ButtonFixed>
+            <Stack gap={1}>
+              {isHomePage && (
+                <ScrollButton to="ranking" icon={<ArrowUp />} down={false} />
+              )}
+              {isHomePage && nextMatch && (
+                <ScrollButton
+                  to={`match-${nextMatch.id}`}
+                  icon={<ArrowDown />}
+                  down
+                />
+              )}
+              {uid && (
+                <Button
+                  variant={isMobile ? "primary" : "light"}
+                  onClick={() => showUploadImage(true)}
+                >
+                  {!isMobile && t("gallery.sendPhoto", "Send your photo")}
+                  <Upload className="mx-1" />
+                </Button>
+              )}
+              {uid && !isOnChat && <ChatButton />}
+            </Stack>
+          </ButtonFixed>
+        )}
         <ToastContainer position="top-end" className="position-fixed">
           <Toast
             onClose={hideToast}
@@ -169,6 +187,8 @@ const MainPage = () => {
             </Trans>
           </p>
         </InfoModal>
+        <ImageModal />
+        <UploadImageModal />
       </Loading>
     </ThemeProvider>
   );

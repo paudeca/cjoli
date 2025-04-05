@@ -12,11 +12,14 @@
         public DateTime? DisplayTime { get;set; }
         public string? Rule { get; set; }
         public TourneyConfigDto? Config { get; set; }
+        public string? WhatsappNumber { get; set; }
+        public string? WhatsappNotif { get; set; }
 
 
         public List<PhaseDto> Phases { get; set; } = new List<PhaseDto>();
         public List<TeamDto> Teams { get; set; } = new List<TeamDto>();
         public List<RankDto> Ranks { get; set; } = new List<RankDto>();
+        public List<MessageDto> Messages { get; set; } = new List<MessageDto>();
 
 
     }

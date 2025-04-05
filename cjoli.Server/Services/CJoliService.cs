@@ -28,7 +28,15 @@ namespace cjoli.Server.Services
 
         private readonly Dictionary<string, IRule> _rules = new Dictionary<string, IRule>();
 
-        public CJoliService(EstimateService estimateService, ServerService serverService, UserService userService, IMapper mapper, IServiceProvider service, ILogger<CJoliService> logger, IMemoryCache memoryCache, IConfiguration configuration)
+        public CJoliService(
+            EstimateService estimateService,
+            ServerService serverService,
+            UserService userService,
+            IMapper mapper,
+            IServiceProvider service,
+            ILogger<CJoliService> logger,
+            IMemoryCache memoryCache,
+            IConfiguration configuration)
         {
             _estimateService = estimateService;
             _serverService = serverService;
@@ -103,9 +111,10 @@ namespace cjoli.Server.Services
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(
                     m => m.Estimates.Where(s => user != null && user.HasCustomEstimate() ? s.User == user : s.User == null)
                  )
-                .Include(t => t.Phases).ThenInclude(p => p.Events).ThenInclude(e => e.Positions)
+                .Include(t => t.Phases).ThenInclude(p => p.Events.OrderBy(e => e.Time)).ThenInclude(e => e.Positions)
                 .Include(t => t.Teams).ThenInclude(t => t.TeamDatas.Where(d => d.Tourney.Uid == tourneyUid))
                 .Include(t => t.Teams).ThenInclude(t => t.Alias)
+                //.Include(t => t.Messages.Where(m=>m.MessageType=="image").OrderByDescending(m=>m.Time))
                 .FirstOrDefault(t => t.Uid == tourneyUid);
 
             if (tourney == null)
@@ -174,6 +183,35 @@ namespace cjoli.Server.Services
             }
             _logger.LogInformation($"Time[CreateRanking]:{sw.ElapsedMilliseconds}ms");
             return map![loginKey];
+        }
+
+        public GalleryDto CreateGallery(string uuid, int page, string? login, bool waiting, bool random, CJoliContext context)
+        {
+            User? user = GetUserWithConfig(login, uuid, context);
+            bool isAdmin = user.IsAdmin(uuid);
+            if(!isAdmin)
+            {
+                waiting = false;
+            }
+
+
+            var query = context.Messages.Where(m=>m.Tourney.Uid== uuid && m.MessageType=="image").OrderByDescending(m=>m.Time);
+            int countWaiting = query.Where(m => !m.IsPublished).Count();
+            int count = query.Where(m=>m.IsPublished == !waiting).Count();
+            int pageSize = 12;
+            List<Message> messages;
+            if(random && count> pageSize)
+            {
+                Random rand = new Random();
+                int skipper = rand.Next(0, count - pageSize);
+                messages = query.Where(m => m.IsPublished == !waiting).Skip(skipper).Take(pageSize).ToList();
+            }
+            else
+            {
+                messages = query.Where(m => m.IsPublished == !waiting).Skip(pageSize * page).Take(pageSize).ToList();
+            }
+            var m = _mapper.Map<List<MessageDto>>(messages);
+            return new GalleryDto() { Page = page, PageSize = pageSize, Total=count, TotalWaiting=countWaiting, Messages = m };
         }
 
         private void UpdateEstimate(string uuid, string login, CJoliContext context)
@@ -911,6 +949,15 @@ namespace cjoli.Server.Services
                 throw new NotFoundException("User", login ?? "no login");
             }
             _userService.SaveUserConfig(tourney, user, dto, context);
+            ClearCache(uuid, user);
+        }
+
+        public void UpdateEvent(string uuid, string? login, EventDto dto, CJoliContext context)
+        {
+            User? user = GetUserWithConfig(login, uuid, context);
+            Event evt = context.Event.Single(e => e.Id == dto.Id);
+            evt.Datas = dto.Datas;
+            context.SaveChanges();
             ClearCache(uuid, user);
         }
 

@@ -13,7 +13,7 @@ import CJoliStack from "../../components/CJoliStack";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCJoli } from "../../hooks/useCJoli";
 import dayjs from "dayjs";
-import React from "react";
+import React, { useEffect } from "react";
 import { Team } from "../../models";
 import { ArrowLeft } from "react-bootstrap-icons";
 import useScreenSize from "../../hooks/useScreenSize";
@@ -24,31 +24,44 @@ import TeamTable from "./team/TeamTable";
 import TeamTime from "./team/TeamTime";
 import { useModal } from "../../hooks/useModal";
 import { Trans } from "react-i18next";
-import Select, { SingleValue } from "react-select";
+import TeamSelect from "../../components/TeamSelect";
 
-const TeamStack = () => {
-  const { teams, getTeam, getTeamRank, tourney } = useCJoli();
-  const { teamId } = useParams();
+interface TeamStackProps extends JSX.IntrinsicAttributes {
+  teamId?: number;
+  teamIdB?: number;
+  modeCast?: boolean;
+}
+
+const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
+  const { teams, getTeam, getTeamRank, tourney, isCastPage } = useCJoli();
+  const { teamId: teamIdParam } = useParams();
   const { isMobile } = useScreenSize();
-  const [teamB, setTeamB] = React.useState<Team | undefined>(undefined);
+  const [teamB, setTeamB] = React.useState<Team | undefined>(
+    teamIdB ? getTeam(teamIdB) : undefined
+  );
   const { setShow: showTeam } = useModal("team");
   const { isRootAdmin } = useUser();
   const navigate = useNavigate();
   const [activeKey, setActiveKey] = React.useState("general");
 
-  const team = getTeam(parseInt(teamId!));
+  useEffect(() => {
+    if (teamIdB) {
+      setTeamB(getTeam(teamIdB));
+    }
+  }, [teamIdB, setTeamB, getTeam]);
+
+  const team = getTeam(teamId ?? parseInt(teamIdParam!));
   if (!team) {
     return <>No team found</>;
   }
   const rank = getTeamRank(team);
 
-  const onChange = (v: SingleValue<{ label: string; value: number }>) => {
-    const value = v?.value;
-    value && setTeamB(getTeam(value));
-  };
-
   return (
-    <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="team">
+    <CJoliStack
+      gap={0}
+      className={`${isCastPage ? "col-md-10" : "col-md-8"} mx-auto mt-5`}
+      data-testid="team"
+    >
       <div className="p-2">
         <CJoliCard>
           <Card.Header>
@@ -72,44 +85,52 @@ const TeamStack = () => {
             </Stack>
           </Card.Header>
           <Card.Body>
-            <Nav variant="underline" defaultActiveKey={activeKey}>
-              <Nav.Item>
-                <Nav.Link
-                  eventKey="general"
-                  onClick={() => setActiveKey("general")}
-                >
-                  <Trans i18nKey="team.chart.general">General</Trans>
-                </Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link
-                  eventKey="timeline"
-                  onClick={() => setActiveKey("timeline")}
-                >
-                  <Trans i18nKey="team.chart.timeline">Timeline</Trans>
-                </Nav.Link>
-              </Nav.Item>
-            </Nav>
+            {!modeCast && (
+              <Nav variant="underline" defaultActiveKey={activeKey}>
+                <Nav.Item>
+                  <Nav.Link
+                    eventKey="general"
+                    onClick={() => setActiveKey("general")}
+                  >
+                    <Trans i18nKey="team.chart.general">General</Trans>
+                  </Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link
+                    eventKey="timeline"
+                    onClick={() => setActiveKey("timeline")}
+                  >
+                    <Trans i18nKey="team.chart.timeline">Timeline</Trans>
+                  </Nav.Link>
+                </Nav.Item>
+              </Nav>
+            )}
             {activeKey == "general" && (
               <Card className="p-2">
                 <Stack className="py-3">
                   <Form className="mx-auto">
-                    <Row className="align-items-center">
+                    <Row
+                      className={`align-items-center ${!isMobile ? "flex-nowrap" : ""}`}
+                    >
                       <Col xs="auto">
                         <Form.Label as="h4">{team?.name}</Form.Label>
                       </Col>
                       <Col xs="auto">
                         <Badge bg="secondary">VS</Badge>
                       </Col>
-                      <Col xs="auto">
-                        <Select
-                          options={teams
-                            ?.filter((t) => t.id != team.id)
-                            .map((t) => ({ value: t.id, label: t.name }))}
-                          onChange={onChange}
-                          isClearable
-                        />
-                      </Col>
+                      {!modeCast && (
+                        <Col xs={12}>
+                          <TeamSelect
+                            teams={teams?.filter((t) => t.id != team?.id) ?? []}
+                            onChangeTeam={(team) => setTeamB(team)}
+                          />
+                        </Col>
+                      )}
+                      {modeCast && (
+                        <Col xs={12}>
+                          <Form.Label as="h4">{teamB?.name}</Form.Label>
+                        </Col>
+                      )}
                     </Row>
                   </Form>
                 </Stack>
@@ -127,18 +148,20 @@ const TeamStack = () => {
               </Card>
             )}
 
-            <Stack direction="horizontal" className="p-3">
-              <Button variant="primary" onClick={() => navigate(-1)}>
-                <ArrowLeft /> <Trans i18nKey="button.back">Back</Trans>
-              </Button>
-              {isRootAdmin && (
-                <div className="ms-auto">
-                  <Button variant="primary" onClick={() => showTeam(true)}>
-                    <Trans i18nKey="button.edit">Edit</Trans>
-                  </Button>
-                </div>
-              )}
-            </Stack>
+            {!modeCast && (
+              <Stack direction="horizontal" className="p-3">
+                <Button variant="primary" onClick={() => navigate(-1)}>
+                  <ArrowLeft /> <Trans i18nKey="button.back">Back</Trans>
+                </Button>
+                {isRootAdmin && (
+                  <div className="ms-auto">
+                    <Button variant="primary" onClick={() => showTeam(true)}>
+                      <Trans i18nKey="button.edit">Edit</Trans>
+                    </Button>
+                  </div>
+                )}
+              </Stack>
+            )}
           </Card.Body>
         </CJoliCard>
       </div>

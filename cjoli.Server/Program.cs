@@ -14,6 +14,7 @@ using cjoli.Server.Middlewares;
 using Serilog.Enrichers.Sensitive;
 using cjoli.Server.Authorizations;
 using Microsoft.AspNetCore.Authorization;
+using Google.Apis.Auth.OAuth2;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -94,6 +95,9 @@ builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<EstimateService>();
 builder.Services.AddSingleton<AIService>();
 builder.Services.AddSingleton<ServerService>();
+builder.Services.AddSingleton<MessageService>();
+builder.Services.AddSingleton<TwilioService>();
+builder.Services.AddSingleton<StorageService>();
 builder.Services.AddSingleton(new OpenAIClient(builder.Configuration["OpenAIKey"]));
 builder.Services.AddSingleton<LoggerMiddleware>();
 
@@ -154,6 +158,5 @@ app.UseMiddleware<LoggerMiddleware>();
 app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
-
 
 app.Run();

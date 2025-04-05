@@ -19,7 +19,7 @@ export const bgSecondary = ({ theme }: { theme: Theme }) =>
 export const useGlobal = (theme: Theme) => {
   const { lightness, isWhite } = useColor();
   const {
-    theme: { primary },
+    theme: { primary, secondary },
   } = useCJoli();
 
   return css`
@@ -55,19 +55,19 @@ export const useGlobal = (theme: Theme) => {
       --bs-btn-disabled-color: ${isWhite(primary) ? "black" : "white"};
     }
     .btn-outline-primary {
-      --bs-btn-color: ${primary};
-      --bs-btn-border-color: ${primary};
+      --bs-btn-color: ${isWhite(primary) ? secondary : primary};
+      --bs-btn-border-color: ${isWhite(primary) ? secondary : primary};
       --bs-btn-hover-color: #fff;
-      --bs-btn-hover-bg: ${primary};
-      --bs-btn-hover-border-color: ${primary};
+      --bs-btn-hover-bg: ${isWhite(primary) ? secondary : primary};
+      --bs-btn-hover-border-color: ${isWhite(primary) ? secondary : primary};
       --bs-btn-focus-shadow-rgb: 13, 110, 253;
       --bs-btn-active-color: #fff;
-      --bs-btn-active-bg: ${primary};
-      --bs-btn-active-border-color: ${primary};
+      --bs-btn-active-bg: ${isWhite(primary) ? secondary : primary};
+      --bs-btn-active-border-color: ${isWhite(primary) ? secondary : primary};
       --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-      --bs-btn-disabled-color: ${primary};
+      --bs-btn-disabled-color: ${isWhite(primary) ? secondary : primary};
       --bs-btn-disabled-bg: transparent;
-      --bs-btn-disabled-border-color: ${primary};
+      --bs-btn-disabled-border-color: ${isWhite(primary) ? secondary : primary};
       --bs-gradient: none;
     }
     .progress {

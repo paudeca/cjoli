@@ -17,6 +17,8 @@ namespace cjoli.Server.Models
         public string? Season { get; set; }
         public string? Category { get; set; }
         public string? Rule { get; set; }
+        public string? WhatsappNumber { get; set; }
+        public string? WhatsappNotif { get; set; }
 
         [NotMapped]
         public IRule? Config { get; set; }
@@ -25,5 +27,6 @@ namespace cjoli.Server.Models
         public List<Phase> Phases { get; set; } = new List<Phase>();
         public IList<Rank> Ranks { get; set; } = new List<Rank>();
         public IList<TeamData> TeamDatas { get; set; } = new List<TeamData>();
+        public IList<Message> Messages { get; set; } = new List<Message>();
     }
 }

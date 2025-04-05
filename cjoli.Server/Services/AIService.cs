@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Twilio.Base;
 
 namespace cjoli.Server.Services
 {
@@ -17,6 +18,7 @@ namespace cjoli.Server.Services
     {
         private readonly IMapper _mapper;
         private readonly OpenAIClient _openAIClient;
+        private readonly IConfiguration _configuration;
 
         private readonly Dictionary<string, string> LANGS = new Dictionary<string, string>{
             { "fr", "français" },
@@ -27,10 +29,11 @@ namespace cjoli.Server.Services
             { "nl", "hollandais" }
         };
 
-        public AIService(IMapper mapper, OpenAIClient openAIClient)
+        public AIService(IMapper mapper, OpenAIClient openAIClient, IConfiguration configuration)
         {
             _mapper = mapper;
             _openAIClient = openAIClient;
+            _configuration = configuration;
         }
 
 
@@ -49,8 +52,9 @@ namespace cjoli.Server.Services
 
 
 
-        public ChatSession CreateSessionForChat(string uuid, string lang, string? login, RankingDto dto, CJoliContext context)
+        public ChatSession CreateSessionForChat(string uuid, string? lang, string? login, RankingDto dto, CJoliContext context)
         {
+            var source = _configuration["Source"];
             Tourney? tourney = context.Tourneys.SingleOrDefault(t => t.Uid == uuid);
             if (tourney == null)
             {
@@ -63,13 +67,17 @@ namespace cjoli.Server.Services
             {
                 user = context.Users
                     .Include(u => u.Configs.Where(c => c.Tourney == tourney)).ThenInclude(c => c.FavoriteTeam)
-                    .SingleOrDefault(u => u.Id == 1);
+                    .Where(u=> u.Source == source)
+                    .OrderBy(u=>u.Id)
+                    .FirstOrDefault();
                 config = user!=null && user.Configs.Count>0 ?user.Configs[0] : null;
             }
 
+            string langPrompt = lang != null ? $"tu réponds en {LANGS[lang]} parfois avec des émoticones." : "tu réponds parfois avec des émoticones.";
             string prompt = "" +
-@"Tu es assistant durant le tournois d'Hockey sur glace '" + tourney.Name + @"', tu réponds en " + LANGS[lang] + @" avec parfois des emoticones.
-Les réponses ne doivent pas dépasser 5 phrases.
+@$"Tu es assistant durant le tournois d'Hockey sur glace '{tourney.Name}', {langPrompt}.
+Si l'utilisateur envoie une image, remercie le et indique lui que tu as bien reçu l'image.
+Les réponses ne doivent pas dépasser 3 phrases.
 Ton premier message est un message d'accueil en soutenant une équipe. ";
             //Ton premier message doit indiquer que tu es dans une phase de Beta, et que les réponses ne sont pas fiables. ";
             if (config != null && config.FavoriteTeam != null)

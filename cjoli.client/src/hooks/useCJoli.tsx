@@ -1,6 +1,7 @@
 import { useCallback, useContext, useEffect } from "react";
 import { CJoliContext } from "../contexts/CJoliContext";
 import {
+  Gallery,
   Match,
   Phase,
   Rank,
@@ -39,6 +40,12 @@ export const useCJoli = (page?: TypePage) => {
   const loadTourney = useCallback(
     (tourney: Tourney) =>
       dispatch({ type: CJoliActions.LOAD_TOURNEY, payload: tourney }),
+    [dispatch]
+  );
+
+  const loadGallery = useCallback(
+    (gallery: Gallery) =>
+      dispatch({ type: CJoliActions.LOAD_GALLERY, payload: gallery }),
     [dispatch]
   );
 
@@ -181,6 +188,7 @@ export const useCJoli = (page?: TypePage) => {
 
   return {
     ...state,
+    loadGallery,
     loadRanking,
     loadTourneys,
     loadTourney,
@@ -202,5 +210,6 @@ export const useCJoli = (page?: TypePage) => {
     setColor,
     selectPage,
     isHomePage: state.page == "home",
+    isCastPage: state.page == "cast",
   };
 };

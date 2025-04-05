@@ -47,6 +47,7 @@ namespace cjoli.Server.Controllers
             return _mapper.Map<TourneyDto>(_settingService.Import(tourney, _context));
         }
 
+
         [HttpPost]
         [Route("User/{user}/admins")]
         [Authorize("IsRootAdmin")]
@@ -54,6 +55,25 @@ namespace cjoli.Server.Controllers
         {
             _userService.SaveUserAdmins(user, tourneys, _context);
         }
+
+        [HttpPost]
+        [Route("{uid}/Message")]
+        [Authorize("IsAdmin")]
+        public async void UpdateMessage(string uid, MessageDto message)
+        {
+            await _authorizationService.AuthorizeAsync(User, uid, "EditTourney");
+            _settingService.UpdateMessage(message, _context);
+        }
+
+        [HttpDelete]
+        [Route("{uid}/Message/{msgId}")]
+        [Authorize("IsAdmin")]
+        public async void DeleteMessage(string uid, int msgId)
+        {
+            await _authorizationService.AuthorizeAsync(User, uid, "EditTourney");
+            _settingService.DeleteMessage(msgId, uid, _context);
+        }
+
 
         [HttpDelete]
         [Route("Tourney/{uid}")]

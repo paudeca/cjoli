@@ -7,6 +7,8 @@ import {
   Tourney,
   UserConfig,
   Position,
+  Gallery,
+  EventPhase,
 } from "../models";
 import Cookie from "universal-cookie";
 
@@ -120,6 +122,18 @@ export const clearMatch = async (uid: string, match: Match) => {
   return data;
 };
 
+export const updateEvent = async (
+  uid: string,
+  event: EventPhase,
+  params: object
+) => {
+  const { data } = await axios.post(`${url}/cjoli/${uid}/updateEvent`, {
+    ...event,
+    datas: JSON.stringify(params),
+  });
+  return data;
+};
+
 export const clearSimulations = async (uid: string, ids: number[]) => {
   const { data } = await axios.post(
     `${url}/cjoli/${uid}/clearSimulations`,
@@ -145,5 +159,18 @@ export const saveUserConfig = async (uid: string, userConfig: UserConfig) => {
 
 export const prompt = async (uid: string, lang: string) => {
   const { data } = await axios.get(`${url}/cjoli/${uid}/prompt?lang=${lang}`);
+  return data;
+};
+
+export const getGallery = async (
+  uid: string,
+  page: number,
+  waiting: boolean,
+  random: boolean
+  // eslint-disable-next-line max-params
+) => {
+  const { data } = await axios.get<Gallery>(
+    `${url}/cjoli/${uid}/gallery/${page}${waiting ? "?waiting=true" : ""}${random ? "?random=true" : ""}`
+  );
   return data;
 };

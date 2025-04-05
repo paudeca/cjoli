@@ -7,6 +7,7 @@ const useUid = () => {
   const uidDomain = host.split(".")[0];
   if (
     uidDomain &&
+    uidDomain != "61c140aa187f" &&
     uidDomain != "www" &&
     uidDomain != "cjoli-hockey" &&
     !uidDomain.startsWith("localhost")

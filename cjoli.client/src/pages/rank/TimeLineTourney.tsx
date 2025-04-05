@@ -24,7 +24,7 @@ const TimeLineTourney = () => {
     { id: "shutOut", label: t("rank.shutOut", "ShutOut") },
     { id: "goalDiff", label: t("rank.goalDiff", "Goal average") },
   ];
-  if (tourney?.config.hasPenalty) {
+  if (tourney?.config?.hasPenalty) {
     options = [
       ...options,
       { id: "penalty", label: t("rank.penalty", "Penalties") },

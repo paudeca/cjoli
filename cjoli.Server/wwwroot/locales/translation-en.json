@@ -26,10 +26,23 @@
     "useCustom": "use personal estimate",
     "menu": "Menu",
     "setting": "Setting",
-    "admin": "Administration"
+    "admin": "Administration",
+    "gallery": "Photos",
+    "cast": "Slideshow"
   },
   "home": {
-    "tourneyNotConfigured": "Tourney not configured"
+    "tourneyNotConfigured": "Tourney not configured",
+    "noImage": "No photos for the tourney"
+  },
+  "gallery": {
+    "sendPhoto": "Send your photos",
+    "whatsapp": "WhatsApp",
+    "qrCode": "QRCode",
+    "selectImage": "Click to select your image"
+  },
+  "event": {
+    "friendly": "🤝 Friendly match",
+    "resurfacing": "🚛 Resurfacing"
   },
   "error": {
     "invalid": "{{field}} is invalid",

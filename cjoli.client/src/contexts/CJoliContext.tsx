@@ -1,6 +1,7 @@
 import React, { Dispatch } from "react";
 import {
   EventPhase,
+  Gallery,
   Match,
   Phase,
   Position,
@@ -29,6 +30,7 @@ interface CJoliState {
     secondary: string;
   };
   page: TypePage;
+  gallery?: Gallery;
 }
 
 export const CJoliContext = React.createContext<{
@@ -69,7 +71,8 @@ type Action =
   | {
       type: CJoliActions.SELECT_PAGE;
       payload: TypePage;
-    };
+    }
+  | { type: CJoliActions.LOAD_GALLERY; payload: Gallery };
 
 const reduceLoadRanking = (state: CJoliState, ranking: Ranking) => {
   const tourney = ranking.tourney;
@@ -144,6 +147,9 @@ const reducer = (state: CJoliState, action: Action) => {
     }
     case CJoliActions.SELECT_PAGE: {
       return { ...state, page: action.payload };
+    }
+    case CJoliActions.LOAD_GALLERY: {
+      return { ...state, gallery: action.payload };
     }
   }
 };

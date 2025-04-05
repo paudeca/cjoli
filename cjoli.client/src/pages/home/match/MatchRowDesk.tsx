@@ -20,16 +20,19 @@ const CellInputDesk = () => {
   const { isConnected, isAdmin } = useUser();
   const { t } = useTranslation();
   const { getSquad } = useCJoli();
-  const { match, saveMatch, updateMatch, register, teamA, teamB } =
+  const { match, saveMatch, updateMatch, register, teamA, teamB, modeCast } =
     useMatchRow();
   const editMode =
-    isAdmin ||
-    (isConnected && match.time > dayjs().format("YYYY-MM-DDTHH:mm:ss"));
+    !modeCast &&
+    (isAdmin ||
+      (isConnected &&
+        !match.isEvent &&
+        match.time > dayjs().format("YYYY-MM-DDTHH:mm:ss")));
 
   return (
     <td>
       <MyScoreDiv isMobile={false}>
-        {!editMode && (
+        {!editMode && !modeCast && (
           <CJoliTooltip info={t("match.simulated", "Simulated result")}>
             <Row style={{ color: "#aaaaaa" }}>
               <Col>{match.estimate?.scoreA}</Col>
@@ -37,7 +40,7 @@ const CellInputDesk = () => {
           </CJoliTooltip>
         )}
 
-        {teamA && teamB && (
+        {teamA && teamB && !modeCast && (
           <CompareButton
             team={teamA}
             teamB={teamB}
@@ -45,7 +48,7 @@ const CellInputDesk = () => {
           />
         )}
 
-        {!editMode && (
+        {!editMode && !modeCast && (
           <CJoliTooltip info={t("match.simulated", "Simulated result")}>
             <Stack direction="horizontal" style={{ color: "#aaaaaa" }}>
               <Row>
@@ -59,6 +62,7 @@ const CellInputDesk = () => {
             </Stack>
           </CJoliTooltip>
         )}
+        {modeCast && <span style={{ color: "#aaaaaa" }}>0 - 0</span>}
 
         {editMode && (
           <>
@@ -100,9 +104,10 @@ const CellInputDesk = () => {
 const CellViewDesk = () => {
   const { getSquad } = useCJoli();
   const { isConnected, isAdmin } = useUser();
-  const { match, imatch, clearMatch, teamA, teamB, isSimulation } =
+  const { match, imatch, clearMatch, teamA, teamB, isSimulation, modeCast } =
     useMatchRow();
-  const couldDelete = isAdmin || (isConnected && isSimulation && !match.done);
+  const couldDelete =
+    !modeCast && (isAdmin || (isConnected && isSimulation && !match.done));
 
   return (
     <td>
@@ -136,6 +141,7 @@ const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
   const { getSquad } = useCJoli();
   const { match, imatch, isSimulation, done, hasLocation } = useMatchRow();
   const squad = getSquad(match.squadId);
+  const { t } = useTranslation();
   return (
     <tr data-testid={`match-${match.id}`}>
       {index == 0 && (
@@ -143,7 +149,9 @@ const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
       )}
       <td>
         <LeftCenterDiv>
-          {squad?.name}
+          {!match.isEvent
+            ? squad?.name
+            : t("event.friendly", "🤝 Friendly match")}
           {!match.done && <SimulationIcon show={isSimulation} />}
           <BetScore match={match} />
         </LeftCenterDiv>

@@ -11,10 +11,11 @@ import { useServer } from "../../hooks/useServer";
 
 interface RankingStackProps extends JSX.IntrinsicAttributes {
   phase: Phase;
+  modeCast?: boolean;
 }
 
-const RankingStack = ({ phase }: RankingStackProps) => {
-  const { phases, selectDay } = useCJoli();
+const RankingStack = ({ phase, modeCast }: RankingStackProps) => {
+  const { phases, selectDay, isCastPage } = useCJoli();
   const { path } = useServer();
   const navigate = useNavigate();
   const { phaseId, squadId } = useParams();
@@ -30,22 +31,28 @@ const RankingStack = ({ phase }: RankingStackProps) => {
   };
 
   return (
-    <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="ranking">
+    <CJoliStack
+      gap={0}
+      className={`${isCastPage ? "col-md-10" : "col-md-8"} mx-auto mt-5`}
+      data-testid="ranking"
+    >
       <div className="p-2">
         <CJoliCard>
           <Element name="ranking">
             <Loading ready={!!phases && !!phase}>
-              <Card.Header>
-                <Nav variant="underline" activeKey={`${phase?.id}`}>
-                  {filterPhases.map((phase) => (
-                    <Nav.Item key={phase.id}>
-                      <Nav.Link onClick={() => handleClick(phase)}>
-                        {phase.name}
-                      </Nav.Link>
-                    </Nav.Item>
-                  ))}
-                </Nav>
-              </Card.Header>
+              {!modeCast && (
+                <Card.Header>
+                  <Nav variant="underline" activeKey={`${phase?.id}`}>
+                    {filterPhases.map((phase) => (
+                      <Nav.Item key={phase.id}>
+                        <Nav.Link onClick={() => handleClick(phase)}>
+                          {phase.name}
+                        </Nav.Link>
+                      </Nav.Item>
+                    ))}
+                  </Nav>
+                </Card.Header>
+              )}
               <RankTable phase={phase} />
             </Loading>
           </Element>

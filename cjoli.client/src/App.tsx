@@ -14,6 +14,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useServer } from "./hooks/useServer";
 import TeamPage from "./pages/TeamPage";
 import AdminPage from "./pages/AdminPage";
+import GalleryPage from "./pages/GalleryPage";
+import CastPage from "./pages/CastPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,7 +42,7 @@ const App = () => {
           element: <HomePage />,
         },
         {
-          path: isUseDomain ? "ranking" : ":uid/ranking/:mode?",
+          path: isUseDomain ? "ranking/:mode?" : ":uid/ranking/:mode?",
           element: <RankPage />,
         },
         {
@@ -67,6 +69,14 @@ const App = () => {
         {
           path: isUseDomain ? "setting" : ":uid/setting",
           element: <SettingPage />,
+        },
+        {
+          path: isUseDomain ? "cast" : ":uid/cast",
+          element: <CastPage />,
+        },
+        {
+          path: isUseDomain ? "gallery/:mode?" : ":uid/gallery/:mode?",
+          element: <GalleryPage />,
         },
       ],
     },
