@@ -4,6 +4,7 @@ using cjoli.Server.Models.AI;
 using cjoli.Server.Models.Twilio;
 using Microsoft.EntityFrameworkCore;
 using PhotoSauce.MagicScaler;
+using PhotoSauce.NativeCodecs.Libpng;
 using System;
 using System.Text.Json;
 using Twilio.Rest.Api.V2010.Account;
@@ -146,7 +147,6 @@ namespace cjoli.Server.Services
             {
                 throw new NotFoundException("Tourney", uuid);
             }
-
             var settings = new ProcessImageSettings()
             {
                 Width = 600,

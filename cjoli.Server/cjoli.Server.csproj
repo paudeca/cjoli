@@ -36,6 +36,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0" />
     <PackageReference Include="PhotoSauce.MagicScaler" Version="0.15.0" />
+    <PackageReference Include="PhotoSauce.NativeCodecs.Libjpeg" Version="3.0.4-preview1" />
+    <PackageReference Include="PhotoSauce.NativeCodecs.Libpng" Version="1.6.44-preview1" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
     <PackageReference Include="Serilog.Enrichers.Sensitive" Version="1.7.3" />
     <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />

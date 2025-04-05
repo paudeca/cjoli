@@ -15,6 +15,9 @@ using Serilog.Enrichers.Sensitive;
 using cjoli.Server.Authorizations;
 using Microsoft.AspNetCore.Authorization;
 using Google.Apis.Auth.OAuth2;
+using PhotoSauce.MagicScaler;
+using PhotoSauce.NativeCodecs.Libpng;
+using PhotoSauce.NativeCodecs.Libjpeg;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -158,5 +161,12 @@ app.UseMiddleware<LoggerMiddleware>();
 app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
+
+CodecManager.Configure(c =>
+{
+    c.UseLibpng();
+    c.UseLibjpeg();
+});
+
 
 app.Run();
