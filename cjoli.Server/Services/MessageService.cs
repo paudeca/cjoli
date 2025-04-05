@@ -3,6 +3,7 @@ using cjoli.Server.Models;
 using cjoli.Server.Models.AI;
 using cjoli.Server.Models.Twilio;
 using Microsoft.EntityFrameworkCore;
+using PhotoSauce.MagicScaler;
 using System;
 using System.Text.Json;
 using Twilio.Rest.Api.V2010.Account;
@@ -146,15 +147,28 @@ namespace cjoli.Server.Services
                 throw new NotFoundException("Tourney", uuid);
             }
 
+            var settings = new ProcessImageSettings()
+            {
+                Width = 600,
+            };
+            using var streamSized = new MemoryStream(); 
+            MagicImageProcessor.ProcessImage(stream, streamSized, settings);
+
             string messageId = Guid.NewGuid().ToString();
             string name = $"{DateTime.Now.ToString("yyyy-MM-dd")}/{messageId}";
-            string url = await _storageService.SaveBlob(stream, uuid, name, contentType);
+
+            stream.Position = 0;
+            streamSized.Position = 0;
+
+            await _storageService.SaveBlob(stream, uuid, name+"-2", contentType);
+            string url = await _storageService.SaveBlob(streamSized, uuid, name, contentType);
 
             Message m = new Message()
             {
                 MessageId = messageId,
                 From = uuid,
                 To = "cjoli",
+                MediaName = name,
                 MessageType = "image",
                 MediaUrl = url,
                 MediaContentType = contentType,

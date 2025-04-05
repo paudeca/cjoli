@@ -35,7 +35,7 @@ const UploadImageInput = () => {
       labelIdle={t("gallery.selectImage", "Click to select your image")}
       credits={false}
       acceptedFileTypes={["image/png", "image/jpeg"]}
-      maxFileSize="2MB"
+      maxFileSize="10MB"
       instantUpload={true}
     />
   );

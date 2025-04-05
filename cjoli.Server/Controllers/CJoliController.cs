@@ -236,6 +236,7 @@ namespace cjoli.Server.Controllers
                     {
                         await formFile.CopyToAsync(stream);
                         stream.Position = 0;
+
                         await _messageService.UploadImage(stream, "image/png", uuid, _context);
                     }
                 }
