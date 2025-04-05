@@ -118,7 +118,7 @@ const CastPage = () => {
                 if (idleTime) {
                   clearTimeout(idleTime);
                 }
-                if (items[eventKey].type == "ranking") {
+                if (items[eventKey].type == "match") {
                   if (teams) {
                     const team =
                       teams[Math.floor(Math.random() * teams.length)];
