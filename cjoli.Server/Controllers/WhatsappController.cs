@@ -41,5 +41,14 @@ namespace cjoli.Server.Controllers
         {
             await _messageService.InboundMessage(uid, message,_context);
         }
+
+        [HttpGet]
+        [Route("/Clean")]
+        public string CleanMessage()
+        {
+            _messageService.CleanMessage(_context);
+            return "OK";
+        }
     }
+
 }

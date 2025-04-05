@@ -35,9 +35,10 @@
     "noImage": "No photos for the tourney"
   },
   "gallery": {
-    "sendPhoto": "Send your best photos:",
+    "sendPhoto": "Send your photos",
     "whatsapp": "WhatsApp",
-    "qrCode": "QRCode"
+    "qrCode": "QRCode",
+    "selectImage": "Click to select your image"
   },
   "event": {
     "friendly": "🤝 Friendly match",

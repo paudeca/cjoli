@@ -23,24 +23,26 @@
     "refresh": "Actualizar",
     "refreshEstimate": "Actualizar estimación",
     "custom": "Personalizado",
-    "useCustom": "Usar estimación personal",
+    "useCustom": "usar estimación personal",
     "menu": "Menú",
     "setting": "Configuración",
     "admin": "Administración",
-    "gallery": "Fotos"
+    "gallery": "Fotos",
+    "cast": "Presentación"
   },
   "home": {
     "tourneyNotConfigured": "Torneo no configurado",
     "noImage": "No hay fotos del torneo"
   },
   "gallery": {
-    "sendPhoto": "Envía tus mejores fotos:",
+    "sendPhoto": "Envía tus fotos",
     "whatsapp": "WhatsApp",
-    "qrCode": "Código QR"
+    "qrCode": "Código QR",
+    "selectImage": "Haz clic para seleccionar tu imagen"
   },
   "event": {
     "friendly": "🤝 Partido amistoso",
-    "resurfacing": "🚛 Reacondicionamiento del hielo"
+    "resurfacing": "🚛 Acondicionamiento del hielo"
   },
   "error": {
     "invalid": "{{field}} no es válido",
@@ -132,14 +134,14 @@
       "goalDiff-min": "Peor diferencia de goles",
       "goalDiffDirect": "Mejor diferencia de goles (directa)",
       "goalDiffDirect-min": "Peor diferencia de goles (directa)",
-      "goalFor": "Más goles a favor",
-      "goalFormin": "Menos goles a favor",
-      "goalForDirect": "Más goles a favor (directo)",
-      "goalForDirect-min": "Menos goles a favor (directo)",
-      "goalAgainst": "Más goles en contra",
-      "goalAgainst-min": "Menos goles en contra",
-      "goalAgainstDirect": "Más goles en contra (directo)",
-      "goalAgainstDirect-min": "Menos goles en contra (directo)",
+      "goalFor": "Más goles marcados",
+      "goalFormin": "Menos goles marcados",
+      "goalForDirect": "Más goles marcados (directo)",
+      "goalForDirect-min": "Menos goles marcados (directo)",
+      "goalAgainst": "Más goles recibidos",
+      "goalAgainst-min": "Menos goles recibidos",
+      "goalAgainstDirect": "Más goles recibidos (directo)",
+      "goalAgainstDirect-min": "Menos goles recibidos (directo)",
       "youngest": "Más joven",
       "equal": "Igual",
       "penalty": "Menos penalizaciones",
@@ -158,7 +160,7 @@
     "loss": "Derrotas",
     "goalFor": "Goles a favor",
     "goalAgainst": "Goles en contra",
-    "shutOut": "Imbatido",
+    "shutOut": "Portería a cero",
     "goalDiff": "Diferencia de goles",
     "penalty": "Penalizaciones",
     "simulation": "Simulación",
@@ -177,20 +179,20 @@
     "live": "En vivo",
     "coming": "Próximamente...",
     "past": "Pasado",
-    "addTourney": "Añadir un torneo"
+    "addTourney": "Añadir torneo"
   },
   "match": {
     "blockShot": {
-      "title": "Guardar resultado",
-      "error": "No se pudo registrar el resultado.<br/>El partido debe terminar con una tanda de penaltis.<br/>Por favor, indique un ganador."
+      "title": "Guardar marcador",
+      "error": "No se pudo guardar el marcador.<br/>El partido debe terminar con una tanda de penales.<br/>Por favor, indica un ganador."
     },
     "compare": "Comparar",
     "forfeit": "Descalificación",
     "simulated": "Resultado simulado"
   },
   "betScore": {
-    "finalScore": "Resultado final",
-    "forecastScore": "Resultado previsto",
+    "finalScore": "Marcador final",
+    "forecastScore": "Marcador pronosticado",
     "point": "Puntos"
   }
 }

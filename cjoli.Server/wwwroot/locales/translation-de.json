@@ -1,5 +1,5 @@
 {
-  "title": "CJoli - Eishockey-Turnier",
+  "title": "CJoli - Eishockeyturnier",
   "lang": {
     "en": "Englisch",
     "fr": "Französisch",
@@ -23,20 +23,22 @@
     "refresh": "Aktualisieren",
     "refreshEstimate": "Schätzung aktualisieren",
     "custom": "Benutzerdefiniert",
-    "useCustom": "Persönliche Schätzung verwenden",
+    "useCustom": "eigene Schätzung verwenden",
     "menu": "Menü",
-    "setting": "Einstellungen",
+    "setting": "Einstellung",
     "admin": "Verwaltung",
-    "gallery": "Fotos"
+    "gallery": "Fotos",
+    "cast": "Diashow"
   },
   "home": {
     "tourneyNotConfigured": "Turnier nicht konfiguriert",
     "noImage": "Keine Fotos für das Turnier"
   },
   "gallery": {
-    "sendPhoto": "Senden Sie Ihre besten Fotos:",
+    "sendPhoto": "Senden Sie Ihre Fotos",
     "whatsapp": "WhatsApp",
-    "qrCode": "QR-Code"
+    "qrCode": "QR-Code",
+    "selectImage": "Klicken Sie, um Ihr Bild auszuwählen"
   },
   "event": {
     "friendly": "🤝 Freundschaftsspiel",
@@ -53,7 +55,7 @@
     "close": "Schließen",
     "save": "Speichern",
     "send": "Senden",
-    "botAI": "Chat mit BotAI",
+    "botAI": "Mit BotAI chatten",
     "back": "Zurück",
     "edit": "Bearbeiten",
     "yes": "Ja",
@@ -80,7 +82,7 @@
       "update": "Aktualisieren"
     },
     "form": {
-      "login": "Anmeldung",
+      "login": "Benutzername",
       "password": "Passwort",
       "confirmPassword": "Passwort bestätigen"
     },
@@ -97,7 +99,7 @@
   "team": {
     "title": "{{team}} bearbeiten",
     "position": "Position",
-    "youngest": "Jüngster",
+    "youngest": "Jüngste",
     "select": "Team auswählen",
     "chart": {
       "general": "Allgemein",
@@ -105,11 +107,11 @@
     },
     "form": {
       "logo": "Logo",
-      "youngest": "Jüngster (Datum)",
+      "youngest": "Jüngste (Datum)",
       "name": "Name",
       "shortName": "Kurzname",
       "fullName": "Vollständiger Name",
-      "alias": "Alias",
+      "alias": "Spitzname",
       "primaryColor": "Primärfarbe",
       "secondaryColor": "Sekundärfarbe"
     },
@@ -128,20 +130,20 @@
       "win-min": "Weniger Siege",
       "loss": "Weniger Niederlagen",
       "loss-min": "Mehr Niederlagen",
-      "goalDiff": "Beste Tordifferenz",
+      "goalDiff": "Bessere Tordifferenz",
       "goalDiff-min": "Schlechte Tordifferenz",
-      "goalDiffDirect": "Beste Tordifferenz (direkt)",
+      "goalDiffDirect": "Bessere Tordifferenz (direkt)",
       "goalDiffDirect-min": "Schlechte Tordifferenz (direkt)",
       "goalFor": "Mehr erzielte Tore",
       "goalFormin": "Weniger erzielte Tore",
       "goalForDirect": "Mehr erzielte Tore (direkt)",
       "goalForDirect-min": "Weniger erzielte Tore (direkt)",
-      "goalAgainst": "Mehr kassierte Tore",
-      "goalAgainst-min": "Weniger kassierte Tore",
-      "goalAgainstDirect": "Mehr kassierte Tore (direkt)",
-      "goalAgainstDirect-min": "Weniger kassierte Tore (direkt)",
-      "youngest": "Jüngster",
-      "equal": "Gleich",
+      "goalAgainst": "Mehr Gegentore",
+      "goalAgainst-min": "Weniger Gegentore",
+      "goalAgainstDirect": "Mehr Gegentore (direkt)",
+      "goalAgainstDirect-min": "Weniger Gegentore (direkt)",
+      "youngest": "Jüngste",
+      "equal": "Gleichstand",
       "penalty": "Weniger Strafen",
       "penalty-min": "Mehr Strafen"
     }
@@ -152,14 +154,14 @@
     "ranking": "Rangliste",
     "team": "Team",
     "total": "Punkte",
-    "game": "Gespielte Spiele",
+    "game": "Spiele",
     "win": "Siege",
     "neutral": "Unentschieden",
     "loss": "Niederlagen",
     "goalFor": "Erzielte Tore",
-    "goalAgainst": "Kassierte Tore",
-    "shutOut": "Zu-Null-Sieg",
-    "goalDiff": "Torverhältnis",
+    "goalAgainst": "Gegentore",
+    "shutOut": "Zu Null",
+    "goalDiff": "Tordifferenz",
     "penalty": "Strafen",
     "simulation": "Simulation",
     "first": "1.",
@@ -169,7 +171,7 @@
     "users": "Benutzer",
     "score": "Punkte",
     "perfect": "Perfekt",
-    "winner": "Gewinner",
+    "winner": "Sieger",
     "diff": "Differenz",
     "goal": "Tor"
   },
@@ -182,15 +184,15 @@
   "match": {
     "blockShot": {
       "title": "Ergebnis speichern",
-      "error": "Ergebnis konnte nicht gespeichert werden.<br/>Das Spiel muss mit einem Penalty-Schießen enden.<br/>Bitte geben Sie einen Gewinner an."
+      "error": "Ergebnis konnte nicht gespeichert werden.<br/>Das Spiel muss mit einem Penaltyschießen enden.<br/>Bitte geben Sie einen Sieger an."
     },
     "compare": "Vergleichen",
-    "forfeit": "Spielaufgabe",
+    "forfeit": "Kampflos",
     "simulated": "Simuliertes Ergebnis"
   },
   "betScore": {
-    "finalScore": "Endstand",
-    "forecastScore": "Prognose-Ergebnis",
+    "finalScore": "Endergebnis",
+    "forecastScore": "Tipp-Ergebnis",
     "point": "Punkte"
   }
 }

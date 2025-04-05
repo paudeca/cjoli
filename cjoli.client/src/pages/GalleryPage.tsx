@@ -19,7 +19,6 @@ import { useServer } from "../hooks/useServer";
 import { useApi } from "../hooks/useApi";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import useUid from "../hooks/useUid";
-import ImageModal from "../modals/ImageModal";
 import { useModal } from "../hooks/useModal";
 import useScreenSize from "../hooks/useScreenSize";
 import { useUser } from "../hooks/useUser";
@@ -28,29 +27,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import ConfirmationModal from "../modals/ConfirmationModal";
 import { Message } from "../models";
 import { Trans } from "react-i18next";
-import { QrCode, Whatsapp } from "react-bootstrap-icons";
-import { FilePond, registerPlugin } from "react-filepond";
-import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
-import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
-import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
-
-import "filepond/dist/filepond.min.css";
-import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
-
-registerPlugin(
-  FilePondPluginImagePreview,
-  FilePondPluginFileValidateType,
-  FilePondPluginFileValidateSize,
-  FilePondPluginImageExifOrientation
-);
-
-const url = import.meta.env.VITE_API_URL;
+import { Upload } from "react-bootstrap-icons";
 
 /* eslint-disable complexity */
 /* eslint-disable max-lines-per-function */
 const GalleryPage = () => {
-  const { tourney, gallery } = useCJoli("gallery");
+  const { gallery } = useCJoli("gallery");
   const { register, path } = useServer();
   const { getGallery, updateMessage, deleteMessage } = useApi();
   const uid = useUid();
@@ -58,12 +40,12 @@ const GalleryPage = () => {
   const { setShowWithData: showConfirmDeleteMessage } = useModal<Message>(
     "confirmDeleteMessage"
   );
+  const { setShow: showUploadImage } = useModal("uploadImage");
 
   const { isMobile } = useScreenSize();
   const { isAdmin } = useUser();
   const { mode } = useParams();
   const navigate = useNavigate();
-  const uuid = useUid();
 
   const [page, setPage] = useState(gallery?.page ?? 0);
   const { isLoading, refetch } = useQuery(
@@ -98,12 +80,6 @@ const GalleryPage = () => {
   const pageSize = gallery?.pageSize ?? 1;
   const pages = Math.ceil(total / pageSize);
 
-  const whatsapp = tourney?.whatsappNumber
-    ? tourney?.whatsappNumber.replace("+", "")
-    : undefined;
-
-  const [files, setFiles] = useState<string[]>([]);
-
   return (
     <Loading ready={!isLoading}>
       <CJoliStack gap={0} className="col-md-8 mx-auto mt-5">
@@ -134,61 +110,22 @@ const GalleryPage = () => {
           <CJoliCard>
             <Card.Body>
               <Container>
-                {whatsapp && (
+                {mode != "waiting" && (
                   <Row className="mb-4">
                     <Col>
-                      <Stack
-                        direction={isMobile ? "vertical" : "horizontal"}
-                        gap={2}
+                      <Button
+                        variant="success"
+                        className="d-flex align-items-center"
+                        onClick={() => showUploadImage(true)}
                       >
-                        <span>
-                          <Trans i18nKey="gallery.sendPhoto">
-                            Send your best photos:
-                          </Trans>
-                        </span>
-                        <div>
-                          <Button
-                            variant="success"
-                            onClick={() =>
-                              window.open(`https://wa.me/${whatsapp}`)
-                            }
-                          >
-                            <Whatsapp />{" "}
-                            <Trans i18nKey="gallery.whatsapp">WhatsApp</Trans>
-                          </Button>
-                          <Badge className="mx-2" bg="transparent" text="dark">
-                            OR
-                          </Badge>
-                          <Button
-                            variant="success"
-                            onClick={() =>
-                              showImage(true, `/qrcodes/${whatsapp}.png`)
-                            }
-                          >
-                            <QrCode />{" "}
-                            <Trans i18nKey="gallery.qrCode">QRCode</Trans>
-                          </Button>
-                        </div>
-                      </Stack>
+                        <Upload className="mx-2" />
+                        <Trans i18nKey="gallery.sendPhoto">
+                          Send your best photos
+                        </Trans>
+                      </Button>
                     </Col>
                   </Row>
                 )}
-                <Row>
-                  <Col>
-                    <FilePond
-                      files={files}
-                      onupdatefiles={setFiles as any}
-                      allowMultiple={true}
-                      maxFiles={3}
-                      server={`${url}/cjoli/${uuid}/upload`}
-                      name="files" /* sets the file input name, it's filepond by default */
-                      labelIdle="Upload your picture"
-                      credits={false}
-                      acceptedFileTypes={["image/png", "image/jpeg"]}
-                      maxFileSize="2MB"
-                    />
-                  </Col>
-                </Row>
                 {messages.length == 0 && (
                   <Row>
                     <Col>
@@ -304,7 +241,6 @@ const GalleryPage = () => {
           </CJoliCard>
         </div>
       </CJoliStack>
-      <ImageModal />
       <ConfirmationModal<Message>
         id="confirmDeleteMessage"
         title="Delete Message"

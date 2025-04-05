@@ -153,7 +153,7 @@ namespace cjoli.Server.Services
             Message m = new Message()
             {
                 MessageId = messageId,
-                From = "user",
+                From = uuid,
                 To = "cjoli",
                 MessageType = "image",
                 MediaUrl = url,
@@ -186,6 +186,13 @@ namespace cjoli.Server.Services
             context.SaveChanges();
         }
 
+        public void CleanMessage(CJoliContext context)
+        {
+            var list = context.Messages.Where(m => m.MessageType != "image" && m.Time < DateTime.Now.AddMonths(-1)).ToList();
+            list.ForEach(m => context.Remove(m));
+            context.SaveChanges();
+        }
 
     }
+
 }

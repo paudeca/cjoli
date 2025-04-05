@@ -35,9 +35,10 @@
     "noImage": "Aucune photo pour le tournoi"
   },
   "gallery": {
-    "sendPhoto": "Envoyez-nous vos meilleurs photos:",
+    "sendPhoto": "Envoyez-nous vos photos",
     "whatsapp": "WhatsApp",
-    "qrCode": "QRCode"
+    "qrCode": "QRCode",
+    "selectImage": "Cliquez pour sélectionner votre image"
   },
   "event": {
     "friendly": "🤝 Match amical",
