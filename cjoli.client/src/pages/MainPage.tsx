@@ -21,7 +21,7 @@ import { useServer } from "../hooks/useServer";
 import { useApi } from "../hooks/useApi";
 import ScrollButton from "./home/button/ScrollButton";
 import { Match } from "../models";
-import { ArrowDown, ArrowUp, Upload } from "react-bootstrap-icons";
+import { ArrowDown, ArrowUp, Image } from "react-bootstrap-icons";
 import { Global, ThemeProvider } from "@emotion/react";
 import { useLogger } from "../hooks/useLogger";
 import { useGlobal } from "../styles";
@@ -149,7 +149,7 @@ const MainPage = () => {
                   onClick={() => showUploadImage(true)}
                 >
                   {!isMobile && t("gallery.sendPhoto", "Send your photo")}
-                  <Upload className="mx-1" />
+                  <Image className="mx-1" />
                 </Button>
               )}
               {uid && !isOnChat && <ChatButton />}

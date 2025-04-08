@@ -27,7 +27,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import ConfirmationModal from "../modals/ConfirmationModal";
 import { Message } from "../models";
 import { Trans } from "react-i18next";
-import { Upload } from "react-bootstrap-icons";
+import { Image } from "react-bootstrap-icons";
 
 /* eslint-disable complexity */
 /* eslint-disable max-lines-per-function */
@@ -118,10 +118,10 @@ const GalleryPage = () => {
                         className="d-flex align-items-center"
                         onClick={() => showUploadImage(true)}
                       >
-                        <Upload className="mx-2" />
                         <Trans i18nKey="gallery.sendPhoto">
                           Send your best photos
                         </Trans>
+                        <Image className="mx-2" />
                       </Button>
                     </Col>
                   </Row>
