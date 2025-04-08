@@ -2,19 +2,23 @@ import { Badge, Button, Col, Row } from "react-bootstrap";
 import ContentModal from "./ContentModal";
 import UploadImageInput from "../components/UploadImageInput";
 import { QrCode, Whatsapp } from "react-bootstrap-icons";
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { useCJoli } from "../hooks/useCJoli";
 import { useModal } from "../hooks/useModal";
 
 const UploadImageModal = () => {
   const { tourney } = useCJoli();
+  const { t } = useTranslation();
   const whatsapp = tourney?.whatsappNumber
     ? tourney?.whatsappNumber.replace("+", "")
     : undefined;
   const { setShowWithData: showImage } = useModal<string>("image");
 
   return (
-    <ContentModal id="uploadImage" title="Upload">
+    <ContentModal
+      id="uploadImage"
+      title={t("gallery.sendPhoto", "Send your photos")}
+    >
       <Row>
         <Col>
           <UploadImageInput />
