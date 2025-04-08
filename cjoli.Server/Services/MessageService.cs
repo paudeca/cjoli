@@ -54,23 +54,7 @@ namespace cjoli.Server.Services
                 m.MediaName = name;
                 answer = await GenerateAnswer(uuid, tourney, message.From,"L'utilisateur a envoyé une image", false, context);
 
-
-                if(!string.IsNullOrEmpty(tourney.WhatsappNotif))
-                {
-                    try
-                    {
-                        string variables = JsonSerializer.Serialize(new Dictionary<string, string> { { "1", message.From } });
-                        string contentSid = _configuration["TwilioNotifContentSid"]!;
-                        foreach (string notif in tourney.WhatsappNotif.Split(';'))
-                        {
-                            await _twilioService.SendMessageTemplate(contentSid: contentSid, contentVariables: variables, from: message.To, to: $"whatsapp:{notif}");
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogError(e,"Unable to send notif");
-                    }
-                }
+                await SendNotification(tourney, message.From);
             }
             else if(message.Body!=null)
             {
@@ -178,23 +162,7 @@ namespace cjoli.Server.Services
             };
             tourney.Messages.Add(m);
 
-            if (!string.IsNullOrEmpty(tourney.WhatsappNotif) && !string.IsNullOrEmpty(tourney.WhatsappNumber))
-            {
-                try
-                {
-                    string variables = JsonSerializer.Serialize(new Dictionary<string, string> { { "1", m.From } });
-                    string contentSid = _configuration["TwilioNotifContentSid"]!;
-                    foreach (string notif in tourney.WhatsappNotif.Split(';'))
-                    {
-                        await _twilioService.SendMessageTemplate(contentSid: contentSid, contentVariables: variables, from: $"whatsapp:{tourney.WhatsappNumber}", to: $"whatsapp:{notif}");
-                    }
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, "Unable to send notif");
-                }
-            }
-
+            await SendNotification(tourney, m.From);
 
             context.SaveChanges();
         }
@@ -204,6 +172,27 @@ namespace cjoli.Server.Services
             var list = context.Messages.Where(m => m.MessageType != "image" && m.Time < DateTime.Now.AddMonths(-1)).ToList();
             list.ForEach(m => context.Remove(m));
             context.SaveChanges();
+        }
+
+        private async Task SendNotification(Tourney tourney, string from)
+        {            
+            if (!string.IsNullOrEmpty(tourney.WhatsappNotif))
+            {
+                try
+                {
+                    string variables = JsonSerializer.Serialize(new Dictionary<string, string> { { "1", from } });
+                    string contentSid = _configuration["TwilioNotifContentSid"]!;
+                    string notifWhatsapp = _configuration["TwilioNotifWhatsapp"]!;
+                    foreach (string notif in tourney.WhatsappNotif.Split(';'))
+                    {
+                        await _twilioService.SendMessageTemplate(contentSid: contentSid, contentVariables: variables, from: $"whatsapp:{notifWhatsapp}", to: $"whatsapp:{notif}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "Unable to send notif");
+                }
+            }
         }
 
     }

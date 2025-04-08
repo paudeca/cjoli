@@ -7,11 +7,11 @@ interface CounterInputProps {
 }
 const CounterInput = ({ count, onChange }: CounterInputProps) => {
   return (
-    <>
+    <h5>
       <Badge pill bg="secondary" className="user-select-none">
         <Dash
           onClick={() => {
-            onChange(count - 1);
+            onChange(count > 1 ? count - 1 : 0);
           }}
           role="button"
         />
@@ -23,7 +23,7 @@ const CounterInput = ({ count, onChange }: CounterInputProps) => {
           role="button"
         />
       </Badge>
-    </>
+    </h5>
   );
 };
 
