@@ -34,7 +34,7 @@ export const SettingProvider = ({
   children: ReactNode;
 }) => {
   const [phase, setPhase] = React.useState<Phase | undefined>(
-    tourney.phases[0]
+    tourney.phases.length > 0 ? tourney.phases[0] : undefined
   );
   const [squad, setSquad] = React.useState<Squad | undefined>(phase?.squads[0]);
   const [position, setPosition] = React.useState<Position | undefined>(

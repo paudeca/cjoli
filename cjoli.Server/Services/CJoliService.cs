@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Data;
 using System.Diagnostics;
 
 namespace cjoli.Server.Services
@@ -235,20 +236,38 @@ namespace cjoli.Server.Services
 
         private ScoresDto CalculateScores(Tourney tourney, User? user, CJoliContext context)
         {
+            IRule rule = GetRule(tourney.Rule);
+
             var scoreTourney = new Score();
             var scoreSquads = new List<ScoreSquad>();
+            var scorePhases = new Dictionary<int, List<Score>>();
             var phases = tourney.Phases;
             phases.Sort((a, b) => a.Id < b.Id ? -1 : 1);
             foreach (var phase in phases)
             {
+                var scorePhase = new List<Score>();
                 foreach (var squad in phase.Squads)
                 {
-                    var scoreSquad = CalculateScoreSquad(squad, scoreTourney, scoreSquads, user);
+                    var scoreSquad = CalculateScoreSquad(squad, scoreTourney, scoreSquads, scorePhases, user);
                     scoreSquads.Add(scoreSquad);
+                    scorePhase.AddRange(scoreSquad.Scores.Select(s => s.Clone()));
                 }
+                scorePhase.Sort(rule.ScoreComparison(phase, null));
+                for (int i = 0; i < scorePhase.Count; i++)
+                {
+                    var score = scorePhase[i];
+                    score.Rank = i + 1;
+                    var scoreBefore = i > 0 ? scorePhase[i - 1] : null;
+                    if (scoreBefore != null && score.Sources[scoreBefore.PositionId]?.Type == SourceType.equal)
+                    {
+                        score.Rank = scoreBefore.Rank;
+                    }
+                }
+
+                scorePhases.Add(phase.Id, scorePhase);
             }
 
-            return new ScoresDto { ScoreSquads = scoreSquads, ScoreTourney = scoreTourney, Bet=new BetDto() };
+            return new ScoresDto { ScoreSquads = scoreSquads, ScoreTourney = scoreTourney, ScorePhases=scorePhases, Bet=new BetDto() };
         }
 
         public static void UpdateSource(Score a, Score b, SourceType type, double value, bool positive)
@@ -257,10 +276,13 @@ namespace cjoli.Server.Services
             b.Sources.Add(a.PositionId, new ScoreSource { Type = type, Value = -value, Winner = (positive && -value >= 0) || (!positive && -value < 0) });
         }
 
-        public Func<Squad, Comparison<Score>> DefaultScoreComparison = (Squad squad) => (Score a, Score b) =>
+        public Func<Phase, Squad?, Comparison<Score>> DefaultScoreComparison = (Phase phase, Squad? squad) => (Score a, Score b) =>
         {
-            var positionA = squad.Positions.Single(p => p.Id == a.PositionId);
-            var positionB = squad.Positions.Single(p => p.Id == b.PositionId);
+            var positions = squad?.Positions ?? phase.Squads.SelectMany(s => s.Positions).ToList();
+            var matches = squad?.Matches ?? phase.Squads.SelectMany(s => s.Matches).ToList();
+
+            var positionA = positions.Single(p => p.Id == a.PositionId);
+            var positionB = positions.Single(p => p.Id == b.PositionId);
 
 
             var diff = a.Total.CompareTo(b.Total);
@@ -270,7 +292,7 @@ namespace cjoli.Server.Services
                 return -diff;
             }
 
-            var match = squad.Matches.OrderBy(m => m.Time).LastOrDefault(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB));
+            var match = matches.OrderBy(m => m.Time).LastOrDefault(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB));
             if (match != null)
             {
                 var userMatch = match.UserMatches.SingleOrDefault(u=>u.User!=null);
@@ -330,10 +352,10 @@ namespace cjoli.Server.Services
         };
 
 
-        private ScoreSquad CalculateScoreSquad(Squad squad, Score scoreTourney, List<ScoreSquad> scoreSquads, User? user)
+        private ScoreSquad CalculateScoreSquad(Squad squad, Score scoreTourney, List<ScoreSquad> scoreSquads, Dictionary<int,List<Score>> scorePhases, User? user)
         {
             IRule rule = GetRule(squad.Phase.Tourney.Rule);
-            Dictionary<int, Score> scores = rule.InitScoreSquad(squad, scoreSquads, user);
+            Dictionary<int, Score> scores = rule.InitScoreSquad(squad, scoreSquads, scorePhases, user);
             squad.Matches.Aggregate(scores, (acc, m) =>
             {
                 var userMatch = m.UserMatches.OrderByDescending(u=>u.LogTime).FirstOrDefault(u => u.User == user);
@@ -358,7 +380,7 @@ namespace cjoli.Server.Services
                 return s;
             }).ToList();
 
-            listScores.Sort(rule.ScoreComparison(squad));
+            listScores.Sort(rule.ScoreComparison(squad.Phase, squad));
             for (int i = 0; i < listScores.Count; i++)
             {
                 var score = listScores[i];
@@ -419,8 +441,16 @@ namespace cjoli.Server.Services
             var positions = ranking.Tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Positions);
             foreach (var position in positions.Where(p => p.ParentPosition != null))
             {
-                var scoreSquad = ranking.Scores.ScoreSquads.Find(s => s.SquadId == (position.ParentPosition?.SquadId ?? 0));
-                var score = scoreSquad?.Scores[(position.ParentPosition?.Value ?? 1) - 1];
+                List<Score> scores;
+                if(position.ParentPosition!.SquadId>0)
+                {
+                    var scoreSquad = ranking.Scores.ScoreSquads.Find(s => s.SquadId == position.ParentPosition!.SquadId);
+                    scores = scoreSquad?.Scores ?? new List<Score>();
+                } else
+                {
+                    scores = ranking.Scores.ScorePhases[position.ParentPosition!.PhaseId];
+                }
+                var score = scores[(position.ParentPosition?.Value ?? 1) - 1];
                 if (score != null && score.Game > 0)
                 {
                     var positionParent = positions.Single(p => p.Id == score.PositionId);

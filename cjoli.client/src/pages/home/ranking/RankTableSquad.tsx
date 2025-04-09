@@ -1,5 +1,5 @@
 import { Card, Table } from "react-bootstrap";
-import { Phase, Squad } from "../../../models";
+import { Match, Phase, Score, Squad } from "../../../models";
 import SimulationIcon from "../../../components/SimulationIcon";
 import CJoliTooltip from "../../../components/CJoliTooltip";
 import { Trans, useTranslation } from "react-i18next";
@@ -31,7 +31,7 @@ const MyArrowLeftSquareFill =
 
 interface RankTableSquadProps {
   phase: Phase;
-  squad: Squad;
+  squad?: Squad;
   squads: Squad[];
 }
 
@@ -45,9 +45,22 @@ const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
   const { t } = useTranslation();
   const { userConfig } = useUser();
 
-  const scores = ranking?.scores.scoreSquads.find((s) => s.squadId == squad.id);
-  const datas = scores ? scores.scores : [];
-  const userMatches = squad.matches
+  let datas: Score[];
+  let matches: Match[];
+  if (squad) {
+    const scores = ranking?.scores.scoreSquads.find(
+      (s) => s.squadId == squad.id
+    );
+    datas = scores ? scores.scores : [];
+    matches = squad.matches;
+  } else {
+    datas = ranking?.scores.scorePhases[phase.id] ?? [];
+    matches = phase.squads.reduce<Match[]>(
+      (acc, s) => [...acc, ...s.matches],
+      []
+    );
+  }
+  const userMatches = matches
     .filter((m) => m.userMatch && !m.done && userConfig.useCustomEstimate)
     .map((m) => m.userMatch!.id);
   const hasSimulation = userMatches.length > 0;
@@ -65,7 +78,7 @@ const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
   }
 
   return (
-    <Card.Body key={squad.id}>
+    <Card.Body>
       <Card.Title>
         {squadId && (
           <MyArrowLeftSquareFill
@@ -75,13 +88,13 @@ const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
             onClick={() => navigate(`${path}phase/${phase.id}`)}
           />
         )}
-        {squad.name}
+        {squad ? squad.name : phase.name}
         <SimulationIcon
           show={hasSimulation}
-          title={`${t("rank.simulation", "Simulation")} - ${squad.name}`}
+          title={`${t("rank.simulation", "Simulation")} - ${squad?.name ?? phase.name}`}
           onRemove={handleRemove(userMatches)}
         />
-        {!squadId && squads.length > 1 && (
+        {squad && !squadId && squads.length > 1 && (
           <MyArrowRightSquareFill
             role="button"
             className="mx-2"
@@ -139,11 +152,13 @@ const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
                     BL
                   </CJoliTooltip>
                 </th>
-                <th>
-                  <CJoliTooltip info={t("rank.penalty", "Penalty")}>
-                    P
-                  </CJoliTooltip>
-                </th>
+                {tourney.config?.hasPenalty && (
+                  <th>
+                    <CJoliTooltip info={t("rank.penalty", "Penalty")}>
+                      P
+                    </CJoliTooltip>
+                  </th>
+                )}
                 <th>
                   <CJoliTooltip info={t("rank.goalDiff", "Goal average")}>
                     +/-
@@ -159,6 +174,7 @@ const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
               key={index}
               score={score}
               tourney={tourney}
+              phase={phase}
               squad={squad}
             />
           ))}

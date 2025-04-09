@@ -183,15 +183,25 @@ namespace cjoli.Server.Services
                         if(parent==null) {
                             return;
                         }
-                        var squadParent = squad.Phase.Tourney.Phases.Single(p => p.Id==parent.PhaseId || p.Name == parent.Phase).Squads.Single(s => s.Id==parent.SquadId || s.Name == parent.Squad);
+                        Squad? squadParent = null;
+                        Phase? phaseParent = null;
+                        if(parent.SquadId>0) {
+                            squadParent = squad.Phase.Tourney.Phases
+                                .Single(p => p.Id==parent.PhaseId).Squads
+                                .Single(s => s.Id==parent.SquadId);
+                        } else {
+                            phaseParent = squad.Phase.Tourney.Phases.Single(p=>p.Id==parent.PhaseId);
+                        }
+
 
                         if (position.ParentPosition == null)
                         {
-                            position.ParentPosition = new ParentPosition() { Position = position, Squad = squadParent, Value = parent.Value };
+                            position.ParentPosition = new ParentPosition() { Position = position, Phase=phaseParent, Squad = squadParent, Value = parent.Value };
                         }
                         else
                         {
                             position.ParentPosition.Value = parent.Value;
+                            position.ParentPosition.Phase = phaseParent;
                             position.ParentPosition.Squad = squadParent;
                         }
                     }

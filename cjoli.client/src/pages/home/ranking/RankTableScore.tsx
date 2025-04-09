@@ -4,7 +4,7 @@ import SimulationIcon from "../../../components/SimulationIcon";
 import TeamName from "../../../components/TeamName";
 import { useCJoli } from "../../../hooks/useCJoli";
 import useScreenSize from "../../../hooks/useScreenSize";
-import { Score, Squad, Tourney } from "../../../models";
+import { Match, Phase, Score, Squad, Tourney } from "../../../models";
 //import PenaltyIcon from "../../../components/PenaltyIcon";
 import useUid from "../../../hooks/useUid";
 import CJoliTooltip from "../../../components/CJoliTooltip";
@@ -26,18 +26,24 @@ const MyTd = MyTh.withComponent("td");
 interface RankTableScoreProps {
   tourney: Tourney;
   score: Score;
-  squad: Squad;
+  phase: Phase;
+  squad?: Squad;
 }
-const RankTableScore = ({ score, squad }: RankTableScoreProps) => {
-  const { getTeam, getPosition, getTeamInfo, loadRanking } = useCJoli();
+const RankTableScore = ({ score, phase, squad }: RankTableScoreProps) => {
+  const { tourney, getTeam, getPosition, getTeamInfo, loadRanking } =
+    useCJoli();
   const { isMobile } = useScreenSize();
   const { t } = useTranslation();
   const uid = useUid();
   const { userConfig } = useUser();
 
   const position = getPosition(score.positionId);
+  console.log("POS", position);
   const team = getTeam(position?.teamId || 0);
-  const userMatches = squad.matches
+  const matches =
+    squad?.matches ??
+    phase.squads.reduce<Match[]>((acc, s) => [...acc, ...s.matches], []);
+  const userMatches = matches
     .filter(
       (m) =>
         m.userMatch &&
@@ -75,7 +81,9 @@ const RankTableScore = ({ score, squad }: RankTableScoreProps) => {
               )*/}
               {team && <ButtonTeam team={team} />}
             </LeftCenterDiv>
-            {position && <InfoButton score={score} squad={squad} />}
+            {position && (
+              <InfoButton score={score} phase={phase} squad={squad} />
+            )}
           </Stack>
         </td>
         <MyTd rowSpan={isMobile ? 2 : 1}>{score.total}</MyTd>
@@ -88,7 +96,7 @@ const RankTableScore = ({ score, squad }: RankTableScoreProps) => {
             <td>{score.goalFor}</td>
             <td>{score.goalAgainst}</td>
             <td>{score.shutOut}</td>
-            <td>{score.penalty}</td>
+            {tourney?.config?.hasPenalty && <td>{score.penalty}</td>}
             <td>{score.goalDiff}</td>
           </>
         )}
@@ -125,11 +133,13 @@ const RankTableScore = ({ score, squad }: RankTableScoreProps) => {
               BC:{score.goalAgainst}
             </CJoliTooltip>
           </td>
-          <td className="w-25">
-            <CJoliTooltip info={t("rank.penalty", "Penalties")}>
-              P:{score.penalty}
-            </CJoliTooltip>
-          </td>
+          {tourney?.config?.hasPenalty && (
+            <td className="w-25">
+              <CJoliTooltip info={t("rank.penalty", "Penalties")}>
+                P:{score.penalty}
+              </CJoliTooltip>
+            </td>
+          )}
           <td className="w-25">
             <CJoliTooltip info={t("rank.goalDiff", "Goal average")}>
               GA:{score.goalDiff}

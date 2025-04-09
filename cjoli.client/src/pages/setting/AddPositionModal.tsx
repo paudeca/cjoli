@@ -22,6 +22,15 @@ const AddPositionModal = ({ onAddPosition }: AddPositionModalProps) => {
   const [phaseParent, setPhaseParent] = useState<Phase>();
   const [squadParent, setSquadParent] = useState<Squad>();
 
+  const optionPositions = squadParent
+    ? squadParent.positions.map((p) => ({
+        label: p.value.toString(),
+        value: p.value,
+      }))
+    : (phaseParent?.squads ?? [])
+        .reduce<Position[]>((acc, s) => [...acc, ...s.positions], [])
+        .map((_p, i) => ({ label: (i + 1).toString(), value: i + 1 }));
+
   const fields: Field<Position>[] = [
     {
       id: "value",
@@ -71,10 +80,7 @@ const AddPositionModal = ({ onAddPosition }: AddPositionModalProps) => {
       id: "parentPosition.value",
       label: "Parent Position",
       type: "select",
-      options: squadParent?.positions.map((p) => ({
-        label: p.value.toString(),
-        value: p.value,
-      })),
+      options: optionPositions,
     },
   ];
 

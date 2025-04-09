@@ -25,7 +25,7 @@ const RankingMatchesStack = ({ phase, team }: RankingMatchesStackProps) => {
     <CJoliStack gap={0} className="col-md-8 mx-auto mt-5" data-testid="ranking">
       <div className="p-2">
         <CJoliCard style={{ background: "#e7e9ee" }}>
-          <RankTable phase={phase} />
+          <RankTable phase={phase} displayPhase={false} />
           <Row className="m-3">
             {filterMatches.map((m) => (
               <Col key={m.id} lg={4} className="my-3">

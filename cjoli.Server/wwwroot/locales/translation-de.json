@@ -23,9 +23,9 @@
     "refresh": "Aktualisieren",
     "refreshEstimate": "Schätzung aktualisieren",
     "custom": "Benutzerdefiniert",
-    "useCustom": "eigene Schätzung verwenden",
+    "useCustom": "persönliche Schätzung verwenden",
     "menu": "Menü",
-    "setting": "Einstellung",
+    "setting": "Einstellungen",
     "admin": "Verwaltung",
     "gallery": "Fotos",
     "cast": "Diashow"
@@ -35,10 +35,10 @@
     "noImage": "Keine Fotos für das Turnier"
   },
   "gallery": {
-    "sendPhoto": "Senden Sie Ihre Fotos",
+    "sendPhoto": "Sende deine Fotos",
     "whatsapp": "WhatsApp",
     "qrCode": "QR-Code",
-    "selectImage": "Klicken Sie, um Ihr Bild auszuwählen"
+    "selectImage": "Klicke, um ein Bild auszuwählen"
   },
   "event": {
     "friendly": "🤝 Freundschaftsspiel",
@@ -82,7 +82,7 @@
       "update": "Aktualisieren"
     },
     "form": {
-      "login": "Benutzername",
+      "login": "Anmeldung",
       "password": "Passwort",
       "confirmPassword": "Passwort bestätigen"
     },
@@ -99,7 +99,7 @@
   "team": {
     "title": "{{team}} bearbeiten",
     "position": "Position",
-    "youngest": "Jüngste",
+    "youngest": "Jüngstes",
     "select": "Team auswählen",
     "chart": {
       "general": "Allgemein",
@@ -107,7 +107,7 @@
     },
     "form": {
       "logo": "Logo",
-      "youngest": "Jüngste (Datum)",
+      "youngest": "Jüngstes (Datum)",
       "name": "Name",
       "shortName": "Kurzname",
       "fullName": "Vollständiger Name",
@@ -124,16 +124,19 @@
     "calculation": "Berechnung",
     "equality": "Gleichstand",
     "victory": "Sieg",
+    "victory-direct": "Direkter Sieg",
     "defeat": "Niederlage",
+    "defeat-direct": "Direkte Niederlage",
+    "displayPhase": "Rangliste der Phase anzeigen",
     "source": {
       "win": "Mehr Siege",
       "win-min": "Weniger Siege",
       "loss": "Weniger Niederlagen",
       "loss-min": "Mehr Niederlagen",
       "goalDiff": "Bessere Tordifferenz",
-      "goalDiff-min": "Schlechte Tordifferenz",
+      "goalDiff-min": "Schlechtere Tordifferenz",
       "goalDiffDirect": "Bessere Tordifferenz (direkt)",
-      "goalDiffDirect-min": "Schlechte Tordifferenz (direkt)",
+      "goalDiffDirect-min": "Schlechtere Tordifferenz (direkt)",
       "goalFor": "Mehr erzielte Tore",
       "goalFormin": "Weniger erzielte Tore",
       "goalForDirect": "Mehr erzielte Tore (direkt)",
@@ -142,7 +145,7 @@
       "goalAgainst-min": "Weniger Gegentore",
       "goalAgainstDirect": "Mehr Gegentore (direkt)",
       "goalAgainstDirect-min": "Weniger Gegentore (direkt)",
-      "youngest": "Jüngste",
+      "youngest": "Jüngstes",
       "equal": "Gleichstand",
       "penalty": "Weniger Strafen",
       "penalty-min": "Mehr Strafen"
@@ -154,13 +157,13 @@
     "ranking": "Rangliste",
     "team": "Team",
     "total": "Punkte",
-    "game": "Spiele",
+    "game": "Spiele gespielt",
     "win": "Siege",
     "neutral": "Unentschieden",
     "loss": "Niederlagen",
     "goalFor": "Erzielte Tore",
     "goalAgainst": "Gegentore",
-    "shutOut": "Zu Null",
+    "shutOut": "Zu null",
     "goalDiff": "Tordifferenz",
     "penalty": "Strafen",
     "simulation": "Simulation",
@@ -169,10 +172,10 @@
     "third": "3.",
     "rankth": "{{rank}}.",
     "users": "Benutzer",
-    "score": "Punkte",
+    "score": "Punktzahl",
     "perfect": "Perfekt",
-    "winner": "Sieger",
-    "diff": "Differenz",
+    "winner": "Gewinner",
+    "diff": "Diff",
     "goal": "Tor"
   },
   "select": {
@@ -184,15 +187,15 @@
   "match": {
     "blockShot": {
       "title": "Ergebnis speichern",
-      "error": "Ergebnis konnte nicht gespeichert werden.<br/>Das Spiel muss mit einem Penaltyschießen enden.<br/>Bitte geben Sie einen Sieger an."
+      "error": "Ergebnis konnte nicht gespeichert werden.<br/>Das Spiel muss mit einem Penaltyschießen enden.<br/>Bitte gib einen Sieger an."
     },
     "compare": "Vergleichen",
-    "forfeit": "Kampflos",
+    "forfeit": "Wertung",
     "simulated": "Simuliertes Ergebnis"
   },
   "betScore": {
-    "finalScore": "Endergebnis",
-    "forecastScore": "Tipp-Ergebnis",
+    "finalScore": "Endstand",
+    "forecastScore": "Prognose",
     "point": "Punkte"
   }
 }

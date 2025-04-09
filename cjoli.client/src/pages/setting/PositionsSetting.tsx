@@ -65,10 +65,14 @@ const PositionsSetting = ({
         const parentSquad = parentPhase?.squads.find(
           (s) => s.id == parent?.squadId
         );
-        const optionsValue = parentSquad?.positions.map((p) => ({
-          label: p.value.toString(),
-          value: p.value,
-        }));
+        const optionsValue = parentSquad
+          ? parentSquad.positions.map((p) => ({
+              label: p.value.toString(),
+              value: p.value,
+            }))
+          : (parentPhase?.squads ?? [])
+              .reduce<Position[]>((acc, s) => [...acc, ...s.positions], [])
+              .map((_p, i) => ({ label: (i + 1).toString(), value: i + 1 }));
 
         return (
           <Accordion.Item key={position.id} eventKey={position.id.toString()}>

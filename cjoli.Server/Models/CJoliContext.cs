@@ -30,6 +30,7 @@ namespace cjoli.Server.Models
             modelBuilder.Entity<Tourney>().HasMany(t => t.Teams).WithMany(t => t.Tourneys);
 
             modelBuilder.Entity<Phase>().HasMany(p => p.Squads).WithOne(s => s.Phase).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Phase>().HasMany(p => p.ParentPositions).WithOne(p => p.Phase).OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Squad>().HasMany(s => s.Positions).WithOne(p => p.Squad).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Squad>().HasMany(s => s.Matches).WithOne(m => m.Squad).OnDelete(DeleteBehavior.Cascade);
