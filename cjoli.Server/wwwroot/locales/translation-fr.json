@@ -127,6 +127,7 @@
     "victory-direct": "Victoire directe",
     "defeat": "Défaite",
     "defeat-direct": "Défaite directe",
+    "displayPhase": "Afficher le classement par phase",
     "source": {
       "win": "Plus de victoires",
       "win-min": "Moins de victoires",

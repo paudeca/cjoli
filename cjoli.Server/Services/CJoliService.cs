@@ -240,19 +240,30 @@ namespace cjoli.Server.Services
 
             var scoreTourney = new Score();
             var scoreSquads = new List<ScoreSquad>();
+            var scorePhases = new Dictionary<int, List<Score>>();
             var phases = tourney.Phases;
             phases.Sort((a, b) => a.Id < b.Id ? -1 : 1);
-            var scorePhases = new Dictionary<int, List<Score>>();
             foreach (var phase in phases)
             {
                 var scorePhase = new List<Score>();
                 foreach (var squad in phase.Squads)
                 {
-                    var scoreSquad = CalculateScoreSquad(squad, scoreTourney, scoreSquads, user);
+                    var scoreSquad = CalculateScoreSquad(squad, scoreTourney, scoreSquads, scorePhases, user);
                     scoreSquads.Add(scoreSquad);
                     scorePhase.AddRange(scoreSquad.Scores.Select(s => s.Clone()));
                 }
                 scorePhase.Sort(rule.ScoreComparison(phase, null));
+                for (int i = 0; i < scorePhase.Count; i++)
+                {
+                    var score = scorePhase[i];
+                    score.Rank = i + 1;
+                    var scoreBefore = i > 0 ? scorePhase[i - 1] : null;
+                    if (scoreBefore != null && score.Sources[scoreBefore.PositionId]?.Type == SourceType.equal)
+                    {
+                        score.Rank = scoreBefore.Rank;
+                    }
+                }
+
                 scorePhases.Add(phase.Id, scorePhase);
             }
 
@@ -341,10 +352,10 @@ namespace cjoli.Server.Services
         };
 
 
-        private ScoreSquad CalculateScoreSquad(Squad squad, Score scoreTourney, List<ScoreSquad> scoreSquads, User? user)
+        private ScoreSquad CalculateScoreSquad(Squad squad, Score scoreTourney, List<ScoreSquad> scoreSquads, Dictionary<int,List<Score>> scorePhases, User? user)
         {
             IRule rule = GetRule(squad.Phase.Tourney.Rule);
-            Dictionary<int, Score> scores = rule.InitScoreSquad(squad, scoreSquads, user);
+            Dictionary<int, Score> scores = rule.InitScoreSquad(squad, scoreSquads, scorePhases, user);
             squad.Matches.Aggregate(scores, (acc, m) =>
             {
                 var userMatch = m.UserMatches.OrderByDescending(u=>u.LogTime).FirstOrDefault(u => u.User == user);
@@ -430,8 +441,16 @@ namespace cjoli.Server.Services
             var positions = ranking.Tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Positions);
             foreach (var position in positions.Where(p => p.ParentPosition != null))
             {
-                var scoreSquad = ranking.Scores.ScoreSquads.Find(s => s.SquadId == (position.ParentPosition?.SquadId ?? 0));
-                var score = scoreSquad?.Scores[(position.ParentPosition?.Value ?? 1) - 1];
+                List<Score> scores;
+                if(position.ParentPosition!.SquadId>0)
+                {
+                    var scoreSquad = ranking.Scores.ScoreSquads.Find(s => s.SquadId == position.ParentPosition!.SquadId);
+                    scores = scoreSquad?.Scores ?? new List<Score>();
+                } else
+                {
+                    scores = ranking.Scores.ScorePhases[position.ParentPosition!.PhaseId];
+                }
+                var score = scores[(position.ParentPosition?.Value ?? 1) - 1];
                 if (score != null && score.Game > 0)
                 {
                     var positionParent = positions.Single(p => p.Id == score.PositionId);

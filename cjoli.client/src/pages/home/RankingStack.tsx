@@ -11,6 +11,7 @@ import { useServer } from "../../hooks/useServer";
 import { ClipboardData } from "react-bootstrap-icons";
 import styled from "@emotion/styled";
 import { useState } from "react";
+import { Trans } from "react-i18next";
 
 const Check = styled(Form.Check)`
   & label {
@@ -69,7 +70,10 @@ const RankingStack = ({ phase, modeCast }: RankingStackProps) => {
                     role="button"
                     label={
                       <span>
-                        <ClipboardData /> Display phase ranking
+                        <ClipboardData className="mx-1" />
+                        <Trans i18nKey="ranking.displayPhase">
+                          Display phase ranking
+                        </Trans>
                       </span>
                     }
                     checked={displayPhase}

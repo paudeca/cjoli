@@ -38,6 +38,7 @@ const RankTableScore = ({ score, phase, squad }: RankTableScoreProps) => {
   const { userConfig } = useUser();
 
   const position = getPosition(score.positionId);
+  console.log("POS", position);
   const team = getTeam(position?.teamId || 0);
   const matches =
     squad?.matches ??

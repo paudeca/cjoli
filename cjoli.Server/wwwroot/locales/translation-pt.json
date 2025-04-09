@@ -25,14 +25,14 @@
     "custom": "Personalizado",
     "useCustom": "usar estimativa pessoal",
     "menu": "Menu",
-    "setting": "Definições",
+    "setting": "Configurações",
     "admin": "Administração",
     "gallery": "Fotos",
-    "cast": "Apresentação"
+    "cast": "Apresentação de diapositivos"
   },
   "home": {
     "tourneyNotConfigured": "Torneio não configurado",
-    "noImage": "Sem fotos do torneio"
+    "noImage": "Sem fotos para o torneio"
   },
   "gallery": {
     "sendPhoto": "Envia as tuas fotos",
@@ -42,7 +42,7 @@
   },
   "event": {
     "friendly": "🤝 Jogo amigável",
-    "resurfacing": "🚛 Reconstrução do gelo"
+    "resurfacing": "🚛 Alisamento do gelo"
   },
   "error": {
     "invalid": "{{field}} é inválido",
@@ -82,12 +82,12 @@
       "update": "Atualizar"
     },
     "form": {
-      "login": "Utilizador",
+      "login": "Nome de utilizador",
       "password": "Palavra-passe",
       "confirmPassword": "Confirmar palavra-passe"
     },
     "error": {
-      "invalidLogin": "Dados de início de sessão inválidos",
+      "invalidLogin": "Credenciais inválidas",
       "register": "Não foi possível registar a conta",
       "update": "Não foi possível atualizar a conta"
     },
@@ -120,11 +120,14 @@
     }
   },
   "ranking": {
-    "rank": "Classificação",
+    "rank": "Posição",
     "calculation": "Cálculo",
     "equality": "Igualdade",
     "victory": "Vitória",
+    "victory-direct": "Vitória direta",
     "defeat": "Derrota",
+    "defeat-direct": "Derrota direta",
+    "displayPhase": "Mostrar classificação da fase",
     "source": {
       "win": "Mais vitórias",
       "win-min": "Menos vitórias",
@@ -132,16 +135,16 @@
       "loss-min": "Mais derrotas",
       "goalDiff": "Melhor diferença de golos",
       "goalDiff-min": "Pior diferença de golos",
-      "goalDiffDirect": "Melhor diferença de golos (direto)",
-      "goalDiffDirect-min": "Pior diferença de golos (direto)",
+      "goalDiffDirect": "Melhor diferença de golos (direta)",
+      "goalDiffDirect-min": "Pior diferença de golos (direta)",
       "goalFor": "Mais golos marcados",
       "goalFormin": "Menos golos marcados",
-      "goalForDirect": "Mais golos marcados (direto)",
-      "goalForDirect-min": "Menos golos marcados (direto)",
+      "goalForDirect": "Mais golos marcados (direta)",
+      "goalForDirect-min": "Menos golos marcados (direta)",
       "goalAgainst": "Mais golos sofridos",
       "goalAgainst-min": "Menos golos sofridos",
-      "goalAgainstDirect": "Mais golos sofridos (direto)",
-      "goalAgainstDirect-min": "Menos golos sofridos (direto)",
+      "goalAgainstDirect": "Mais golos sofridos (direta)",
+      "goalAgainstDirect-min": "Menos golos sofridos (direta)",
       "youngest": "Mais jovem",
       "equal": "Igual",
       "penalty": "Menos penalizações",
@@ -177,14 +180,14 @@
   },
   "select": {
     "live": "Em direto",
-    "coming": "Em breve...",
+    "coming": "Brevemente...",
     "past": "Passado",
-    "addTourney": "Adicionar Torneio"
+    "addTourney": "Adicionar torneio"
   },
   "match": {
     "blockShot": {
       "title": "Guardar resultado",
-      "error": "Não foi possível guardar o resultado.<br/>O jogo deve terminar em penáltis.<br/>Por favor, indique um vencedor."
+      "error": "Não foi possível registar o resultado.<br/>O jogo deve terminar com grandes penalidades.<br/>Por favor indica um vencedor."
     },
     "compare": "Comparar",
     "forfeit": "Desistência",
@@ -192,7 +195,7 @@
   },
   "betScore": {
     "finalScore": "Resultado final",
-    "forecastScore": "Previsão de resultado",
+    "forecastScore": "Previsão",
     "point": "Pontos"
   }
 }

@@ -30,16 +30,42 @@ namespace cjoli.Server.Services.Rules
 
         public Action<Match, MatchDto> ApplyForfeit => _service.DefaultApplyForfeit;
 
-        public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads, User? user)
+        private Position FindParentPosition(Position position, IList<ScoreSquad> squadScores, IList<Score> phaseScores)
+        {
+            if (position.ParentPosition != null && (position.ParentPosition.Squad != null || position.ParentPosition.Phase != null))
+            {
+                IList<Score> scores;
+                IEnumerable<Position> positions;
+                if (position.ParentPosition.Squad != null)
+                {
+                    var squad = position.ParentPosition.Squad;
+                    positions = squad.Positions;
+                    scores = squadScores.Single(s => s.SquadId == squad.Id).Scores;
+                }
+                else
+                {
+                    positions = position.ParentPosition.Phase!.Squads.SelectMany(s => s.Positions) ?? new List<Position>();
+                    scores = phaseScores;
+                }
+                var score = scores[position.ParentPosition.Value - 1];
+                if (score.Game > 0)
+                {
+                    position = positions.Single(s => s.Id == score.PositionId);
+                }
+            }
+            return position;
+        }
+
+
+        public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads, Dictionary<int, List<Score>> scorePhases, User? user)
         {
             var mapPositions = squad.Positions.Where(p => p.ParentPosition != null).ToDictionary(p => p.Id, p =>
             {
-                var scoreSquad = scoreSquads.Single(s => s.SquadId == p.ParentPosition!.Squad.Id);
-                var score = scoreSquad.Scores![p.ParentPosition!.Value - 1];
-                return score.PositionId;
+                var parentPosition = FindParentPosition(p, scoreSquads, p.ParentPosition!.Phase != null ? scorePhases[p.ParentPosition!.Phase.Id] : new List<Score>());
+                return parentPosition.Id;
             });
             var scores = squad.Positions.ToDictionary(p => p.Id, p => new Score() { PositionId = p.Id, TeamId = p.Team?.Id ?? 0 });
-            if (mapPositions.Count == 0)
+            if (mapPositions.Count == 0 || squad.Phase.Name != "Phase 2")
             {
                 return scores;
             }
@@ -47,7 +73,7 @@ namespace cjoli.Server.Services.Rules
             var tourney = squad.Phase.Tourney;
             var matches = tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Matches.Where(m => positionIds.Contains(m.PositionA.Id) && positionIds.Contains(m.PositionB.Id))).ToList();
 
-            Dictionary<int, Score> initScores = positionIds.ToDictionary(p => p, p => new Score() { PositionId = p });
+            Dictionary<int, Score> initScores = new Dictionary<int, Score>();
             matches.Aggregate(initScores, (acc, m) =>
             {
                 var userMatch = m.UserMatches.OrderByDescending(u=>u.LogTime).FirstOrDefault(u=>u.User==user);
@@ -63,8 +89,16 @@ namespace cjoli.Server.Services.Rules
                 {
                     return acc;
                 }
-                var scoreA = initScores[m.PositionA.Id];
-                var scoreB = initScores[m.PositionB.Id];
+                if (!initScores.ContainsKey(m.PositionA.Id))
+                {
+                    acc.Add(m.PositionA.Id, new Score() { PositionId = m.PositionA.Id });
+                }
+                if (!initScores.ContainsKey(m.PositionB.Id))
+                {
+                    acc.Add(m.PositionB.Id, new Score() { PositionId = m.PositionB.Id });
+                }
+                var scoreA = acc[m.PositionA.Id];
+                var scoreB = acc[m.PositionB.Id];
 
                 _service.UpdateScore(scoreA, scoreB, null, match, m, this);
                 return acc;
@@ -73,7 +107,7 @@ namespace cjoli.Server.Services.Rules
             scores = squad.Positions.ToDictionary(p => p.Id, p =>
             {
                 var id = mapPositions[p.Id];
-                var score = initScores[id];
+                var score = initScores.ContainsKey(id)?initScores[id]:new Score() { PositionId=id};
                 score.PositionId = p.Id;
                 return score;
             });

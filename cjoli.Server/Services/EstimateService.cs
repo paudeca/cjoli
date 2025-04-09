@@ -12,8 +12,8 @@ namespace cjoli.Server.Services
         {
             var userMatches = context.UserMatch.Where(u => user!=null && u.User == user && u.Match!=null).ToList();
 
-            var scoreUserA = userMatches.Where(u => u.Match != null).Select(u => CreateScore(u.Match.PositionA, u.Match.PositionB, u.ScoreA, u.ScoreB, u.Match, scores.ScoreSquads));
-            var scoreUserB = userMatches.Where(u => u.Match != null).Select(u => CreateScore(u.Match.PositionB, u.Match.PositionA, u.ScoreB, u.ScoreA, u.Match, scores.ScoreSquads));
+            var scoreUserA = userMatches.Where(u => u.Match != null).Select(u => CreateScore(u.Match.PositionA, u.Match.PositionB, u.ScoreA, u.ScoreB, u.Match, scores.ScoreSquads, scores.ScorePhases[u.Match.Squad!.Phase.Id]));
+            var scoreUserB = userMatches.Where(u => u.Match != null).Select(u => CreateScore(u.Match.PositionB, u.Match.PositionA, u.ScoreB, u.ScoreA, u.Match, scores.ScoreSquads, scores.ScorePhases[u.Match.Squad!.Phase.Id]));
             var scoreUsers = scoreUserA.Concat(scoreUserB).ToList();
 
             var queryMatch = context.MatchResult.Where(r => r.Match.Squad!.Phase.Tourney.Category == tourney.Category);
@@ -114,8 +114,6 @@ namespace cjoli.Server.Services
                 int key = scores.Key;
                 foreach (var score in scores)
                 {
-                    //MergeScore(mapAllTeam, getTeamId(context.Team.SingleOrDefault(t=>t.Id==key)), score, 10);
-                    //MergeScore(mapAllTeamSeason, getTeamId(context.Team.SingleOrDefault(t => t.Id == key)), score, 100);
                     MergeScore(mapCurrentTeam, key, score, coef["user"] * totalGame);
                 }
             });
@@ -179,7 +177,7 @@ namespace cjoli.Server.Services
                     Func<Match, bool> filter = (Match m) => user == null ? !m.Done : !m.Done || m.UserMatches.Count > 0;
                     foreach (var match in squad.Matches.Where(filter))
                     {
-                        CaculateEstimate(match, scores.ScoreSquads, user, funcScore, tourney);
+                        CaculateEstimate(match, scores.ScoreSquads, scores.ScorePhases[match.Squad!.Phase.Id], user, funcScore, tourney);
                     }
                 }
             }
@@ -188,17 +186,28 @@ namespace cjoli.Server.Services
 
 
 
-        private Team? FindTeam(Position position, IList<ScoreSquad> scores)
+        private Team? FindTeam(Position position, IList<ScoreSquad> squadScores, IList<Score> phaseScores)
         {
-            while (position.Team == null && position.ParentPosition != null && position.ParentPosition.Squad != null)
+            while (position.Team == null && position.ParentPosition != null && (position.ParentPosition.Squad != null || position.ParentPosition.Phase != null))
             {
-                var squad = position.ParentPosition.Squad;
-                var score = scores.Single(s => s.SquadId == squad.Id).Scores![position.ParentPosition.Value - 1];
+                IList<Score> scores;
+                IEnumerable<Position> positions;
+                if(position.ParentPosition.Squad!=null)
+                {
+                    var squad = position.ParentPosition.Squad;
+                    positions = squad.Positions;
+                    scores = squadScores.Single(s => s.SquadId == squad.Id).Scores;
+                } else
+                {
+                    positions = position.Squad?.Phase.Squads.SelectMany(s => s.Positions) ?? new List<Position>();
+                    scores = phaseScores;
+                }
+                var score = scores[position.ParentPosition.Value - 1];
                 if (score.Game == 0)
                 {
                     break;
                 }
-                position = squad.Positions.Single(s => s.Id == score.PositionId);
+                position = positions.Single(s => s.Id == score.PositionId);
             }
             return position.Team;
         }
@@ -222,10 +231,10 @@ namespace cjoli.Server.Services
         }
 
 
-        private Score CreateScore(Position positionA, Position positionB, int scoreA, int scoreB, Match match, IList<ScoreSquad> scores)
+        private Score CreateScore(Position positionA, Position positionB, int scoreA, int scoreB, Match match, IList<ScoreSquad> scores, IList<Score> phaseScores)
         {
-            Team? teamA = FindTeam(positionA, scores);
-            Team? teamB = FindTeam(positionB, scores);
+            Team? teamA = FindTeam(positionA, scores, phaseScores);
+            Team? teamB = FindTeam(positionB, scores, phaseScores);
             return new Score()
             {
                 TeamId = teamA?.Id ?? 0,
@@ -266,34 +275,12 @@ namespace cjoli.Server.Services
             };
         }
 
-        private Position FindParentPosition(Position position, IList<ScoreSquad> scores)
-        {
-            while (position.Team == null && position.ParentPosition != null)
-            {
-                var squadParent = position.ParentPosition.Squad;
-                var val = position.ParentPosition.Value;
-                var scoreSquad = scores.SingleOrDefault(s => s.SquadId == squadParent.Id);
-                if (scoreSquad == null)
-                {
-                    break;
-                }
-                var scoreParent = scoreSquad.Scores[val - 1];
-                if (scoreParent.Game == 0)
-                {
-                    break;
-                }
-                position = squadParent.Positions.Single(s => s.Id == scoreParent.PositionId);
-            }
-            return position;
-        }
 
-        private void CaculateEstimate(Match match, IList<ScoreSquad> scores, User? user, Func<Match, Team, Team, bool, Score> calculateScore, Tourney tourney)
+        private void CaculateEstimate(Match match, IList<ScoreSquad> scores, IList<Score> phaseScores, User? user, Func<Match, Team, Team, bool, Score> calculateScore, Tourney tourney)
         {
-            Position positionA = FindParentPosition(match.PositionA, scores);
-            Position positionB = FindParentPosition(match.PositionB, scores);
+            Team? teamA = FindTeam(match.PositionA, scores, phaseScores);
+            Team? teamB = FindTeam(match.PositionB, scores, phaseScores);
 
-            Team? teamA = positionA.Team;
-            Team? teamB = positionB.Team;
             if (teamA == null || teamB == null)
             {
                 return;
