@@ -83,6 +83,7 @@ const reduceLoadRanking = (state: CJoliState, ranking: Ranking) => {
     (acc, phase) => [...acc, ...phase.squads],
     []
   );
+  squads.sort((a, b) => (a.name > b.name ? 1 : -1));
   const events = phases.reduce<EventPhase[]>(
     (acc, phase) => [...acc, ...phase.events],
     []

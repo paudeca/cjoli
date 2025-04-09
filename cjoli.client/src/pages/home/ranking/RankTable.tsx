@@ -15,6 +15,7 @@ const RankTable = ({ phase }: RankTableProps) => {
     ? (squad: Squad) => isTeamInSquad(parseInt(teamId), squad)
     : (squad: Squad) => !squadId || parseInt(squadId) == squad.id;
   const squads = phase.squads.filter(filter);
+  squads.sort((a, b) => (a.name > b.name ? 1 : -1));
 
   return (
     <>

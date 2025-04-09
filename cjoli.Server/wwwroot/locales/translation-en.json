@@ -124,7 +124,9 @@
     "calculation": "Calculation",
     "equality": "Equality",
     "victory": "Victory",
+    "victory-direct": "Direct victory",
     "defeat": "Defeat",
+    "defeat-direct": "Direct defeat",
     "source": {
       "win": "More victories",
       "win-min": "Fewer victories",

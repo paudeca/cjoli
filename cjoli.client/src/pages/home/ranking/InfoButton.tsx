@@ -72,11 +72,11 @@ const InfoButton = ({ score, squad }: InfoButtonProps) => {
       case "direct":
         return source.winner ? (
           <Col className="fw-bold">
-            <Trans i18nKey="ranking.victory">Victory</Trans>
+            <Trans i18nKey="ranking.victory-direct">Direct victory</Trans>
           </Col>
         ) : (
           <Col className="fw-bold">
-            <Trans i18nKey="ranking.defeat">Defeat</Trans>
+            <Trans i18nKey="ranking.defeat-direct">Direct defeat</Trans>
           </Col>
         );
     }
