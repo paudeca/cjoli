@@ -160,6 +160,7 @@ export const createRanking = (ranking: Partial<Ranking>) => {
     tourney,
     scores: {
       scoreTeams: [],
+      scorePhases: {},
       scoreSquads: [],
       scoreTourney: createScore(),
       bet: {
