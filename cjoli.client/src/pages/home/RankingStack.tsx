@@ -1,4 +1,4 @@
-import { Card, Nav } from "react-bootstrap";
+import { Card, Form, Nav } from "react-bootstrap";
 import CJoliCard from "../../components/CJoliCard";
 import CJoliStack from "../../components/CJoliStack";
 import RankTable from "./ranking/RankTable";
@@ -8,6 +8,16 @@ import { useCJoli } from "../../hooks/useCJoli";
 import { useNavigate, useParams } from "react-router-dom";
 import { Element } from "react-scroll";
 import { useServer } from "../../hooks/useServer";
+import { ClipboardData } from "react-bootstrap-icons";
+import styled from "@emotion/styled";
+import { useState } from "react";
+
+const Check = styled(Form.Check)`
+  & label {
+    cursor: pointer;
+    user-select: none;
+  }
+`;
 
 interface RankingStackProps extends JSX.IntrinsicAttributes {
   phase: Phase;
@@ -19,6 +29,7 @@ const RankingStack = ({ phase, modeCast }: RankingStackProps) => {
   const { path } = useServer();
   const navigate = useNavigate();
   const { phaseId, squadId } = useParams();
+  const [displayPhase, setDisplayPhase] = useState(false);
 
   const filterPhases =
     phases?.filter(
@@ -51,9 +62,22 @@ const RankingStack = ({ phase, modeCast }: RankingStackProps) => {
                       </Nav.Item>
                     ))}
                   </Nav>
+                  <Check
+                    type="switch"
+                    id="rankingPhase"
+                    reverse
+                    role="button"
+                    label={
+                      <span>
+                        <ClipboardData /> Display phase ranking
+                      </span>
+                    }
+                    checked={displayPhase}
+                    onChange={() => setDisplayPhase(!displayPhase)}
+                  />
                 </Card.Header>
               )}
-              <RankTable phase={phase} />
+              <RankTable phase={phase} displayPhase={displayPhase} />
             </Loading>
           </Element>
         </CJoliCard>

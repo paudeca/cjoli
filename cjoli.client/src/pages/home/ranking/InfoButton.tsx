@@ -15,7 +15,7 @@ import {
   ViewStacked,
 } from "react-bootstrap-icons";
 import { Fragment, ReactNode } from "react";
-import { Score, ScoreSource, Squad } from "../../../models";
+import { Phase, Score, ScoreSource, Squad } from "../../../models";
 import { Trans } from "react-i18next";
 import { useCJoli } from "../../../hooks/useCJoli";
 
@@ -28,10 +28,11 @@ const MyButton = styled(InfoCircle)`
 
 interface InfoButtonProps {
   score: Score;
-  squad: Squad;
+  phase: Phase;
+  squad?: Squad;
 }
 
-const InfoButton = ({ score, squad }: InfoButtonProps) => {
+const InfoButton = ({ score, phase, squad }: InfoButtonProps) => {
   const { getTeamInfo, tourney, getScoreFromPosition } = useCJoli();
 
   const { name, logo } = getTeamInfo(score.positionId);
@@ -134,7 +135,7 @@ const InfoButton = ({ score, squad }: InfoButtonProps) => {
             const positionB = s.positionId;
             const source = score.sources[positionB];
             const infoB = getTeamInfo(positionB);
-            const scoreB = getScoreFromPosition(positionB, squad.id);
+            const scoreB = getScoreFromPosition(positionB, phase, squad);
 
             return (
               <ListGroup.Item

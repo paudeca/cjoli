@@ -6,6 +6,7 @@ import {
   Phase,
   Rank,
   Ranking,
+  Score,
   Squad,
   Team,
   Tourney,
@@ -91,11 +92,16 @@ export const useCJoli = (page?: TypePage) => {
   );
 
   const getScoreFromPosition = useCallback(
-    (positionId: number, squadId: number) => {
-      const scoreSquad = state.ranking?.scores.scoreSquads.find(
-        (s) => s.squadId == squadId
-      );
-      return scoreSquad?.scores.find((s) => s.positionId == positionId);
+    (positionId: number, phase: Phase, squad?: Squad) => {
+      let scores: Score[];
+      if (squad) {
+        scores =
+          state.ranking?.scores.scoreSquads.find((s) => s.squadId == squad.id)
+            ?.scores ?? [];
+      } else {
+        scores = state.ranking?.scores.scorePhases[phase.id] ?? [];
+      }
+      return scores.find((s) => s.positionId == positionId);
     },
     [state.ranking]
   );

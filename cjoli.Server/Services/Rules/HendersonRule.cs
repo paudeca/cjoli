@@ -26,7 +26,7 @@ namespace cjoli.Server.Services.Rules
         public bool HasYoungest => true;
 
 
-        public Func<Squad, Comparison<Score>> ScoreComparison => _service.DefaultScoreComparison;
+        public Func<Phase, Squad?, Comparison<Score>> ScoreComparison => _service.DefaultScoreComparison;
 
         public Action<Match, MatchDto> ApplyForfeit => _service.DefaultApplyForfeit;
 

@@ -22,6 +22,21 @@
         public Dictionary<int, ScoreSource> Sources { get; set; } = new Dictionary<int, ScoreSource>();
         public Dictionary<string, RankInfo> Ranks { get; set; } = new Dictionary<string, RankInfo>();
 
+        public Score Clone()
+        {
+            var score = new Score()
+            {
+                PositionId=PositionId,
+                Rank=Rank,
+                MatchId=MatchId,
+                TeamId=TeamId,
+                TeamAgainstId=TeamAgainstId,
+                Time=Time
+            };
+            score.Merge(this);
+            return score;
+        }
+
         public void Merge(Score score)
         {
             Total += score.Total;

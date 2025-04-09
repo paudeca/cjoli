@@ -27,7 +27,7 @@ namespace cjoli.Server.Services.Rules
         public bool HasForfeit => true;
         public bool HasYoungest => false;
 
-        public Func<Squad, Comparison<Score>> ScoreComparison => _service.DefaultScoreComparison;
+        public Func<Phase, Squad?, Comparison<Score>> ScoreComparison => _service.DefaultScoreComparison;
         public Action<Match, MatchDto> ApplyForfeit => _service.DefaultApplyForfeit;
 
         public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads, User? user)

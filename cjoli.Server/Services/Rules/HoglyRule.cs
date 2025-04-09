@@ -30,10 +30,13 @@ namespace cjoli.Server.Services.Rules
         public bool HasYoungest => false;
 
 
-        public Func<Squad, Comparison<Score>> ScoreComparison => (Squad squad) => (Score a, Score b) =>
+        public Func<Phase, Squad?, Comparison<Score>> ScoreComparison => (Phase phase, Squad? squad) => (Score a, Score b) =>
         {
-            var positionA = squad.Positions.Single(p => p.Id == a.PositionId);
-            var positionB = squad.Positions.Single(p => p.Id == b.PositionId);
+            var positions = squad?.Positions ?? phase.Squads.SelectMany(s => s.Positions).ToList();
+            var matches = squad?.Matches ?? phase.Squads.SelectMany(s => s.Matches).ToList();
+
+            var positionA = positions.Single(p => p.Id == a.PositionId);
+            var positionB = positions.Single(p => p.Id == b.PositionId);
 
 
             var diff = a.Total.CompareTo(b.Total);
@@ -55,7 +58,7 @@ namespace cjoli.Server.Services.Rules
                 return diff;
             }
 
-            return _service.DefaultScoreComparison(squad)(a,b);
+            return _service.DefaultScoreComparison(phase, squad)(a,b);
         };
 
         public Action<Match, MatchDto> ApplyForfeit => (Match match, MatchDto dto) =>
