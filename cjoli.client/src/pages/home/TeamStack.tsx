@@ -33,7 +33,15 @@ interface TeamStackProps extends JSX.IntrinsicAttributes {
 }
 
 const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
-  const { teams, getTeam, getTeamRank, tourney, isCastPage } = useCJoli();
+  const {
+    teams,
+    getTeam,
+    getTeamRank,
+    tourney,
+    isCastPage,
+    modeScore,
+    selectModeScore,
+  } = useCJoli();
   const { teamId: teamIdParam } = useParams();
   const { isMobile } = useScreenSize();
   const [teamB, setTeamB] = React.useState<Team | undefined>(
@@ -119,12 +127,41 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
                         <Badge bg="secondary">VS</Badge>
                       </Col>
                       {!modeCast && (
-                        <Col xs={12}>
-                          <TeamSelect
-                            teams={teams?.filter((t) => t.id != team?.id) ?? []}
-                            onChangeTeam={(team) => setTeamB(team)}
-                          />
-                        </Col>
+                        <>
+                          <Col xs={isMobile ? 12 : 6}>
+                            <TeamSelect
+                              teams={
+                                teams?.filter((t) => t.id != team?.id) ?? []
+                              }
+                              onChangeTeam={(team) => setTeamB(team)}
+                            />
+                          </Col>
+                          <Col xs="auto" className="py-3">
+                            <Form.Select
+                              defaultValue={modeScore}
+                              onChange={(e) =>
+                                selectModeScore(
+                                  e.target.value as
+                                    | "tourney"
+                                    | "season"
+                                    | "allTime"
+                                )
+                              }
+                            >
+                              <option value="tourney">{tourney?.name}</option>
+                              <option value="season">
+                                <Trans i18nKey="team.currentSeason">
+                                  Current season
+                                </Trans>
+                              </option>
+                              <option value="allTime">
+                                <Trans i18nKey="team.allSeasons">
+                                  All seasons
+                                </Trans>
+                              </option>
+                            </Form.Select>
+                          </Col>
+                        </>
                       )}
                       {modeCast && (
                         <Col xs={12}>

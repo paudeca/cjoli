@@ -101,6 +101,8 @@
     "position": "Position",
     "youngest": "Youngest",
     "select": "Select Team",
+    "currentSeason": "Current season",
+    "allSeasons": "All seasons",
     "chart": {
       "general": "General",
       "timeline": "Timeline"

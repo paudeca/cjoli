@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Table } from "react-bootstrap";
 import TeamName from "../../../components/TeamName";
 import CJoliTooltip from "../../../components/CJoliTooltip";
@@ -5,7 +6,7 @@ import React from "react";
 import TeamCell from "./TeamCell";
 import { Rank, Score, Squad, Team, Tourney } from "../../../models";
 import { useCJoli } from "../../../hooks/useCJoli";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 
 const percent = (value: number, total: number) =>
   total == 0 ? "" : `${Math.round((value / total) * 100)}%`;
@@ -103,7 +104,7 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
         percent(s.loss, s.game) + formatRank(s.ranks?.loss?.rank),
       up: false,
       active: !!teamB,
-      needTeam: true,
+      needTeam: false,
     },
     {
       label: "BP",
@@ -182,12 +183,22 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
 };
 
 const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
-  const { ranking, tourney, getTeamRank, getScoreForTeam, getScoreFromSquad } =
-    useCJoli();
+  const {
+    ranking,
+    tourney,
+    getTeamRank,
+    getScoreForTeam,
+    getScoreFromSquad,
+    modeScore,
+  } = useCJoli();
+
+  //const [mode, setMode] = useState<"tourney" | "season" | "allTime">("tourney");
+
   let rank = getTeamRank(team);
   let rankB = teamB && getTeamRank(teamB);
-  const score = getScoreForTeam(team)!;
-  let scoreB = teamB && getScoreForTeam(teamB);
+  const score = getScoreForTeam(modeScore, team)!;
+  //score = ranking?.scores.scoreTeamsSeason[team.id]!;
+  let scoreB = teamB && getScoreForTeam(modeScore, teamB);
   const scoreSquad = squad && getScoreFromSquad(squad, team);
   const scoreSquadB = squad && teamB && getScoreFromSquad(squad, teamB);
   if ((!rank || !rankB) && scoreSquad && scoreSquadB) {
@@ -196,12 +207,25 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
   }
 
   let datas: { team?: Team; rank?: Rank; score?: Score }[] = [
-    { team, rank, score },
+    { team, rank: modeScore == "tourney" ? rank : undefined, score },
   ];
   if (teamB) {
-    datas = [...datas, { team: teamB, rank: rankB, score: scoreB }];
+    datas = [
+      ...datas,
+      {
+        team: teamB,
+        rank: modeScore == "tourney" ? rankB : undefined,
+        score: scoreB,
+      },
+    ];
   } else {
-    const scoreTourney = ranking?.scores.scoreTourney;
+    const type =
+      modeScore == "tourney"
+        ? "scoreTourney"
+        : modeScore == "season"
+          ? "scoreSeason"
+          : "scoreAllTime";
+    const scoreTourney = ranking?.scores[type];
     scoreB = scoreTourney;
     datas = [
       ...datas,
@@ -218,7 +242,15 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
           <th />
           {datas.map(({ team }) => (
             <th key={team?.id || 0}>
-              {team ? <TeamName teamId={team.id} /> : tourney?.name}
+              {team ? (
+                <TeamName teamId={team.id} hideFavorite />
+              ) : modeScore == "tourney" ? (
+                tourney?.name
+              ) : modeScore == "season" ? (
+                <Trans i18nKey="team.currentSeason">Current season</Trans>
+              ) : (
+                <Trans i18nKey="team.allSeasons">All seasons</Trans>
+              )}
             </th>
           ))}
         </tr>
@@ -251,7 +283,7 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
                     getInfo={c.getInfo}
                     active={c.active && j == 0}
                     up={c.up}
-                    display={!c.needTeam || !!team}
+                    display={!c.needTeam || (!!team && modeScore == "tourney")}
                   />
                 )}
               </React.Fragment>

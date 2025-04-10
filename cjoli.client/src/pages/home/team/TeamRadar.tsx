@@ -62,15 +62,15 @@ interface TeamRadarProps {
 }
 
 const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
-  const { ranking, getTeamRank, getScoreForTeam } = useCJoli();
+  const { ranking, getTeamRank, getScoreForTeam, modeScore } = useCJoli();
   const options = {
     responsive: true,
   };
   const rank = getTeamRank(team);
   const rankB = teamB && getTeamRank(teamB);
 
-  const score = getScoreForTeam(team);
-  const scoreB = teamB && getScoreForTeam(teamB);
+  const score = getScoreForTeam(modeScore, team);
+  const scoreB = teamB && getScoreForTeam(modeScore, teamB);
 
   const countTeams = ranking?.tourney.teams.length || 0;
   const winPt = ranking?.tourney.config.win || 2;
@@ -79,7 +79,7 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
   const getData = React.useCallback(
     (score: Score, rank?: Rank) => {
       return [
-        score.game > 0
+        score.game > 0 && modeScore == "tourney"
           ? ((countTeams - (rank?.order || 0)) / countTeams) * 100
           : 0,
         (score.total / (score.game * winPt)) * 100,
@@ -96,7 +96,7 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
           100,
       ];
     },
-    [countTeams, ranks, winPt]
+    [countTeams, ranks, winPt, modeScore]
   );
 
   if (!team || !score) {

@@ -101,6 +101,8 @@
     "position": "Positie",
     "youngest": "Jongste",
     "select": "Selecteer team",
+    "currentSeason": "Huidig seizoen",
+    "allSeasons": "Alle seizoenen",
     "chart": {
       "general": "Algemeen",
       "timeline": "Tijdlijn"

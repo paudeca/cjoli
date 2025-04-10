@@ -101,6 +101,8 @@
     "position": "Posição",
     "youngest": "Mais jovem",
     "select": "Selecionar equipa",
+    "currentSeason": "Época atual",
+    "allSeasons": "Todas as épocas",
     "chart": {
       "general": "Geral",
       "timeline": "Linha temporal"

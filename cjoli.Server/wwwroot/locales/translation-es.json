@@ -101,6 +101,8 @@
     "position": "Posición",
     "youngest": "Más joven",
     "select": "Seleccionar equipo",
+    "currentSeason": "Temporada actual",
+    "allSeasons": "Todas las temporadas",
     "chart": {
       "general": "General",
       "timeline": "Línea de tiempo"
