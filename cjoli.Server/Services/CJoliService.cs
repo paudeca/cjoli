@@ -934,6 +934,7 @@ namespace cjoli.Server.Services
             }
             context.SaveChanges();
             ClearCache(uuid, user);
+            RunThread((CJoliContext context) => UpdateEstimate(uuid, login, context));
 
             if (user.IsAdmin(uuid))
             {
