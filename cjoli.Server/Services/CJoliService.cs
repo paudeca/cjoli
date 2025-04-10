@@ -218,6 +218,7 @@ namespace cjoli.Server.Services
         private void UpdateEstimate(string uuid, string login, CJoliContext context)
         {
             User? user = GetUserWithConfig(login, uuid, context);
+            User? originalUser = user;
 
             bool isAdmin = user.IsAdminWithNoCustomEstimate(uuid);
             if (isAdmin)
@@ -227,7 +228,7 @@ namespace cjoli.Server.Services
             Tourney tourney = GetTourney(uuid, user, context);
             var scores = CalculateScores(tourney, user, context);
             _estimateService.CalculateEstimates(tourney, scores, user, context);
-            ClearCache(uuid, user);
+            ClearCache(uuid, originalUser);
             if (isAdmin)
             {
                 _serverService.UpdateRanking(uuid);
