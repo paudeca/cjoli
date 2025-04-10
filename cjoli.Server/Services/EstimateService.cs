@@ -6,8 +6,6 @@ namespace cjoli.Server.Services
 {
     public class EstimateService
     {
-
-
         public void CalculateEstimates(Tourney tourney, ScoresDto scores, User? user, CJoliContext context)
         {
             var userMatches = context.UserMatch.Where(u => user!=null && u.User == user && u.Match!=null).ToList();
@@ -53,7 +51,7 @@ namespace cjoli.Server.Services
 
 
             Score scoreTotal = func(coef["total"], queryMatch);
-            int totalGame = scoreTotal.Game;
+            int totalGame = 1;// scoreTotal.Game;
 
             Score scoreTotalSeason = func(coef["totalSeason"] * totalGame, queryMatchSeason);
 
@@ -168,7 +166,7 @@ namespace cjoli.Server.Services
                 },
              ];
 
-            var funcScore = CalculateScore(scoreList);
+            var funcScore = CalculateScore(scoreList, scoreTotal);
 
             foreach (var phase in tourney.Phases)
             {
@@ -251,24 +249,25 @@ namespace cjoli.Server.Services
             };
         }
 
-        private Func<Match, Team, Team, bool, Score> CalculateScore(List<Func<Team, Team, Score>> scoreList)
+        private Func<Match, Team, Team, bool, Score> CalculateScore(List<Func<Team, Team, Score>> scoreList, Score scoreTotal)
         {
             return (Match match, Team teamA, Team teamB, bool inverse) =>
             {
                 List<Score> scores = scoreList.Select(func => func(teamA, teamB)).ToList();
                 Score scoreFinal = scores.Aggregate(new Score(), (acc, score) =>
                 {
-                    if (score == null)
+                    if (score == null || score.Game == 0)
                     {
                         return acc;
                     }
-                    acc.Game += score.Game * score.Coefficient;
-                    acc.Win += score.Win * score.Coefficient;
-                    acc.Neutral += score.Neutral * score.Coefficient;
-                    acc.Loss += score.Loss * score.Coefficient;
-                    acc.GoalFor += score.GoalFor * score.Coefficient;
-                    acc.GoalAgainst += score.GoalAgainst * score.Coefficient;
-                    acc.GoalDiff += score.GoalDiff * score.Coefficient;
+                    double coef = score.Coefficient * (double)scoreTotal.Game / score.Game;
+                    acc.Game += Convert.ToInt32(score.Game * coef);
+                    acc.Win += Convert.ToInt32(score.Win * coef);
+                    acc.Neutral += Convert.ToInt32(score.Neutral * coef);
+                    acc.Loss += Convert.ToInt32(score.Loss * coef);
+                    acc.GoalFor += Convert.ToInt32(score.GoalFor * coef);
+                    acc.GoalAgainst += Convert.ToInt32(score.GoalAgainst * coef);
+                    acc.GoalDiff += Convert.ToInt32(score.GoalDiff * coef);
                     return acc;
                 });
                 return scoreFinal;

@@ -172,6 +172,7 @@ namespace cjoli.Server.Services
                 var dto = _mapper.Map<RankingDto>(ranking);
                 AffectationTeams(dto);
                 CalculateHistory(dto);
+                CalculateHistoryByTimes(dto, ranking.Tourney, context);
                 CalculateAllBetScores(dto, user, context);
                 if(!map!.ContainsKey(loginKey))
                 {
@@ -218,6 +219,7 @@ namespace cjoli.Server.Services
         private void UpdateEstimate(string uuid, string login, CJoliContext context)
         {
             User? user = GetUserWithConfig(login, uuid, context);
+            User? originalUser = user;
 
             bool isAdmin = user.IsAdminWithNoCustomEstimate(uuid);
             if (isAdmin)
@@ -227,7 +229,7 @@ namespace cjoli.Server.Services
             Tourney tourney = GetTourney(uuid, user, context);
             var scores = CalculateScores(tourney, user, context);
             _estimateService.CalculateEstimates(tourney, scores, user, context);
-            ClearCache(uuid, user);
+            ClearCache(uuid, originalUser);
             if (isAdmin)
             {
                 _serverService.UpdateRanking(uuid);
@@ -527,6 +529,96 @@ namespace cjoli.Server.Services
             ranking.History = mapTeams;
             ranking.Scores.ScoreTeams = scoreTeams;
         }
+
+        class IMatchResult
+        {
+            public int Win;
+            public int Loss;
+            public int Neutral;
+            public int GoalFor;
+            public int GoalAgainst;
+            public int GoalDiff;
+            public int ShutOut;
+            public Match Match;
+        }
+
+        private void CalculateHistoryByTimes(RankingDto ranking, Tourney tourney, CJoliContext context)
+        {
+            var query = context.MatchResult.Where(r => r.Match.Squad!.Phase.Tourney.Category == tourney.Category && (r.Win == 1 || r.Neutral == 1));
+            var queryMatchAll = query
+                .Select(r=>new IMatchResult(){Win=r.Win, Loss=r.Loss, Neutral=r.Neutral, GoalFor=r.GoalFor, GoalAgainst=r.GoalAgainst, GoalDiff=r.GoalDiff, Match=r.Match, ShutOut=r.ShutOut}).Distinct();
+            var queryMatchAllSeason = query.Where(r=>r.Match.Squad!.Phase.Tourney.Season == tourney.Season)
+                .Select(r => new IMatchResult() { Win = r.Win, Loss = r.Loss, Neutral = r.Neutral, GoalFor = r.GoalFor, GoalAgainst = r.GoalAgainst, GoalDiff = r.GoalDiff, Match = r.Match,ShutOut=r.ShutOut }).Distinct();
+
+            var func = (IQueryable<IMatchResult> query) =>
+            {
+                Score score = query.GroupBy(r => 1).Select(ISelectScore).SingleOrDefault() ?? new Score();
+                return score;
+            };
+
+            Score scoreTotal = func(queryMatchAll);
+            Score scoreTotalSeason = func(queryMatchAllSeason);
+
+            ranking.Scores.ScoreAllTime = scoreTotal;
+            ranking.Scores.ScoreSeason = scoreTotalSeason;
+
+
+
+            var teamIds = tourney.Teams.Select(t => t.Id);
+            var queryMatch = context.MatchResult.Where(r => r.Match.Squad!.Phase.Tourney.Category == tourney.Category && teamIds.Contains(r.Team.Id));
+            var queryMatchSeason = queryMatch.Where(r => r.Match.Squad!.Phase.Tourney.Season == tourney.Season);
+
+            var funcMap = (IQueryable<MatchResult> query) =>
+            {
+                var mapScore = query
+                    .GroupBy(r => r.Team.Id)
+                    .ToDictionary(kv => kv.Key, kv => SelectScore(kv)) ?? new Dictionary<int, Score>();
+                return mapScore;
+            };
+            var mapAllTeam = funcMap(queryMatch);
+            var mapAllTeamSeason = funcMap(queryMatchSeason);
+
+            SortTeams(mapAllTeam);
+            SortTeams(mapAllTeamSeason);
+
+
+            ranking.Scores.ScoreTeamsAllTime = mapAllTeam;
+            ranking.Scores.ScoreTeamsSeason = mapAllTeamSeason;
+
+        }
+
+        private Score SelectScore(IGrouping<int, MatchResult> o) 
+        {
+            return new Score
+            {
+                TeamId = o.Key,
+                Game = o.Count(),
+                Win = o.Sum(m => m.Win),
+                Neutral = o.Sum(m => m.Neutral),
+                Loss = o.Sum(m => m.Loss),
+                GoalFor = o.Sum(m => m.GoalFor),
+                GoalAgainst = o.Sum(m => m.GoalAgainst),
+                GoalDiff = o.Sum(m => m.GoalDiff),
+                ShutOut = o.Sum(m=>m.ShutOut),
+            };
+        }
+
+        private Score ISelectScore(IGrouping<int, IMatchResult> o)
+        {
+            return new Score
+            {
+                Game = o.Count(),
+                Win = o.Sum(m => m.Win),
+                Neutral = o.Sum(m => m.Neutral),
+                Loss = o.Sum(m => m.Loss),
+                GoalFor = o.Sum(m => m.GoalFor),
+                GoalAgainst = o.Sum(m => m.GoalAgainst),
+                GoalDiff = o.Sum(m => m.GoalDiff),
+                ShutOut = o.Sum(m=>m.ShutOut)
+            };
+        }
+
+
 
         private void CalculateAllBetScores(RankingDto ranking, User? user, CJoliContext context)
         {
@@ -934,6 +1026,7 @@ namespace cjoli.Server.Services
             }
             context.SaveChanges();
             ClearCache(uuid, user);
+            RunThread((CJoliContext context) => UpdateEstimate(uuid, login, context));
 
             if (user.IsAdmin(uuid))
             {

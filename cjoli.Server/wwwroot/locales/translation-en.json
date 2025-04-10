@@ -101,6 +101,8 @@
     "position": "Position",
     "youngest": "Youngest",
     "select": "Select Team",
+    "currentSeason": "Current season",
+    "allSeasons": "All seasons",
     "chart": {
       "general": "General",
       "timeline": "Timeline"
@@ -127,7 +129,8 @@
     "victory-direct": "Direct victory",
     "defeat": "Defeat",
     "defeat-direct": "Direct defeat",
-    "displayPhase": "Display phase ranking",
+    "displayPhase": "Show ranking by phase",
+    "displaySquad": "Show ranking by group",
     "source": {
       "win": "More victories",
       "win-min": "Fewer victories",

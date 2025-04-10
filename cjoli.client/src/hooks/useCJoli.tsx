@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect } from "react";
-import { CJoliContext } from "../contexts/CJoliContext";
+import { CJoliContext, ModeScoreType } from "../contexts/CJoliContext";
 import {
   Gallery,
   Match,
@@ -14,6 +14,7 @@ import {
 } from "../models";
 import { CJoliActions } from "../contexts/actions";
 
+// eslint-disable-next-line max-lines-per-function
 export const useCJoli = (page?: TypePage) => {
   const ctx = useContext(CJoliContext);
   if (!ctx) {
@@ -152,10 +153,21 @@ export const useCJoli = (page?: TypePage) => {
   );
 
   const getScoreForTeam = useCallback(
-    (team: Team) => {
-      return state.ranking?.scores.scoreTeams[team.id];
+    (mode: "tourney" | "season" | "allTime", team: Team) => {
+      switch (mode) {
+        case "tourney":
+          return state.ranking?.scores.scoreTeams[team.id];
+        case "season":
+          return state.ranking?.scores.scoreTeamsSeason[team.id];
+        case "allTime":
+          return state.ranking?.scores.scoreTeamsAllTime[team.id];
+      }
     },
-    [state.ranking?.scores.scoreTeams]
+    [
+      state.ranking?.scores.scoreTeams,
+      state.ranking?.scores.scoreTeamsSeason,
+      state.ranking?.scores.scoreTeamsAllTime,
+    ]
   );
 
   const getScoreFromSquad = useCallback(
@@ -188,6 +200,12 @@ export const useCJoli = (page?: TypePage) => {
     [dispatch]
   );
 
+  const selectModeScore = useCallback(
+    (mode: ModeScoreType) =>
+      dispatch({ type: CJoliActions.SELECT_MODESCORE, payload: mode }),
+    [dispatch]
+  );
+
   useEffect(() => {
     page && selectPage(page);
   }, [page, selectPage]);
@@ -215,6 +233,7 @@ export const useCJoli = (page?: TypePage) => {
     getScoreFromSquad,
     setColor,
     selectPage,
+    selectModeScore,
     isHomePage: state.page == "home",
     isCastPage: state.page == "cast",
   };

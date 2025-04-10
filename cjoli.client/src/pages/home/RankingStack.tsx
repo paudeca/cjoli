@@ -8,10 +8,11 @@ import { useCJoli } from "../../hooks/useCJoli";
 import { useNavigate, useParams } from "react-router-dom";
 import { Element } from "react-scroll";
 import { useServer } from "../../hooks/useServer";
-import { ClipboardData } from "react-bootstrap-icons";
+import { ChevronBarContract, ChevronBarExpand } from "react-bootstrap-icons";
 import styled from "@emotion/styled";
 import { useState } from "react";
 import { Trans } from "react-i18next";
+import useScreenSize from "../../hooks/useScreenSize";
 
 const Check = styled(Form.Check)`
   & label {
@@ -31,6 +32,7 @@ const RankingStack = ({ phase, modeCast }: RankingStackProps) => {
   const navigate = useNavigate();
   const { phaseId, squadId } = useParams();
   const [displayPhase, setDisplayPhase] = useState(false);
+  const { isMobile } = useScreenSize();
 
   const filterPhases =
     phases?.filter(
@@ -70,10 +72,26 @@ const RankingStack = ({ phase, modeCast }: RankingStackProps) => {
                     role="button"
                     label={
                       <span>
-                        <ClipboardData className="mx-1" />
-                        <Trans i18nKey="ranking.displayPhase">
-                          Display phase ranking
-                        </Trans>
+                        {!displayPhase && (
+                          <>
+                            <ChevronBarContract className="mx-1" />
+                            {!isMobile && (
+                              <Trans i18nKey="ranking.displayPhase">
+                                Display phase ranking
+                              </Trans>
+                            )}
+                          </>
+                        )}
+                        {displayPhase && (
+                          <>
+                            <ChevronBarExpand className="mx-1" />
+                            {!isMobile && (
+                              <Trans i18nKey="ranking.displaySquad">
+                                Display group ranking
+                              </Trans>
+                            )}
+                          </>
+                        )}
                       </span>
                     }
                     checked={displayPhase}

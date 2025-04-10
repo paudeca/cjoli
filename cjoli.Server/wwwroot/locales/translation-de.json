@@ -101,6 +101,8 @@
     "position": "Position",
     "youngest": "Jüngstes",
     "select": "Team auswählen",
+    "currentSeason": "Aktuelle Saison",
+    "allSeasons": "Alle Saisons",
     "chart": {
       "general": "Allgemein",
       "timeline": "Zeitverlauf"
@@ -127,7 +129,8 @@
     "victory-direct": "Direkter Sieg",
     "defeat": "Niederlage",
     "defeat-direct": "Direkte Niederlage",
-    "displayPhase": "Rangliste der Phase anzeigen",
+    "displayPhase": "Phasenwertung anzeigen",
+    "displaySquad": "Gruppenwertung anzeigen",
     "source": {
       "win": "Mehr Siege",
       "win-min": "Weniger Siege",

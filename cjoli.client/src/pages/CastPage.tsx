@@ -13,7 +13,7 @@ import TeamStack from "./home/TeamStack";
 let idleTime = 0;
 
 const CastPage = () => {
-  const { gallery, phases, teams } = useCJoli("cast");
+  const { gallery, phases, teams, tourney } = useCJoli("cast");
   const { getGallery, getRanking } = useApi();
   const uid = useUid();
   const { isMobile } = useScreenSize();
@@ -73,7 +73,7 @@ const CastPage = () => {
             </div>
           ),
         });
-        if (i == 0) {
+        if (i == 0 && tourney?.whatsappNumber) {
           acc.push({
             type: "qrcode",
             content: (

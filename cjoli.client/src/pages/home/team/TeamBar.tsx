@@ -59,12 +59,12 @@ ChartJS.register(
 );
 
 const TeamBar = ({ team, teamB }: { team: Team; teamB?: Team }) => {
-  const { getTeamRank, getScoreForTeam } = useCJoli();
+  const { getTeamRank, getScoreForTeam, modeScore } = useCJoli();
   const rank = getTeamRank(team);
   const rankB = teamB && getTeamRank(teamB);
 
-  const score = getScoreForTeam(team);
-  const scoreB = teamB && getScoreForTeam(teamB);
+  const score = getScoreForTeam(modeScore, team);
+  const scoreB = teamB && getScoreForTeam(modeScore, teamB);
 
   const getData = React.useCallback((score: Score, rank?: Rank) => {
     return [

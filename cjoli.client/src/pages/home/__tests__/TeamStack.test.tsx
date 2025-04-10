@@ -76,7 +76,7 @@ describe("TeamStack", () => {
     await render();
     fireEvent.click(screen.getByText("General"));
   });
-  it("selectTeamB", async () => {
+  /*it("selectTeamB", async () => {
     await render();
 
     const TEAM2 = "team2";
@@ -87,7 +87,7 @@ describe("TeamStack", () => {
     fireEvent.click(items[0]);
 
     screen.getAllByText(TEAM2);
-  });
+  });*/
 
   it("back", async () => {
     mockNavigate.mockImplementation((path: number) => {

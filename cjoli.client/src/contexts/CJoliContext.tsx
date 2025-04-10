@@ -14,6 +14,8 @@ import {
 import { CJoliActions } from "./actions";
 import dayjs from "dayjs";
 
+export type ModeScoreType = "tourney" | "season" | "allTime";
+
 interface CJoliState {
   tourneys?: Tourney[];
   tourney?: Tourney;
@@ -31,6 +33,7 @@ interface CJoliState {
   };
   page: TypePage;
   gallery?: Gallery;
+  modeScore: ModeScoreType;
 }
 
 export const CJoliContext = React.createContext<{
@@ -47,6 +50,7 @@ const initialState: CJoliState = {
     secondary: "#932829",
   },
   page: "welcome",
+  modeScore: "tourney",
 };
 
 type Action =
@@ -72,7 +76,8 @@ type Action =
       type: CJoliActions.SELECT_PAGE;
       payload: TypePage;
     }
-  | { type: CJoliActions.LOAD_GALLERY; payload: Gallery };
+  | { type: CJoliActions.LOAD_GALLERY; payload: Gallery }
+  | { type: CJoliActions.SELECT_MODESCORE; payload: ModeScoreType };
 
 const reduceLoadRanking = (state: CJoliState, ranking: Ranking) => {
   const tourney = ranking.tourney;
@@ -151,6 +156,9 @@ const reducer = (state: CJoliState, action: Action) => {
     }
     case CJoliActions.LOAD_GALLERY: {
       return { ...state, gallery: action.payload };
+    }
+    case CJoliActions.SELECT_MODESCORE: {
+      return { ...state, modeScore: action.payload };
     }
   }
 };

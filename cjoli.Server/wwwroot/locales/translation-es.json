@@ -101,6 +101,8 @@
     "position": "Posición",
     "youngest": "Más joven",
     "select": "Seleccionar equipo",
+    "currentSeason": "Temporada actual",
+    "allSeasons": "Todas las temporadas",
     "chart": {
       "general": "General",
       "timeline": "Línea de tiempo"
@@ -128,6 +130,7 @@
     "defeat": "Derrota",
     "defeat-direct": "Derrota directa",
     "displayPhase": "Mostrar clasificación por fase",
+    "displaySquad": "Mostrar clasificación por grupo",
     "source": {
       "win": "Más victorias",
       "win-min": "Menos victorias",
