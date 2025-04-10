@@ -127,7 +127,8 @@
     "victory-direct": "Directe overwinning",
     "defeat": "Verlies",
     "defeat-direct": "Direct verlies",
-    "displayPhase": "Faseranglijst weergeven",
+    "displayPhase": "Toon ranglijst per fase",
+    "displaySquad": "Toon ranglijst per groep",
     "source": {
       "win": "Meer overwinningen",
       "win-min": "Minder overwinningen",

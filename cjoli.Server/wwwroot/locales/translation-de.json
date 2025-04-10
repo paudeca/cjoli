@@ -127,7 +127,8 @@
     "victory-direct": "Direkter Sieg",
     "defeat": "Niederlage",
     "defeat-direct": "Direkte Niederlage",
-    "displayPhase": "Rangliste der Phase anzeigen",
+    "displayPhase": "Phasenwertung anzeigen",
+    "displaySquad": "Gruppenwertung anzeigen",
     "source": {
       "win": "Mehr Siege",
       "win-min": "Weniger Siege",

@@ -128,6 +128,7 @@
     "defeat": "Derrota",
     "defeat-direct": "Derrota directa",
     "displayPhase": "Mostrar clasificación por fase",
+    "displaySquad": "Mostrar clasificación por grupo",
     "source": {
       "win": "Más victorias",
       "win-min": "Menos victorias",

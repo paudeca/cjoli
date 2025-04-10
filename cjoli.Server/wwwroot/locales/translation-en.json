@@ -127,7 +127,8 @@
     "victory-direct": "Direct victory",
     "defeat": "Defeat",
     "defeat-direct": "Direct defeat",
-    "displayPhase": "Display phase ranking",
+    "displayPhase": "Show ranking by phase",
+    "displaySquad": "Show ranking by group",
     "source": {
       "win": "More victories",
       "win-min": "Fewer victories",
