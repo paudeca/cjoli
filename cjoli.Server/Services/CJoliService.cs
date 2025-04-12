@@ -734,6 +734,14 @@ namespace cjoli.Server.Services
                     var tmp = new List<Score>(listScores);
                     tmp.Sort((a, b) =>
                     {
+                        if(a.Game==0)
+                        {
+                            return -1;
+                        }
+                        if(b.Game==0)
+                        {
+                            return 1;
+                        }
                         var valueA = (double)c.Val(a)/a.Game;
                         var valueB = (double)c.Val(b)/b.Game;
                         if (valueA > valueB) return c.Reverse ? 1 : -1;
@@ -744,9 +752,17 @@ namespace cjoli.Server.Services
                     });
                     int rank = tmp.FindIndex(s => s.TeamId == teamId);
                     int max = c.Reverse?c.Val(tmp[tmp.Count - 1]): c.Val(tmp[0]);
-                    double maxRatio = c.Reverse ? (double) c.Val(tmp[tmp.Count - 1])/ tmp[tmp.Count - 1].Game : (double) c.Val(tmp[0])/ tmp[0].Game;
-                    int min = c.Reverse? c.Val(tmp[0]):c.Val(tmp[tmp.Count - 1]);
-                    double minRatio = c.Reverse ? (double)c.Val(tmp[0]) / tmp[0].Game : (double)c.Val(tmp[tmp.Count - 1]) / tmp[tmp.Count - 1].Game;
+                    double maxRatio = 0;
+                    if((c.Reverse && tmp[tmp.Count - 1].Game>0) || (!c.Reverse && tmp[0].Game>0))
+                    {
+                        maxRatio = c.Reverse ? (double)c.Val(tmp[tmp.Count - 1]) / tmp[tmp.Count - 1].Game : (double)c.Val(tmp[0]) / tmp[0].Game;
+                    }
+                    int min = c.Reverse ? c.Val(tmp[0]) : c.Val(tmp[tmp.Count - 1]);
+                    double minRatio = 0;
+                    if ((c.Reverse && tmp[0].Game>0) || (!c.Reverse && tmp[tmp.Count - 1].Game>0))
+                    {
+                        minRatio = c.Reverse ? (double)c.Val(tmp[0]) / tmp[0].Game : (double)c.Val(tmp[tmp.Count - 1]) / tmp[tmp.Count - 1].Game;
+                    }
                     acc[c.Type] = new RankInfo { Rank = rank, Min = min, Max = max, MinRatio = minRatio, MaxRatio = maxRatio };
                     return acc;
                 });
