@@ -530,7 +530,7 @@ namespace cjoli.Server.Services
             ranking.Scores.ScoreTeams = scoreTeams;
         }
 
-        class IMatchResult
+        class IMatchResultt
         {
             public int Win;
             public int Loss;
@@ -539,16 +539,16 @@ namespace cjoli.Server.Services
             public int GoalAgainst;
             public int GoalDiff;
             public int ShutOut;
-            public Match Match;
+            public Match? Match;
         }
 
         private void CalculateHistoryByTimes(RankingDto ranking, Tourney tourney, CJoliContext context)
         {
             var query = context.MatchResult.Where(r => r.Match.Squad!.Phase.Tourney.Category == tourney.Category && (r.Win == 1 || r.Neutral == 1));
             var queryMatchAll = query
-                .Select(r=>new IMatchResult(){Win=r.Win, Loss=r.Loss, Neutral=r.Neutral, GoalFor=r.GoalFor, GoalAgainst=r.GoalAgainst, GoalDiff=r.GoalDiff, Match=r.Match, ShutOut=r.ShutOut}).Distinct();
+                .Select(r=>new MatchResultBase(){Win=r.Win, Loss=r.Loss, Neutral=r.Neutral, GoalFor=r.GoalFor, GoalAgainst=r.GoalAgainst, GoalDiff=r.GoalDiff, Match=r.Match, ShutOut=r.ShutOut}).Distinct();
             var queryMatchAllSeason = query.Where(r=>r.Match.Squad!.Phase.Tourney.Season == tourney.Season)
-                .Select(r => new IMatchResult() { Win = r.Win, Loss = r.Loss, Neutral = r.Neutral, GoalFor = r.GoalFor, GoalAgainst = r.GoalAgainst, GoalDiff = r.GoalDiff, Match = r.Match,ShutOut=r.ShutOut }).Distinct();
+                .Select(r => new MatchResultBase() { Win = r.Win, Loss = r.Loss, Neutral = r.Neutral, GoalFor = r.GoalFor, GoalAgainst = r.GoalAgainst, GoalDiff = r.GoalDiff, Match = r.Match,ShutOut=r.ShutOut }).Distinct();
 
             var func = (IQueryable<IMatchResult> query) =>
             {
@@ -572,7 +572,7 @@ namespace cjoli.Server.Services
             {
                 var mapScore = query
                     .GroupBy(r => r.Team.Id)
-                    .ToDictionary(kv => kv.Key, kv => SelectScore(kv)) ?? new Dictionary<int, Score>();
+                    .ToDictionary(kv => kv.Key, kv => ISelectScore(kv)) ?? new Dictionary<int, Score>();
                 return mapScore;
             };
             var mapAllTeam = funcMap(queryMatch);
@@ -587,26 +587,11 @@ namespace cjoli.Server.Services
 
         }
 
-        private Score SelectScore(IGrouping<int, MatchResult> o) 
-        {
-            return new Score
-            {
-                TeamId = o.Key,
-                Game = o.Count(),
-                Win = o.Sum(m => m.Win),
-                Neutral = o.Sum(m => m.Neutral),
-                Loss = o.Sum(m => m.Loss),
-                GoalFor = o.Sum(m => m.GoalFor),
-                GoalAgainst = o.Sum(m => m.GoalAgainst),
-                GoalDiff = o.Sum(m => m.GoalDiff),
-                ShutOut = o.Sum(m=>m.ShutOut),
-            };
-        }
-
         private Score ISelectScore(IGrouping<int, IMatchResult> o)
         {
             return new Score
             {
+                TeamId = o.Key,
                 Game = o.Count(),
                 Win = o.Sum(m => m.Win),
                 Neutral = o.Sum(m => m.Neutral),
@@ -749,8 +734,8 @@ namespace cjoli.Server.Services
                     var tmp = new List<Score>(listScores);
                     tmp.Sort((a, b) =>
                     {
-                        var valueA = c.Val(a);
-                        var valueB = c.Val(b);
+                        var valueA = (double)c.Val(a)/a.Game;
+                        var valueB = (double)c.Val(b)/b.Game;
                         if (valueA > valueB) return c.Reverse ? 1 : -1;
                         else if (valueA < valueB) return c.Reverse ? -1 : 1;
                         else if (a.TeamId == teamId) return -1;
@@ -759,8 +744,10 @@ namespace cjoli.Server.Services
                     });
                     int rank = tmp.FindIndex(s => s.TeamId == teamId);
                     int max = c.Reverse?c.Val(tmp[tmp.Count - 1]): c.Val(tmp[0]);
+                    double maxRatio = c.Reverse ? (double) c.Val(tmp[tmp.Count - 1])/ tmp[tmp.Count - 1].Game : (double) c.Val(tmp[0])/ tmp[0].Game;
                     int min = c.Reverse? c.Val(tmp[0]):c.Val(tmp[tmp.Count - 1]);
-                    acc[c.Type] = new RankInfo { Rank = rank, Min = min, Max = max };
+                    double minRatio = c.Reverse ? (double)c.Val(tmp[0]) / tmp[0].Game : (double)c.Val(tmp[tmp.Count - 1]) / tmp[tmp.Count - 1].Game;
+                    acc[c.Type] = new RankInfo { Rank = rank, Min = min, Max = max, MinRatio = minRatio, MaxRatio = maxRatio };
                     return acc;
                 });
                 scoreTeams[teamId].Ranks = mapResult;

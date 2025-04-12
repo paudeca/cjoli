@@ -14,4 +14,5 @@
         public int PenaltyA { get; set; }
         public int PenaltyB { get; set; }
     }
+
 }

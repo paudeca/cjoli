@@ -28,7 +28,7 @@ import {
 } from "chart.js";
 import { Rank, Score, Team } from "../../../models";
 import { useCJoli } from "../../../hooks/useCJoli";
-import React from "react";
+import React, { useCallback } from "react";
 
 ChartJS.register(
   CategoryScale,
@@ -74,29 +74,48 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
 
   const countTeams = ranking?.tourney.teams.length || 0;
   const winPt = ranking?.tourney.config.win || 2;
-  const ranks = score?.ranks;
+
+  const getDataRatio = useCallback((type: keyof Score, score: Score) => {
+    return (
+      ((score[type] as number) / score.game / score.ranks[type].maxRatio) * 100
+    );
+  }, []);
+
+  const getDataRatioReverse = useCallback((type: keyof Score, score: Score) => {
+    return (
+      ((score.ranks[type].maxRatio - (score[type] as number) / score.game) /
+        score.ranks[type].maxRatio) *
+      100
+    );
+  }, []);
 
   const getData = React.useCallback(
     (score: Score, rank?: Rank) => {
-      return [
-        score.game > 0 && modeScore == "tourney"
-          ? ((countTeams - (rank?.order || 0)) / countTeams) * 100
-          : 0,
-        (score.total / (score.game * winPt)) * 100,
-        (score.win / ranks!.win.max) * 100,
-        (score.neutral / ranks!.neutral.max) * 100,
-        ((ranks!.loss.max - score.loss) / ranks!.loss.max) * 100,
-        (score.goalFor / ranks!.goalFor.max) * 100,
-        ((ranks!.goalAgainst.max - score.goalAgainst) /
-          ranks!.goalAgainst.max) *
-          100,
-        (score.shutOut / ranks!.shutOut.max) * 100,
-        ((score.goalDiff - ranks!.goalDiff.min) /
-          (ranks!.goalDiff.max - ranks!.goalDiff.min)) *
+      let data: number[] = [];
+      if (modeScore == "tourney") {
+        data = [
+          score.game > 0 && modeScore == "tourney"
+            ? ((countTeams - (rank?.order || 0)) / (countTeams - 1)) * 100
+            : 0,
+          (score.total / (score.game * winPt)) * 100,
+        ];
+      }
+      data = [
+        ...data,
+        getDataRatio("win", score),
+        getDataRatio("neutral", score),
+        getDataRatioReverse("loss", score),
+        getDataRatio("goalFor", score),
+        getDataRatioReverse("goalAgainst", score),
+        getDataRatio("shutOut", score),
+        //getDataRatio("goalDiff", score),
+        ((score.goalDiff / score.game - score.ranks!.goalDiff.minRatio) /
+          (score.ranks!.goalDiff.maxRatio - score.ranks!.goalDiff.minRatio)) *
           100,
       ];
+      return data;
     },
-    [countTeams, ranks, winPt, modeScore]
+    [countTeams, winPt, modeScore, getDataRatio, getDataRatioReverse]
   );
 
   if (!team || !score) {
@@ -104,7 +123,10 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
   }
 
   const data = {
-    labels: ["Rang", "PTS", "V", "N", "D", "BP", "BC", "BL", "GA"],
+    labels:
+      modeScore == "tourney"
+        ? ["Rang", "PTS", "V", "N", "D", "BP", "BC", "BL", "GA"]
+        : ["V", "N", "D", "BP", "BC", "BL", "GA"],
     datasets: [
       {
         label: team.name,

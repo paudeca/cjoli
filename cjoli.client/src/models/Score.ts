@@ -15,6 +15,15 @@ export interface Score {
   penalty: number;
   time: Date;
   rank: number;
-  ranks: Record<string, { rank: number; max: number; min: number }>;
+  ranks: Record<
+    string,
+    {
+      rank: number;
+      max: number;
+      min: number;
+      maxRatio: number;
+      minRatio: number;
+    }
+  >;
   sources: Record<number, ScoreSource>;
 }

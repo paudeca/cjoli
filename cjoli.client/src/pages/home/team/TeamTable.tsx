@@ -38,36 +38,54 @@ const useFormatRank = () => {
 
 const useColumns = (tourney?: Tourney, teamB?: Team) => {
   const { t } = useTranslation();
+  const { modeScore } = useCJoli();
   const formatRank = useFormatRank();
 
   const winPt = tourney?.config.win || 2;
+  let columns: {
+    label: string;
+    description: string;
+    callRank?: (r: Rank) => number;
+    callScore?: (s: Score) => number;
+    getLabelRank?: (r: Rank) => number | string | undefined;
+    getLabelScore?: (s: Score) => number | string | undefined;
+    getInfo?: (r: Score) => string;
+    up: boolean;
+    active: boolean;
+    needTeam: boolean;
+  }[] = [];
 
-  let columns = [
-    {
-      label: "Rang",
-      description: t("rank.ranking", "Ranking"),
-      callRank: (r: Rank) => r.order || 0,
-      getLabel: (r: Rank) =>
-        r.order == 1
-          ? `${t("rank.first")} 🥇`
-          : r.order == 2
-            ? `${t("rank.second")} 🥈`
-            : r.order == 3
-              ? `${t("rank.third")} 🥉`
-              : t("rank.rankth", { rank: r.order }),
-      up: false,
-      active: true,
-      needTeam: true,
-    },
-    {
-      label: "PTS",
-      description: t("rank.total", "Points"),
-      callScore: (s: Score) => s.total,
-      getInfo: (s: Score) => percent(s.total, winPt * s.game),
-      up: true,
-      active: !!teamB,
-      needTeam: true,
-    },
+  if (modeScore == "tourney") {
+    columns = [
+      {
+        label: "Rang",
+        description: t("rank.ranking", "Ranking"),
+        callRank: (r: Rank) => r.order || 0,
+        getLabelRank: (r: Rank) =>
+          r.order == 1
+            ? `${t("rank.first")} 🥇`
+            : r.order == 2
+              ? `${t("rank.second")} 🥈`
+              : r.order == 3
+                ? `${t("rank.third")} 🥉`
+                : t("rank.rankth", { rank: r.order }),
+        up: false,
+        active: true,
+        needTeam: true,
+      },
+      {
+        label: "PTS",
+        description: t("rank.total", "Points"),
+        callScore: (s: Score) => s.total,
+        getInfo: (s: Score) => percent(s.total, winPt * s.game),
+        up: true,
+        active: !!teamB,
+        needTeam: true,
+      },
+    ];
+  }
+  columns = [
+    ...columns,
     {
       label: "PJ",
       description: t("rank.game", "Games played"),
@@ -113,7 +131,7 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
         if (!teamB) return s.goalFor / s.game;
         return s.goalFor;
       },
-      getLabel: (s: Score) => s.goalFor,
+      getLabelScore: (s: Score) => s.goalFor,
       getInfo: (s: Score) =>
         average(s.goalFor, s.game) + formatRank(s.ranks?.goalFor?.rank),
       up: true,
@@ -127,7 +145,7 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
         if (!teamB) return s.goalAgainst / s.game;
         return s.goalAgainst;
       },
-      getLabel: (s: Score) => s.goalAgainst,
+      getLabelScore: (s: Score) => s.goalAgainst,
       getInfo: (s: Score) =>
         average(s.goalAgainst, s.game) + formatRank(s.ranks?.goalAgainst?.rank),
       up: false,
@@ -141,7 +159,7 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
         if (!teamB) return s.shutOut / s.game;
         return s.shutOut;
       },
-      getLabel: (s: Score) => s.shutOut,
+      getLabelScore: (s: Score) => s.shutOut,
       getInfo: (s: Score) =>
         percent(s.shutOut, s.game) + formatRank(s.ranks?.shutOut?.rank),
       up: true,
@@ -155,7 +173,7 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
         if (!teamB) return s.goalDiff / s.game;
         return s.goalDiff;
       },
-      getLabel: (s: Score) => s.goalDiff,
+      getLabelScore: (s: Score) => s.goalDiff,
       getInfo: (s: Score) =>
         average(s.goalDiff, s.game) + formatRank(s.ranks?.goalDiff?.rank),
       up: true,
@@ -192,12 +210,9 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
     modeScore,
   } = useCJoli();
 
-  //const [mode, setMode] = useState<"tourney" | "season" | "allTime">("tourney");
-
   let rank = getTeamRank(team);
   let rankB = teamB && getTeamRank(teamB);
   const score = getScoreForTeam(modeScore, team)!;
-  //score = ranking?.scores.scoreTeamsSeason[team.id]!;
   let scoreB = teamB && getScoreForTeam(modeScore, teamB);
   const scoreSquad = squad && getScoreFromSquad(squad, team);
   const scoreSquadB = squad && teamB && getScoreFromSquad(squad, teamB);
@@ -268,8 +283,7 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
                     value={rank}
                     valueB={rankB}
                     call={c.callRank}
-                    getLabel={c.getLabel}
-                    getInfo={c.getInfo}
+                    getLabel={c.getLabelRank}
                     active={c.active && j == 0}
                     up={c.up}
                     display={!c.needTeam || !!team}
@@ -279,7 +293,7 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
                     value={score}
                     valueB={scoreB}
                     call={c.callScore!}
-                    getLabel={c.getLabel}
+                    getLabel={c.getLabelScore}
                     getInfo={c.getInfo}
                     active={c.active && j == 0}
                     up={c.up}
