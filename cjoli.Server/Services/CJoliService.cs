@@ -6,6 +6,7 @@ using cjoli.Server.Models;
 using cjoli.Server.Models.AI;
 using cjoli.Server.Services.Rules;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -578,6 +579,19 @@ namespace cjoli.Server.Services
             var mapAllTeam = funcMap(queryMatch);
             var mapAllTeamSeason = funcMap(queryMatchSeason);
 
+            tourney.Teams.ToList().ForEach(t =>
+            {
+                if(!mapAllTeam.ContainsKey(t.Id))
+                {
+                    mapAllTeam.Add(t.Id, new Score() { TeamId=t.Id});
+                }
+                if (!mapAllTeamSeason.ContainsKey(t.Id))
+                {
+                    mapAllTeamSeason.Add(t.Id, new Score() { TeamId=t.Id});
+                }
+
+            });
+
             SortTeams(mapAllTeam);
             SortTeams(mapAllTeamSeason);
 
@@ -751,19 +765,28 @@ namespace cjoli.Server.Services
                         return 1;
                     });
                     int rank = tmp.FindIndex(s => s.TeamId == teamId);
-                    int max = c.Reverse?c.Val(tmp[tmp.Count - 1]): c.Val(tmp[0]);
-                    double maxRatio = 0;
-                    if((c.Reverse && tmp[tmp.Count - 1].Game>0) || (!c.Reverse && tmp[0].Game>0))
+
+                    var filterTmp = tmp.Where(s => s.Game > 0).ToList();
+                    if(filterTmp.Count>0)
                     {
-                        maxRatio = c.Reverse ? (double)c.Val(tmp[tmp.Count - 1]) / tmp[tmp.Count - 1].Game : (double)c.Val(tmp[0]) / tmp[0].Game;
-                    }
-                    int min = c.Reverse ? c.Val(tmp[0]) : c.Val(tmp[tmp.Count - 1]);
-                    double minRatio = 0;
-                    if ((c.Reverse && tmp[0].Game>0) || (!c.Reverse && tmp[tmp.Count - 1].Game>0))
+                        int max = c.Reverse ? c.Val(filterTmp[filterTmp.Count - 1]) : c.Val(filterTmp[0]);
+                        double maxRatio = 0;
+                        if ((c.Reverse && filterTmp[filterTmp.Count - 1].Game > 0) || (!c.Reverse && filterTmp[0].Game > 0))
+                        {
+                            maxRatio = c.Reverse ? (double)c.Val(filterTmp[filterTmp.Count - 1]) / filterTmp[filterTmp.Count - 1].Game : (double)c.Val(filterTmp[0]) / filterTmp[0].Game;
+                        }
+                        int min = c.Reverse ? c.Val(filterTmp[0]) : c.Val(filterTmp[filterTmp.Count - 1]);
+                        double minRatio = 0;
+                        if ((c.Reverse && filterTmp[0].Game > 0) || (!c.Reverse && filterTmp[filterTmp.Count - 1].Game > 0))
+                        {
+                            minRatio = c.Reverse ? (double)c.Val(filterTmp[0]) / filterTmp[0].Game : (double)c.Val(filterTmp[filterTmp.Count - 1]) / filterTmp[filterTmp.Count - 1].Game;
+                        }
+                        acc[c.Type] = new RankInfo { Rank = rank, Min = min, Max = max, MinRatio = minRatio, MaxRatio = maxRatio };
+                    } else
                     {
-                        minRatio = c.Reverse ? (double)c.Val(tmp[0]) / tmp[0].Game : (double)c.Val(tmp[tmp.Count - 1]) / tmp[tmp.Count - 1].Game;
+                        acc[c.Type] = new RankInfo { Rank = rank, Min = 0, Max = 0, MinRatio = 0, MaxRatio = 0 };
                     }
-                    acc[c.Type] = new RankInfo { Rank = rank, Min = min, Max = max, MinRatio = minRatio, MaxRatio = maxRatio };
+
                     return acc;
                 });
                 scoreTeams[teamId].Ranks = mapResult;
