@@ -235,6 +235,11 @@ export const useCJoli = (page?: TypePage) => {
     selectPage,
     selectModeScore,
     isHomePage: state.page == "home",
-    isCastPage: state.page == "cast",
+    isCastPage: state.page == "cast" || state.page == "fullcast",
+    isXl: state.page == "fullcast",
+    classNamesCast:
+      state.page == "fullcast"
+        ? { title: "display-1", table: "display-5", padding: "p-3", radar: 24 }
+        : { title: undefined, table: undefined, padding: undefined, radar: 12 },
   };
 };

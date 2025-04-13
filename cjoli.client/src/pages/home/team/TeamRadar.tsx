@@ -62,7 +62,14 @@ interface TeamRadarProps {
 }
 
 const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
-  const { ranking, getTeamRank, getScoreForTeam, modeScore } = useCJoli();
+  const {
+    ranking,
+    getTeamRank,
+    getScoreForTeam,
+    modeScore,
+    isXl,
+    classNamesCast,
+  } = useCJoli();
   const options = {
     responsive: true,
   };
@@ -153,8 +160,8 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
   return (
     <div
       style={{
-        width: "100%",
-        maxHeight: 450,
+        width: isXl ? "70%" : "100%",
+        maxHeight: isXl ? 1000 : 450,
       }}
     >
       <Radar
@@ -162,7 +169,24 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
         options={{
           ...options,
           scales: {
-            r: { beginAtZero: true, display: true },
+            r: {
+              beginAtZero: true,
+              display: true,
+              ticks: { font: { size: classNamesCast.radar } },
+              pointLabels: {
+                font: { size: classNamesCast.radar },
+              },
+            },
+          },
+
+          plugins: {
+            legend: {
+              labels: {
+                font: {
+                  size: classNamesCast.radar,
+                },
+              },
+            },
           },
         }}
       />

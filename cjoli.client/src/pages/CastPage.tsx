@@ -9,18 +9,26 @@ import RankingStack from "./home/RankingStack";
 import MatchesStack from "./home/MatchesStack";
 import useScreenSize from "../hooks/useScreenSize";
 import TeamStack from "./home/TeamStack";
+import { useRef } from "react";
 
-let idleTime = 0;
+interface CastPageProps {
+  xl?: boolean;
+}
 
-const CastPage = () => {
-  const { gallery, phases, teams, tourney } = useCJoli("cast");
+const CastPage = ({ xl }: CastPageProps) => {
+  const { gallery, phases, teams, tourney } = useCJoli(
+    xl ? "fullcast" : "cast"
+  );
   const { getGallery, getRanking } = useApi();
   const uid = useUid();
   const { isMobile } = useScreenSize();
+  const { isXl } = useCJoli();
 
   const [teamId, setTeamId] = useState(0);
   const [teamIdB, setTeamIdB] = useState(0);
   const [images, setImages] = useState(gallery?.messages ?? []);
+  const [index, setIndex] = useState(0);
+
   useEffect(() => {
     if (gallery) {
       const images = (gallery?.messages ?? [])
@@ -31,19 +39,12 @@ const CastPage = () => {
     }
   }, [gallery]);
 
-  useEffect(() => {
-    return () => {
-      clearTimeout(idleTime);
-    };
-  }, []);
-
   useQuery({
     ...getRanking(uid),
     refetchInterval: 10000,
   });
-  const { isLoading } = useQuery({
+  const { isLoading, refetch } = useQuery({
     ...getGallery(uid, 0, false, true),
-    refetchInterval: 10000 * (phases ?? [{}]).length,
   });
 
   type TypePage = "ranking" | "match" | "team" | "image" | "qrcode";
@@ -68,7 +69,9 @@ const CastPage = () => {
               <img
                 src={m.mediaUrl}
                 className="img-fluid mx-auto d-block"
-                style={{ height: isMobile ? "inherit" : "80vh" }}
+                style={{
+                  height: isMobile ? "inherit" : isXl ? "100vh" : "80vh",
+                }}
               />
             </div>
           ),
@@ -80,7 +83,9 @@ const CastPage = () => {
               <img
                 src={`/qrcodes/${uid}.png`}
                 className="img-fluid mx-auto d-block"
-                style={{ height: isMobile ? "inherit" : "80vh" }}
+                style={{
+                  height: isMobile ? "inherit" : isXl ? "100vh" : "80vh",
+                }}
               />
             ),
           });
@@ -91,17 +96,24 @@ const CastPage = () => {
     [] as { type: TypePage; content: ReactNode }[]
   );
 
-  const scrollDown = (delay: number) => {
-    idleTime = window.setTimeout(() => {
-      window.scrollTo({
-        top: window.scrollY + screen.height,
-        behavior: "smooth",
-      });
-      if (window.scrollY + screen.height < document.body.scrollHeight) {
-        scrollDown(delay);
+  const id = useRef<ReturnType<typeof setInterval>>();
+  useEffect(() => {
+    id.current = setInterval(() => {
+      console.log("Check");
+      const height = screen.height;
+      if (window.scrollY + height < document.body.scrollHeight) {
+        window.scrollTo({
+          top: window.scrollY + height - 250,
+          behavior: "smooth",
+        });
+      } else {
+        setIndex((index + 1) % items.length);
       }
-    }, delay);
-  };
+    }, 5000);
+    return () => {
+      clearInterval(id.current);
+    };
+  }, [index, items.length]);
 
   return (
     <Loading ready={!isLoading}>
@@ -112,12 +124,12 @@ const CastPage = () => {
               fade={false}
               wrap
               slide={false}
-              interval={10000}
+              interval={null}
+              activeIndex={index}
+              onSelect={setIndex}
               pause={false}
               onSlide={(eventKey) => {
-                if (idleTime) {
-                  clearTimeout(idleTime);
-                }
+                window.scrollTo({ top: 0, behavior: "instant" });
                 if (items[eventKey].type == "match") {
                   if (teams) {
                     const team =
@@ -127,16 +139,8 @@ const CastPage = () => {
                     const teamB =
                       teamFilter[Math.floor(Math.random() * teamFilter.length)];
                     setTeamIdB(teamB.id);
+                    refetch();
                   }
-                }
-                window.scrollTo({
-                  top: 0,
-                });
-                const pages = Math.floor(
-                  document.body.scrollHeight / screen.height
-                );
-                if (pages > 0) {
-                  scrollDown(10000 / (pages + 1));
                 }
               }}
               onSlid={() => {}}

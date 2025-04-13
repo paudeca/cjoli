@@ -2,6 +2,7 @@ import { Badge } from "react-bootstrap";
 import TeamName from "../../../components/TeamName";
 import { Trans } from "react-i18next";
 import PenaltyBadge from "../../../components/PenaltyBadge";
+import { useCJoli } from "../../../hooks/useCJoli";
 
 const TeamCell = ({
   positionId,
@@ -12,9 +13,10 @@ const TeamCell = ({
   forfeit: boolean;
   penalty: number;
 }) => {
+  const { isCastPage } = useCJoli();
   return (
     <>
-      <TeamName positionId={positionId} />
+      <TeamName positionId={positionId} hideFavorite={isCastPage} />
       {forfeit && (
         <Badge bg="danger" className="mx-2">
           <Trans i18nKey="match.forfeit">Forfeit</Trans>

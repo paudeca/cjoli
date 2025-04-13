@@ -19,7 +19,8 @@ interface MatchesStackProps extends JSX.IntrinsicAttributes {
   modeCast?: boolean;
 }
 const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
-  const { matches, daySelected, selectDay, isCastPage } = useCJoli();
+  const { matches, daySelected, selectDay, isCastPage, classNamesCast } =
+    useCJoli();
   const { events } = phase;
   const uid = useUid();
   const { squadId } = useParams();
@@ -119,7 +120,9 @@ const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
                 return (
                   <Accordion.Item key={index} eventKey={key} data-testid={key}>
                     <Accordion.Header>
-                      {upperFirstLetter(dayjs(key).format("dddd LL"))}
+                      <span className={classNamesCast.table}>
+                        {upperFirstLetter(dayjs(key).format("dddd LL"))}
+                      </span>
                     </Accordion.Header>
                     <Accordion.Body>
                       <Table
@@ -127,6 +130,7 @@ const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
                         bordered
                         hover
                         style={{ textAlign: "center" }}
+                        className={classNamesCast.table}
                       >
                         <tbody>
                           {Object.keys(map).map((k) =>

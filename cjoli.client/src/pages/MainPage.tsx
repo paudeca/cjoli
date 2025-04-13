@@ -52,6 +52,7 @@ const MainPage = () => {
     isHomePage,
     isCastPage,
     daySelected,
+    isXl,
   } = useCJoli();
   const uid = useUid();
   const { pathname } = useLocation();
@@ -128,7 +129,7 @@ const MainPage = () => {
     <ThemeProvider theme={theme}>
       <Global styles={style} />
       <Loading ready={!isLoading}>
-        <MenuNav />
+        {!isXl && <MenuNav />}
         <Outlet />
         {!isCastPage && (
           <ButtonFixed>

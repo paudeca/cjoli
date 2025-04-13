@@ -36,7 +36,8 @@ interface RankTableSquadProps {
 }
 
 const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
-  const { tourney, ranking, loadRanking } = useCJoli();
+  const { tourney, ranking, loadRanking, isCastPage, classNamesCast, isXl } =
+    useCJoli();
   const { squadId } = useParams();
   const navigate = useNavigate();
   const uid = useUid();
@@ -80,7 +81,7 @@ const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
   return (
     <Card.Body>
       <Card.Title>
-        {squadId && (
+        {squadId && !isCastPage && (
           <MyArrowLeftSquareFill
             role="button"
             className="mx-2"
@@ -88,13 +89,15 @@ const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
             onClick={() => navigate(`${path}phase/${phase.id}`)}
           />
         )}
-        {squad ? squad.name : phase.name}
+        <span className={classNamesCast.title}>
+          {squad ? squad.name : phase.name}
+        </span>
         <SimulationIcon
           show={hasSimulation}
           title={`${t("rank.simulation", "Simulation")} - ${squad?.name ?? phase.name}`}
           onRemove={handleRemove(userMatches)}
         />
-        {squad && !squadId && squads.length > 1 && (
+        {!isCastPage && squad && !squadId && squads.length > 1 && (
           <MyArrowRightSquareFill
             role="button"
             className="mx-2"
@@ -105,65 +108,83 @@ const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
           />
         )}
       </Card.Title>
-      <Table striped bordered hover size="sm" style={{ textAlign: "center" }}>
+      <Table
+        striped
+        bordered
+        hover
+        size="sm"
+        style={{ textAlign: "center" }}
+        className={classNamesCast.table}
+      >
         <thead>
           <tr>
-            <th rowSpan={isMobile ? 2 : 1}>#</th>
-            <th colSpan={isMobile ? 8 : 1} className="w-50">
+            <th rowSpan={isMobile ? 2 : 1} className={classNamesCast.padding}>
+              #
+            </th>
+            <th
+              colSpan={isMobile ? 8 : 1}
+              className={`${classNamesCast.padding} w-50`}
+            >
               <Trans i18nKey="rank.team">Team</Trans>
             </th>
-            <MyTh rowSpan={isMobile ? 2 : 1}>
+            <MyTh rowSpan={isMobile ? 2 : 1} className={classNamesCast.padding}>
               <CJoliTooltip info={t("rank.total", "Points")}>PTS</CJoliTooltip>
             </MyTh>
             {!isMobile && (
               <>
-                <th>
+                <th className={classNamesCast.padding}>
                   <CJoliTooltip info={t("rank.game", "Games played")}>
                     PJ
                   </CJoliTooltip>
                 </th>
-                <th>
+                <th className={classNamesCast.padding}>
                   <CJoliTooltip info={t("rank.win", "Victories")}>
                     V
                   </CJoliTooltip>
                 </th>
-                <th>
+                <th className={classNamesCast.padding}>
                   <CJoliTooltip info={t("rank.neutral", "Drawn games")}>
                     N
                   </CJoliTooltip>
                 </th>
-                <th>
+                <th className={classNamesCast.padding}>
                   <CJoliTooltip info={t("rank.loss", "Defeats")}>
                     D
                   </CJoliTooltip>
                 </th>
-                <th>
-                  <CJoliTooltip info={t("rank.goalFor", "Goals for")}>
-                    BP
-                  </CJoliTooltip>
-                </th>
-                <th>
-                  <CJoliTooltip info={t("rank.goalAgainst", "Goals against")}>
-                    BC
-                  </CJoliTooltip>
-                </th>
-                <th>
-                  <CJoliTooltip info={t("rank.shutOut", "ShutOut")}>
-                    BL
-                  </CJoliTooltip>
-                </th>
-                {tourney.config?.hasPenalty && (
-                  <th>
-                    <CJoliTooltip info={t("rank.penalty", "Penalty")}>
-                      P
-                    </CJoliTooltip>
-                  </th>
+                {!isXl && (
+                  <>
+                    <th className={classNamesCast.padding}>
+                      <CJoliTooltip info={t("rank.goalFor", "Goals for")}>
+                        BP
+                      </CJoliTooltip>
+                    </th>
+                    <th className={classNamesCast.padding}>
+                      <CJoliTooltip
+                        info={t("rank.goalAgainst", "Goals against")}
+                      >
+                        BC
+                      </CJoliTooltip>
+                    </th>
+                    <th className={classNamesCast.padding}>
+                      <CJoliTooltip info={t("rank.shutOut", "ShutOut")}>
+                        BL
+                      </CJoliTooltip>
+                    </th>
+                    {tourney.config?.hasPenalty && (
+                      <th className={classNamesCast.padding}>
+                        <CJoliTooltip info={t("rank.penalty", "Penalty")}>
+                          P
+                        </CJoliTooltip>
+                      </th>
+                    )}
+                    <th className={classNamesCast.padding}>
+                      <CJoliTooltip info={t("rank.goalDiff", "Goal average")}>
+                        +/-
+                      </CJoliTooltip>
+                    </th>
+                  </>
                 )}
-                <th>
-                  <CJoliTooltip info={t("rank.goalDiff", "Goal average")}>
-                    +/-
-                  </CJoliTooltip>
-                </th>
               </>
             )}
           </tr>

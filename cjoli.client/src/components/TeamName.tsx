@@ -33,7 +33,7 @@ const TeamName = ({
   defaultName?: string;
   hideFavorite?: boolean;
 }) => {
-  const { getTeamInfo, getTeam, findTeam } = useCJoli();
+  const { getTeamInfo, getTeam, findTeam, isXl } = useCJoli();
   const { userConfig, isConnected, handleSaveUserConfig } = useUser();
   const { showToast } = useToast();
   const { t } = useTranslation();
@@ -69,7 +69,7 @@ const TeamName = ({
             t("user.favoriteRemoved", "Favorite team removed")
           );
     },
-    [handleSaveUserConfig, userConfig, showToast, t]
+    [handleSaveUserConfig, userConfig, showToast, t, isConnected]
   );
 
   const isCurrentTeam =
@@ -100,8 +100,11 @@ const TeamName = ({
         )}
       <img
         src={logo}
-        style={{ maxWidth: "30px", maxHeight: "30px" }}
-        className="mx-2"
+        style={{
+          maxWidth: isXl ? "60px" : "30px",
+          maxHeight: isXl ? "60px" : "30px",
+        }}
+        className={isXl ? "mx-3" : "mx-2"}
       />
       <span>
         {isCurrentTeam ? <MyTeam color={color}>{fullname}</MyTeam> : fullname}

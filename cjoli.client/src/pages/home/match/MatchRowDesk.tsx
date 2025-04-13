@@ -19,7 +19,7 @@ import ScoreMatchView from "./ScoreMatchView";
 const CellInputDesk = () => {
   const { isConnected, isAdmin } = useUser();
   const { t } = useTranslation();
-  const { getSquad } = useCJoli();
+  const { getSquad, classNamesCast } = useCJoli();
   const { match, saveMatch, updateMatch, register, teamA, teamB, modeCast } =
     useMatchRow();
   const editMode =
@@ -30,7 +30,7 @@ const CellInputDesk = () => {
         match.time > dayjs().format("YYYY-MM-DDTHH:mm:ss")));
 
   return (
-    <td>
+    <td className={classNamesCast.padding}>
       <MyScoreDiv isMobile={false}>
         {!editMode && !modeCast && (
           <CJoliTooltip info={t("match.simulated", "Simulated result")}>
@@ -102,7 +102,7 @@ const CellInputDesk = () => {
 };
 
 const CellViewDesk = () => {
-  const { getSquad } = useCJoli();
+  const { getSquad, classNamesCast, isCastPage } = useCJoli();
   const { isConnected, isAdmin } = useUser();
   const { match, imatch, clearMatch, teamA, teamB, isSimulation, modeCast } =
     useMatchRow();
@@ -110,9 +110,9 @@ const CellViewDesk = () => {
     !modeCast && (isAdmin || (isConnected && isSimulation && !match.done));
 
   return (
-    <td>
+    <td className={classNamesCast.padding}>
       <MyScoreDiv isMobile={false}>
-        {teamA && teamB && (
+        {!isCastPage && teamA && teamB && (
           <CompareButton
             team={teamA}
             teamB={teamB}
@@ -138,16 +138,18 @@ interface MatchRowDeskProps {
 }
 
 const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
-  const { getSquad } = useCJoli();
+  const { getSquad, classNamesCast } = useCJoli();
   const { match, imatch, isSimulation, done, hasLocation } = useMatchRow();
   const squad = getSquad(match.squadId);
   const { t } = useTranslation();
   return (
     <tr data-testid={`match-${match.id}`}>
       {index == 0 && (
-        <td rowSpan={rowSpan}>{dayjs(match.time).format("LT")}</td>
+        <td rowSpan={rowSpan} className={classNamesCast.padding}>
+          {dayjs(match.time).format("LT")}
+        </td>
       )}
-      <td>
+      <td className={classNamesCast.padding}>
         <LeftCenterDiv>
           {!match.isEvent
             ? squad?.name
@@ -157,7 +159,7 @@ const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
         </LeftCenterDiv>
       </td>
       {hasLocation && <td>{match.location}</td>}
-      <td>
+      <td className={classNamesCast.padding}>
         <LeftCenterDiv>
           <TeamCell
             positionId={match.positionIdA}
@@ -168,7 +170,7 @@ const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
       </td>
       {!done && <CellInputDesk />}
       {done && <CellViewDesk />}
-      <td>
+      <td className={classNamesCast.padding}>
         <LeftCenterDiv>
           <TeamCell
             positionId={match.positionIdB}

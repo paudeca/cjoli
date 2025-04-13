@@ -75,6 +75,10 @@ const App = () => {
           element: <CastPage />,
         },
         {
+          path: isUseDomain ? "fullcast" : ":uid/fullcast",
+          element: <CastPage xl />,
+        },
+        {
           path: isUseDomain ? "gallery/:mode?" : ":uid/gallery/:mode?",
           element: <GalleryPage />,
         },

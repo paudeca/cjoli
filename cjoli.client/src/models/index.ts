@@ -29,7 +29,8 @@ type TypePage =
   | "ranking"
   | "setting"
   | "gallery"
-  | "cast";
+  | "cast"
+  | "fullcast";
 
 export type {
   Gallery,

@@ -49,7 +49,7 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
     callScore?: (s: Score) => number;
     getLabelRank?: (r: Rank) => number | string | undefined;
     getLabelScore?: (s: Score) => number | string | undefined;
-    getInfo?: (r: Score) => string;
+    getInfo?: (r: Score) => string | boolean;
     up: boolean;
     active: boolean;
     needTeam: boolean;
@@ -77,7 +77,7 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
         label: "PTS",
         description: t("rank.total", "Points"),
         callScore: (s: Score) => s.total,
-        getInfo: (s: Score) => percent(s.total, winPt * s.game),
+        getInfo: (s: Score) => s.game > 0 && percent(s.total, winPt * s.game),
         up: true,
         active: !!teamB,
         needTeam: true,
@@ -99,7 +99,7 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
       description: t("rank.win", "Victories"),
       callScore: (s: Score) => s.win,
       getInfo: (s: Score) =>
-        percent(s.win, s.game) + formatRank(s.ranks?.win?.rank),
+        s.game > 0 && percent(s.win, s.game) + formatRank(s.ranks?.win?.rank),
       up: true,
       active: !!teamB,
       needTeam: false,
@@ -109,6 +109,7 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
       description: t("rank.neutral", "Drawn games"),
       callScore: (s: Score) => s.neutral,
       getInfo: (s: Score) =>
+        s.game > 0 &&
         percent(s.neutral, s.game) + formatRank(s.ranks?.neutral?.rank),
       up: true,
       active: false,
@@ -119,7 +120,7 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
       description: t("rank.loss", "Defeats"),
       callScore: (s: Score) => s.loss,
       getInfo: (s: Score) =>
-        percent(s.loss, s.game) + formatRank(s.ranks?.loss?.rank),
+        s.game > 0 && percent(s.loss, s.game) + formatRank(s.ranks?.loss?.rank),
       up: false,
       active: !!teamB,
       needTeam: false,
@@ -133,6 +134,7 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
       },
       getLabelScore: (s: Score) => s.goalFor,
       getInfo: (s: Score) =>
+        s.game > 0 &&
         average(s.goalFor, s.game) + formatRank(s.ranks?.goalFor?.rank),
       up: true,
       active: true,
@@ -147,6 +149,7 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
       },
       getLabelScore: (s: Score) => s.goalAgainst,
       getInfo: (s: Score) =>
+        s.game > 0 &&
         average(s.goalAgainst, s.game) + formatRank(s.ranks?.goalAgainst?.rank),
       up: false,
       active: true,
@@ -161,6 +164,7 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
       },
       getLabelScore: (s: Score) => s.shutOut,
       getInfo: (s: Score) =>
+        s.game > 0 &&
         percent(s.shutOut, s.game) + formatRank(s.ranks?.shutOut?.rank),
       up: true,
       active: true,
@@ -175,6 +179,7 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
       },
       getLabelScore: (s: Score) => s.goalDiff,
       getInfo: (s: Score) =>
+        s.game > 0 &&
         average(s.goalDiff, s.game) + formatRank(s.ranks?.goalDiff?.rank),
       up: true,
       active: true,
@@ -189,6 +194,7 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
         description: t("rank.penalty", "Penalties"),
         callScore: (s: Score) => s.penalty,
         getInfo: (s: Score) =>
+          s.game > 0 &&
           average(s.penalty, s.game) + formatRank(s.ranks?.penalty?.rank),
         up: false,
         active: true,
@@ -208,6 +214,7 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
     getScoreForTeam,
     getScoreFromSquad,
     modeScore,
+    classNamesCast,
   } = useCJoli();
 
   let rank = getTeamRank(team);
@@ -251,61 +258,65 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
   const columns = useColumns(tourney, teamB);
 
   return (
-    <Table striped bordered size="sm" style={{ textAlign: "center" }}>
-      <thead>
-        <tr>
-          <th />
-          {datas.map(({ team }) => (
-            <th key={team?.id || 0}>
-              {team ? (
-                <TeamName teamId={team.id} hideFavorite />
-              ) : modeScore == "tourney" ? (
-                tourney?.name
-              ) : modeScore == "season" ? (
-                <Trans i18nKey="team.currentSeason">Current season</Trans>
-              ) : (
-                <Trans i18nKey="team.allSeasons">All seasons</Trans>
-              )}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {columns.map((c, i) => (
-          <tr key={i}>
-            <td>
-              <CJoliTooltip info={c.description}>{c.label}</CJoliTooltip>
-            </td>
-            {datas.map(({ team, rank, score }, j) => (
-              <React.Fragment key={j}>
-                {c.callRank ? (
-                  <TeamCell
-                    value={rank}
-                    valueB={rankB}
-                    call={c.callRank}
-                    getLabel={c.getLabelRank}
-                    active={c.active && j == 0}
-                    up={c.up}
-                    display={!c.needTeam || !!team}
-                  />
+    <div className="" style={{ width: "100%" }}>
+      <Table striped bordered size="sm" style={{ textAlign: "center" }}>
+        <thead>
+          <tr>
+            <th />
+            {datas.map(({ team }) => (
+              <th key={team?.id || 0} className={classNamesCast.padding}>
+                {team ? (
+                  <TeamName teamId={team.id} hideFavorite />
+                ) : modeScore == "tourney" ? (
+                  tourney?.name
+                ) : modeScore == "season" ? (
+                  <Trans i18nKey="team.currentSeason">Current season</Trans>
                 ) : (
-                  <TeamCell
-                    value={score}
-                    valueB={scoreB}
-                    call={c.callScore!}
-                    getLabel={c.getLabelScore}
-                    getInfo={c.getInfo}
-                    active={c.active && j == 0}
-                    up={c.up}
-                    display={!c.needTeam || (!!team && modeScore == "tourney")}
-                  />
+                  <Trans i18nKey="team.allSeasons">All seasons</Trans>
                 )}
-              </React.Fragment>
+              </th>
             ))}
           </tr>
-        ))}
-      </tbody>
-    </Table>
+        </thead>
+        <tbody>
+          {columns.map((c, i) => (
+            <tr key={i}>
+              <td className={classNamesCast.padding}>
+                <CJoliTooltip info={c.description}>{c.label}</CJoliTooltip>
+              </td>
+              {datas.map(({ team, rank, score }, j) => (
+                <React.Fragment key={j}>
+                  {c.callRank ? (
+                    <TeamCell
+                      value={rank}
+                      valueB={rankB}
+                      call={c.callRank}
+                      getLabel={c.getLabelRank}
+                      active={c.active && j == 0}
+                      up={c.up}
+                      display={!c.needTeam || !!team}
+                    />
+                  ) : (
+                    <TeamCell
+                      value={score}
+                      valueB={scoreB}
+                      call={c.callScore!}
+                      getLabel={c.getLabelScore}
+                      getInfo={c.getInfo}
+                      active={c.active && j == 0}
+                      up={c.up}
+                      display={
+                        !c.needTeam || (!!team && modeScore == "tourney")
+                      }
+                    />
+                  )}
+                </React.Fragment>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </div>
   );
 };
 

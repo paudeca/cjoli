@@ -37,6 +37,8 @@ const RankTableScore = ({ score, phase, squad }: RankTableScoreProps) => {
     getTeamInfo,
     loadRanking,
     isCastPage,
+    isXl,
+    classNamesCast,
   } = useCJoli();
   const { isMobile } = useScreenSize();
   const { t } = useTranslation();
@@ -71,8 +73,10 @@ const RankTableScore = ({ score, phase, squad }: RankTableScoreProps) => {
   return (
     <>
       <tr>
-        <td rowSpan={isMobile ? 2 : 1}>{score.rank}</td>
-        <td colSpan={isMobile ? 8 : 1}>
+        <td rowSpan={isMobile ? 2 : 1} className={classNamesCast.padding}>
+          {score.rank}
+        </td>
+        <td colSpan={isMobile ? 8 : 1} className={classNamesCast.padding}>
           <Stack direction="horizontal">
             <LeftCenterDiv className="mx-auto">
               <TeamName
@@ -89,23 +93,29 @@ const RankTableScore = ({ score, phase, squad }: RankTableScoreProps) => {
               )*/}
               {team && !isCastPage && <ButtonTeam team={team} />}
             </LeftCenterDiv>
-            {position && (
+            {position && !isCastPage && (
               <InfoButton score={score} phase={phase} squad={squad} />
             )}
           </Stack>
         </td>
-        <MyTd rowSpan={isMobile ? 2 : 1}>{score.total}</MyTd>
+        <MyTd rowSpan={isMobile ? 2 : 1} className={classNamesCast.padding}>
+          {score.total}
+        </MyTd>
         {!isMobile && (
           <>
-            <td>{score.game}</td>
-            <td>{score.win}</td>
-            <td>{score.neutral}</td>
-            <td>{score.loss}</td>
-            <td>{score.goalFor}</td>
-            <td>{score.goalAgainst}</td>
-            <td>{score.shutOut}</td>
-            {tourney?.config?.hasPenalty && <td>{score.penalty}</td>}
-            <td>{score.goalDiff}</td>
+            <td className={classNamesCast.padding}>{score.game}</td>
+            <td className={classNamesCast.padding}>{score.win}</td>
+            <td className={classNamesCast.padding}>{score.neutral}</td>
+            <td className={classNamesCast.padding}>{score.loss}</td>
+            {!isXl && (
+              <>
+                <td>{score.goalFor}</td>
+                <td>{score.goalAgainst}</td>
+                <td>{score.shutOut}</td>
+                {tourney?.config?.hasPenalty && <td>{score.penalty}</td>}
+                <td>{score.goalDiff}</td>
+              </>
+            )}
           </>
         )}
       </tr>

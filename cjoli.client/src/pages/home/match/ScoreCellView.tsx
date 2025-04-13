@@ -1,5 +1,6 @@
 import { Badge } from "react-bootstrap";
 import { IMatch } from "../../../models";
+import { useCJoli } from "../../../hooks/useCJoli";
 
 interface ScoreCellViewProps {
   match: IMatch;
@@ -7,6 +8,7 @@ interface ScoreCellViewProps {
 }
 
 const ScoreCellView = ({ match, mode }: ScoreCellViewProps) => {
+  const { isXl } = useCJoli();
   let badge =
     (mode == "A" && match.scoreA > match.scoreB) ||
     (mode == "B" && match.scoreA < match.scoreB)
@@ -25,7 +27,10 @@ const ScoreCellView = ({ match, mode }: ScoreCellViewProps) => {
     <Badge
       bg={badge}
       text={text}
-      style={{ fontSize: "18px", opacity: match.done ? 1 : 0.6 }}
+      style={{
+        fontSize: isXl ? "32px" : "18px",
+        opacity: match.done ? 1 : 0.6,
+      }}
       className="my-1"
     >
       {mode == "A" ? match.scoreA : match.scoreB}

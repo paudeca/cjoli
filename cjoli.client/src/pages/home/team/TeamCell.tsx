@@ -1,5 +1,6 @@
 import { CaretDownFill, CaretUpFill, PauseFill } from "react-bootstrap-icons";
 import LeftCenterDiv from "../../../components/LeftCenterDiv";
+import { useCJoli } from "../../../hooks/useCJoli";
 
 interface CellValueProps<T> {
   value?: T;
@@ -42,7 +43,7 @@ type TeamCellProps<T> = {
   valueB?: T;
   call: (a: T) => number | undefined;
   getLabel?: (a: T) => string | number | undefined;
-  getInfo?: (a: T) => string;
+  getInfo?: (a: T) => string | boolean;
   up?: boolean;
   active: boolean;
   display: boolean;
@@ -58,6 +59,7 @@ const TeamCell = <T,>({
   active,
   display,
 }: TeamCellProps<T>) => {
+  const { isXl } = useCJoli();
   const calcul = up
     ? (a: number, b: number) => (a > b ? 1 : a == b ? 0 : -1)
     : (a: number, b: number) => (a < b ? 1 : a == b ? 0 : -1);
@@ -75,7 +77,10 @@ const TeamCell = <T,>({
           display={display}
         />
         {active && <CellEvolution result={result} valB={valB} />}
-        <span className="mx-1" style={{ fontSize: 11, color: "grey" }}>
+        <span
+          className="mx-1"
+          style={{ fontSize: isXl ? 36 : 11, color: "grey" }}
+        >
           {getInfo && value && display && getInfo(value)}
         </span>
       </LeftCenterDiv>
