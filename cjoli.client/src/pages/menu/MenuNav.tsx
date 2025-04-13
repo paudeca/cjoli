@@ -109,7 +109,7 @@ const MenuNav = () => {
               }
             >
               <Controller className="mx-2" />
-              Simulation
+              <Trans i18nKey="simulation.tooltip">Simulation</Trans>
             </ToggleButton>
             <div>
               <BetScoreTotal />

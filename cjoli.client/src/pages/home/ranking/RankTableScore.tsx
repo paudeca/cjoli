@@ -30,8 +30,14 @@ interface RankTableScoreProps {
   squad?: Squad;
 }
 const RankTableScore = ({ score, phase, squad }: RankTableScoreProps) => {
-  const { tourney, getTeam, getPosition, getTeamInfo, loadRanking } =
-    useCJoli();
+  const {
+    tourney,
+    getTeam,
+    getPosition,
+    getTeamInfo,
+    loadRanking,
+    isCastPage,
+  } = useCJoli();
   const { isMobile } = useScreenSize();
   const { t } = useTranslation();
   const uid = useUid();
@@ -69,7 +75,10 @@ const RankTableScore = ({ score, phase, squad }: RankTableScoreProps) => {
         <td colSpan={isMobile ? 8 : 1}>
           <Stack direction="horizontal">
             <LeftCenterDiv className="mx-auto">
-              <TeamName positionId={score.positionId} />
+              <TeamName
+                positionId={score.positionId}
+                hideFavorite={isCastPage}
+              />
               <SimulationIcon
                 show={hasSimulation}
                 title={`${t("rank.simulation", "Simulation")} - ${name}`}
@@ -78,7 +87,7 @@ const RankTableScore = ({ score, phase, squad }: RankTableScoreProps) => {
               {/*tourney.config?.hasPenalty && (
                 <PenaltyIcon positionId={score.positionId} />
               )*/}
-              {team && <ButtonTeam team={team} />}
+              {team && !isCastPage && <ButtonTeam team={team} />}
             </LeftCenterDiv>
             {position && (
               <InfoButton score={score} phase={phase} squad={squad} />
