@@ -10,13 +10,15 @@ import MatchesStack from "./home/MatchesStack";
 import useScreenSize from "../hooks/useScreenSize";
 import TeamStack from "./home/TeamStack";
 import { useRef } from "react";
+import dayjs from "dayjs";
+import { Match, Phase } from "../models";
 
 interface CastPageProps {
   xl?: boolean;
 }
 
 const CastPage = ({ xl }: CastPageProps) => {
-  const { gallery, phases, teams, tourney } = useCJoli(
+  const { gallery, phases, teams, tourney, matches } = useCJoli(
     xl ? "fullcast" : "cast"
   );
   const { getGallery, getRanking } = useApi();
@@ -49,16 +51,24 @@ const CastPage = ({ xl }: CastPageProps) => {
 
   type TypePage = "ranking" | "match" | "team" | "image" | "qrcode";
 
-  const items: { type: TypePage; content: ReactNode }[] = (phases ?? []).reduce(
-    (acc, p, i) => {
+  const items: { type: TypePage; content: ReactNode; phase: Phase }[] = (
+    phases ?? []
+  ).reduce(
+    (acc, phase, i) => {
       acc.push({
         type: "ranking",
-        content: <RankingStack phase={p} modeCast />,
+        content: <RankingStack phase={phase} modeCast />,
+        phase,
       });
-      acc.push({ type: "match", content: <MatchesStack phase={p} modeCast /> });
+      acc.push({
+        type: "match",
+        content: <MatchesStack phase={phase} modeCast />,
+        phase,
+      });
       acc.push({
         type: "team",
         content: <TeamStack teamId={teamId} teamIdB={teamIdB} modeCast />,
+        phase,
       });
       const m = images[i];
       if (m) {
@@ -75,6 +85,7 @@ const CastPage = ({ xl }: CastPageProps) => {
               />
             </div>
           ),
+          phase,
         });
         if (i == 0 && tourney?.whatsappNumber) {
           acc.push({
@@ -88,12 +99,13 @@ const CastPage = ({ xl }: CastPageProps) => {
                 }}
               />
             ),
+            phase,
           });
         }
       }
       return acc;
     },
-    [] as { type: TypePage; content: ReactNode }[]
+    [] as { type: TypePage; content: ReactNode; phase: Phase }[]
   );
 
   const id = useRef<ReturnType<typeof setInterval>>();
@@ -135,13 +147,33 @@ const CastPage = ({ xl }: CastPageProps) => {
                 window.scrollTo({ top: 0, behavior: "instant" });
                 if (items[eventKey] && items[eventKey].type == "match") {
                   if (teams) {
-                    const team =
-                      teams[Math.floor(Math.random() * teams.length)];
-                    setTeamId(team.id);
-                    const teamFilter = teams.filter((t) => t.id != team.id);
-                    const teamB =
-                      teamFilter[Math.floor(Math.random() * teamFilter.length)];
-                    setTeamIdB(teamB.id);
+                    const phase = items[eventKey].phase;
+                    const matchesPhase = phase.squads.reduce<Match[]>(
+                      (acc, s) => [...acc, ...s.matches],
+                      []
+                    );
+                    matchesPhase.sort((a, b) => (a.time > b.time ? 1 : -1));
+                    const nextMatches = matchesPhase.filter(
+                      (m) =>
+                        dayjs(m.time) > dayjs() &&
+                        !m.done &&
+                        m.teamIdA > 0 &&
+                        m.teamIdB > 0
+                    );
+                    if (nextMatches.length > 0) {
+                      setTeamId(nextMatches[0].teamIdA);
+                      setTeamIdB(nextMatches[0].teamIdB);
+                    } else {
+                      const team =
+                        teams[Math.floor(Math.random() * teams.length)];
+                      setTeamId(team.id);
+                      const teamFilter = teams.filter((t) => t.id != team.id);
+                      const teamB =
+                        teamFilter[
+                          Math.floor(Math.random() * teamFilter.length)
+                        ];
+                      setTeamIdB(teamB.id);
+                    }
                     refetch();
                   }
                 }
