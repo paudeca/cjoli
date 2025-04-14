@@ -1,4 +1,6 @@
-﻿namespace cjoli.Server.Models
+﻿using cjoli.Server.Models.AI;
+
+namespace cjoli.Server.Models
 {
     public class Score
     {
@@ -39,7 +41,7 @@
 
         public void Merge(Score score)
         {
-            Total += score.Total;
+            Total = Math.Round(Total + score.Total, 1);
             Game += score.Game;
             Win += score.Win;
             Neutral += score.Neutral;
