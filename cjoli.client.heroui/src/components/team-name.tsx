@@ -69,7 +69,7 @@ export const TeamName: FC<{
           />
         </Button>
       )}
-      <CJoliImage src={logo} isZoomed />
+      <CJoliImage src={logo} />
       <span
         className={`px-2 ${isCurrentTeam ? "font-semibold text-secondary" : ""}`}
       >

@@ -62,7 +62,7 @@ export const useHomePage = (map: Record<string, ReactNode>) => {
         content: map.ranking,
         title: t("home.ranking", "Ranking"),
         hide: !phase,
-        defaultExpanded: false,
+        defaultExpanded: true,
       },
       {
         key: "match",

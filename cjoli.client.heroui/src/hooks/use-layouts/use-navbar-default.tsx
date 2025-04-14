@@ -44,6 +44,21 @@ export const useNavbarDefault = () => {
               label: t("menu.ranking", "Ranking"),
               path: "/ranking",
             },
+            {
+              id: "gallery",
+              label: t("menu.gallery", "Photos"),
+              path: "/gallery",
+            },
+            {
+              id: "cast",
+              label: t("menu.cast", "Slideshow"),
+              path: "/cast",
+            },
+            {
+              id: "setting",
+              label: t("menu.setting", "Setting"),
+              path: "/setting",
+            },
           ]
         : [],
     [t, uid]
