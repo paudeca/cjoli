@@ -98,18 +98,21 @@ const CastPage = ({ xl }: CastPageProps) => {
 
   const id = useRef<ReturnType<typeof setInterval>>();
   useEffect(() => {
-    id.current = setInterval(() => {
-      console.log("Check");
-      const height = screen.height;
-      if (window.scrollY + height < document.body.scrollHeight) {
-        window.scrollTo({
-          top: window.scrollY + height - 250,
-          behavior: "smooth",
-        });
-      } else {
-        setIndex((index + 1) % items.length);
-      }
-    }, 5000);
+    try {
+      id.current = setInterval(() => {
+        const height = screen.height;
+        if (window.scrollY + height < document.body.scrollHeight) {
+          window.scrollTo({
+            top: window.scrollY + height - 250,
+            behavior: "smooth",
+          });
+        } else {
+          setIndex((index + 1) % items.length);
+        }
+      }, 5000);
+    } catch (e) {
+      console.error("excpetion in scroll down", e);
+    }
     return () => {
       clearInterval(id.current);
     };
@@ -130,7 +133,7 @@ const CastPage = ({ xl }: CastPageProps) => {
               pause={false}
               onSlide={(eventKey) => {
                 window.scrollTo({ top: 0, behavior: "instant" });
-                if (items[eventKey].type == "match") {
+                if (items[eventKey] && items[eventKey].type == "match") {
                   if (teams) {
                     const team =
                       teams[Math.floor(Math.random() * teams.length)];
