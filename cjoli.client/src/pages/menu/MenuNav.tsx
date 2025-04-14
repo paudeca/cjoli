@@ -93,7 +93,7 @@ const MenuNav = () => {
     >
       <Container fluid>
         <MenuBrand setShow={setShow} />
-        {user && tourneyLabel && !isCastPage && (
+        {isAdmin && tourneyLabel && !isCastPage && (
           <Stack direction="horizontal" gap={3}>
             <ToggleButton
               id="toggle-check"
