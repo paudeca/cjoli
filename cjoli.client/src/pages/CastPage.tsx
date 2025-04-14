@@ -18,7 +18,7 @@ interface CastPageProps {
 }
 
 const CastPage = ({ xl }: CastPageProps) => {
-  const { gallery, phases, teams, tourney, matches } = useCJoli(
+  const { gallery, phases, teams, tourney } = useCJoli(
     xl ? "fullcast" : "cast"
   );
   const { getGallery, getRanking } = useApi();
