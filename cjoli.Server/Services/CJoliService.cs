@@ -1108,6 +1108,7 @@ namespace cjoli.Server.Services
             evt.Datas = dto.Datas;
             context.SaveChanges();
             ClearCache(uuid, user);
+            _serverService.UpdateRanking(uuid);
         }
 
 
