@@ -1,4 +1,3 @@
-import { CjoliAccordion } from "@/components";
 import { CJoliLoading } from "@/components/cjoli-loading";
 import { useSelectPage } from "@/hooks";
 import { useTools } from "@cjoli/core";
@@ -14,56 +13,55 @@ export const SelectPage = () => {
 
   return (
     <CJoliLoading loading={!loaded}>
-      <CjoliAccordion
-        items={datas.map((d) => ({ ...d, defaultExpanded: true }))}
-      >
-        {(item) => (
-          <div className="gap-4 grid grid-cols sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
-            {item.tourneys.map((t) => (
-              <Card
-                key={t.id}
-                className="max-w-[400px]"
-                isPressable
-                onPress={() => goTourney(t)}
-              >
-                <CardHeader className="gap-3 bg-secondary-400 text-foreground">
-                  <Avatar
-                    name={t.name}
-                    radius="sm"
-                    isBordered
-                    color="primary"
-                    src=""
-                    classNames={{
-                      icon: "text-black/80",
-                      name: "text-xl subpixel-antialiased",
-                    }}
-                  />
-                  <div className="flex flex-col items-start text-left">
-                    <span className="text-large tracking-tight inline font-semibold text-background text-nowrap truncate w-50">
-                      {t.name}
-                    </span>
+      {datas.map((d) => (
+        <Card key={d.key} className="m-2 pb-2 px-2 md:m-4 md:pb-4">
+          <CardHeader>{d.title}</CardHeader>
+          <Divider />
+          <CardBody>
+            <div className="gap-4 grid grid-cols sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
+              {d.tourneys.map((t) => (
+                <Card key={t.id} isPressable onPress={() => goTourney(t)}>
+                  <CardHeader className="gap-3 bg-secondary-400 text-foreground">
+                    <Avatar
+                      name={t.name}
+                      radius="sm"
+                      isBordered
+                      color="primary"
+                      src={t.logo}
+                      classNames={{
+                        icon: "text-black/80",
+                        name: "text-xl subpixel-antialiased",
+                      }}
+                    />
+                    <div className="flex flex-col items-start text-left">
+                      <span className="text-large tracking-tight inline font-semibold text-background text-nowrap truncate w-50">
+                        {t.name}
+                      </span>
 
-                    <div className="text-xs text-background/80">{t.season}</div>
-                    <div className="text-xs text-background/80">
-                      {t.category}
+                      <div className="text-xs text-background/80">
+                        {t.season}
+                      </div>
+                      <div className="text-xs text-background/80">
+                        {t.category}
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
-                <Divider />
-                <CardBody>
-                  <p className="text-xs">
-                    {formatDate(t.startTime)} -{" "}
-                    {formatDate(t.endTime, { upper: false })}
-                  </p>
-                  <p className="text-xs text-right">
-                    {dayjs(t.startTime).fromNow()}
-                  </p>
-                </CardBody>
-              </Card>
-            ))}
-          </div>
-        )}
-      </CjoliAccordion>
+                  </CardHeader>
+                  <Divider />
+                  <CardBody>
+                    <p className="text-xs">
+                      {formatDate(t.startTime)} -{" "}
+                      {formatDate(t.endTime, { upper: false })}
+                    </p>
+                    <p className="text-xs text-right">
+                      {dayjs(t.startTime).fromNow()}
+                    </p>
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+      ))}
     </CJoliLoading>
   );
 };

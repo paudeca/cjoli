@@ -34,7 +34,7 @@ export const DefaultLayout: FC = memo(() => {
     <CJoliLoading loading={isLoading}>
       <div className="relative flex flex-col h-screen">
         <NavbarDefault page={page} />
-        <main className="container mx-auto max-w-7xl px-0 md:px-6 flex-grow pt-2 md:pt-16">
+        <main className="container mx-auto max-w-7xl px-0 md:px-6 flex-grow pt-2 md:pt-4">
           <Outlet />
         </main>
         <footer className="w-full flex items-end justify-start p-3">

@@ -86,7 +86,7 @@ export const SquadTableRanking: FC<SquadTableRankingProps> = ({
       );
     }
     return (
-      <div className="py-4">
+      <div className="py-2">
         {topContent}
         {hasSimulation && (
           <SimultPopover

@@ -16,4 +16,5 @@ export interface Tourney {
   ranks: Rank[];
   rule: string;
   config: TourneyConfig;
+  logo?: string;
 }

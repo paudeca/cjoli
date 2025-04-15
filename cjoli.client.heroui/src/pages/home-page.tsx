@@ -1,6 +1,5 @@
-import { CjoliAccordion } from "@/components";
 import { RankingkHome } from "./home/ranking-home";
-import { Alert } from "@heroui/react";
+import { Alert, Card, CardBody } from "@heroui/react";
 import { useTranslation } from "react-i18next";
 import { CJoliLoading } from "@/components/cjoli-loading";
 import { MatchHome } from "./home/match-home";
@@ -18,7 +17,13 @@ export const HomePage = memo(() => {
 
   return (
     <CJoliLoading loading={isLoading}>
-      <CjoliAccordion items={items}>{(item) => item.content}</CjoliAccordion>
+      {items
+        .filter((item) => !item.hide)
+        .map((item) => (
+          <Card key={item.key} className="mb-4">
+            <CardBody>{item.content}</CardBody>
+          </Card>
+        ))}
       {!isConfigured && (
         <div className="flex items-center justify-center w-full">
           <Alert
