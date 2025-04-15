@@ -3,7 +3,7 @@ import { Chip, getKeyValue, Tooltip } from "@heroui/react";
 import { FC, Fragment, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { ButtonSquadTableRanking } from "./button-squad-table-ranking";
-import { SimultPopover } from "@/components/popovers/simul-popover";
+import { SimulPopover } from "@/components/popovers/simul-popover";
 import { CellTeamSquadTableRanking } from "./cell-team-squad-table-ranking";
 import { useSquadTableRankingHomePage } from "@/hooks";
 import {
@@ -86,10 +86,10 @@ export const SquadTableRanking: FC<SquadTableRankingProps> = ({
       );
     }
     return (
-      <div className="py-2">
+      <div className="py-2 flex items-center">
         {topContent}
         {hasSimulation && (
-          <SimultPopover
+          <SimulPopover
             title={`${t("rank.simulation", "Simulation")} - ${squad.name}`}
             onRemove={handleRemove(userMatches)}
           />

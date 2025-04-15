@@ -11,12 +11,20 @@ export const useMatch = () => {
   const form =
     useForm<Record<string, { scoreA: number | ""; scoreB: number | "" }>>();
   const blockShotModal = useDisclosure();
-  const { userConfig, isAdmin, handleSaveUserConfig } = useUser();
-  const { saveMatchOptions, updateMatchOptions, clearMatchOptions } = useApi();
+  const { userConfig, isAdmin } = useUser();
+  const {
+    saveMatchOptions,
+    updateMatchOptions,
+    clearMatchOptions,
+    saveUserConfig,
+  } = useApi();
 
   const { mutateAsync: doSaveMatch } = useMutation(saveMatchOptions(uid));
   const { mutateAsync: updateMatch } = useMutation(updateMatchOptions(uid));
   const { mutateAsync: clearMatch } = useMutation(clearMatchOptions(uid));
+  const { mutateAsync: handleSaveUserConfig } = useMutation(
+    saveUserConfig(uid)
+  );
 
   const saveMatch = async (match: Match) => {
     let { scoreA, scoreB } = form.getValues(`m${match.id}`) ?? {

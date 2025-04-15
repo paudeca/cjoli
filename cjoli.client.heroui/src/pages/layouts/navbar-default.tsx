@@ -9,6 +9,8 @@ import {
   Button,
   Link,
   useDisclosure,
+  Switch,
+  Spinner,
 } from "@heroui/react";
 import { link as linkStyles } from "@heroui/theme";
 import clsx from "clsx";
@@ -17,11 +19,38 @@ import { Icon } from "@iconify/react";
 import { LangDropdown, UserDropdown } from "@/components/dropdowns";
 import { Trans } from "react-i18next";
 import { LoginModal } from "@/components/modals";
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import { useNavbarDefault } from "@/hooks";
+import {
+  BoltIcon,
+  BoltSlashIcon,
+  ChartBarIcon,
+  HomeIcon,
+  PhotoIcon,
+  RectangleStackIcon,
+  SettingIcon,
+  StarsIcon,
+  StarsSlashIcon,
+} from "@/components/icons";
 
 export const NavbarDefault: FC<{ page?: "home" | "ranking" }> = ({ page }) => {
-  const { label, navs, goTo, isConnected, logo } = useNavbarDefault();
+  const {
+    label,
+    navs,
+    goTo,
+    isConnected,
+    logo,
+    useCustomEstimate,
+    changeCustomEstimate,
+    isPendingSaveUserConfig,
+  } = useNavbarDefault();
+  const icons: Record<string, ReactNode> = {
+    home: <HomeIcon className="size-5 me-1" />,
+    ranking: <ChartBarIcon className="size-5 me-1" />,
+    gallery: <PhotoIcon className="size-5 me-1" />,
+    cast: <RectangleStackIcon className="size-5 me-1" />,
+    setting: <SettingIcon className="size-5 me-1" />,
+  };
   const login = useDisclosure();
   return (
     <Navbar
@@ -62,6 +91,7 @@ export const NavbarDefault: FC<{ page?: "home" | "ranking" }> = ({ page }) => {
                 onPress={() => goTo(n.path)}
                 role="button"
               >
+                {icons[n.id]}
                 {n.label}
               </Link>
             </NavbarItem>
@@ -69,26 +99,38 @@ export const NavbarDefault: FC<{ page?: "home" | "ranking" }> = ({ page }) => {
         </div>
       </NavbarContent>
 
-      <NavbarContent
-        className="hiddenn sm:flex basis-1/5 sm:basis-full"
-        justify="end"
-      >
+      <NavbarContent className="sm:flex basis-1/5 sm:basis-full" justify="end">
+        <NavbarItem>
+          <Switch
+            defaultSelected
+            classNames={{ label: "text-background" }}
+            color="secondary"
+            startContent={<StarsSlashIcon />}
+            endContent={<StarsIcon />}
+            isSelected={useCustomEstimate}
+            onValueChange={changeCustomEstimate}
+            thumbIcon={
+              isPendingSaveUserConfig && (
+                <Spinner size="sm" variant="gradient" color="secondary" />
+              )
+            }
+            disabled={isPendingSaveUserConfig}
+          />
+        </NavbarItem>
         <NavbarItem className="hidden lg:flex gap-2">
           <LangDropdown />
         </NavbarItem>
         {!isConnected && (
-          <>
-            <NavbarMenuItem>
-              <Button
-                endContent={<Icon icon="solar:alt-arrow-right-linear" />}
-                fullWidth
-                variant="faded"
-                onPress={login.onOpen}
-              >
-                <Trans i18nKey="menu.login">Login</Trans>
-              </Button>
-            </NavbarMenuItem>
-          </>
+          <NavbarMenuItem>
+            <Button
+              endContent={<Icon icon="solar:alt-arrow-right-linear" />}
+              fullWidth
+              variant="faded"
+              onPress={login.onOpen}
+            >
+              <Trans i18nKey="menu.login">Login</Trans>
+            </Button>
+          </NavbarMenuItem>
         )}
         {isConnected && (
           <div className="flex items-center gap-4">
@@ -121,6 +163,7 @@ export const NavbarDefault: FC<{ page?: "home" | "ranking" }> = ({ page }) => {
                 role="button"
                 onPress={() => goTo(n.path)}
               >
+                {icons[n.id]}
                 {n.label}
               </Link>
             </NavbarMenuItem>

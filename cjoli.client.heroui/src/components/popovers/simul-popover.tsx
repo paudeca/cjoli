@@ -2,9 +2,9 @@ import { Button } from "@heroui/react";
 import { FC } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { CJoliPopover } from "../cjoli-popover";
-import { HashIcon } from "../icons";
+import { StarsIcon } from "../icons";
 
-export const SimultPopover: FC<{
+export const SimulPopover: FC<{
   title?: string;
   onRemove: () => Promise<void>;
 }> = ({ title, onRemove }) => {
@@ -21,21 +21,24 @@ export const SimultPopover: FC<{
         <Button
           isIconOnly
           aria-label="Team"
-          variant="light"
-          color="primary"
+          color="secondary"
           size="sm"
+          variant="flat"
+          radius="lg"
         >
-          <HashIcon
-            size={16}
-            className="text-default-500 [&>path]:stroke-[1.5]"
-          />
+          <StarsIcon size={16} className="[&>path]:stroke-[1.5]" />
         </Button>
       }
-      title={title ?? t("simulation.tooltip", "Simulation")}
+      title={
+        <div className="flex items-center">
+          <StarsIcon className="me-2" />
+          {title ?? t("simulation.tooltip", "Simulation")}
+        </div>
+      }
       body={
-        <p>
+        <div className="p-4">
           <Trans i18nKey="simulation.removeAll">Remove all simulations</Trans>
-        </p>
+        </div>
       }
       footer={(close) => (
         <>

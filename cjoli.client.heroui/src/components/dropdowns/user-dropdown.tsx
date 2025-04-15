@@ -65,6 +65,7 @@ export const UserDropdown: FC<{
               onPress={item.onPress}
               className={item.className}
               color={item.color ?? "default"}
+              textValue={item.id}
             >
               {item.label}
             </DropdownItem>

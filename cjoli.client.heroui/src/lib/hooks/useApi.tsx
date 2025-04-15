@@ -16,6 +16,7 @@ import {
   Team,
   Tourney,
   User,
+  UserConfig,
 } from "../models";
 import { useNavigate } from "react-router-dom";
 
@@ -103,6 +104,7 @@ const useApiGet = () => {
 
 const useApiPost = () => {
   const { loadTourney, loadRanking } = useCJoli();
+  const { loadUser } = useUser();
   const settingService = useSettingService();
   const cjoliService = useCjoliService();
 
@@ -134,6 +136,23 @@ const useApiPost = () => {
       }),
     [settingService]
   );
+
+  const saveUserConfig = useCallback(
+    (uid: string) =>
+      mutationOptions({
+        mutationKey: ["saveUserConfig"],
+        mutationFn: async (userConfig: UserConfig) => {
+          const ranking = await cjoliService.saveUserConfig(uid, userConfig);
+          loadRanking(ranking);
+
+          const user = await cjoliService.getUser();
+          loadUser(user);
+          return ranking;
+        },
+      }),
+    [cjoliService, loadUser, loadRanking]
+  );
+
   const saveMatchOptions = useCallback(
     (uid: string) =>
       mutationOptions({
@@ -173,6 +192,7 @@ const useApiPost = () => {
 
   return {
     saveTourney,
+    saveUserConfig,
     saveUserAdminConfig,
     saveMatchOptions,
     updateMatchOptions,

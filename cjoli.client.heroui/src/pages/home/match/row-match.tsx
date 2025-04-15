@@ -1,11 +1,11 @@
 import { CJoliTableCell, CJoliTableRow, ComparePopover } from "@/components";
-import { Match } from "@/lib/models";
+import { IMatch, Match } from "@/lib/models";
 import dayjs from "dayjs";
 import { FC, useCallback, useContext } from "react";
 import { ScoreInputCellMatch } from "./score-input-cell-match";
 import { useCJoli, useUser } from "@/lib/hooks";
 import { Button } from "@heroui/react";
-import { CancelIcon, CheckIcon } from "@/components/icons";
+import { CancelIcon, CheckIcon, StarsIcon } from "@/components/icons";
 import { MatchContext } from "./match-context";
 import { TeamCellMatch } from "./team-cell-match";
 import { ScoreViewCellMatch } from "./score-view-cell-match";
@@ -24,17 +24,40 @@ export const RowMatch: FC<RowMatchProps> = ({
 }) => {
   const { getSquad, findTeam } = useCJoli();
   const { saveMatch, clearMatch } = useContext(MatchContext)!;
-  const { isConnected } = useUser();
+  const {
+    isConnected,
+    isAdmin,
+    userConfig: { useCustomEstimate },
+  } = useUser();
+
+  const hasUserMatch =
+    match.userMatch && (!isAdmin || (isAdmin && useCustomEstimate));
+  const imatch: IMatch = match.done
+    ? match
+    : match.userMatch && hasUserMatch
+      ? match.userMatch
+      : match;
+  const done = hasUserMatch || match.done;
+  const isSimulation = !!hasUserMatch;
+  const teamA = findTeam({ positionId: match.positionIdA });
+  const teamB = findTeam({ positionId: match.positionIdB });
+  const squad = getSquad(match.squadId);
 
   const renderCell = useCallback(
-    (match: Match, column: string) => {
+    (column: string) => {
       switch (column) {
         case "time": {
           return dayjs(match.time).format("LT");
         }
         case "squad": {
-          const squad = getSquad(match.squadId);
-          return squad?.name;
+          return (
+            <div className="flex">
+              {squad?.name}
+              {isSimulation && (
+                <StarsIcon size={16} className="[&>path]:stroke-[1.5]" />
+              )}
+            </div>
+          );
         }
         case "location": {
           return match.location;
@@ -62,19 +85,12 @@ export const RowMatch: FC<RowMatchProps> = ({
           );
         }
         case "score": {
-          const teamA = findTeam({ positionId: match.positionIdA });
-          const teamB = findTeam({ positionId: match.positionIdB });
-
           return (
             <>
               {match.done && (
                 <div className="flex items-center justify-center">
                   {teamA && teamB && (
-                    <ComparePopover
-                      team={teamA}
-                      teamB={teamB}
-                      squad={getSquad(match.squadId)}
-                    />
+                    <ComparePopover team={teamA} teamB={teamB} squad={squad} />
                   )}
                   <ScoreViewCellMatch match={match} mode="A" />
                   <span className="px-1 text-2xl">-</span>
@@ -96,11 +112,7 @@ export const RowMatch: FC<RowMatchProps> = ({
               {!match.done && (
                 <div className="flex items-center justify-center">
                   {teamA && teamB && (
-                    <ComparePopover
-                      team={teamA}
-                      teamB={teamB}
-                      squad={getSquad(match.squadId)}
-                    />
+                    <ComparePopover team={teamA} teamB={teamB} squad={squad} />
                   )}
                   <ScoreInputCellMatch
                     id={`m${match.id}.scoreA`}
@@ -134,7 +146,16 @@ export const RowMatch: FC<RowMatchProps> = ({
           return "not implemented";
       }
     },
-    [findTeam, getSquad, clearMatch, saveMatch]
+    [
+      clearMatch,
+      saveMatch,
+      isConnected,
+      match,
+      teamA,
+      teamB,
+      squad,
+      isSimulation,
+    ]
   );
 
   return (
@@ -146,7 +167,7 @@ export const RowMatch: FC<RowMatchProps> = ({
             rowSpan={column.key == "time" ? size : 1}
             className="border"
           >
-            {renderCell(match, column.key)}
+            {renderCell(column.key)}
           </CJoliTableCell>
         )
       }

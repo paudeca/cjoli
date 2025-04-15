@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { User, UserConfig } from "@@/models";
+import { User } from "@@/models";
 import { useCJoli } from "./useCJoli";
 import { useCjoliService } from "./useServices";
 import { useUid } from "./useUid";
@@ -62,24 +62,6 @@ export const useUser = () => {
     [dispatch]
   );
 
-  const handleSaveUserConfig = useCallback(
-    async (userConfig: UserConfig) => {
-      try {
-        const ranking = await service.saveUserConfig(uid, userConfig);
-        loadRanking(ranking);
-        //TODO use slice redux
-        const configs =
-          state.user?.configs?.map((c) =>
-            c.tourneyId == userConfig.tourneyId ? userConfig : c
-          ) || [];
-        loadUser({ ...state.user, configs } as User);
-      } catch (error) {
-        console.error("Unable to save userConfig", error);
-      }
-    },
-    [loadRanking, loadUser, uid, state.user, service]
-  );
-
   const { tourney } = useCJoli();
 
   const findConfig = (user?: User) => {
@@ -108,6 +90,5 @@ export const useUser = () => {
     userConfig,
     loadUser,
     setCountUser,
-    handleSaveUserConfig,
   };
 };

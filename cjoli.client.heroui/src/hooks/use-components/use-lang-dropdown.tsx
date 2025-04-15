@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useCallback, useState } from "react";
 import dayjs from "dayjs";
 
-const langs = ["en", "fr", "pt", "es", "de"];
+const langs = ["en", "fr", "pt", "es", "de", "nl"];
 
 export const useLangDropdown = () => {
   const { i18n } = useTranslation();

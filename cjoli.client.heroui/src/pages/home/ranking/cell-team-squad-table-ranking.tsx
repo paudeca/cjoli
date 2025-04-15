@@ -1,5 +1,5 @@
 import { InfoPopover } from "@/components/popovers";
-import { SimultPopover } from "@/components/popovers/simul-popover";
+import { SimulPopover } from "@/components/popovers/simul-popover";
 import { TeamButton } from "@/components/buttons";
 import { TeamName } from "@/components/team-name";
 import { Score, Squad, useCJoli, useUser } from "@cjoli/core";
@@ -43,7 +43,7 @@ export const CellTeamSquadTableRanking: FC<{ score: Score; squad: Squad }> = ({
       <div className="text-left items-center inline-flex min-w-[70%]">
         <TeamName positionId={score.positionId} />
         {hasSimulation && (
-          <SimultPopover
+          <SimulPopover
             title={`${t("rank.simulation", "Simulation")} - ${name}`}
             onRemove={handleRemove(userMatches)}
           />

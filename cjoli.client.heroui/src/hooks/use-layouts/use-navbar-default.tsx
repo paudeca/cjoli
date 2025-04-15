@@ -1,7 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useCallback, useMemo } from "react";
-import { useCJoli, useConfig, useUid, useUser } from "@cjoli/core";
+import { useApi, useCJoli, useConfig, useUid, useUser } from "@cjoli/core";
+import { useMutation } from "@tanstack/react-query";
 
 export const useNavbarDefault = () => {
   const { tourney, teams } = useCJoli();
@@ -10,6 +11,12 @@ export const useNavbarDefault = () => {
   const navigate = useNavigate();
   const { getPath } = useConfig();
   const uid = useUid();
+  const { saveUserConfig } = useApi();
+
+  const {
+    mutateAsync: handleSaveUserConfig,
+    isPending: isPendingSaveUserConfig,
+  } = useMutation(saveUserConfig(uid));
 
   const logo = useMemo(() => {
     const team = teams?.find((t) => t.id == userConfig.favoriteTeamId);
@@ -33,6 +40,13 @@ export const useNavbarDefault = () => {
     },
     [getPath, navigate]
   );
+
+  const changeCustomEstimate = useCallback(() => {
+    handleSaveUserConfig({
+      ...userConfig,
+      useCustomEstimate: !userConfig.useCustomEstimate,
+    });
+  }, [handleSaveUserConfig, userConfig]);
 
   const navs = useMemo(
     () =>
@@ -64,5 +78,14 @@ export const useNavbarDefault = () => {
     [t, uid]
   );
 
-  return { label, navs, goTo, isConnected, logo };
+  return {
+    label,
+    navs,
+    goTo,
+    isConnected,
+    logo,
+    useCustomEstimate: userConfig.useCustomEstimate,
+    changeCustomEstimate,
+    isPendingSaveUserConfig,
+  };
 };
