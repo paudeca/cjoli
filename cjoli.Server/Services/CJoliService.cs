@@ -55,6 +55,9 @@ namespace cjoli.Server.Services
             _rules.Add("simple320", new Simple320Rule(this));
             _rules.Add("simple321", new Simple321Rule(this));
 
+            _rules.Add("simple310Goal", new Simple310GoalRule(this));
+
+
             _rules.Add("lyon", new LyonRule(this));
             _rules.Add("scooby", new ScoobyRule(this));
             _rules.Add("henderson", new HendersonRule(this));
