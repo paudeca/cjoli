@@ -298,7 +298,7 @@ namespace cjoli.Server.Services
             var match = matches.OrderBy(m => m.Time).LastOrDefault(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB));
             if (match != null)
             {
-                var userMatch = match.UserMatches.SingleOrDefault(u=>u.User!=null);
+                var userMatch = match.UserMatches.FirstOrDefault(u=>u.User!=null);
                 IMatch m = match.Done ? match : userMatch != null ? userMatch : match;
                 if (m.ScoreA > m.ScoreB || m.ForfeitB)
                 {
@@ -1108,6 +1108,7 @@ namespace cjoli.Server.Services
             evt.Datas = dto.Datas;
             context.SaveChanges();
             ClearCache(uuid, user);
+            _serverService.UpdateRanking(uuid);
         }
 
 

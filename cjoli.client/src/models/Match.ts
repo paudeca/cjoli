@@ -20,4 +20,6 @@ export interface Match extends IMatch {
   penaltyB: number;
   isEvent?: boolean;
   event?: EventPhase;
+  teamIdA: number;
+  teamIdB: number;
 }

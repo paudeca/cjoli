@@ -41,25 +41,25 @@ namespace cjoli.Server.Services.Rules
             var diff = a.Total.CompareTo(b.Total);
             if (diff != 0)
             {
-                CJoliService.UpdateSource(a, b, SourceType.total, a.Total - b.Total, true);
+                UpdateSource(a, b, SourceType.total, a.Total - b.Total, true);
                 return -diff;
             }
 
             var match = matches.OrderBy(m => m.Time).LastOrDefault(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB));
             if (match != null)
             {
-                var userMatch = match.UserMatches.SingleOrDefault(u => u.User != null);
+                var userMatch = match.UserMatches.FirstOrDefault(u => u.User != null);
                 IMatch m = match.Done ? match : userMatch != null ? userMatch : match;
                 if (m.ScoreA > m.ScoreB || m.ForfeitB)
                 {
                     int result = match.PositionA == positionA ? -1 : 1;
-                    CJoliService.UpdateSource(a, b, SourceType.direct, -result, true);
+                    UpdateSource(a, b, SourceType.direct, -result, true);
                     return result;
                 }
                 else if (m.ScoreB > m.ScoreA || m.ForfeitA)
                 {
                     int result = match.PositionB == positionA ? -1 : 1;
-                    CJoliService.UpdateSource(a, b, SourceType.direct, -result, true);
+                    UpdateSource(a, b, SourceType.direct, -result, true);
                     return result;
                 }
             }
@@ -67,25 +67,25 @@ namespace cjoli.Server.Services.Rules
             diff = a.Penalty.CompareTo(b.Penalty);
             if (diff != 0)
             {
-                CJoliService.UpdateSource(a, b, SourceType.penalty, b.Penalty - a.Penalty, false);
+                UpdateSource(a, b, SourceType.penalty, b.Penalty - a.Penalty, false);
                 return diff;
             }
             diff = a.GoalDiff.CompareTo(b.GoalDiff);
             if (diff != 0)
             {
-                CJoliService.UpdateSource(a, b, SourceType.goalDiff, a.GoalDiff - b.GoalDiff, true);
+                UpdateSource(a, b, SourceType.goalDiff, a.GoalDiff - b.GoalDiff, true);
                 return -diff;
             }
             diff = a.GoalFor.CompareTo(b.GoalFor);
             if (diff != 0)
             {
-                CJoliService.UpdateSource(a, b, SourceType.goalFor, a.GoalFor - b.GoalFor, true);
+                UpdateSource(a, b, SourceType.goalFor, a.GoalFor - b.GoalFor, true);
                 return -diff;
             }
             diff = a.GoalAgainst.CompareTo(b.GoalAgainst);
             if (diff != 0)
             {
-                CJoliService.UpdateSource(a, b, SourceType.goalAgainst, b.GoalAgainst - a.GoalAgainst, false);
+                UpdateSource(a, b, SourceType.goalAgainst, b.GoalAgainst - a.GoalAgainst, false);
                 return diff;
             }
 

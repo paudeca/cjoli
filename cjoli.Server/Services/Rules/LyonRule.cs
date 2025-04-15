@@ -58,7 +58,7 @@ namespace cjoli.Server.Services.Rules
                 diff = 0;
                 foreach (var match in matches)
                 {
-                    var userMatch = match.UserMatches.SingleOrDefault();
+                    var userMatch = match.UserMatches.FirstOrDefault();
                     IMatch m = match.Done ? match : userMatch != null ? userMatch : match;
                     if (m.ScoreA > m.ScoreB || m.ForfeitB)
                     {
