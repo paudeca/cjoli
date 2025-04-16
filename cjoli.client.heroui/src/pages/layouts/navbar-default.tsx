@@ -22,8 +22,6 @@ import { LoginModal } from "@/components/modals";
 import { FC, ReactNode } from "react";
 import { useNavbarDefault } from "@/hooks";
 import {
-  BoltIcon,
-  BoltSlashIcon,
   ChartBarIcon,
   HomeIcon,
   PhotoIcon,
@@ -35,10 +33,12 @@ import {
 
 export const NavbarDefault: FC<{ page?: "home" | "ranking" }> = ({ page }) => {
   const {
+    uid,
     label,
     navs,
     goTo,
     isConnected,
+    isAdmin,
     logo,
     useCustomEstimate,
     changeCustomEstimate,
@@ -100,23 +100,25 @@ export const NavbarDefault: FC<{ page?: "home" | "ranking" }> = ({ page }) => {
       </NavbarContent>
 
       <NavbarContent className="sm:flex basis-1/5 sm:basis-full" justify="end">
-        <NavbarItem>
-          <Switch
-            defaultSelected
-            classNames={{ label: "text-background" }}
-            color="secondary"
-            startContent={<StarsSlashIcon />}
-            endContent={<StarsIcon />}
-            isSelected={useCustomEstimate}
-            onValueChange={changeCustomEstimate}
-            thumbIcon={
-              isPendingSaveUserConfig && (
-                <Spinner size="sm" variant="gradient" color="secondary" />
-              )
-            }
-            disabled={isPendingSaveUserConfig}
-          />
-        </NavbarItem>
+        {uid && isAdmin && (
+          <NavbarItem>
+            <Switch
+              defaultSelected
+              classNames={{ label: "text-background" }}
+              color="secondary"
+              startContent={<StarsSlashIcon />}
+              endContent={<StarsIcon />}
+              isSelected={useCustomEstimate}
+              onValueChange={changeCustomEstimate}
+              thumbIcon={
+                isPendingSaveUserConfig && (
+                  <Spinner size="sm" variant="gradient" color="secondary" />
+                )
+              }
+              disabled={isPendingSaveUserConfig}
+            />
+          </NavbarItem>
+        )}
         <NavbarItem className="hidden lg:flex gap-2">
           <LangDropdown />
         </NavbarItem>

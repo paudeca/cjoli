@@ -3,12 +3,13 @@ import { IMatch, Match } from "@/lib/models";
 import dayjs from "dayjs";
 import { FC, useCallback, useContext } from "react";
 import { ScoreInputCellMatch } from "./score-input-cell-match";
-import { useCJoli, useUser } from "@/lib/hooks";
-import { Button } from "@heroui/react";
+import { useApi, useCJoli, useUid, useUser } from "@/lib/hooks";
+import { Button, Spinner } from "@heroui/react";
 import { CancelIcon, CheckIcon, StarsIcon } from "@/components/icons";
 import { MatchContext } from "./match-context";
 import { TeamCellMatch } from "./team-cell-match";
 import { ScoreViewCellMatch } from "./score-view-cell-match";
+import { useMutation } from "@tanstack/react-query";
 
 interface RowMatchProps {
   index: number;
@@ -23,12 +24,14 @@ export const RowMatch: FC<RowMatchProps> = ({
   size,
 }) => {
   const { getSquad, findTeam } = useCJoli();
-  const { saveMatch, clearMatch } = useContext(MatchContext)!;
+  const { saveMatch } = useContext(MatchContext)!;
   const {
     isConnected,
     isAdmin,
     userConfig: { useCustomEstimate },
   } = useUser();
+  const { clearMatchOptions } = useApi();
+  const uid = useUid();
 
   const hasUserMatch =
     match.userMatch && (!isAdmin || (isAdmin && useCustomEstimate));
@@ -42,6 +45,8 @@ export const RowMatch: FC<RowMatchProps> = ({
   const teamA = findTeam({ positionId: match.positionIdA });
   const teamB = findTeam({ positionId: match.positionIdB });
   const squad = getSquad(match.squadId);
+
+  const clearMatch = useMutation(clearMatchOptions(uid));
 
   const renderCell = useCallback(
     (column: string) => {
@@ -67,7 +72,7 @@ export const RowMatch: FC<RowMatchProps> = ({
             <div className="text-left items-center inline-flex min-w-[70%]">
               <TeamCellMatch
                 positionId={match.positionIdA}
-                forfeit={match.forfeitA}
+                forfeit={imatch.forfeitA}
                 penalty={match.penaltyA}
               />
             </div>
@@ -78,7 +83,7 @@ export const RowMatch: FC<RowMatchProps> = ({
             <div className="text-left items-center inline-flex min-w-[70%]">
               <TeamCellMatch
                 positionId={match.positionIdB}
-                forfeit={match.forfeitB}
+                forfeit={imatch.forfeitB}
                 penalty={match.penaltyB}
               />
             </div>
@@ -87,29 +92,33 @@ export const RowMatch: FC<RowMatchProps> = ({
         case "score": {
           return (
             <>
-              {match.done && (
+              {done && (
                 <div className="flex items-center justify-center">
                   {teamA && teamB && (
                     <ComparePopover team={teamA} teamB={teamB} squad={squad} />
                   )}
-                  <ScoreViewCellMatch match={match} mode="A" />
+                  <ScoreViewCellMatch match={imatch} mode="A" />
                   <span className="px-1 text-2xl">-</span>
-                  <ScoreViewCellMatch match={match} mode="B" />
+                  <ScoreViewCellMatch match={imatch} mode="B" />
                   {isConnected && (
                     <Button
                       isIconOnly
                       variant="light"
                       color="danger"
                       radius="full"
-                      onPress={() => clearMatch(match)}
+                      onPress={() => clearMatch.mutateAsync(match)}
                       tabIndex={-1}
                     >
-                      <CancelIcon />
+                      {clearMatch.isPending ? (
+                        <Spinner variant="gradient" color="danger" size="sm" />
+                      ) : (
+                        <CancelIcon />
+                      )}
                     </Button>
                   )}
                 </div>
               )}
-              {!match.done && (
+              {!done && (
                 <div className="flex items-center justify-center">
                   {teamA && teamB && (
                     <ComparePopover team={teamA} teamB={teamB} squad={squad} />
@@ -155,6 +164,8 @@ export const RowMatch: FC<RowMatchProps> = ({
       teamB,
       squad,
       isSimulation,
+      done,
+      imatch,
     ]
   );
 

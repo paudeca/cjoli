@@ -21,7 +21,7 @@ export const useMatch = () => {
 
   const { mutateAsync: doSaveMatch } = useMutation(saveMatchOptions(uid));
   const { mutateAsync: updateMatch } = useMutation(updateMatchOptions(uid));
-  const { mutateAsync: clearMatch } = useMutation(clearMatchOptions(uid));
+  const clearMatch = useMutation(clearMatchOptions(uid));
   const { mutateAsync: handleSaveUserConfig } = useMutation(
     saveUserConfig(uid)
   );
@@ -47,9 +47,9 @@ export const useMatch = () => {
       scoreA,
       scoreB,
     });
-    if (!isAdmin) {
+    /*if (!isAdmin) {
       handleSaveUserConfig({ ...userConfig, useCustomEstimate: true });
-    }
+    }*/
   };
 
   return { saveMatch, updateMatch, clearMatch, form, blockShotModal };

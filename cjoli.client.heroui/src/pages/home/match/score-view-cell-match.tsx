@@ -31,7 +31,7 @@ export const ScoreViewCellMatch: FC<ScoreViewCellMatchProps> = ({
   return (
     <Chip
       classNames={{
-        base: `mx-2 min-w-[40px] text-center bg-gradient-to-br ${classNames[badge]} border-small border-white/50`,
+        base: `mx-2 min-w-[40px] text-center bg-gradient-to-br ${classNames[badge]} border-small border-white/50 opacity-60`,
         content: "drop-shadow shadow-black text-white",
       }}
       radius="sm"

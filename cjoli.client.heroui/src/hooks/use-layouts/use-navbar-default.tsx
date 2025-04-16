@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 
 export const useNavbarDefault = () => {
   const { tourney, teams } = useCJoli();
-  const { userConfig, isConnected } = useUser();
+  const { userConfig, isConnected, isAdmin } = useUser();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { getPath } = useConfig();
@@ -79,10 +79,12 @@ export const useNavbarDefault = () => {
   );
 
   return {
+    uid,
     label,
     navs,
     goTo,
     isConnected,
+    isAdmin,
     logo,
     useCustomEstimate: userConfig.useCustomEstimate,
     changeCustomEstimate,

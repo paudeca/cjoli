@@ -1,13 +1,15 @@
 import { CJoliTable, CJoliTableBody } from "@/components";
 import { Match } from "@cjoli/core";
-import { FC } from "react";
+import { FC, useContext } from "react";
 import { RowMatch } from "./row-match";
+import { MatchContext } from "./match-context";
 
 interface TableMatchProps {
-  datas: Record<string, Match[]>;
+  matches: Record<string, Match[]>;
 }
-export const TableMatch: FC<TableMatchProps> = ({ datas }) => {
-  const columns = [
+export const TableMatch: FC<TableMatchProps> = ({ matches }) => {
+  const { hasLocation } = useContext(MatchContext)!;
+  let columns = [
     { key: "time" },
     { key: "squad" },
     { key: "location" },
@@ -15,17 +17,20 @@ export const TableMatch: FC<TableMatchProps> = ({ datas }) => {
     { key: "score" },
     { key: "teamB" },
   ];
+  if (!hasLocation) {
+    columns = columns.filter((c) => c.key != "location");
+  }
   return (
     <CJoliTable>
-      <CJoliTableBody items={Object.keys(datas)}>
+      <CJoliTableBody items={Object.keys(matches)}>
         {(item) =>
-          datas[item].map((match, i) => (
+          matches[item].map((match, i) => (
             <RowMatch
               key={i}
               index={i}
               columns={columns}
               match={match}
-              size={datas[item].length}
+              size={matches[item].length}
             />
           ))
         }

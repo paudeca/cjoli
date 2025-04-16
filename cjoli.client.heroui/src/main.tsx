@@ -7,17 +7,7 @@ import { Provider } from "./provider.tsx";
 import "@/styles/globals.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  false ? (
-    <React.StrictMode>
-      <BrowserRouter>
-        <Provider>
-          <main className="cjoli text-foreground bg-background">
-            <App />
-          </main>
-        </Provider>
-      </BrowserRouter>
-    </React.StrictMode>
-  ) : (
+  <React.StrictMode>
     <BrowserRouter>
       <Provider>
         <main className="cjoli text-foreground bg-background">
@@ -25,5 +15,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         </main>
       </Provider>
     </BrowserRouter>
-  )
+  </React.StrictMode>
 );

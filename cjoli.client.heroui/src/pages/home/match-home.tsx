@@ -73,15 +73,21 @@ export const MatchHome = () => {
     }));
   }, [keys]);
 
+  const hasLocation = useMemo(
+    () => matches.some((m) => !!m.location),
+    [matches]
+  );
+
   return (
     <FormProvider {...form}>
       <MatchProvider
         saveMatch={saveMatch}
         updateMatch={updateMatch}
         clearMatch={clearMatch}
+        hasLocation={hasLocation}
       >
         <CjoliAccordion items={items} mode="single" variant="light" colorHeader>
-          {(item) => <TableMatch key={item.key} datas={map[item.key]} />}
+          {(item) => <TableMatch key={item.key} matches={map[item.key]} />}
         </CjoliAccordion>
         <CJoliModal
           {...blockShotModal}

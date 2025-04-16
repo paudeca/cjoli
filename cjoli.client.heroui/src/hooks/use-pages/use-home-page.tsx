@@ -19,7 +19,6 @@ export const useHomePage = (map: Record<string, ReactNode>) => {
   const { getRanking } = useApi();
   const uid = useUid();
   const { phaseId } = useParams();
-  const { t } = useTranslation();
 
   const { refetch, isLoading } = useQuery(getRanking(uid));
 
@@ -53,26 +52,23 @@ export const useHomePage = (map: Record<string, ReactNode>) => {
       {
         key: "final",
         content: map.final,
-        title: t("home.finalRanking", "Final Ranking"),
         hide: !allMatchesDone,
         defaultExpanded: true,
       },
       {
         key: "ranking",
         content: map.ranking,
-        title: t("home.ranking", "Ranking"),
         hide: !phase,
         defaultExpanded: true,
       },
       {
         key: "match",
         content: map.match,
-        title: t("home.matches", "Matches"),
         hide: !phase,
         defaultExpanded: true,
       },
     ];
-  }, [t, matches, phase, map]);
+  }, [matches, phase, map]);
 
   return { isConfigured: !!phase, isLoading, items };
 };
