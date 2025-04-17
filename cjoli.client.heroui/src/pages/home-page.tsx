@@ -9,7 +9,7 @@ import { memo } from "react";
 export const HomePage = memo(() => {
   const map = {
     final: <div>Final</div>,
-    ranking: <RankingkHome />,
+    //ranking: <RankingkHome />,
     match: <MatchHome />,
   };
   const { isConfigured, isLoading, items } = useHomePage(map);

@@ -55,12 +55,12 @@ export const useHomePage = (map: Record<string, ReactNode>) => {
         hide: !allMatchesDone,
         defaultExpanded: true,
       },
-      {
+      /*{
         key: "ranking",
         content: map.ranking,
         hide: !phase,
         defaultExpanded: true,
-      },
+      },*/
       {
         key: "match",
         content: map.match,
