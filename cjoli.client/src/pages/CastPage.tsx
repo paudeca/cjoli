@@ -123,7 +123,7 @@ const CastPage = ({ xl }: CastPageProps) => {
         }
       }, 5000);
     } catch (e) {
-      console.error("excpetion in scroll down", e);
+      console.error("exception in scroll down", e);
     }
     return () => {
       clearInterval(id.current);
@@ -139,7 +139,7 @@ const CastPage = ({ xl }: CastPageProps) => {
               fade={false}
               wrap
               slide={false}
-              interval={null}
+              interval={20000}
               activeIndex={index}
               onSelect={setIndex}
               pause={false}

@@ -152,20 +152,18 @@ const RankTableSquad = ({ phase, squad, squads }: RankTableSquadProps) => {
                     D
                   </CJoliTooltip>
                 </th>
+                <th className={classNamesCast.padding}>
+                  <CJoliTooltip info={t("rank.goalFor", "Goals for")}>
+                    BP
+                  </CJoliTooltip>
+                </th>
+                <th className={classNamesCast.padding}>
+                  <CJoliTooltip info={t("rank.goalAgainst", "Goals against")}>
+                    BC
+                  </CJoliTooltip>
+                </th>
                 {!isXl && (
                   <>
-                    <th className={classNamesCast.padding}>
-                      <CJoliTooltip info={t("rank.goalFor", "Goals for")}>
-                        BP
-                      </CJoliTooltip>
-                    </th>
-                    <th className={classNamesCast.padding}>
-                      <CJoliTooltip
-                        info={t("rank.goalAgainst", "Goals against")}
-                      >
-                        BC
-                      </CJoliTooltip>
-                    </th>
                     <th className={classNamesCast.padding}>
                       <CJoliTooltip info={t("rank.shutOut", "ShutOut")}>
                         BL
