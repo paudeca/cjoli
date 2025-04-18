@@ -24,4 +24,7 @@ export default defineConfig({
       all: true,
     },
   },
+  build: {
+    sourcemap: true,
+  },
 });
