@@ -18,6 +18,7 @@ import { useServer } from "./hooks/useServer";
 //import GalleryPage from "./pages/GalleryPage";
 //import CastPage from "./pages/CastPage";
 import { Suspense, lazy } from "react";
+import { MyProgressBar } from "./components/Loading";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -104,7 +105,7 @@ const App = () => {
         <UserProvider>
           <ToastProvider>
             <QueryClientProvider client={queryClient}>
-              <Suspense fallback={<div>Loading..</div>}>
+              <Suspense fallback={<MyProgressBar />}>
                 <RouterProvider router={router} />
               </Suspense>
             </QueryClientProvider>

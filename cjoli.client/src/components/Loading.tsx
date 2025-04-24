@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import { ReactNode } from "react";
 import { Container } from "react-bootstrap";
 
-const MyProgressBar = styled("div")`
+export const MyProgressBar = styled("div")`
   height: 4px;
   width: 100%;
   --c: no-repeat linear-gradient(#6100ee 0 0);
