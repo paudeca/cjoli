@@ -1,21 +1,23 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import HomePage from "./pages/HomePage";
+//import HomePage from "./pages/HomePage";
 import { CJoliProvider } from "./contexts/CJoliContext";
 import { ModalProvider } from "./contexts/ModalContext";
 import { UserProvider } from "./contexts/UserContext";
-import SelectPage from "./pages/SelectPage";
+//import HomePage from "./pages/HomePage";
+//import SelectPage from "./pages/SelectPage";
 import MainPage from "./pages/MainPage";
 import { ToastProvider } from "./contexts/ToastContext";
-import RankPage from "./pages/RankPage";
-import ChatPage from "./pages/ChatPage";
+//import RankPage from "./pages/RankPage";
+//import ChatPage from "./pages/ChatPage";
 import SettingPage from "./pages/SettingPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useServer } from "./hooks/useServer";
-import TeamPage from "./pages/TeamPage";
-import AdminPage from "./pages/AdminPage";
-import GalleryPage from "./pages/GalleryPage";
-import CastPage from "./pages/CastPage";
+//import TeamPage from "./pages/TeamPage";
+//import AdminPage from "./pages/AdminPage";
+//import GalleryPage from "./pages/GalleryPage";
+//import CastPage from "./pages/CastPage";
+import { Suspense, lazy } from "react";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,6 +26,16 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+const HomePage = lazy(() => import("./pages/HomePage"));
+const SelectPage = lazy(() => import("./pages/SelectPage"));
+const RankPage = lazy(() => import("./pages/RankPage"));
+const ChatPage = lazy(() => import("./pages/ChatPage"));
+const TeamPage = lazy(() => import("./pages/TeamPage"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
+const GalleryPage = lazy(() => import("./pages/GalleryPage"));
+const CastPage = lazy(() => import("./pages/CastPage"));
+
 const App = () => {
   const { isUseDomain } = useServer();
 
@@ -92,7 +104,9 @@ const App = () => {
         <UserProvider>
           <ToastProvider>
             <QueryClientProvider client={queryClient}>
-              <RouterProvider router={router} />
+              <Suspense fallback={<div>Loading..</div>}>
+                <RouterProvider router={router} />
+              </Suspense>
             </QueryClientProvider>
           </ToastProvider>
         </UserProvider>
