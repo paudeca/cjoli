@@ -76,7 +76,7 @@ namespace cjoli.Server_Tests.Services
             //Arrange
             var tourney = CreateTourney();
             var user = CreateUser();
-            _service.ClearCache(tourney.Uid, user);
+            _service.ClearCache(tourney.Uid, user, _context);
             var team1 = Team("team1", tourney);
             var team2 = Team("team2", tourney);
             CreateMatch(tourney, team1, team2, match =>
@@ -105,7 +105,7 @@ namespace cjoli.Server_Tests.Services
             //Arrange
             var tourney = CreateTourney();
             var user = CreateUser();
-            _service.ClearCache(tourney.Uid, user);
+            _service.ClearCache(tourney.Uid, user, _context);
 
             var team1 = Team("team1", tourney);
             var team2 = Team("team2", tourney);
@@ -152,7 +152,7 @@ namespace cjoli.Server_Tests.Services
             //Arrange
             var tourney = CreateTourney();
             var user = CreateUser();
-            _service.ClearCache(tourney.Uid, user);
+            _service.ClearCache(tourney.Uid, user,_context);
 
             var team1 = Team("team1", tourney);
             var team2 = Team("team2", tourney);
@@ -300,7 +300,7 @@ namespace cjoli.Server_Tests.Services
             //Arrange
             var user = CreateUser();
             var tourney = CreateTourney();
-            _service.ClearCache(tourney.Uid, user);
+            _service.ClearCache(tourney.Uid, user, _context);
 
             var match = Match(tourney);
             var dto = _mapper.Map<MatchDto>(match);
