@@ -97,4 +97,4 @@ jobs:
         uses: azure/CLI@v1
         with:
             inlineScript: |
-                az storage blob upload-batch --account-name cjolifront --auth-mode key -d '$web' -s ${{env.DOTNET_ROOT}}/myapp/wwwroot
+                az storage blob upload-batch --account-name cjolifront --auth-mode key -d '$web' -s .
