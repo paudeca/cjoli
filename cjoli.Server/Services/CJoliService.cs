@@ -26,6 +26,7 @@ namespace cjoli.Server.Services
         private readonly ILogger<CJoliService> _logger;
         private readonly IMemoryCache _memoryCache;
         private readonly IConfiguration _configuration;
+        private readonly Dictionary<string, ReaderWriterLockSlim> locks = new Dictionary<string, ReaderWriterLockSlim>();
 
 
         private readonly Dictionary<string, IRule> _rules = new Dictionary<string, IRule>();
@@ -153,17 +154,28 @@ namespace cjoli.Server.Services
 
         public void ClearCache(string uuid, User? user, CJoliContext context)
         {
+            _logger.LogInformation($"ClearCache for user:{user?.Login}");
+
             bool isAdmin = user.IsAdminWithNoCustomEstimate(uuid);
             if(isAdmin)
             {
-                var dto = CreateRankingImpl(uuid, null, context);
-                _memoryCache.Remove(uuid);
                 string loginKey = "anonymous";
                 var map = _memoryCache.GetOrCreate(uuid, entry => new Dictionary<string, RankingDto>());
-                if (!map!.ContainsKey(loginKey))
+                var dto = CreateRankingImpl(uuid, null, context);
+
+                UpdateWithLock($"{uuid}-{loginKey}", update: () =>
                 {
-                    map.Add(loginKey, dto);
-                }
+                    if (!map!.ContainsKey(loginKey))
+                    {
+                        map.Add(loginKey, dto);
+                    }
+                    else
+                    {
+                        map.Remove(loginKey);
+                        map.Add(loginKey, dto);
+                    }
+                    return dto;
+                });
             }
             else if(user!=null)
             {
@@ -184,25 +196,111 @@ namespace cjoli.Server.Services
             return dto;
         }
 
+        private RankingDto UpdateWithLock(string key, Func<RankingDto> update)
+        {
+            ReaderWriterLockSlim? cacheLock;
+            if (!locks.TryGetValue(key, out cacheLock))
+            {
+                cacheLock = new ReaderWriterLockSlim();
+                locks.TryAdd(key, cacheLock);
+            }
+
+            cacheLock.EnterUpgradeableReadLock();
+            try
+            {
+                RankingDto? data;
+                cacheLock.EnterWriteLock();
+                try
+                {
+                    data = update();
+                }
+                finally
+                {
+                    cacheLock.ExitWriteLock();
+                }
+                return data;
+            }
+            finally
+            {
+                cacheLock.ExitUpgradeableReadLock();
+            }
+        }
+
+
+        private RankingDto GetOrUpdateWithLock(string key,Func<RankingDto?> get, Func<RankingDto> update)
+        {
+            ReaderWriterLockSlim? cacheLock;
+            if (!locks.TryGetValue(key, out cacheLock))
+            {
+                cacheLock = new ReaderWriterLockSlim();
+                locks.TryAdd(key, cacheLock);
+            }
+
+            cacheLock.EnterUpgradeableReadLock();
+            try
+            {
+                RankingDto? data;
+                cacheLock.EnterReadLock();
+                try
+                {
+                    data = get();
+                }
+                finally
+                {
+                    cacheLock.ExitReadLock();
+                }
+
+                if (data == null)
+                {
+                    cacheLock.EnterWriteLock();
+                    try
+                    {
+                        data = get();
+                        if(data==null)
+                        {
+                            data = update();
+                        }
+                    }
+                    finally
+                    {
+                        cacheLock.ExitWriteLock();
+                    }
+                }
+                return data;
+            }
+            finally
+            {
+                cacheLock.ExitUpgradeableReadLock();
+            }
+        }
+
         public RankingDto CreateRanking(string tourneyUid, string? login, CJoliContext context)
         {
             Stopwatch sw = Stopwatch.StartNew();
             string loginKey = login ?? "anonymous";
+
             var map = _memoryCache.GetOrCreate(tourneyUid, entry => new Dictionary<string, RankingDto>());
-            if(!map!.ContainsKey(loginKey))
+
+            var dto = GetOrUpdateWithLock($"{tourneyUid}-{loginKey}", get: () =>
             {
+                return map!.GetValueOrDefault(loginKey, null);
+            }, update: () =>
+            {
+                _logger.LogInformation($"Generate RankingDto");
                 var dto = CreateRankingImpl(tourneyUid, login, context);
-                if(!map!.ContainsKey(loginKey))
+                if (!map!.ContainsKey(loginKey))
                 {
                     map.Add(loginKey, dto);
-                } else
+                }
+                else
                 {
                     map.Remove(loginKey);
                     map.Add(loginKey, dto);
                 }
-            }
+                return dto;
+            });
             _logger.LogInformation($"Time[CreateRanking]:{sw.ElapsedMilliseconds}ms");
-            return map![loginKey];
+            return dto;
         }
 
         public GalleryDto CreateGallery(string uuid, int page, string? login, bool waiting, bool random, CJoliContext context)
@@ -765,6 +863,10 @@ namespace cjoli.Server.Services
                     var tmp = new List<Score>(listScores);
                     tmp.Sort((a, b) =>
                     {
+                        if(a.Game==0 && b.Game==0)
+                        {
+                            return a.TeamId < b.TeamId ? -1 : 1;
+                        }
                         if(a.Game==0)
                         {
                             return -1;
