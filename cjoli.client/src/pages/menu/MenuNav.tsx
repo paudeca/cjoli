@@ -7,6 +7,7 @@ import {
   Stack,
   ToggleButton,
   Button,
+  Spinner,
 } from "react-bootstrap";
 import styled from "@emotion/styled";
 import LoginModal from "../../modals/LoginModal";
@@ -31,7 +32,7 @@ import { useNavigate } from "react-router-dom";
 import useScreenSize from "../../hooks/useScreenSize";
 import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
-import React from "react";
+import React, { useState } from "react";
 import { useModal } from "../../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
 import dayjs from "dayjs";
@@ -65,7 +66,7 @@ const MenuNav = () => {
   const navigate = useNavigate();
   const { isMobile } = useScreenSize();
   const { t, i18n } = useTranslation();
-  const [lang, setLang] = React.useState(i18n.resolvedLanguage);
+  const [lang, setLang] = useState(i18n.resolvedLanguage);
 
   const logout = async () => {
     await cjoliService.logout();
@@ -76,7 +77,8 @@ const MenuNav = () => {
       loadRanking(ranking);
     }
   };
-  const [show, setShow] = React.useState(false);
+  const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
   const {
     isAdmin,
     isRootAdmin,
@@ -101,14 +103,20 @@ const MenuNav = () => {
               variant="outline-primary"
               checked={useCustomEstimate}
               value="1"
-              onChange={(e) =>
-                handleSaveUserConfig({
+              onChange={async (e) => {
+                setLoading(true);
+                await handleSaveUserConfig({
                   ...userConfig,
                   useCustomEstimate: e.currentTarget.checked,
-                })
-              }
+                });
+                setLoading(false);
+              }}
             >
-              <Controller className="mx-2" />
+              {loading ? (
+                <Spinner animation="grow" size="sm" className="mx-2" />
+              ) : (
+                <Controller className="mx-2" />
+              )}
               <Trans i18nKey="simulation.tooltip">Simulation</Trans>
             </ToggleButton>
             <div>

@@ -159,7 +159,8 @@ namespace cjoli.Server.Services
             bool isAdmin = user.IsAdminWithNoCustomEstimate(uuid);
             if(isAdmin)
             {
-                string loginKey = "anonymous";
+                _memoryCache.Remove(uuid);
+                /*string loginKey = "anonymous";
                 var map = _memoryCache.GetOrCreate(uuid, entry => new Dictionary<string, RankingDto>());
                 var dto = CreateRankingImpl(uuid, null, context);
 
@@ -175,7 +176,7 @@ namespace cjoli.Server.Services
                         map.Add(loginKey, dto);
                     }
                     return dto;
-                });
+                })*/;
             }
             else if(user!=null)
             {
