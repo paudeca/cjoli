@@ -32,7 +32,7 @@ import { useNavigate } from "react-router-dom";
 import useScreenSize from "../../hooks/useScreenSize";
 import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useModal } from "../../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
 import dayjs from "dayjs";
