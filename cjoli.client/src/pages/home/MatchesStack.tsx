@@ -58,9 +58,9 @@ const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
             return -1;
           } else if (b.location == "Olympique Seine") {
             return 1;
-          } else if (a.location == "Olympique Surfacage") {
+          } else if (a.location == "Olympique Surfaceuse") {
             return -1;
-          } else if (b.location == "Olympique Surfacage") {
+          } else if (b.location == "Olympique Surfaceuse") {
             return 1;
           } else if (a.location == "Balester Restaurant") {
             return -1;
