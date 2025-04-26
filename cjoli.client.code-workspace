@@ -11,6 +11,9 @@
     {
       "name": "cjoli.client.heroui",
       "path": "cjoli.client.heroui"
+    },
+    {
+      "path": "cjoli.client.mobile"
     }
   ],
   "settings": {
