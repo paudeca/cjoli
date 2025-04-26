@@ -343,8 +343,20 @@ namespace cjoli.Server.Services
 
         public static void UpdateSource(Score a, Score b, SourceType type, double value, bool positive)
         {
-            a.Sources.Add(b.PositionId, new ScoreSource { Type = type, Value = value, Winner = (positive && value >= 0) || (!positive && value < 0) });
-            b.Sources.Add(a.PositionId, new ScoreSource { Type = type, Value = -value, Winner = (positive && -value >= 0) || (!positive && -value < 0) });
+            if(a.Sources.ContainsKey(b.PositionId))
+            {
+                a.Sources[b.PositionId] = new ScoreSource { Type = type, Value = value, Winner = (positive && value >= 0) || (!positive && value < 0) };
+            } else
+            {
+                a.Sources.Add(b.PositionId, new ScoreSource { Type = type, Value = value, Winner = (positive && value >= 0) || (!positive && value < 0) });
+            }
+            if(b.Sources.ContainsKey(a.PositionId))
+            {
+                b.Sources[a.PositionId] = new ScoreSource { Type = type, Value = -value, Winner = (positive && -value >= 0) || (!positive && -value < 0) };
+            } else
+            {
+                b.Sources.Add(a.PositionId, new ScoreSource { Type = type, Value = -value, Winner = (positive && -value >= 0) || (!positive && -value < 0) });
+            }
         }
 
         public Func<Phase, Squad?, Comparison<Score>> DefaultScoreComparison = (Phase phase, Squad? squad) => (Score a, Score b) =>
