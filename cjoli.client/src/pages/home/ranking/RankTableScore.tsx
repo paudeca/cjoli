@@ -107,10 +107,10 @@ const RankTableScore = ({ score, phase, squad }: RankTableScoreProps) => {
             <td className={classNamesCast.padding}>{score.win}</td>
             <td className={classNamesCast.padding}>{score.neutral}</td>
             <td className={classNamesCast.padding}>{score.loss}</td>
+            <td className={classNamesCast.padding}>{score.goalFor}</td>
+            <td className={classNamesCast.padding}>{score.goalAgainst}</td>
             {!isXl && (
               <>
-                <td>{score.goalFor}</td>
-                <td>{score.goalAgainst}</td>
                 <td>{score.shutOut}</td>
                 {tourney?.config?.hasPenalty && <td>{score.penalty}</td>}
                 <td>{score.goalDiff}</td>

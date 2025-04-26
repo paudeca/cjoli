@@ -26,6 +26,7 @@ namespace cjoli.Server.Services
         private readonly ILogger<CJoliService> _logger;
         private readonly IMemoryCache _memoryCache;
         private readonly IConfiguration _configuration;
+        private readonly Dictionary<string, ReaderWriterLockSlim> locks = new Dictionary<string, ReaderWriterLockSlim>();
 
 
         private readonly Dictionary<string, IRule> _rules = new Dictionary<string, IRule>();
@@ -151,16 +152,78 @@ namespace cjoli.Server.Services
             return new Ranking() { Tourney = tourney, Scores = scores };
         }
 
-        public void ClearCache(string uuid, User? user)
+        public void ClearCache(string uuid, User? user, CJoliContext context)
         {
+            _logger.LogInformation($"ClearCache for user:{user?.Login}");
+
             bool isAdmin = user.IsAdminWithNoCustomEstimate(uuid);
             if(isAdmin)
             {
                 _memoryCache.Remove(uuid);
-            } else if(user!=null)
+            }
+            else if(user!=null)
             {
                 var map = _memoryCache.GetOrCreate(uuid, entry => new Dictionary<string, RankingDto>());
                 map!.Remove(user.Login);
+            }
+        }
+
+        private RankingDto CreateRankingImpl(string tourneyUid, string? login, CJoliContext context)
+        {
+            User? user = GetUserWithConfig(login, tourneyUid, context);
+            var ranking = GetRanking(tourneyUid, user, context);
+            var dto = _mapper.Map<RankingDto>(ranking);
+            AffectationTeams(dto);
+            CalculateHistory(dto);
+            CalculateHistoryByTimes(dto, ranking.Tourney, context);
+            CalculateAllBetScores(dto, user, context);
+            return dto;
+        }
+
+        private RankingDto GetOrUpdateWithLock(string key,Func<RankingDto?> get, Func<RankingDto> update)
+        {
+            ReaderWriterLockSlim? cacheLock;
+            if (!locks.TryGetValue(key, out cacheLock))
+            {
+                cacheLock = new ReaderWriterLockSlim();
+                locks.TryAdd(key, cacheLock);
+            }
+
+            cacheLock.EnterUpgradeableReadLock();
+            try
+            {
+                RankingDto? data;
+                cacheLock.EnterReadLock();
+                try
+                {
+                    data = get();
+                }
+                finally
+                {
+                    cacheLock.ExitReadLock();
+                }
+
+                if (data == null)
+                {
+                    cacheLock.EnterWriteLock();
+                    try
+                    {
+                        data = get();
+                        if(data==null)
+                        {
+                            data = update();
+                        }
+                    }
+                    finally
+                    {
+                        cacheLock.ExitWriteLock();
+                    }
+                }
+                return data;
+            }
+            finally
+            {
+                cacheLock.ExitUpgradeableReadLock();
             }
         }
 
@@ -168,27 +231,29 @@ namespace cjoli.Server.Services
         {
             Stopwatch sw = Stopwatch.StartNew();
             string loginKey = login ?? "anonymous";
+
             var map = _memoryCache.GetOrCreate(tourneyUid, entry => new Dictionary<string, RankingDto>());
-            if(!map!.ContainsKey(loginKey))
+
+            var dto = GetOrUpdateWithLock($"{tourneyUid}-{loginKey}", get: () =>
             {
-                User? user = GetUserWithConfig(login, tourneyUid, context);
-                var ranking = GetRanking(tourneyUid, user, context);
-                var dto = _mapper.Map<RankingDto>(ranking);
-                AffectationTeams(dto);
-                CalculateHistory(dto);
-                CalculateHistoryByTimes(dto, ranking.Tourney, context);
-                CalculateAllBetScores(dto, user, context);
-                if(!map!.ContainsKey(loginKey))
+                return map!.GetValueOrDefault(loginKey, null);
+            }, update: () =>
+            {
+                _logger.LogInformation($"Generate RankingDto");
+                var dto = CreateRankingImpl(tourneyUid, login, context);
+                if (!map!.ContainsKey(loginKey))
                 {
                     map.Add(loginKey, dto);
-                } else
+                }
+                else
                 {
                     map.Remove(loginKey);
                     map.Add(loginKey, dto);
                 }
-            }
+                return dto;
+            });
             _logger.LogInformation($"Time[CreateRanking]:{sw.ElapsedMilliseconds}ms");
-            return map![loginKey];
+            return dto;
         }
 
         public GalleryDto CreateGallery(string uuid, int page, string? login, bool waiting, bool random, CJoliContext context)
@@ -233,7 +298,7 @@ namespace cjoli.Server.Services
             Tourney tourney = GetTourney(uuid, user, context);
             var scores = CalculateScores(tourney, user, context);
             _estimateService.CalculateEstimates(tourney, scores, user, context);
-            ClearCache(uuid, originalUser);
+            ClearCache(uuid, originalUser, context);
             if (isAdmin)
             {
                 _serverService.UpdateRanking(uuid);
@@ -751,6 +816,10 @@ namespace cjoli.Server.Services
                     var tmp = new List<Score>(listScores);
                     tmp.Sort((a, b) =>
                     {
+                        if(a.Game==0 && b.Game==0)
+                        {
+                            return a.TeamId < b.TeamId ? -1 : 1;
+                        }
                         if(a.Game==0)
                         {
                             return -1;
@@ -947,7 +1016,7 @@ namespace cjoli.Server.Services
                 UpsertUserMatch(dto, match, user);
             }
             context.SaveChanges();
-            ClearCache(uuid, user);
+            ClearCache(uuid, user, context);
             RunThread((CJoliContext context) => UpdateEstimate(uuid, login, context));
         }
 
@@ -968,7 +1037,7 @@ namespace cjoli.Server.Services
                 match.PenaltyB = dto.PenaltyB;
             }
             context.SaveChanges();
-            ClearCache(uuid, user);
+            ClearCache(uuid, user, context);
         }
 
 
@@ -1054,7 +1123,7 @@ namespace cjoli.Server.Services
                 }
             }
             context.SaveChanges();
-            ClearCache(uuid, user);
+            ClearCache(uuid, user, context);
             RunThread((CJoliContext context) => UpdateEstimate(uuid, login, context));
 
             if (user.IsAdmin(uuid))
@@ -1101,7 +1170,7 @@ namespace cjoli.Server.Services
                 throw new NotFoundException("User", login ?? "no login");
             }
             _userService.SaveUserConfig(tourney, user, dto, context);
-            ClearCache(uuid, user);
+            ClearCache(uuid, user, context);
         }
 
         public void UpdateEvent(string uuid, string? login, EventDto dto, CJoliContext context)
@@ -1110,7 +1179,7 @@ namespace cjoli.Server.Services
             Event evt = context.Event.Single(e => e.Id == dto.Id);
             evt.Datas = dto.Datas;
             context.SaveChanges();
-            ClearCache(uuid, user);
+            ClearCache(uuid, user, context);
             _serverService.UpdateRanking(uuid);
         }
 
@@ -1124,7 +1193,7 @@ namespace cjoli.Server.Services
                 context.Remove(userMatch);
             }
             context.SaveChanges();
-            ClearCache(uuid, user);
+            ClearCache(uuid, user, context);
         }
 
         public void UpdatePosition(string uuid, PositionDto positionDto, CJoliContext context)

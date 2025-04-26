@@ -70,7 +70,7 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
   return (
     <CJoliStack
       gap={0}
-      className={`${isCastPage ? "col-md-10" : "col-md-8"} mx-auto mt-5`}
+      className={`${isXl ? "col-md-12" : isCastPage ? "col-md-10" : "col-md-8"} mx-auto mt-5`}
       data-testid="team"
     >
       <div className="p-2">

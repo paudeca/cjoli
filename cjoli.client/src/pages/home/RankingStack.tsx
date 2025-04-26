@@ -27,7 +27,7 @@ interface RankingStackProps extends JSX.IntrinsicAttributes {
 }
 
 const RankingStack = ({ phase, modeCast }: RankingStackProps) => {
-  const { phases, selectDay, isCastPage } = useCJoli();
+  const { phases, selectDay, isCastPage, isXl } = useCJoli();
   const { path } = useServer();
   const navigate = useNavigate();
   const { phaseId, squadId } = useParams();
@@ -47,7 +47,7 @@ const RankingStack = ({ phase, modeCast }: RankingStackProps) => {
   return (
     <CJoliStack
       gap={0}
-      className={`${isCastPage ? "col-md-10" : "col-md-8"} mx-auto mt-5`}
+      className={`${isXl ? "col-md-12" : isCastPage ? "col-md-10" : "col-md-8"} mx-auto mt-5`}
       data-testid="ranking"
     >
       <div className="p-2">
