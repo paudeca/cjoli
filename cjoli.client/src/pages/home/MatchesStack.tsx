@@ -53,7 +53,24 @@ const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
       list.sort((a, b) => {
         if (a.time < b.time) return -1;
         else if (a.time > b.time) return 1;
-        else if (a.location && b.location && a.location > b.location) return 1;
+        else if (uid == "rouen2025") {
+          if (a.location == "Olympique Seine") {
+            return -1;
+          } else if (b.location == "Olympique Seine") {
+            return 1;
+          } else if (a.location == "Olympique Surfacage") {
+            return -1;
+          } else if (b.location == "Olympique Surfacage") {
+            return 1;
+          } else if (a.location == "Balester Restaurant") {
+            return -1;
+          } else if (b.location == "Balester Restaurant") {
+            return 1;
+          } else {
+            return a.location && b.location && a.location > b.location ? -1 : 1;
+          }
+        } else if (a.location && b.location && a.location > b.location)
+          return 1;
         else return -1;
       });
       return { ...acc, [date]: list };
