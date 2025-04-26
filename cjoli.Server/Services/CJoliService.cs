@@ -160,23 +160,6 @@ namespace cjoli.Server.Services
             if(isAdmin)
             {
                 _memoryCache.Remove(uuid);
-                /*string loginKey = "anonymous";
-                var map = _memoryCache.GetOrCreate(uuid, entry => new Dictionary<string, RankingDto>());
-                var dto = CreateRankingImpl(uuid, null, context);
-
-                UpdateWithLock($"{uuid}-{loginKey}", update: () =>
-                {
-                    if (!map!.ContainsKey(loginKey))
-                    {
-                        map.Add(loginKey, dto);
-                    }
-                    else
-                    {
-                        map.Remove(loginKey);
-                        map.Add(loginKey, dto);
-                    }
-                    return dto;
-                })*/;
             }
             else if(user!=null)
             {
@@ -196,37 +179,6 @@ namespace cjoli.Server.Services
             CalculateAllBetScores(dto, user, context);
             return dto;
         }
-
-        private RankingDto UpdateWithLock(string key, Func<RankingDto> update)
-        {
-            ReaderWriterLockSlim? cacheLock;
-            if (!locks.TryGetValue(key, out cacheLock))
-            {
-                cacheLock = new ReaderWriterLockSlim();
-                locks.TryAdd(key, cacheLock);
-            }
-
-            cacheLock.EnterUpgradeableReadLock();
-            try
-            {
-                RankingDto? data;
-                cacheLock.EnterWriteLock();
-                try
-                {
-                    data = update();
-                }
-                finally
-                {
-                    cacheLock.ExitWriteLock();
-                }
-                return data;
-            }
-            finally
-            {
-                cacheLock.ExitUpgradeableReadLock();
-            }
-        }
-
 
         private RankingDto GetOrUpdateWithLock(string key,Func<RankingDto?> get, Func<RankingDto> update)
         {
