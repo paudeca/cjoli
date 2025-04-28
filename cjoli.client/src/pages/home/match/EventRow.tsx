@@ -16,9 +16,10 @@ interface EventRowProps {
   event: EventPhase;
   hasLocation: boolean;
   modeCast?: boolean;
+  index: number;
 }
 // eslint-disable-next-line complexity
-const EventRow = ({ event, hasLocation, modeCast }: EventRowProps) => {
+const EventRow = ({ event, hasLocation, modeCast, index }: EventRowProps) => {
   const { teams } = useCJoli();
   const { t } = useTranslation();
   const uid = useUid();
@@ -137,7 +138,7 @@ const EventRow = ({ event, hasLocation, modeCast }: EventRowProps) => {
     <tr>
       {!isMobile && (
         <>
-          <td>{time}</td>
+          {index == 0 && <td>{time}</td>}
           <td colSpan={hasLocation ? 5 : 4}>
             <Stack>
               <div>{content}</div>

@@ -65,7 +65,8 @@ const CellViewMobile = () => {
 const CellInputMobile = () => {
   const { isConnected, isAdmin } = useUser();
   const { t } = useTranslation();
-  const { saveMatch, updateMatch, register, match, modeCast } = useMatchRow();
+  const { saveMatch, updateMatch, register, match, modeCast, teamA, teamB } =
+    useMatchRow();
   const editMode =
     !modeCast &&
     (isAdmin ||
@@ -105,10 +106,14 @@ const CellInputMobile = () => {
           <CJoliTooltip info={t("match.simulated", "Simulated result")}>
             <Stack style={{ color: "#aaaaaa" }}>
               <Row>
-                <Col>{!modeCast ? match.estimate?.scoreA : 0}</Col>
+                <Col>
+                  {!modeCast && teamA && teamB ? match.estimate?.scoreA : 0}
+                </Col>
               </Row>
               <Row>
-                <Col>{!modeCast ? match.estimate?.scoreB : 0}</Col>
+                <Col>
+                  {!modeCast && teamA && teamB ? match.estimate?.scoreB : 0}
+                </Col>
               </Row>
               {!modeCast && (
                 <Row>

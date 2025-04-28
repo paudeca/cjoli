@@ -32,7 +32,7 @@ const CellInputDesk = () => {
   return (
     <td className={classNamesCast.padding}>
       <MyScoreDiv isMobile={false}>
-        {!editMode && !modeCast && (
+        {!editMode && !modeCast && teamA && teamB && (
           <CJoliTooltip info={t("match.simulated", "Simulated result")}>
             <Row style={{ color: "#aaaaaa" }}>
               <Col>{match.estimate?.scoreA}</Col>
@@ -48,7 +48,7 @@ const CellInputDesk = () => {
           />
         )}
 
-        {!editMode && !modeCast && (
+        {!editMode && !modeCast && teamA && teamB && (
           <CJoliTooltip info={t("match.simulated", "Simulated result")}>
             <Stack direction="horizontal" style={{ color: "#aaaaaa" }}>
               <Row>

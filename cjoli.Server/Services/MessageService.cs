@@ -72,7 +72,7 @@ namespace cjoli.Server.Services
 
         private async Task<string?> GenerateAnswer(string uuid, Tourney tourney, String from, String body,bool isUser, CJoliContext context)
         {
-            var dto = _cjoliService.CreateRanking(uuid, null, context);
+            var dto = _cjoliService.CreateRanking(uuid, null, false, context);
             var session = _aiService.CreateSessionForChat(uuid, null, null, dto, context);
 
             List<Message> messages = context.Messages

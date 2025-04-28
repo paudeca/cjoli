@@ -19,6 +19,7 @@ const setHeader = () => {
   const token = cookie.get("CJOLI_AUTH_TOKEN");
   axios.defaults.headers.common = {
     Authorization: `Bearer ${token}`,
+    "CJoli-UseEstimate": localStorage.getItem("useEstimate"),
   };
 };
 setHeader();
@@ -29,6 +30,7 @@ export const getTourneys = async () => {
 };
 
 export const getRanking = async (uid: string) => {
+  setHeader();
   const { data } = await axios.get<Ranking>(`${url}/cjoli/${uid}/ranking`);
   return data;
 };
@@ -150,6 +152,7 @@ export const updateEstimate = async (uid: string) => {
 };
 
 export const saveUserConfig = async (uid: string, userConfig: UserConfig) => {
+  setHeader();
   const { data } = await axios.post<Ranking>(
     `${url}/cjoli/${uid}/saveUserConfig`,
     userConfig

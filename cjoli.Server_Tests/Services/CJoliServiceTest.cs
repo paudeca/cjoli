@@ -86,7 +86,7 @@ namespace cjoli.Server_Tests.Services
                 match.Done = true;
             });
             //Act
-            var ranking = _service.CreateRanking(tourney.Uid, user.Login, _context);
+            var ranking = _service.CreateRanking(tourney.Uid, user.Login, false, _context);
             //Assert
             Assert.Same(tourney.Uid, ranking.Tourney.Uid);
             Assert.NotNull(ranking.Scores);
@@ -132,7 +132,7 @@ namespace cjoli.Server_Tests.Services
             });
 
             //Act
-            var ranking = _service.CreateRanking(tourney.Uid, user.Login, _context);
+            var ranking = _service.CreateRanking(tourney.Uid, user.Login, false, _context);
             var result = string.Join(' ', ranking.Scores.ScoreSquads.First().Scores.Select((s, i) => $"{i}:{s.TeamId}:{s.Total}"));
             //Assert
             Assert.Same(tourney.Uid, ranking.Tourney.Uid);
@@ -177,7 +177,7 @@ namespace cjoli.Server_Tests.Services
             });
 
             //Act
-            var ranking = _service.CreateRanking(tourney.Uid, user.Login, _context);
+            var ranking = _service.CreateRanking(tourney.Uid, user.Login, false,_context);
             var result = string.Join(' ', ranking.Scores.ScoreSquads.First().Scores.Select((s, i) => $"{i}:{s.TeamId}:{s.Total}"));
             //Assert
             Assert.Same(tourney.Uid, ranking.Tourney.Uid);
@@ -198,7 +198,7 @@ namespace cjoli.Server_Tests.Services
             var team2 = Team("team2", tourney);
 
             //Act
-            var dto = _service.CreateRanking(tourney.Uid, null, _context);
+            var dto = _service.CreateRanking(tourney.Uid, null, false, _context);
             var match = dto.Tourney.Phases.First().Squads.First().Matches.First();
             //Assert
             Assert.Equal(team1.Id, match.TeamIdA);
@@ -221,7 +221,7 @@ namespace cjoli.Server_Tests.Services
 
 
             //Act
-            var dto = _service.CreateRanking(tourney.Uid, null, _context);
+            var dto = _service.CreateRanking(tourney.Uid, null, false, _context);
             //Assert
             var positions = dto.Tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Positions);
             var position1 = positions.Single(p => p.Name == "position2-1");
@@ -241,7 +241,7 @@ namespace cjoli.Server_Tests.Services
             var team2 = Team("team2", tourney);
 
             //Act
-            var dto = _service.CreateRanking(tourney.Uid, null, _context);
+            var dto = _service.CreateRanking(tourney.Uid, null, false,  _context);
             //Assert
             Assert.True(dto.History.ContainsKey(team1.Id));
             Assert.True(dto.History.ContainsKey(team2.Id));
@@ -256,7 +256,7 @@ namespace cjoli.Server_Tests.Services
             var tourney = CreateTourney();
 
             //Act
-            var ranking = _service.CreateRanking(tourney.Uid, null, _context);
+            var ranking = _service.CreateRanking(tourney.Uid, null, false, _context);
             var dto = _mapper.Map<RankingDto>(ranking);
             //Assert
             Assert.NotNull(dto.Tourney.Config);

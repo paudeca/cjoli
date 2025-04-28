@@ -309,6 +309,14 @@ namespace cjoli.Server.Services
             var winA = (double)scoreA.Win / scoreA.Game;
             var winB = (double)scoreB.Win / scoreB.Game;
 
+            var estimatesToDelete = match.Estimates.Where(s => s.User == user).OrderByDescending(s=>s.Id).Skip(1);
+            if(estimatesToDelete.Count()>0)
+            {
+                foreach(var e in estimatesToDelete)
+                {
+                    match.Estimates.Remove(e);
+                }
+            }
             MatchEstimate? estimate = match.Estimates.FirstOrDefault(s => s.User == user);
             if (estimate == null)
             {
@@ -316,7 +324,7 @@ namespace cjoli.Server.Services
                 match.Estimates.Add(estimate);
             }
 
-            estimate.User = user.IsAdmin(tourney.Uid) ? null : user;
+            estimate.User = user;
             estimate.ScoreA = (int)Math.Round(goalA);
             estimate.ScoreB = (int)Math.Round(goalB);
 

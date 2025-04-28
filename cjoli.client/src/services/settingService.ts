@@ -9,6 +9,7 @@ const setHeader = () => {
   const token = cookie.get("CJOLI_AUTH_TOKEN");
   axios.defaults.headers.common = {
     Authorization: `Bearer ${token}`,
+    "CJoli-UseEstimate": localStorage.getItem("useEstimate"),
   };
 };
 setHeader();
