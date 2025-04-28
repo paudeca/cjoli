@@ -88,6 +88,7 @@ const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
     if (keys && keys.length > 0 && !keys.includes(daySelected)) {
       let i = 0;
       while (
+        keys[i] &&
         !datas[keys[i]].some((me) => me.type == "match") &&
         i < keys.length
       ) {
@@ -206,6 +207,7 @@ const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
                                 return (
                                   <EventRow
                                     key={me.id}
+                                    index={i}
                                     event={me as EventPhase}
                                     hasLocation={hasLocation}
                                     modeCast={modeCast}

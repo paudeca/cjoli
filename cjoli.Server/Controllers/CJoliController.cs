@@ -81,7 +81,10 @@ namespace cjoli.Server.Controllers
         public RankingDto GetRanking(string uuid)
         {
             string? login = GetLogin();
-            return _service.CreateRanking(uuid, login, _context);
+
+            var useEstimate = HttpContext.Request.Headers["CJoli-UseEstimate"];
+
+            return _service.CreateRanking(uuid, login, useEstimate=="true", _context);
         }
 
         [HttpGet]
@@ -189,28 +192,30 @@ namespace cjoli.Server.Controllers
 
 
         [HttpPost]
-        [Authorize]
         [Route("{uuid}/SaveUserConfig")]
         public RankingDto SaveUserConfig(string uuid, UserConfigDto config)
         {
             var login = GetLogin();
-            _service.SaveUserConfig(uuid, login, config, _context);
+            if(login!=null)
+            {
+                _service.SaveUserConfig(uuid, login, config, _context);
+            }
             return GetRanking(uuid);
         }
 
         [HttpGet]
         [Route("{uuid}/Prompt")]
-        public async Task<string?> Prompt(string uuid, [FromQuery] string lang)
+        public async Task<string?> Prompt(string uuid, [FromQuery] string lang, [FromQuery] bool useEstimate)
         {
             var login = GetLogin();
-            var dto = _service.CreateRanking(uuid, login, _context);
+            var dto = _service.CreateRanking(uuid, login, useEstimate, _context);
             return await _aiService.Prompt(uuid, lang, login, dto, _context);
         }
 
         [HttpPost]
         [Authorize("IsAdmin")]
         [Route("{uuid}/UpdateEvent")]
-        public RankingDto UpdatEvent([FromRoute] string uuid, [FromBody] EventDto dto)
+        public RankingDto UpdatEvent([FromRoute] string uuid, [FromBody] EventDto dto,[FromQuery] bool useEstimate)
         {
             using (LogContext.PushProperty("uid", uuid))
             {

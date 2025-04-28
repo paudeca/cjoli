@@ -141,14 +141,15 @@ namespace cjoli.Server.Services
         }
 
 
-        private Ranking GetRanking(string tourneyUid, User? user, CJoliContext context)
+        private Ranking GetRanking(string tourneyUid, User? user, bool? useEstimate, CJoliContext context)
         {
             var tourney = GetTourney(tourneyUid, user, context);
             if(tourney.DisplayTime > DateTime.Now && !user.IsAdmin(tourneyUid))
             {
                 tourney = new Tourney() { Uid = tourney.Uid, Name = tourney.Name };
             }
-            var scores = CalculateScores(tourney, user, context);
+            var scores = CalculateScores(tourney, user, estimate: useEstimate);
+
             return new Ranking() { Tourney = tourney, Scores = scores };
         }
 
@@ -164,14 +165,15 @@ namespace cjoli.Server.Services
             else if(user!=null)
             {
                 var map = _memoryCache.GetOrCreate(uuid, entry => new Dictionary<string, RankingDto>());
-                map!.Remove(user.Login);
+                map!.Remove($"{user.Login}-True");
+                map!.Remove($"{user.Login}-False");
             }
         }
 
-        private RankingDto CreateRankingImpl(string tourneyUid, string? login, CJoliContext context)
+        private RankingDto CreateRankingImpl(string tourneyUid, string? login, bool? useEstimate, CJoliContext context)
         {
             User? user = GetUserWithConfig(login, tourneyUid, context);
-            var ranking = GetRanking(tourneyUid, user, context);
+            var ranking = GetRanking(tourneyUid, user, useEstimate, context);
             var dto = _mapper.Map<RankingDto>(ranking);
             AffectationTeams(dto);
             CalculateHistory(dto);
@@ -227,10 +229,10 @@ namespace cjoli.Server.Services
             }
         }
 
-        public RankingDto CreateRanking(string tourneyUid, string? login, CJoliContext context)
+        public RankingDto CreateRanking(string tourneyUid, string? login, bool? useEstimate, CJoliContext context)
         {
             Stopwatch sw = Stopwatch.StartNew();
-            string loginKey = login ?? "anonymous";
+            string loginKey = $"{login ?? "anonymous"}-{useEstimate}";
 
             var map = _memoryCache.GetOrCreate(tourneyUid, entry => new Dictionary<string, RankingDto>());
 
@@ -240,7 +242,7 @@ namespace cjoli.Server.Services
             }, update: () =>
             {
                 _logger.LogInformation($"Generate RankingDto");
-                var dto = CreateRankingImpl(tourneyUid, login, context);
+                var dto = CreateRankingImpl(tourneyUid, login, useEstimate, context);
                 if (!map!.ContainsKey(loginKey))
                 {
                     map.Add(loginKey, dto);
@@ -296,7 +298,7 @@ namespace cjoli.Server.Services
                 user = null;
             }
             Tourney tourney = GetTourney(uuid, user, context);
-            var scores = CalculateScores(tourney, user, context);
+            var scores = CalculateScores(tourney, user, estimate: false);
             _estimateService.CalculateEstimates(tourney, scores, user, context);
             ClearCache(uuid, originalUser, context);
             if (isAdmin)
@@ -305,7 +307,7 @@ namespace cjoli.Server.Services
             }
         }
 
-        private ScoresDto CalculateScores(Tourney tourney, User? user, CJoliContext context)
+        private ScoresDto CalculateScores(Tourney tourney, User? user, bool? estimate)
         {
             IRule rule = GetRule(tourney.Rule);
 
@@ -319,7 +321,7 @@ namespace cjoli.Server.Services
                 var scorePhase = new List<Score>();
                 foreach (var squad in phase.Squads)
                 {
-                    var scoreSquad = CalculateScoreSquad(squad, scoreTourney, scoreSquads, scorePhases, user);
+                    var scoreSquad = CalculateScoreSquad(squad, scoreTourney, scoreSquads, scorePhases, user, estimate);
                     scoreSquads.Add(scoreSquad);
                     scorePhase.AddRange(scoreSquad.Scores.Select(s => s.Clone()));
                 }
@@ -435,7 +437,7 @@ namespace cjoli.Server.Services
         };
 
 
-        private ScoreSquad CalculateScoreSquad(Squad squad, Score scoreTourney, List<ScoreSquad> scoreSquads, Dictionary<int,List<Score>> scorePhases, User? user)
+        private ScoreSquad CalculateScoreSquad(Squad squad, Score scoreTourney, List<ScoreSquad> scoreSquads, Dictionary<int,List<Score>> scorePhases, User? user, bool? estimate)
         {
             IRule rule = GetRule(squad.Phase.Tourney.Rule);
             Dictionary<int, Score> scores = rule.InitScoreSquad(squad, scoreSquads, scorePhases, user);
@@ -446,7 +448,15 @@ namespace cjoli.Server.Services
 
                 if ((userMatch == null || !useCustom) && !m.Done)
                 {
-                    return acc;
+                    var estimateMatch = m.Estimates.FirstOrDefault();
+                    if(estimateMatch != null && estimate.HasValue && estimate.Value)
+                    {
+                        userMatch = new UserMatch() { Match = m, ScoreA = estimateMatch.ScoreA, ScoreB = estimateMatch.ScoreB };
+                    } else
+                    {
+                        return acc;
+                    }
+                    //return acc;
                 }
                 IMatch match = m.Done ? m : userMatch!;
                 var scoreA = scores[m.PositionA.Id];
