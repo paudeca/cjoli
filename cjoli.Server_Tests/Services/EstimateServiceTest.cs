@@ -33,7 +33,7 @@ namespace cjoli.Server_Tests.Services
             //Arrange
             var tourney = CreateTourney();
             var user = CreateUser();
-            var ranking = _cjoliService.CreateRanking(tourney.Uid, null, _context);
+            var ranking = _cjoliService.CreateRanking(tourney.Uid, null, false, _context);
             var match = Match(tourney);
 
             Assert.Empty(match.Estimates);
@@ -115,7 +115,7 @@ namespace cjoli.Server_Tests.Services
             });
 
 
-            var ranking = _cjoliService.CreateRanking(tourney.Uid, user.Login, _context);
+            var ranking = _cjoliService.CreateRanking(tourney.Uid, user.Login, false, _context);
             //Act
             _service.CalculateEstimates(tourney, ranking.Scores, user, _context);
             //Assert
