@@ -298,7 +298,7 @@ namespace cjoli.Server.Services
                 user = null;
             }
             Tourney tourney = GetTourney(uuid, user, context);
-            var scores = CalculateScores(tourney, user, estimate: false);
+            var scores = CalculateScores(tourney, user, estimate: true);
             _estimateService.CalculateEstimates(tourney, scores, user, context);
             ClearCache(uuid, originalUser, context);
             if (isAdmin)
