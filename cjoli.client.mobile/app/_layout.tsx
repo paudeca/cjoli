@@ -29,49 +29,16 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [interLoaded, interError]);
-  console.log("inter", interLoaded);
-  console.log("error", interError);
 
   if (!interLoaded && interError) {
     return null;
   }
 
-  const colorScheme = useColorScheme();
   return (
     <Provider>
       <RootLayoutNav />
-      {/*<ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>*/}
     </Provider>
   );
-  /*return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );*/
-
-  //const colorScheme = useColorScheme();
-  /*const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  });
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }*/
 }
 
 function RootLayoutNav() {
