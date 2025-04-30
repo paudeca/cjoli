@@ -1,22 +1,53 @@
 import {
   DarkTheme,
   DefaultTheme,
+  NavigationContainer,
   ThemeProvider,
+  useNavigation,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Link, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 //import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
+import { Drawer } from "expo-router/drawer";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { Provider } from "@/components/Provider";
-import { StatusBar } from "react-native";
+import { Providers } from "@/components/Providers";
+import { Linking, StatusBar, View } from "react-native";
 import { useTheme } from "tamagui";
+import {
+  createDrawerNavigator,
+  DrawerContentScrollView,
+  DrawerItem,
+} from "@react-navigation/drawer";
+import { Button } from "@react-navigation/elements";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+//const Drawer = createDrawerNavigator();
+
+function HomeScreen() {
+  const navigation = useNavigation();
+
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Button onPress={() => {}}>Go to notifications</Button>
+    </View>
+  );
+}
+
+function NotificationsScreen() {
+  const navigation = useNavigation();
+
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Button onPress={() => navigation.goBack()}>Go back home</Button>
+    </View>
+  );
+}
 
 export default function RootLayout() {
   const [interLoaded, interError] = useFonts({
@@ -35,9 +66,31 @@ export default function RootLayout() {
   }
 
   return (
-    <Provider>
-      <RootLayoutNav />
-    </Provider>
+    <Providers>
+      <Drawer
+        drawerContent={(props) => (
+          <DrawerContentScrollView {...props}>
+            <DrawerItem
+              label="website"
+              onPress={() => Linking.openURL("https://cjoli-hockey.com")}
+            />
+            <Link
+              href={"/_sitemap"}
+              onPress={() => props.navigation.closeDrawer()}
+            >
+              Login
+            </Link>
+          </DrawerContentScrollView>
+        )}
+        screenOptions={{
+          title: "CJoli",
+        }}
+      ></Drawer>
+      {/*<Drawer.Navigator initialRouteName="Home">
+        <Drawer.Screen name="Home" component={HomeScreen} />
+        <Drawer.Screen name="Notifications" component={NotificationsScreen} />
+      </Drawer.Navigator>*/}
+    </Providers>
   );
 }
 
