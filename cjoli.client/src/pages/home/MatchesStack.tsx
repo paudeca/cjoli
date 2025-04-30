@@ -18,6 +18,7 @@ interface MatchesStackProps extends JSX.IntrinsicAttributes {
   phase: Phase;
   modeCast?: boolean;
 }
+// eslint-disable-next-line max-lines-per-function
 const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
   const { matches, daySelected, selectDay, isCastPage, classNamesCast, isXl } =
     useCJoli();
@@ -50,6 +51,7 @@ const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
       const time = dayjs(m.time);
       const date = time.format("YYYY-MM-DD");
       const list = [...(acc[date] || []), m];
+      // eslint-disable-next-line complexity
       list.sort((a, b) => {
         if (a.time < b.time) return -1;
         else if (a.time > b.time) return 1;
@@ -65,6 +67,18 @@ const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
           } else if (a.location == "Balester Restaurant") {
             return -1;
           } else if (b.location == "Balester Restaurant") {
+            return 1;
+          } else {
+            return a.location && b.location && a.location > b.location ? -1 : 1;
+          }
+        } else if (uid == "lyon2025") {
+          if (a.location == "Surfaceuse") {
+            return -1;
+          } else if (b.location == "Surfaceuse") {
+            return 1;
+          } else if (a.location == "Centre") {
+            return -1;
+          } else if (b.location == "Centre") {
             return 1;
           } else {
             return a.location && b.location && a.location > b.location ? -1 : 1;
@@ -208,6 +222,7 @@ const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
                                   <EventRow
                                     key={me.id}
                                     index={i}
+                                    rowSpan={map[k].length}
                                     event={me as EventPhase}
                                     hasLocation={hasLocation}
                                     modeCast={modeCast}

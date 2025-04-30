@@ -10,3 +10,5 @@
 /cjoli.Server/Properties/PublishProfiles/CJoli - Zip Deploy.pubxml.user
 /cjoli.Server/Properties/PublishProfiles/CJoli - Zip Deploy.pubxml.user
 */node_modules/
+/test/expo-router/.yarn/*
+/test/expo-router/node_modules/*
