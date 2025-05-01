@@ -3,13 +3,14 @@ import {
   DefaultTheme,
   NavigationContainer,
   ThemeProvider,
+  useIsFocused,
   useNavigation,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Link, Stack } from "expo-router";
+import { Link, Stack, useFocusEffect } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 //import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "react-native-reanimated";
 import { Drawer } from "expo-router/drawer";
 
@@ -23,6 +24,9 @@ import {
   DrawerItem,
 } from "@react-navigation/drawer";
 import { Button } from "@react-navigation/elements";
+import Constants from "expo-constants";
+//import * as Application from "expo-application";
+import { AppState } from "react-native";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -30,8 +34,6 @@ SplashScreen.preventAutoHideAsync();
 //const Drawer = createDrawerNavigator();
 
 function HomeScreen() {
-  const navigation = useNavigation();
-
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Button onPress={() => {}}>Go to notifications</Button>
@@ -61,9 +63,21 @@ export default function RootLayout() {
     }
   }, [interLoaded, interError]);
 
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const u = AppState.addEventListener("change", (a) => {
+      console.log("change", a, count);
+      a == "active" && setCount(count + 1);
+    });
+    return () => u.remove();
+  });
+
   if (!interLoaded && interError) {
     return null;
   }
+
+  const version = Constants.manifest2?.extra?.expoClient?.version;
 
   return (
     <Providers>
@@ -83,48 +97,9 @@ export default function RootLayout() {
           </DrawerContentScrollView>
         )}
         screenOptions={{
-          title: "CJoli",
+          title: `CJoli v${version} - ${count}`,
         }}
       ></Drawer>
-      {/*<Drawer.Navigator initialRouteName="Home">
-        <Drawer.Screen name="Home" component={HomeScreen} />
-        <Drawer.Screen name="Notifications" component={NotificationsScreen} />
-      </Drawer.Navigator>*/}
     </Providers>
-  );
-}
-
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-  const theme = useTheme();
-
-  return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <StatusBar
-        barStyle={colorScheme === "dark" ? "light-content" : "dark-content"}
-      />
-      <Stack>
-        <Stack.Screen
-          name="(tabs)"
-          options={{
-            headerShown: false,
-          }}
-        />
-
-        <Stack.Screen
-          name="modal"
-          options={{
-            title: "Tamagui + Expo",
-            presentation: "modal",
-            animation: "slide_from_right",
-            gestureEnabled: true,
-            gestureDirection: "horizontal",
-            contentStyle: {
-              backgroundColor: theme.background.val,
-            },
-          }}
-        />
-      </Stack>
-    </ThemeProvider>
   );
 }
