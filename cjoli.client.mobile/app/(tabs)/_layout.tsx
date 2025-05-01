@@ -26,17 +26,18 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Tab One",
+          title: "Ranking",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="house.fill" color={color} />
           ),
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Button mr="$4" bg="$green8" color="$green12">
-                Hello!
-              </Button>
-            </Link>
-          ),
+          headerRight: () =>
+            false && (
+              <Link href="/modal" asChild>
+                <Button mr="$4" bg="$green8" color="$green12">
+                  Hello!
+                </Button>
+              </Link>
+            ),
         }}
       />
       <Tabs.Screen
