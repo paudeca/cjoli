@@ -5,14 +5,15 @@
       "path": "cjoli.client"
     },
     {
-      "name": "cjoli.client.common",
-      "path": "cjoli.client.common"
+      "name": "cjoli.client.core",
+      "path": "cjoli.client.core"
     },
     {
       "name": "cjoli.client.heroui",
       "path": "cjoli.client.heroui"
     },
     {
+      "name": "cjoli.client.mobile",
       "path": "cjoli.client.mobile"
     }
   ],

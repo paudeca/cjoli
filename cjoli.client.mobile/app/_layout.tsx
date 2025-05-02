@@ -14,7 +14,6 @@ import { useCallback, useEffect, useState } from "react";
 import "react-native-reanimated";
 import { Drawer } from "expo-router/drawer";
 
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { Providers } from "@/components/Providers";
 import { Linking, StatusBar, View } from "react-native";
 import { useTheme } from "tamagui";
@@ -25,8 +24,9 @@ import {
 } from "@react-navigation/drawer";
 import { Button } from "@react-navigation/elements";
 import Constants from "expo-constants";
-//import * as Application from "expo-application";
 import { AppState } from "react-native";
+import * as Application from "expo-application";
+import { version } from "../package.json";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -76,8 +76,6 @@ export default function RootLayout() {
   if (!interLoaded && interError) {
     return null;
   }
-
-  const version = Constants.manifest2?.extra?.expoClient?.version;
 
   return (
     <Providers>
