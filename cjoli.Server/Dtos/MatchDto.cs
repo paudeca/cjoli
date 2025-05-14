@@ -26,5 +26,6 @@ namespace cjoli.Server.Dtos
         public MatchEstimateDto? Estimate { get; set; }
         public int PenaltyA { get; set; }
         public int PenaltyB { get; set; }
+        public string? Tournify { get; set; }
     }
 }

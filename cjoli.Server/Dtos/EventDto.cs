@@ -11,6 +11,7 @@ namespace cjoli.Server.Dtos
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public required EventType EventType { get; set; }
         public string? Datas { get; set; }
+        public string? Tournify { get; set; }
 
         public List<int> PositionIds { get; set; } = new List<int>();
         public List<int> SquadIds { get; set; } = new List<int>();

@@ -25,7 +25,7 @@ const RankTable = ({ phase, displayPhase }: RankTableProps) => {
       return a.id > b.id ? -1 : 1;
     });
   } else {
-    squads.sort((a, b) => (a.id > b.id ? 1 : -1));
+    squads.sort((a, b) => (a.order > b.order ? 1 : -1)); //a.id > b.id ? 1 : -1));
   }
 
   return (

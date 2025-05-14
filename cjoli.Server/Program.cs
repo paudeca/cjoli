@@ -101,6 +101,7 @@ builder.Services.AddSingleton<ServerService>();
 builder.Services.AddSingleton<MessageService>();
 builder.Services.AddSingleton<TwilioService>();
 builder.Services.AddSingleton<StorageService>();
+builder.Services.AddSingleton<SynchroService>();
 builder.Services.AddSingleton(new OpenAIClient(builder.Configuration["OpenAIKey"]));
 builder.Services.AddSingleton<LoggerMiddleware>();
 
