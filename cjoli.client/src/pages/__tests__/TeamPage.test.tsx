@@ -39,6 +39,7 @@ describe("TeamPage", () => {
               name: "squad1",
               positions: [createPosition({ id: 1, teamId: TEAM_ID })],
               matches: [],
+              order: 0,
             },
           ],
           events: [],

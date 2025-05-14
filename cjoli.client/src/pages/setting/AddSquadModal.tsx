@@ -30,7 +30,7 @@ const AddSquadModal = ({ onAddSquad, fieldLabel }: AddSquadModalProps) => {
     }
     if (
       !(await onAddSquad(
-        { id: 0, name: value, positions: [], matches: [] },
+        { id: 0, name: value, positions: [], matches: [], order: 0 },
         phase
       ))
     ) {
