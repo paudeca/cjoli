@@ -50,7 +50,7 @@ builder.Services.AddAuthorization(opt =>
     });
     opt.AddPolicy("IsAdmin", policy =>
     {
-        policy.RequireRole("ADMIN","ADMIN_LOCAL");
+        policy.RequireRole("ADMIN", "ADMIN_LOCAL");
     });
     opt.AddPolicy("EditTourney", policy =>
     {
@@ -86,7 +86,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddDataProtection();
 builder.Services.AddAutoMapper(typeof(Program));
-builder.Services.AddMemoryCache(opt=>
+builder.Services.AddMemoryCache(opt =>
 {
     //opt.SizeLimit = 1024;
 });
@@ -107,10 +107,12 @@ builder.Services.AddSingleton<LoggerMiddleware>();
 
 builder.Services.AddSingleton<IAuthorizationHandler, AdminTourneyAuthorizationHandler>();
 
+builder.Services.AddHostedService<SynchroHostedService>();
+
 builder.Services.AddDbContextPool<CJoliContext>(options =>
 {
     var cnx = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseMySql(cnx, ServerVersion.AutoDetect(cnx),o=>o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
+    options.UseMySql(cnx, ServerVersion.AutoDetect(cnx), o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
 }
 );
 
@@ -119,7 +121,8 @@ builder.Services.AddLogging(configure =>
     var logger = new LoggerConfiguration()
     .Enrich.WithExceptionDetails()
     .Enrich.FromLogContext()
-    .Enrich.WithSensitiveDataMasking(opt => { 
+    .Enrich.WithSensitiveDataMasking(opt =>
+    {
         opt.MaskProperties.Add("Password");
     })
     .WriteTo.DatadogLogs(builder.Configuration["DatadogKey"],
