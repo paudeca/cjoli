@@ -6,4 +6,5 @@ export interface Squad {
   name: string;
   positions: Position[];
   matches: Match[];
+  order: number;
 }

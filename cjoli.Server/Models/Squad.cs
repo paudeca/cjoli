@@ -12,5 +12,7 @@ namespace cjoli.Server.Models
         public required Phase Phase { get; set; }
         public IList<ParentPosition>? ParentPositions { get; set; }
         public IList<Rank> Ranks { get; set; } = new List<Rank>();
+        public string? Tournify { get; set; }
+        public int Order { get; set; }
     }
 }

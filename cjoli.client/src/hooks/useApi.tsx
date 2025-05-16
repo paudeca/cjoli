@@ -128,7 +128,7 @@ const useApiPost = () => {
   const saveTourney = useCallback(
     ({ onSuccess }: { onSuccess?: () => void }) =>
       mutationOptions({
-        mutationKey: ["addTourney"],
+        mutationKey: ["saveTourney"],
         mutationFn: async (tourney: Tourney) => {
           const t = await settingService.importTourney(tourney);
           loadTourney(t);
@@ -138,6 +138,19 @@ const useApiPost = () => {
       }),
     [loadTourney]
   );
+  const synchroTourney = useCallback(
+    (uid: string) =>
+      mutationOptions({
+        mutationKey: ["synchroTourney"],
+        mutationFn: async () => {
+          const t = await settingService.synchroTourney(uid);
+          loadTourney(t);
+          return t;
+        },
+      }),
+    [loadTourney]
+  );
+
   const saveUserAdminConfig = useCallback(
     ({ onSuccess }: { onSuccess: () => void }) =>
       mutationOptions({
@@ -178,7 +191,13 @@ const useApiPost = () => {
     []
   );
 
-  return { saveTourney, saveUserAdminConfig, updateMessage, deleteMessage };
+  return {
+    saveTourney,
+    saveUserAdminConfig,
+    updateMessage,
+    deleteMessage,
+    synchroTourney,
+  };
 };
 
 const useApiDelete = () => {

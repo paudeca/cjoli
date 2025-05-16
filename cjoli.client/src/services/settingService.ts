@@ -19,6 +19,14 @@ export const getTeams = async () => {
   return data;
 };
 
+export const synchroTourney = async (uid: string) => {
+  const { data } = await axios.post<Tourney>(
+    `${url}/setting/tourney/${uid}/synchro`,
+    {}
+  );
+  return data;
+};
+
 export const importTourney = async (tourney: Tourney) => {
   const { data } = await axios.post<Tourney>(`${url}/setting/tourney`, tourney);
   return data;

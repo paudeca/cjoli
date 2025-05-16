@@ -39,6 +39,7 @@ const tourney = createTourney({
               time: dayjs().add(1, "hour").toDate(),
             })
           ),
+          order: 0,
         },
         {
           id: SQUAD_ID2,
@@ -62,6 +63,7 @@ const tourney = createTourney({
               time: dayjs().add(1, "day").toDate(),
             }),
           ],
+          order: 0,
         },
       ],
       events: [],

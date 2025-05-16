@@ -8,9 +8,15 @@ const TourneySetting = () => {
       <Card.Body>
         <Card.Title className="mb-3">Tourney</Card.Title>
         <Row className="mb-3">
+          <Form.Group as={Col} lg={6} xs={12} controlId="tournify">
+            <Form.Label>Tournify</Form.Label>
+            <Form.Control {...register("tournify")} autoFocus />
+          </Form.Group>
+        </Row>
+        <Row className="mb-3">
           <Form.Group as={Col} lg={6} xs={12} controlId="name">
             <Form.Label>Name</Form.Label>
-            <Form.Control {...register("name")} autoFocus />
+            <Form.Control {...register("name")} />
           </Form.Group>
 
           <Form.Group as={Col} lg={3} xs={12} controlId="season">

@@ -5,6 +5,8 @@ using cjoli.Server.Models;
 using cjoli.Server.Services;
 using Google.Apis.Auth;
 using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Firestore;
+using Google.Cloud.Firestore.V1;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -16,9 +18,19 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace cjoli.Server.Controllers
 {
+
+    [FirestoreData]
+    public class Toto
+    {
+        //public string bgURL { get; set; }
+        [FirestoreProperty]
+        public string? name { get; set; }
+    }
+
 
     [ApiController]
     [Route("[controller]")]
@@ -63,8 +75,35 @@ namespace cjoli.Server.Controllers
 
         [HttpGet]
         [Route("Tourneys")]
-        public List<TourneyDto> ListTourneys()
+        public async Task<List<TourneyDto>> ListTourneys()
         {
+
+            var builder = new FirestoreClientBuilder();
+            builder.ApiKey = "AIzaSyDpqIP2yOZBWjAcknp1szptkyh0fk6zGQI";
+            FirestoreClient client = builder.Build();
+
+            //FirestoreClient client = FirestoreClient.Create();
+            FirestoreDb db = FirestoreDb.Create("tournamentsoftware-a1b3d",client);
+            var query = db.Collection("tournaments").WhereEqualTo("liveLink", "paudeca");
+            QuerySnapshot querySnapshot = query.GetSnapshotAsync().Result;
+            string id = querySnapshot.Documents.First().Id;
+            var doc = querySnapshot.Documents.First().ToDictionary();
+            var toto = querySnapshot.Documents.First().ConvertTo<Toto>();
+
+            var c = db.Collection("tournaments").Document(id).ListCollectionsAsync();
+            c.ForEachAsync(a =>
+            {
+                var id = a.Id;
+            });
+
+            query = db.Collection("tournaments").Document(id).Collection("matches");
+            querySnapshot = query.GetSnapshotAsync().Result;
+            querySnapshot.ToList().ForEach(q =>
+            {
+                var m = q.ToDictionary();
+            });
+
+
             return _service.ListTourneys(_context).Select(_mapper.Map<TourneyDto>).ToList();
         }
 

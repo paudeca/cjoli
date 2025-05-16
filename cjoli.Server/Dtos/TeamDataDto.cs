@@ -9,5 +9,7 @@
         public string? Logo { get; set; }
         public string? PrimaryColor { get; set; }
         public string? SecondaryColor { get; set; }
+
+        public string? Tournify { get; set; }
     }
 }

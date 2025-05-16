@@ -16,6 +16,7 @@ namespace cjoli.Server.Models
         public DateTime Time { get; set; }
         public required EventType EventType { get; set; }
         public string? Datas { get; set; }
+        public string? Tournify { get; set; }
 
         public IList<Position> Positions { get; set; } = new List<Position>();
 

@@ -20,8 +20,9 @@ namespace cjoli.Server.Controllers
         private readonly IMapper _mapper;
         private readonly CJoliContext _context;
         private readonly IAuthorizationService _authorizationService;
+        private readonly SynchroService _synchroService;
 
-        public SettingController(CJoliService service, SettingService settingService, UserService userService, IAuthorizationService authorizationService, IMapper mapper, CJoliContext context)
+        public SettingController(CJoliService service, SettingService settingService, UserService userService, IAuthorizationService authorizationService, SynchroService synchroService, IMapper mapper, CJoliContext context)
         {
             _service = service;
             _settingService = settingService;
@@ -29,6 +30,7 @@ namespace cjoli.Server.Controllers
             _mapper = mapper;
             _context = context;
             _authorizationService = authorizationService;
+            _synchroService = synchroService;
         }
 
 
@@ -46,6 +48,15 @@ namespace cjoli.Server.Controllers
             await _authorizationService.AuthorizeAsync(User, tourney.Uid, "EditTourney");
             return _mapper.Map<TourneyDto>(_settingService.Import(tourney, _context));
         }
+
+        [HttpPost]
+        [Route("Tourney/{uid}/Synchro")]
+        public async Task<TourneyDto> SynchroAsync(string uid)
+        {
+            await _authorizationService.AuthorizeAsync(User, uid, "EditTourney");
+            return _mapper.Map<TourneyDto>(await _synchroService.Synchro(uid, _context));
+        }
+
 
 
         [HttpPost]

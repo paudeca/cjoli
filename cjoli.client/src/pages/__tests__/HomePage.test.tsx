@@ -112,6 +112,7 @@ describe("HomePage", () => {
               name: "squad1",
               positions: [],
               matches: [createMatch({ done: true })],
+              order: 0,
             },
           ],
           events: [],
