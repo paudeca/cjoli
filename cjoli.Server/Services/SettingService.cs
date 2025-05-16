@@ -32,7 +32,7 @@ namespace cjoli.Server.Services
 
         public Tourney Import(TourneyDto tourneyDto, CJoliContext context)
         {
-            var tourney= Import(
+            var tourney = Import(
                 dto: tourneyDto,
                 context: context,
                 select: () => context.Tourneys
@@ -59,6 +59,7 @@ namespace cjoli.Server.Services
                     tourney.Rule = tourneyDto.Rule ?? tourney.Rule;
                     tourney.WhatsappNumber = tourneyDto.WhatsappNumber ?? tourney.WhatsappNumber;
                     tourney.WhatsappNotif = tourneyDto.WhatsappNotif ?? tourney.WhatsappNotif;
+                    tourney.Tournify = tourneyDto.Tournify ?? tourney.Tournify;
 
                 },
                 children: [
@@ -245,7 +246,7 @@ namespace cjoli.Server.Services
                 select: () => phase.Events.SingleOrDefault(e => e.Id == eventDto.Id),
                 create: () =>
                 {
-                    var e = new Event() { Name = eventDto.Name, EventType = eventDto.EventType};
+                    var e = new Event() { Name = eventDto.Name, EventType = eventDto.EventType };
                     phase.Events.Add(e);
                     return e;
                 },
@@ -254,7 +255,7 @@ namespace cjoli.Server.Services
                     e.Name = eventDto.Name;
                     e.EventType = eventDto.EventType;
                     e.Time = eventDto.Time;
-                    var positions = phase.Squads.SelectMany(s => s.Positions.Where(p=>eventDto.PositionIds.Contains(p.Id))).ToList();
+                    var positions = phase.Squads.SelectMany(s => s.Positions.Where(p => eventDto.PositionIds.Contains(p.Id))).ToList();
                     e.Positions = positions;
                     e.Datas = eventDto.Datas ?? e.Datas;
                 }
@@ -305,7 +306,7 @@ namespace cjoli.Server.Services
         public void DeleteMessage(int msgId, string uid, CJoliContext context)
         {
             Message message = context.Messages.Single(m => m.Id == msgId);
-            if(message.MediaName!=null)
+            if (message.MediaName != null)
             {
                 _storageService.DeleteBlob(uid, message.MediaName);
             }
@@ -393,7 +394,5 @@ namespace cjoli.Server.Services
             _memoryCache.Remove(uid);
             return tourney;
         }
-
-
     }
 }

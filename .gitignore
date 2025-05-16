@@ -13,3 +13,7 @@
 */.yarn/*
 /test/expo-router/.yarn/*
 /test/expo-router/node_modules/*
+/test/expo-router/.yarn/*
+/test/expo-router/node_modules/*
+/cjoli.client.common/dist/*
+/cjoli.client.core/dist/*

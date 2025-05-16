@@ -9,12 +9,21 @@ const setHeader = () => {
   const token = cookie.get("CJOLI_AUTH_TOKEN");
   axios.defaults.headers.common = {
     Authorization: `Bearer ${token}`,
+    "CJoli-UseEstimate": localStorage.getItem("useEstimate"),
   };
 };
 setHeader();
 
 export const getTeams = async () => {
   const { data } = await axios.get<Team[]>(`${url}/setting/teams`);
+  return data;
+};
+
+export const synchroTourney = async (uid: string) => {
+  const { data } = await axios.post<Tourney>(
+    `${url}/setting/tourney/${uid}/synchro`,
+    {}
+  );
   return data;
 };
 

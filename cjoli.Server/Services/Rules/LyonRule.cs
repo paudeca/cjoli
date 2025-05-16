@@ -13,7 +13,7 @@ namespace cjoli.Server.Services.Rules
             _service = service;
         }
 
-        public int Win => 3;
+        public int Win => 2;
 
         public int Neutral => 1;
 

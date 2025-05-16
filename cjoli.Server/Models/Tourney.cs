@@ -20,6 +20,8 @@ namespace cjoli.Server.Models
         public string? WhatsappNumber { get; set; }
         public string? WhatsappNotif { get; set; }
         public string? Logo { get; set; }
+        public string? Tournify { get; set; }
+        public bool HasTournifySynchroName { get; set; }
 
         [NotMapped]
         public IRule? Config { get; set; }

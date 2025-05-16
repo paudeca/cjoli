@@ -18,6 +18,7 @@ interface MatchesStackProps extends JSX.IntrinsicAttributes {
   phase: Phase;
   modeCast?: boolean;
 }
+// eslint-disable-next-line max-lines-per-function
 const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
   const { matches, daySelected, selectDay, isCastPage, classNamesCast, isXl } =
     useCJoli();
@@ -50,10 +51,40 @@ const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
       const time = dayjs(m.time);
       const date = time.format("YYYY-MM-DD");
       const list = [...(acc[date] || []), m];
+      // eslint-disable-next-line complexity
       list.sort((a, b) => {
         if (a.time < b.time) return -1;
         else if (a.time > b.time) return 1;
-        else if (a.location && b.location && a.location > b.location) return 1;
+        else if (uid == "rouen2025") {
+          if (a.location == "Olympique Seine") {
+            return -1;
+          } else if (b.location == "Olympique Seine") {
+            return 1;
+          } else if (a.location == "Olympique Surfaceuse") {
+            return -1;
+          } else if (b.location == "Olympique Surfaceuse") {
+            return 1;
+          } else if (a.location == "Balester Restaurant") {
+            return -1;
+          } else if (b.location == "Balester Restaurant") {
+            return 1;
+          } else {
+            return a.location && b.location && a.location > b.location ? -1 : 1;
+          }
+        } else if (uid == "lyon2025") {
+          if (a.location == "Surfaceuse") {
+            return -1;
+          } else if (b.location == "Surfaceuse") {
+            return 1;
+          } else if (a.location == "Centre") {
+            return -1;
+          } else if (b.location == "Centre") {
+            return 1;
+          } else {
+            return a.location && b.location && a.location > b.location ? -1 : 1;
+          }
+        } else if (a.location && b.location && a.location > b.location)
+          return 1;
         else return -1;
       });
       return { ...acc, [date]: list };
@@ -71,6 +102,7 @@ const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
     if (keys && keys.length > 0 && !keys.includes(daySelected)) {
       let i = 0;
       while (
+        keys[i] &&
         !datas[keys[i]].some((me) => me.type == "match") &&
         i < keys.length
       ) {
@@ -189,6 +221,8 @@ const MatchesStack = ({ phase, modeCast }: MatchesStackProps) => {
                                 return (
                                   <EventRow
                                     key={me.id}
+                                    index={i}
+                                    rowSpan={map[k].length}
                                     event={me as EventPhase}
                                     hasLocation={hasLocation}
                                     modeCast={modeCast}

@@ -19,6 +19,7 @@ namespace cjoli.Server.Models
         public Squad? Squad { get; set; }
         public int PenaltyA { get; set; }
         public int PenaltyB { get; set; }
+        public string? Tournify { get; set; }
 
         public IList<MatchEstimate> Estimates { get; set; } = new List<MatchEstimate>();
         public IList<UserMatch> UserMatches { get; set; } = new List<UserMatch>();

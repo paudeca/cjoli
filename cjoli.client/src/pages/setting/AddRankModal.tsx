@@ -13,10 +13,12 @@ const AddRankModal = ({ onAddRank }: AddRankModalProps) => {
   const { tourney } = useCJoli();
 
   const [phase, setPhase] = React.useState<Phase | undefined>(
-    tourney?.phases.length == 1 ? tourney?.phases[0] : undefined
+    //tourney?.phases.length == 1 ? tourney?.phases[0] : undefined
+    undefined
   );
   const [squad, setSquad] = React.useState<Squad | undefined>(
-    phase?.squads.length == 1 ? phase?.squads[0] : undefined
+    //phase?.squads.length == 1 ? phase?.squads[0] : undefined
+    undefined
   );
 
   const fields: Field<Rank>[] = [
@@ -25,8 +27,9 @@ const AddRankModal = ({ onAddRank }: AddRankModalProps) => {
       label: "Phase",
       type: "select",
       options: tourney?.phases.map((p) => ({ label: p.name, value: p.id })),
-      onChange: (value?: string) =>
-        setPhase(tourney?.phases.find((p) => p.id.toString() == value)),
+      onChange: (value?: string) => {
+        setPhase(tourney?.phases.find((p) => p.id.toString() == value));
+      },
     },
     {
       id: "squadId",
@@ -48,8 +51,8 @@ const AddRankModal = ({ onAddRank }: AddRankModalProps) => {
   ];
 
   const values = {
-    phaseId: tourney?.phases.length == 1 ? tourney?.phases[0].id : undefined,
-    squadId: phase?.squads.length == 1 ? phase?.squads[0].id : undefined,
+    phaseId: undefined, //tourney?.phases.length == 1 ? tourney?.phases[0].id : undefined,
+    squadId: undefined, //phase?.squads.length == 1 ? phase?.squads[0].id : undefined,
   };
 
   const onSubmit = async (rank: Rank) => {

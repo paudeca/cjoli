@@ -76,6 +76,9 @@ namespace cjoli.Server.Migrations
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Tournify")
+                        .HasColumnType("longtext");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PhaseId");
@@ -129,6 +132,9 @@ namespace cjoli.Server.Migrations
 
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Tournify")
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -411,8 +417,14 @@ namespace cjoli.Server.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
                     b.Property<int>("PhaseId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Tournify")
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -490,6 +502,9 @@ namespace cjoli.Server.Migrations
                     b.Property<int>("TourneyId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Tournify")
+                        .HasColumnType("longtext");
+
                     b.HasKey("Id");
 
                     b.HasIndex("TeamId");
@@ -518,6 +533,9 @@ namespace cjoli.Server.Migrations
 
                     b.Property<string>("Logo")
                         .HasColumnType("longtext");
+                        
+                    b.Property<bool>("HasTournifySynchroName")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -531,6 +549,9 @@ namespace cjoli.Server.Migrations
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Tournify")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Uid")
                         .IsRequired()

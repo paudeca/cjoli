@@ -56,7 +56,7 @@ namespace cjoli.Server.Controllers
 
         private async Task Bot(WebSocket webSocket, string uuid, string lang, string login)
         {
-            var dto = _cjoliService.CreateRanking(uuid, login, _context);
+            var dto = _cjoliService.CreateRanking(uuid, login, false, _context);
             var session = _service.CreateSessionForChat(uuid, lang, login, dto, _context);
             session.OnReply += async (sender, e) => { await SendMessage(e.Message, webSocket); };
             await _service.PromptMessage(session);

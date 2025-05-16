@@ -21,4 +21,5 @@ export interface Tourney {
   messages: Message[];
   whatsappNumber?: string;
   whatsappNotif?: string;
+  tournify?: string;
 }

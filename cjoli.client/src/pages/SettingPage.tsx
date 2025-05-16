@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import {
@@ -34,10 +35,12 @@ import CJoliStack from "../components/CJoliStack";
 import { useAddSetting } from "./setting/useAddSetting";
 import { useUser } from "../hooks/useUser";
 import AddEventModal from "./setting/AddEventModal";
+import { useToast } from "../hooks/useToast";
 
 const SettingPage = () => {
   const { tourney } = useCJoli("setting");
   const { isRootAdmin } = useUser();
+  const { showToast } = useToast();
   const {
     getRanking,
     removeTourney,
@@ -48,6 +51,7 @@ const SettingPage = () => {
     removeMatch,
     removeRank,
     removeEvent,
+    synchroTourney,
   } = useApi();
   const uid = useUid();
   const { register, handleSubmit, setValue, control } = useForm<Tourney>({
@@ -81,6 +85,8 @@ const SettingPage = () => {
   const { mutateAsync: doRemoveRank } = useMutation(removeRank(uid));
   const { mutateAsync: doRemoveEvent } = useMutation(removeEvent(uid));
 
+  const { mutateAsync: doSynchro } = useMutation(synchroTourney(uid));
+
   const submit = async (tourney: Tourney) => {
     await doSaveTourney(tourney);
   };
@@ -96,6 +102,20 @@ const SettingPage = () => {
           Save
         </Button>
       </div>
+      {tourney.tournify && (
+        <div>
+          <Button
+            variant="primary"
+            onClick={async () => {
+              await doSynchro();
+              showToast("success", "Synchro done");
+            }}
+          >
+            Synchronize
+          </Button>
+        </div>
+      )}
+
       {isRootAdmin && (
         <div className="p-2">
           <Button

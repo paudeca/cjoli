@@ -51,13 +51,6 @@ const useColumnsTourney = () => {
       },
       width: "30%",
     },
-    {
-      id: "total",
-      label: t("rank.total", "Points"),
-      value: (rank: RankScore) => rank.score?.total,
-      focus: true,
-      width: "20%",
-    },
   ];
   const datas =
     tourney?.ranks.map((rank) => ({

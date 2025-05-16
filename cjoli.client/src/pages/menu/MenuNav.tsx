@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import {
   Navbar,
   Container,
@@ -32,7 +33,7 @@ import { useNavigate } from "react-router-dom";
 import useScreenSize from "../../hooks/useScreenSize";
 import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useModal } from "../../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
 import dayjs from "dayjs";
@@ -54,7 +55,7 @@ const langs = [
   { key: "nl", icon: "🇳🇱" },
 ];
 
-// eslint-disable-next-line max-lines-per-function
+// eslint-disable-next-line max-lines-per-function, complexity
 const MenuNav = () => {
   const { loadRanking, tourney, isCastPage } = useCJoli();
   const { user, userConfig, loadUser, handleSaveUserConfig } = useUser();
@@ -85,6 +86,10 @@ const MenuNav = () => {
     userConfig: { useCustomEstimate },
   } = useUser();
 
+  const useEstimate =
+    (isAdmin && useCustomEstimate) ||
+    (!isAdmin && localStorage.getItem("useEstimate") == "true");
+
   const tourneyLabel = uid && tourney?.name;
 
   return (
@@ -95,20 +100,29 @@ const MenuNav = () => {
     >
       <Container fluid>
         <MenuBrand setShow={setShow} />
-        {isAdmin && tourneyLabel && !isCastPage && (
+        {tourneyLabel && !isCastPage && (
           <Stack direction="horizontal" gap={3}>
             <ToggleButton
               id="toggle-check"
               type="checkbox"
               variant="outline-primary"
-              checked={useCustomEstimate}
+              checked={useEstimate}
               value="1"
               onChange={async (e) => {
                 setLoading(true);
-                await handleSaveUserConfig({
-                  ...userConfig,
-                  useCustomEstimate: e.currentTarget.checked,
-                });
+                localStorage.setItem(
+                  "useEstimate",
+                  e.currentTarget.checked ? "true" : "false"
+                );
+                if (isAdmin) {
+                  await handleSaveUserConfig({
+                    ...userConfig,
+                    useCustomEstimate: e.currentTarget.checked,
+                  });
+                } else {
+                  const ranking = await cjoliService.getRanking(uid);
+                  loadRanking(ranking);
+                }
                 setLoading(false);
               }}
             >
