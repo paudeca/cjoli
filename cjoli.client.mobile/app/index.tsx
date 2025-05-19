@@ -32,7 +32,7 @@ const data = [
 export default () => {
   //rconst { datas } = useSelectPage();
   //console.log("datas", datas);
-  console.log("use", useSelectPage);
+  //console.log("use", useSelectPage);
   return (
     <ScrollView backgroundColor="#202644">
       <YStack marginStart="$3" marginBlockStart="$2" gap="$2">
