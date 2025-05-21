@@ -16,6 +16,8 @@
         public string? WhatsappNotif { get; set; }
         public string? Tournify { get; set; }
         public bool HasTournifySynchroName { get; set; }
+        public string? RuleConfig { get; set; }
+
 
 
         public List<PhaseDto> Phases { get; set; } = new List<PhaseDto>();

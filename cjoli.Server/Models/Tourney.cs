@@ -21,6 +21,7 @@ namespace cjoli.Server.Models
         public string? WhatsappNotif { get; set; }
         public string? Tournify { get; set; }
         public bool HasTournifySynchroName { get; set; }
+        public string? RuleConfig { get; set; }
 
         [NotMapped]
         public IRule? Config { get; set; }

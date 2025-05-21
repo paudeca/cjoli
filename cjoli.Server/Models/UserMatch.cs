@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper.Configuration.Annotations;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -20,6 +21,11 @@ namespace cjoli.Server.Models
         public bool BetWinner { get; set; }
         public bool BetDiff { get; set; }
         public bool BetGoal { get; set; }
+
+        [Ignore]
+        public bool WinnerA => false;
+        [Ignore]
+        public bool WinnerB => false;
 
         public DateTime Time { get { return Match.Time; } }
     }

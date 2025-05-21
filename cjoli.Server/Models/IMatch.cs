@@ -7,6 +7,8 @@
         public bool ForfeitA { get; set; }
         public bool ForfeitB { get; set; }
         public DateTime Time { get; }
+        public bool WinnerA { get; }
+        public bool WinnerB { get; }
     }
 
     public interface IPenalty

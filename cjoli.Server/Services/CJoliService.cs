@@ -64,12 +64,15 @@ namespace cjoli.Server.Services
             _rules.Add("henderson", new HendersonRule(this));
             _rules.Add("hogly", new HoglyRule(this));
             _rules.Add("nordcup", new NordCupRule(this));
-
         }
 
-        private IRule GetRule(string? rule)
+        private IRule GetRule(Tourney tourney)
         {
-            string ruleName = rule ?? "simple";
+            string ruleName = tourney.Rule ?? "simple";
+            if (ruleName == "tournify")
+            {
+                return new TournifyRule(this, tourney);
+            }
             return _rules.ContainsKey(ruleName) ? _rules[ruleName] : _rules["simple"];
         }
 
@@ -77,7 +80,7 @@ namespace cjoli.Server.Services
         {
             return context.Tourneys.OrderByDescending(t => t.StartTime).ToList().Select(t =>
             {
-                t.Config = GetRule(t.Rule);
+                t.Config = GetRule(t);
                 return t;
             }).ToList();
         }
@@ -129,7 +132,7 @@ namespace cjoli.Server.Services
             }
             tourney.Ranks = context.Tourneys.Include(t => t.Ranks.OrderBy(r => r.Order)).First(t => t.Uid == tourneyUid).Ranks;
 
-            tourney.Config = GetRule(tourney.Rule);
+            tourney.Config = GetRule(tourney);
 
 
             return tourney;
@@ -176,7 +179,7 @@ namespace cjoli.Server.Services
             var ranking = GetRanking(tourneyUid, user, useEstimate, context);
             var dto = _mapper.Map<RankingDto>(ranking);
             AffectationTeams(dto);
-            CalculateHistory(dto);
+            CalculateHistory(dto, ranking.Tourney);
             CalculateHistoryByTimes(dto, ranking.Tourney, context);
             CalculateAllBetScores(dto, user, context);
             return dto;
@@ -309,7 +312,7 @@ namespace cjoli.Server.Services
 
         private ScoresDto CalculateScores(Tourney tourney, User? user, bool? estimate)
         {
-            IRule rule = GetRule(tourney.Rule);
+            IRule rule = GetRule(tourney);
 
             var scoreTourney = new Score();
             var scoreSquads = new List<ScoreSquad>();
@@ -441,7 +444,7 @@ namespace cjoli.Server.Services
 
         private ScoreSquad CalculateScoreSquad(Squad squad, Score scoreTourney, List<ScoreSquad> scoreSquads, Dictionary<int, List<Score>> scorePhases, User? user, bool? estimate)
         {
-            IRule rule = GetRule(squad.Phase.Tourney.Rule);
+            IRule rule = GetRule(squad.Phase.Tourney);
             Dictionary<int, Score> scores = rule.InitScoreSquad(squad, scoreSquads, scorePhases, user);
             squad.Matches.Aggregate(scores, (acc, m) =>
             {
@@ -459,7 +462,6 @@ namespace cjoli.Server.Services
                     {
                         return acc;
                     }
-                    //return acc;
                 }
                 IMatch match = m.Done ? m : userMatch!;
                 var scoreA = scores[m.PositionA.Id];
@@ -575,7 +577,7 @@ namespace cjoli.Server.Services
             }
         }
 
-        private void CalculateHistory(RankingDto ranking)
+        private void CalculateHistory(RankingDto ranking, Tourney tourney)
         {
 
             var mapTeams = ranking.Tourney.Teams.ToDictionary(t => t.Id, t => new List<Score>());
@@ -605,7 +607,7 @@ namespace cjoli.Server.Services
 
                 IMatch match = m.Done ? m : m.UserMatch != null ? m.UserMatch : m;
 
-                IRule rule = GetRule(ranking.Tourney.Rule);
+                IRule rule = GetRule(tourney);
                 UpdateScore(scoreA, scoreB, null, match, m, rule);
 
                 if (listA.Count > 0)
@@ -932,7 +934,7 @@ namespace cjoli.Server.Services
             }
 
             bool isForfeit = match.ForfeitA || match.ForfeitB;
-            if (match.ScoreA > match.ScoreB || match.ForfeitB)
+            if (match.ScoreA > match.ScoreB || match.ForfeitB || match.WinnerA)
             {
                 scoreA.Win++;
                 scoreB.Loss++;
@@ -949,7 +951,7 @@ namespace cjoli.Server.Services
                     scoreTourney.ShutOut += !isForfeit && match.ScoreB == 0 ? 1 : 0;
                 }
             }
-            else if (match.ScoreA < match.ScoreB || match.ForfeitA)
+            else if (match.ScoreA < match.ScoreB || match.ForfeitA || match.WinnerB)
             {
                 scoreA.Loss++;
                 scoreB.Win++;
@@ -1011,7 +1013,7 @@ namespace cjoli.Server.Services
                 throw new NotFoundException("Match", dto.Id);
             }
             bool isAdmin = user.IsAdminWithNoCustomEstimate(uuid);
-            IRule rule = GetRule(match.Squad!.Phase.Tourney.Rule);
+            IRule rule = GetRule(match.Squad!.Phase.Tourney);
             if (isAdmin)
             {
                 match.Done = true;

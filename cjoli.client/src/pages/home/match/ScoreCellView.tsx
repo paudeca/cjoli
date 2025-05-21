@@ -10,10 +10,10 @@ interface ScoreCellViewProps {
 const ScoreCellView = ({ match, mode }: ScoreCellViewProps) => {
   const { isXl } = useCJoli();
   let badge =
-    (mode == "A" && match.scoreA > match.scoreB) ||
-    (mode == "B" && match.scoreA < match.scoreB)
+    (mode == "A" && (match.scoreA > match.scoreB || match.winnerA)) ||
+    (mode == "B" && (match.scoreA < match.scoreB || match.winnerB))
       ? "success"
-      : match.scoreA === match.scoreB
+      : match.scoreA === match.scoreB && !match.winnerA && !match.winnerB
         ? "warning"
         : "danger";
   if (match.forfeitA) {

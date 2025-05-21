@@ -27,5 +27,7 @@ namespace cjoli.Server.Dtos
         public int PenaltyA { get; set; }
         public int PenaltyB { get; set; }
         public string? Tournify { get; set; }
+        public bool WinnerA { get; set; }
+        public bool WinnerB { get; set; }
     }
 }

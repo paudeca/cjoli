@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AutoMapper.Configuration.Annotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace cjoli.Server.Models
 {
@@ -20,6 +21,13 @@ namespace cjoli.Server.Models
         public int PenaltyA { get; set; }
         public int PenaltyB { get; set; }
         public string? Tournify { get; set; }
+        public Position? Winner { get; set; }
+
+        [Ignore]
+        public bool WinnerA => Winner == PositionA;
+        [Ignore]
+        public bool WinnerB => Winner == PositionB;
+
 
         public IList<MatchEstimate> Estimates { get; set; } = new List<MatchEstimate>();
         public IList<UserMatch> UserMatches { get; set; } = new List<UserMatch>();

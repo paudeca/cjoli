@@ -18,5 +18,8 @@ namespace cjoli.Server.Dtos
         public bool BetWinner { get; set; }
         public bool BetDiff { get; set; }
         public bool BetGoal { get; set; }
+
+        public bool WinnerA => false;
+        public bool WinnerB => false;
     }
 }

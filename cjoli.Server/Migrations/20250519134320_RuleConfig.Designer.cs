@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using cjoli.Server.Models;
 
@@ -11,9 +12,11 @@ using cjoli.Server.Models;
 namespace cjoli.Server.Migrations
 {
     [DbContext(typeof(CJoliContext))]
-    partial class CJoliContextModelSnapshot : ModelSnapshot
+    [Migration("20250519134320_RuleConfig")]
+    partial class RuleConfig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,9 +139,6 @@ namespace cjoli.Server.Migrations
                     b.Property<string>("Tournify")
                         .HasColumnType("longtext");
 
-                    b.Property<int?>("WinnerId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PositionAId");
@@ -146,8 +146,6 @@ namespace cjoli.Server.Migrations
                     b.HasIndex("PositionBId");
 
                     b.HasIndex("SquadId");
-
-                    b.HasIndex("WinnerId");
 
                     b.ToTable("Match");
                 });
@@ -750,17 +748,11 @@ namespace cjoli.Server.Migrations
                         .HasForeignKey("SquadId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("cjoli.Server.Models.Position", "Winner")
-                        .WithMany()
-                        .HasForeignKey("WinnerId");
-
                     b.Navigation("PositionA");
 
                     b.Navigation("PositionB");
 
                     b.Navigation("Squad");
-
-                    b.Navigation("Winner");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.MatchEstimate", b =>

@@ -25,6 +25,8 @@ namespace cjoli.Server.Models.Tournify
         public int team2 { get; set; }
         [FirestoreProperty]
         public string? field { get; set; }
+        [FirestoreProperty]
+        public int? winner { get; set; }
 
 
 
