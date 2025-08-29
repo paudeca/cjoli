@@ -66,7 +66,6 @@ namespace cjoli.Server_Tests.Services
             Assert.Equal("squad", squad.Name);
             var position = Assert.Single(squad.Positions);
             Assert.True(position.Id > 0);
-            //Assert.Equal(team.Id, position.Team?.Id);
             var match = Assert.Single(squad.Matches);
             Assert.True(match.Id > 0);
             var rank = Assert.Single(tourney.Ranks);
