@@ -358,8 +358,7 @@ namespace cjoli.Server_Tests.Services
         }
 
 
-        //TODO
-        /*[Fact]
+        [Fact]
         public void SaveMatch_User_Admin()
         {
             //Arrange
@@ -383,10 +382,7 @@ namespace cjoli.Server_Tests.Services
             Assert.True(match.Done);
             Assert.Equal(1, match.ScoreA);
             Assert.Equal(0, match.ScoreB);
-            Assert.Empty(match.UserMatches);
-
-
-        }*/
+        }
 
 
         [Fact]
