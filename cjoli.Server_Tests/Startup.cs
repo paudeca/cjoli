@@ -4,10 +4,12 @@ using cjoli.Server.Dtos;
 using cjoli.Server.Models;
 using cjoli.Server.Services;
 using cjoli.Server_Tests.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moq;
 
 namespace cjoli.Server_Tests
@@ -47,11 +49,11 @@ namespace cjoli.Server_Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(initialData: [
                     KeyValuePair.Create<string, string?>("JwtKey", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"),
-                    KeyValuePair.Create<string, string?>("ConnectionStrings:AzureStorage", "UseDevelopmentStorage=true")
+                    KeyValuePair.Create<string, string?>("ConnectionStrings:AzureStorage", "UseDevelopmentStorage=true"),
+                    KeyValuePair.Create<string, string?>("IsTesting", "true")
                  ])
                 .Build();
             services.AddSingleton<IConfiguration>(config);
-
 
             var context = services.BuildServiceProvider().GetService<CJoliContext>();
             if (context == null)
@@ -59,6 +61,7 @@ namespace cjoli.Server_Tests
                 throw new Exception("unable to create context");
             }
             context.Database.EnsureCreated();
+
         }
 
     }
