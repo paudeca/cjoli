@@ -25,6 +25,7 @@ namespace cjoli.Server_Tests
             services.AddSingleton<SettingService>();
             services.AddSingleton<AIService>();
             services.AddSingleton<ServerService>();
+            services.AddSingleton<StorageService>();
             services.AddSingleton<SynchroService>();
 
             var openAIClient = new Mock<OpenAIClient>();
@@ -44,7 +45,10 @@ namespace cjoli.Server_Tests
             services.AddAutoMapper(typeof(TourneyDto));
 
             var config = new ConfigurationBuilder()
-                .AddInMemoryCollection(initialData: [KeyValuePair.Create<string, string?>("JwtKey", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")])
+                .AddInMemoryCollection(initialData: [
+                    KeyValuePair.Create<string, string?>("JwtKey", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"),
+                    KeyValuePair.Create<string, string?>("ConnectionStrings:AzureStorage", "UseDevelopmentStorage=true")
+                 ])
                 .Build();
             services.AddSingleton<IConfiguration>(config);
 

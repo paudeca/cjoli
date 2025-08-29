@@ -62,15 +62,15 @@ namespace cjoli.Server.Services
             }
 
             User? user = context.Users.Include(u => u.Configs.Where(c => c.Tourney == tourney)).ThenInclude(c => c.FavoriteTeam).SingleOrDefault(u => u.Login == login);
-            UserConfig? config = user!=null && user.Configs.Count>0 ? user.Configs[0]:null;
+            UserConfig? config = user != null && user.Configs.Count > 0 ? user.Configs[0] : null;
             if (config == null || config.FavoriteTeam == null)
             {
                 user = context.Users
                     .Include(u => u.Configs.Where(c => c.Tourney == tourney)).ThenInclude(c => c.FavoriteTeam)
-                    .Where(u=> u.Source == source)
-                    .OrderBy(u=>u.Id)
+                    .Where(u => u.Source == source)
+                    .OrderBy(u => u.Id)
                     .FirstOrDefault();
-                config = user!=null && user.Configs.Count>0 ?user.Configs[0] : null;
+                config = user != null && user.Configs.Count > 0 ? user.Configs[0] : null;
             }
 
             string langPrompt = lang != null ? $"tu réponds en {LANGS[lang]} parfois avec des émoticones." : "tu réponds parfois avec des émoticones.";
@@ -130,8 +130,8 @@ Les réponses ne doivent pas dépasser 3 phrases.
             var tourneyAI = _mapper.Map<TourneyAI>(dto.Tourney);
             tourneyAI.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Matches).ToList().ForEach(m =>
             {
-                m.TeamA = tourneyAI.Teams.Single(t => t.Id == m.TeamIdA).Name;
-                m.TeamB = tourneyAI.Teams.Single(t => t.Id == m.TeamIdB).Name;
+                m.TeamA = tourneyAI.Teams.SingleOrDefault(t => t.Id == m.TeamIdA)?.Name;
+                m.TeamB = tourneyAI.Teams.SingleOrDefault(t => t.Id == m.TeamIdB)?.Name;
             });
             tourneyAI.Ranks.ForEach(r =>
             {
@@ -153,7 +153,7 @@ Les réponses ne doivent pas dépasser 3 phrases.
 
             session.AddSystemMessage("Utilise le json suivant pour donner des informations.\n" + json);
 
-            return session;    
+            return session;
         }
 
 
@@ -172,7 +172,7 @@ Les réponses ne doivent pas dépasser 3 phrases.
                 if (responseChoice.FinishReason == CompletionsFinishReason.Stopped)
                 {
                     string reply = responseChoice.Message.Content;
-                    session.AddAssistantMessage(reply);                    
+                    session.AddAssistantMessage(reply);
                     session.SendReply(reply);
                     return reply;
                 }

@@ -54,9 +54,10 @@ namespace cjoli.Server_Tests.Services
             _context.SaveChanges();
             SetResponse("myMessage");
 
-
-            RankingDto dto = new RankingDto() { Scores=null,Tourney=null};
-            var session = _service.CreateSessionForChat(tourney.Uid, "fr", null, dto, _context) ;
+            var tourneyDto = _mapper.Map<TourneyDto>(tourney);
+            var scoresDto = new ScoresDto() { ScoreTeams = new Dictionary<int, Score>(), Bet = new BetDto(), ScoreTourney = new Score() };
+            RankingDto dto = new RankingDto() { Scores = scoresDto, Tourney = tourneyDto };
+            var session = _service.CreateSessionForChat(tourney.Uid, "fr", null, dto, _context);
 
             var called = false;
             session.OnReply += (sender, m) =>

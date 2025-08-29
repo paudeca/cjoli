@@ -24,17 +24,18 @@ namespace cjoli.Server_Tests.Services
             _transaction.Rollback();
         }
 
-        private TourneyDto CreateTourney()
+        private TourneyDto CreateTourney(int teamId = 0)
         {
             return new TourneyDto()
             {
-                Teams = [new TeamDto() { Name = "team" }],
+                Teams = [new TeamDto() { Id = teamId, Name = "team" }],
                 Phases = [new PhaseDto() {
                     Name = "phase",
                     Squads = [new SquadDto() {
                         Name = "squad",
                         Positions = [new PositionDto() {
                             Value=1,
+                            TeamId = teamId,
                             ParentPosition = new ParentPositionDto(){Phase="phase",Squad="squad"}
                         }],
                         Matches = [ new MatchDto() { PositionA=1, PositionB=1}]
@@ -65,6 +66,7 @@ namespace cjoli.Server_Tests.Services
             Assert.Equal("squad", squad.Name);
             var position = Assert.Single(squad.Positions);
             Assert.True(position.Id > 0);
+            //Assert.Equal(team.Id, position.Team?.Id);
             var match = Assert.Single(squad.Matches);
             Assert.True(match.Id > 0);
             var rank = Assert.Single(tourney.Ranks);
@@ -79,6 +81,7 @@ namespace cjoli.Server_Tests.Services
             var t = _service.Import(dto, _context);
             dto.Uid = t.Uid;
             dto.Name = "newName";
+            dto.Teams.First().Id = t.Teams.First().Id;
             //Act
             var tourney = _service.Import(dto, _context);
             //Assert
