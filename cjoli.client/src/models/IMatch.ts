@@ -4,4 +4,6 @@ export interface IMatch {
   forfeitA: boolean;
   forfeitB: boolean;
   done: boolean;
+  winnerA: boolean;
+  winnerB: boolean;
 }

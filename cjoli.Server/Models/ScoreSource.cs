@@ -18,6 +18,8 @@ namespace cjoli.Server.Models
         youngest,
         equal,
         penalty,
+        shutOut,
+        avg,
     }
 
     public class ScoreSource

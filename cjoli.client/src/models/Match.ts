@@ -22,4 +22,6 @@ export interface Match extends IMatch {
   event?: EventPhase;
   teamIdA: number;
   teamIdB: number;
+  winnerA: boolean;
+  winnerB: boolean;
 }

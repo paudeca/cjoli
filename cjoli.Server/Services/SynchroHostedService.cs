@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Caching.Memory;
 using System;
+using System.Text.Json;
 using System.Threading;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -181,6 +182,8 @@ namespace cjoli.Server.Services
                 TourneyTournify tourneyTournify = docTourney.ConvertTo<TourneyTournify>();
                 tourney.Name = tourney.HasTournifySynchroName ? tourneyTournify.name ?? tourney.Name : tourney.Name;
                 tourney.StartTime = DateTimeOffset.FromUnixTimeSeconds(tourneyTournify.date).ToLocalTime().DateTime;
+
+                tourney.RuleConfig = JsonSerializer.Serialize(tourneyTournify);
 
                 var lastMatch = tourney.Phases.SelectMany(p => p.Squads.SelectMany(s => s.Matches)).OrderByDescending(m => m.Time).FirstOrDefault();
                 var lastEvent = tourney.Phases.SelectMany(p => p.Events).OrderByDescending(e => e.Time).FirstOrDefault();
@@ -483,6 +486,14 @@ namespace cjoli.Server.Services
                         match.ScoreA = matchTournify.score1.Value;
                         match.ScoreB = matchTournify.score2.Value;
                         match.Done = true;
+                        if (matchTournify.winner.HasValue)
+                        {
+                            match.Winner = squad.Positions.Single(p => p.Value == (matchTournify.winner.Value + 1));
+                        }
+                        else
+                        {
+                            match.Winner = null;
+                        }
                     }
                     else
                     {

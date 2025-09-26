@@ -20,9 +20,9 @@ namespace cjoli.Server
 
             CreateMap<ParentPosition, ParentPositionDto>()
                 .ForMember(x => x.SquadId, opt => opt.MapFrom(a => a.Squad != null ? a.Squad.Id : 0))
-                .ForMember(x => x.Squad, opt => opt.MapFrom(a => a.Squad !=null ? a.Squad.Name : null))
-                .ForMember(x => x.PhaseId, opt => opt.MapFrom(a => a.Squad !=null ? a.Squad.Phase.Id : a.Phase!=null ? a.Phase.Id : 0))
-                .ForMember(x => x.Phase, opt => opt.MapFrom(a => a.Squad != null ? a.Squad.Phase.Name: a.Phase!=null ? a.Phase.Name : null));
+                .ForMember(x => x.Squad, opt => opt.MapFrom(a => a.Squad != null ? a.Squad.Name : null))
+                .ForMember(x => x.PhaseId, opt => opt.MapFrom(a => a.Squad != null ? a.Squad.Phase.Id : a.Phase != null ? a.Phase.Id : 0))
+                .ForMember(x => x.Phase, opt => opt.MapFrom(a => a.Squad != null ? a.Squad.Phase.Name : a.Phase != null ? a.Phase.Name : null));
 
             CreateMap<Match, MatchDto>()
                 .ForMember(x => x.PositionA, opt => opt.MapFrom(a => a.PositionA.Value))
@@ -31,13 +31,15 @@ namespace cjoli.Server
                 .ForMember(x => x.PositionIdB, opt => opt.MapFrom(a => a.PositionB.Id))
                 .ForMember(x => x.SquadId, opt => opt.MapFrom(a => a.Squad != null ? a.Squad.Id : 0))
                 .ForMember(x => x.PhaseId, opt => opt.MapFrom(a => a.Squad != null && a.Squad.Phase != null ? a.Squad.Phase.Id : 0))
-                .ForMember(x => x.UserMatch, opt => opt.MapFrom(m => m.UserMatches.FirstOrDefault(u=>u.Match==m && u.User!=null)))
-                .ForMember(x => x.Estimate, opt => opt.MapFrom(a => a.Estimates.OrderByDescending(s => s.User).FirstOrDefault()));
+                .ForMember(x => x.UserMatch, opt => opt.MapFrom(m => m.UserMatches.FirstOrDefault(u => u.Match == m && u.User != null)))
+                .ForMember(x => x.Estimate, opt => opt.MapFrom(a => a.Estimates.OrderByDescending(s => s.User).FirstOrDefault()))
+                .ForMember(x => x.WinnerA, opt => opt.MapFrom(a => a.Winner != null && a.Winner == a.PositionA))
+                .ForMember(x => x.WinnerB, opt => opt.MapFrom(a => a.Winner != null && a.Winner == a.PositionB));
             CreateMap<UserMatch, UserMatchDto>().ForMember(x => x.Time, opt => opt.MapFrom(u => u.Match.Time));
             CreateMap<MatchEstimate, MatchEstimateDto>();
-            CreateMap<Event,  EventDto>()
-                .ForMember(x => x.PositionIds, opt => opt.MapFrom(a => a.Positions.Select(p=>p.Id)))
-                .ForMember(x => x.SquadIds, opt => opt.MapFrom(a => a.Positions.GroupBy(p=>p.Squad).Select(s=>s.Key.Id)));
+            CreateMap<Event, EventDto>()
+                .ForMember(x => x.PositionIds, opt => opt.MapFrom(a => a.Positions.Select(p => p.Id)))
+                .ForMember(x => x.SquadIds, opt => opt.MapFrom(a => a.Positions.GroupBy(p => p.Squad).Select(s => s.Key.Id)));
 
             CreateMap<Team, TeamDto>()
                 .ForMember(x => x.Datas, opt => opt.MapFrom(t => t.TeamDatas.SingleOrDefault()))

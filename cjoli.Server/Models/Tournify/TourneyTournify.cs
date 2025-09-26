@@ -14,5 +14,16 @@ namespace cjoli.Server.Models.Tournify
         [FirestoreProperty]
         public Dictionary<string, BreakTournify>? breaks { get; set; }
 
+        [FirestoreProperty]
+        public string? pointsWin { get; set; }
+        [FirestoreProperty]
+        public string? pointsLoss { get; set; }
+        [FirestoreProperty]
+        public string? pointsTie { get; set; }
+
+        [FirestoreProperty]
+        public List<TieBreakerTournify>? tiebreakers { get; set; }
+
+
     }
 }
