@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { Match } from "../models";
-import { useUser } from "./useUser";
+//import { useUser } from "./useUser";
 import { useDisclosure } from "@heroui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useApi } from "./useApi";
@@ -11,20 +11,20 @@ export const useMatch = () => {
   const form =
     useForm<Record<string, { scoreA: number | ""; scoreB: number | "" }>>();
   const blockShotModal = useDisclosure();
-  const { userConfig, isAdmin } = useUser();
+  //const { userConfig, isAdmin } = useUser();
   const {
     saveMatchOptions,
     updateMatchOptions,
     clearMatchOptions,
-    saveUserConfig,
+    //saveUserConfig,
   } = useApi();
 
   const { mutateAsync: doSaveMatch } = useMutation(saveMatchOptions(uid));
   const { mutateAsync: updateMatch } = useMutation(updateMatchOptions(uid));
   const clearMatch = useMutation(clearMatchOptions(uid));
-  const { mutateAsync: handleSaveUserConfig } = useMutation(
+  /*const { mutateAsync: handleSaveUserConfig } = useMutation(
     saveUserConfig(uid)
-  );
+  );*/
 
   const saveMatch = async (match: Match) => {
     let { scoreA, scoreB } = form.getValues(`m${match.id}`) ?? {

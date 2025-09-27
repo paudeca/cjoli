@@ -24,6 +24,7 @@ export const SelectPage = () => {
                   <CardHeader className="gap-3 bg-secondary-400 text-foreground">
                     <Avatar
                       name={t.name}
+                      size="lg"
                       radius="sm"
                       isBordered
                       color="primary"

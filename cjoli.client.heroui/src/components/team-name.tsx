@@ -19,7 +19,7 @@ export const TeamName: FC<{
     ? getTeamInfo(positionId, defaultName)
     : getTeam(teamId!) || { name: defaultName };
   const { t } = useTranslation();
-  const { userConfig, isConnected, handleSaveUserConfig } = useUser();
+  const { userConfig, isConnected /*, handleSaveUserConfig*/ } = useUser();
   const { toast } = useToast();
   const { teamId: currentTeamId } = useParams();
 
@@ -31,17 +31,17 @@ export const TeamName: FC<{
 
   const saveFavoriteTeam = useCallback(
     async (teamId?: number) => {
-      await handleSaveUserConfig({
+      /*await handleSaveUserConfig({
         ...userConfig,
         favoriteTeamId: teamId || 0,
-      });
+      });*/
       if (teamId) {
         toast("success", t("user.favoriteSaved", "Favorite team saved"));
       } else {
         toast("success", t("user.favoriteRemoved", "Favorite team removed"));
       }
     },
-    [handleSaveUserConfig, userConfig, toast, t]
+    [/*handleSaveUserConfig,userConfig, */ toast, t]
   );
 
   const isFavorite = team && userConfig.favoriteTeamId == team.id;

@@ -1,4 +1,4 @@
-import { RankingkHome } from "./home/ranking-home";
+//import { RankingkHome } from "./home/ranking-home";
 import { Alert, Card, CardBody } from "@heroui/react";
 import { useTranslation } from "react-i18next";
 import { CJoliLoading } from "@/components/cjoli-loading";

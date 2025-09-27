@@ -193,7 +193,7 @@ export const ChevronIcon = ({ ...props }) => (
   </svg>
 );
 
-export const MinusIcon = () => (
+export const MinusIcon = ({ ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
@@ -201,6 +201,7 @@ export const MinusIcon = () => (
     strokeWidth={1.5}
     stroke="currentColor"
     className="size-6"
+    {...props}
   >
     <path
       strokeLinecap="round"
@@ -210,7 +211,7 @@ export const MinusIcon = () => (
   </svg>
 );
 
-export const PlusIcon = () => (
+export const PlusIcon = ({ ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
@@ -218,6 +219,7 @@ export const PlusIcon = () => (
     strokeWidth={1.5}
     stroke="currentColor"
     className="size-6"
+    {...props}
   >
     <path
       strokeLinecap="round"
