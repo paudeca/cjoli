@@ -6,10 +6,9 @@ namespace cjoli.Server.Services
 {
     public class StorageService
     {
-        private readonly IConfiguration _configuration;
         private readonly BlobServiceClient _blobServiceClient;
-        public StorageService(IConfiguration configuation) {
-            _configuration = configuation;
+        public StorageService(IConfiguration configuation)
+        {
             _blobServiceClient = new(configuation.GetConnectionString("AzureStorage"));
         }
 
@@ -28,7 +27,7 @@ namespace cjoli.Server.Services
             }
         }
 
-        public void DeleteBlob(string uid,string name)
+        public void DeleteBlob(string uid, string name)
         {
             var container = _blobServiceClient.GetBlobContainerClient(uid);
             var blob = container.GetBlobClient(name);

@@ -39,7 +39,8 @@ namespace cjoli.Server.Services
             IServiceProvider service,
             ILogger<CJoliService> logger,
             IMemoryCache memoryCache,
-            IConfiguration configuration)
+            IConfiguration configuration
+         )
         {
             _estimateService = estimateService;
             _serverService = serverService;
@@ -1047,7 +1048,7 @@ namespace cjoli.Server.Services
             }
             context.SaveChanges();
             ClearCache(uuid, user, context);
-            RunThread((CJoliContext context) => UpdateEstimate(uuid, login, context));
+            RunThread((CJoliContext context) => UpdateEstimate(uuid, login, context), context);
         }
 
         public void UpdateMatch(MatchDto dto, string login, string uuid, CJoliContext context)
@@ -1071,20 +1072,27 @@ namespace cjoli.Server.Services
         }
 
 
-        private void RunThread(Action<CJoliContext> callback)
+        private void RunThread(Action<CJoliContext> callback, CJoliContext context)
         {
-            var thread = new Thread(new ThreadStart(() =>
+            if (_configuration.GetValue<string>("IsTesting") == "true")
             {
-                using (var scope = _service.CreateScope())
+                callback(context);
+            }
+            else
+            {
+                var thread = new Thread(new ThreadStart(() =>
                 {
-                    var context = scope.ServiceProvider.GetService<CJoliContext>();
-                    if (context != null)
+                    using (var scope = _service.CreateScope())
                     {
-                        callback(context);
+                        var context = scope.ServiceProvider.GetService<CJoliContext>();
+                        if (context != null)
+                        {
+                            callback(context);
+                        }
                     }
-                }
-            }));
-            thread.Start();
+                }));
+                thread.Start();
+            }
         }
 
         private void UpsertUserMatch(MatchDto dto, Match match, User? user)
@@ -1154,7 +1162,7 @@ namespace cjoli.Server.Services
             }
             context.SaveChanges();
             ClearCache(uuid, user, context);
-            RunThread((CJoliContext context) => UpdateEstimate(uuid, login, context));
+            RunThread((CJoliContext context) => UpdateEstimate(uuid, login, context), context);
 
             if (user.IsAdmin(uuid))
             {

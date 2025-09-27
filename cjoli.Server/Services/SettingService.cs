@@ -191,7 +191,7 @@ namespace cjoli.Server.Services
                                 .Single(p => p.Id==parent.PhaseId).Squads
                                 .Single(s => s.Id==parent.SquadId);
                         } else {
-                            phaseParent = squad.Phase.Tourney.Phases.Single(p=>p.Id==parent.PhaseId);
+                            phaseParent = squad.Phase.Tourney.Phases.SingleOrDefault(p=>p.Id==parent.PhaseId);
                         }
 
 
