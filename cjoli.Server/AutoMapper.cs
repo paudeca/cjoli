@@ -13,7 +13,7 @@ namespace cjoli.Server
             CreateMap<Tourney, TourneyDto>();
             CreateMap<IRule, TourneyConfigDto>();
             CreateMap<Phase, PhaseDto>();
-            CreateMap<Squad, SquadDto>();
+            CreateMap<Squad, SquadDto>().ForMember(x => x.IsBracket, opt => opt.MapFrom(a => a.Type == TypeSquad.Bracket));
             CreateMap<Position, PositionDto>()
                 .ForMember(x => x.TeamId, opt => opt.MapFrom(a => a.Team != null ? a.Team.Id : 0))
                 .ForMember(x => x.SquadId, opt => opt.MapFrom(a => a.Squad != null ? a.Squad.Id : 0));

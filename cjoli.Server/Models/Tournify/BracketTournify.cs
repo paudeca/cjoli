@@ -3,7 +3,7 @@
 namespace cjoli.Server.Models.Tournify
 {
     [FirestoreData]
-    public class PouleTournify
+    public class BracketTournify
     {
         [FirestoreProperty]
         public string? name { get; set; }
@@ -12,12 +12,10 @@ namespace cjoli.Server.Models.Tournify
         [FirestoreProperty]
         public int fase { get; set; }
         [FirestoreProperty]
-        public string? bracket { get; set; }
+        public string? subBracketTo { get; set; }
         [FirestoreProperty]
         public int num { get; set; }
         [FirestoreProperty]
-        public int bracketRound { get; set; }
-
-        public Squad? Squad { get; set; }
+        public int size { get; set; }
     }
 }

@@ -562,6 +562,26 @@ namespace cjoli.Server.Services
                 }
             }
             var matches = ranking.Tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Matches);
+            foreach (var position in positions.Where(p => p.MatchType != null))
+            {
+                var m = matches.SingleOrDefault(m => m.SquadId == position.SquadId && m.MatchType == position.MatchType);
+                var userMatch = m?.UserMatch;
+                IMatch? match = m != null && m.Done ? m : userMatch;
+                if (match != null)
+                {
+                    var positionId = 0;
+                    if (position.Winner)
+                    {
+                        positionId = match.ScoreA > match.ScoreB || match.ForfeitB || match.WinnerA ? m.PositionIdA : m.PositionIdB;
+                    }
+                    else
+                    {
+                        positionId = match.ScoreA > match.ScoreB || match.ForfeitB || match.WinnerA ? m.PositionIdB : m.PositionIdA;
+                    }
+                    var positionParent = positions.Single(p => p.Id == positionId);
+                    position.TeamId = positionParent.TeamId;
+                }
+            }
             foreach (var match in matches)
             {
                 match.TeamIdA = positions.Single(p => p.Id == match.PositionIdA).TeamId;

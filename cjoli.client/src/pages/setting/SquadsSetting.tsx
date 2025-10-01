@@ -57,10 +57,19 @@ const SquadsSetting = ({ indexPhase }: SquadsSettingProps) => {
                         <Form.Label column lg={1}>
                           Name
                         </Form.Label>
-                        <Col lg={5} className="mb-3">
+                        <Col lg={3} className="mb-3">
                           <Form.Control
                             {...register(
                               `phases.${indexPhase}.squads.${i}.name`
+                            )}
+                          />
+                        </Col>
+                        <Col lg={2}>
+                          <Form.Check
+                            type="switch"
+                            label="Bracket"
+                            {...register(
+                              `phases.${indexPhase}.squads.${i}.isBracket`
                             )}
                           />
                         </Col>
@@ -91,7 +100,6 @@ const SquadsSetting = ({ indexPhase }: SquadsSettingProps) => {
                           </Button>
                         </Col>
                       </Form.Group>
-
                       <PositionsSetting
                         squad={squad}
                         phase={phase}

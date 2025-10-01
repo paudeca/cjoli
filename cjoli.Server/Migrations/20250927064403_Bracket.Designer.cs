@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using cjoli.Server.Models;
 
@@ -11,9 +12,11 @@ using cjoli.Server.Models;
 namespace cjoli.Server.Migrations
 {
     [DbContext(typeof(CJoliContext))]
-    partial class CJoliContextModelSnapshot : ModelSnapshot
+    [Migration("20250927064403_Bracket")]
+    partial class Bracket
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -104,12 +107,6 @@ namespace cjoli.Server.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Location")
-                        .HasColumnType("longtext");
-
-                    b.Property<int?>("MatchType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
                         .HasColumnType("longtext");
 
                     b.Property<int>("PenaltyA")
@@ -357,9 +354,6 @@ namespace cjoli.Server.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("MatchType")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .HasColumnType("longtext");
 
@@ -375,17 +369,8 @@ namespace cjoli.Server.Migrations
                     b.Property<int?>("TeamId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Tournify")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("TourniyPoule")
-                        .HasColumnType("longtext");
-
                     b.Property<int>("Value")
                         .HasColumnType("int");
-
-                    b.Property<bool>("Winner")
-                        .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id");
 
@@ -435,6 +420,9 @@ namespace cjoli.Server.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BracketCount")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()

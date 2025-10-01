@@ -22,7 +22,7 @@ const AddMatchModal = ({ onAddMatch }: AddMatchModalProps) => {
     (position: Position) => {
       return position.teamId > 0
         ? tourney.teams.find((t) => t.id == position.teamId)?.name || "noname"
-        : position.name ?? position.value.toString();
+        : (position.name ?? position.value.toString());
     },
     [tourney]
   );
@@ -80,6 +80,7 @@ const AddMatchModal = ({ onAddMatch }: AddMatchModalProps) => {
       creatable: true,
       options: locationOptions,
     },
+    { id: "name", label: "Name", type: "text" },
     {
       id: "shot",
       label: "Shot",

@@ -7,4 +7,6 @@ export interface Squad {
   positions: Position[];
   matches: Match[];
   order: number;
+  type: "Ranking" | "Bracket";
+  isBracket: boolean;
 }

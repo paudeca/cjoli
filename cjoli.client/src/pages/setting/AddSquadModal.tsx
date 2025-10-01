@@ -14,23 +14,38 @@ const AddSquadModal = ({ onAddSquad, fieldLabel }: AddSquadModalProps) => {
   const { showToast } = useToast();
   const { data: phase } = useModal<Phase>("addSquad");
 
-  const fields: Field<{ value: string }>[] = [
+  const fields: Field<{ value: string; isBracket: boolean }>[] = [
     {
       id: "value",
       label: fieldLabel ?? "Squad Name",
       type: "text",
       autoFocus: true,
     },
+    { id: "isBracket", label: "Bracket", type: "switch" },
   ];
 
-  const onSubmit = async ({ value }: { value: string }) => {
+  const onSubmit = async ({
+    value,
+    isBracket,
+  }: {
+    value: string;
+    isBracket: boolean;
+  }) => {
     if (!phase) {
       showToast("danger", "Invalid data is undefined");
       return false;
     }
     if (
       !(await onAddSquad(
-        { id: 0, name: value, positions: [], matches: [], order: 0 },
+        {
+          id: 0,
+          name: value,
+          positions: [],
+          matches: [],
+          order: 0,
+          type: isBracket ? "Bracket" : "Ranking",
+          isBracket,
+        },
         phase
       ))
     ) {

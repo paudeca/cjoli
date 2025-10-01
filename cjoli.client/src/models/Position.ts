@@ -1,3 +1,4 @@
+import { MatchType } from "./Match";
 import { ParentPosition } from "./ParentPosition";
 
 export interface Position {
@@ -9,4 +10,6 @@ export interface Position {
   squadId: number;
   penalty: number;
   parentPosition?: ParentPosition;
+  matchType?: MatchType;
+  winner?: boolean;
 }

@@ -1,10 +1,12 @@
 import { Accordion, Button, Col, Form, Row } from "react-bootstrap";
-import { Match, Phase, Squad } from "../../models";
+import { Match, Phase, Squad, MatchType } from "../../models";
 import React from "react";
 import { Trash3 } from "react-bootstrap-icons";
 import { useModal } from "../../hooks/useModal";
 import { useSetting } from "../../hooks/useSetting";
 import dayjs from "dayjs";
+import Select from "react-select";
+import { MATCH_TYPES } from "../../models/Match";
 
 interface MatchesSettingProps {
   squad: Squad;
@@ -18,7 +20,7 @@ const MatchesSetting = ({
   indexPhase,
   indexSquad,
 }: MatchesSettingProps) => {
-  const { tourney, register } = useSetting();
+  const { tourney, register, setValue } = useSetting();
 
   const { setShowWithData: showConfirmDelete } = useModal<{
     match: Match;
@@ -31,12 +33,14 @@ const MatchesSetting = ({
       const position = squad.positions.find((p) => p.value == value);
       return position && position.teamId! > 0
         ? tourney.teams.find((t) => t.id == position.teamId)?.name
-        : position?.name ?? position?.value.toString();
+        : (position?.name ?? position?.value.toString());
     },
     [tourney, squad.positions]
   );
 
   squad.matches.sort((a, b) => (a.time < b.time ? -1 : 1));
+
+  const options = MATCH_TYPES.map((v) => ({ label: v, value: v }));
 
   return (
     <Accordion className="p-3">
@@ -44,6 +48,7 @@ const MatchesSetting = ({
         return (
           <Accordion.Item key={match.id} eventKey={match.id.toString()}>
             <Accordion.Header>
+              {match.name ? `${match.name} - ` : ""}
               {dayjs(match.time).format()} - [{getLabel(match.positionA)} -{" "}
               {getLabel(match.positionB)}] - {match.location}
             </Accordion.Header>
@@ -79,6 +84,34 @@ const MatchesSetting = ({
                     {...register(
                       `phases.${indexPhase}.squads.${indexSquad}.matches.${i}.shot`
                     )}
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Form.Label column lg={2}>
+                  Name
+                </Form.Label>
+                <Col lg={5}>
+                  <Form.Control
+                    {...register(
+                      `phases.${indexPhase}.squads.${indexSquad}.matches.${i}.name`
+                    )}
+                  />
+                </Col>
+                <Col lg={4} className="mb-3">
+                  <Select
+                    options={options}
+                    defaultValue={options?.find(
+                      (o) => o.value == match?.matchType
+                    )}
+                    onChange={(val) => {
+                      setValue(
+                        `phases.${indexPhase}.squads.${indexSquad}.matches.${i}.matchType`,
+                        val?.value as MatchType
+                      );
+                    }}
+                    isClearable
+                    placeholder="Select MatchType"
                   />
                 </Col>
               </Row>

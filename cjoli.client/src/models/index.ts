@@ -2,7 +2,7 @@ import { Gallery } from "./Gallery";
 import { IMatch } from "./IMatch";
 import { Tourney } from "./Tourney";
 import { TourneyConfig } from "./TourneyConfig";
-import { Match } from "./Match";
+import { Match, MatchType } from "./Match";
 import { Message } from "./Message";
 import { MessageServer } from "./MessageServer";
 import { ParentPosition } from "./ParentPosition";
@@ -38,6 +38,7 @@ export type {
   Tourney,
   TourneyConfig,
   Match,
+  MatchType,
   Message,
   MessageServer,
   ParentPosition,

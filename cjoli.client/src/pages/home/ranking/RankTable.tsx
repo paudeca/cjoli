@@ -3,6 +3,7 @@ import { useCJoli } from "../../../hooks/useCJoli";
 import { useParams } from "react-router-dom";
 import RankTableSquad from "./RankTableSquad";
 import useUid from "../../../hooks/useUid";
+import RankTableBracket from "./RankTableBracket";
 
 interface RankTableProps {
   phase: Phase;
@@ -34,12 +35,18 @@ const RankTable = ({ phase, displayPhase }: RankTableProps) => {
 
       {!displayPhase &&
         squads.map((squad) => (
-          <RankTableSquad
-            key={squad.id}
-            phase={phase}
-            squad={squad}
-            squads={squads}
-          />
+          <>
+            {squad.type == "Bracket" ? (
+              <RankTableBracket key={squad.id} phase={phase} squad={squad} />
+            ) : (
+              <RankTableSquad
+                key={squad.id}
+                phase={phase}
+                squad={squad}
+                squads={squads}
+              />
+            )}
+          </>
         ))}
     </>
   );

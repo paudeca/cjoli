@@ -1,10 +1,12 @@
 ﻿using cjoli.Server.Models;
+using System.Text.Json.Serialization;
 
 namespace cjoli.Server.Dtos
 {
     public class MatchDto : IMatch, IPenalty
     {
         public int Id { get; set; }
+        public string? Name { get; set; }
         public bool Done { get; set; }
         public int TeamIdA { get; set; }
         public int TeamIdB { get; set; }
@@ -29,5 +31,8 @@ namespace cjoli.Server.Dtos
         public string? Tournify { get; set; }
         public bool WinnerA { get; set; }
         public bool WinnerB { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public Models.MatchType? MatchType { get; set; }
+
     }
 }

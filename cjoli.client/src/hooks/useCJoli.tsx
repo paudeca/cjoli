@@ -84,9 +84,10 @@ export const useCJoli = (page?: TypePage) => {
       if (!team) {
         return { name: (defaultName ?? position.name) || "noname" };
       }
-      const name = position.name
-        ? `${team?.name} - ${position.short}`
-        : team?.name || "noname";
+      const name =
+        position.name && position.short
+          ? `${team?.name} - ${position.short}`
+          : team?.name || "noname";
       return { name, logo: team?.logo };
     },
     [getPosition, getTeam]

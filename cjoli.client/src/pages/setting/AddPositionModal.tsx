@@ -5,6 +5,7 @@ import { useToast } from "../../hooks/useToast";
 import { useCJoli } from "../../hooks/useCJoli";
 import { useState } from "react";
 import { useModal } from "../../hooks/useModal";
+import { MATCH_TYPES } from "../../models/Match";
 
 interface AddPositionModalProps {
   onAddPosition: (
@@ -82,6 +83,13 @@ const AddPositionModal = ({ onAddPosition }: AddPositionModalProps) => {
       type: "select",
       options: optionPositions,
     },
+    {
+      id: "matchType",
+      label: "Match",
+      type: "select",
+      options: MATCH_TYPES.map((v) => ({ label: v, value: v })),
+    },
+    { id: "winner", label: "Is Winner", type: "switch" },
   ];
 
   const onSubmit = async (position: Position) => {

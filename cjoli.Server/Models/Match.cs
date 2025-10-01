@@ -3,10 +3,28 @@ using System.ComponentModel.DataAnnotations;
 
 namespace cjoli.Server.Models
 {
+
+    public enum MatchType
+    {
+        Quarter1,
+        Quarter2,
+        Quarter3,
+        Quarter4,
+        Semi1,
+        Semi2,
+        Semi3,
+        Semi4,
+        Final1,
+        Final2,
+        Final3,
+        Final4
+    }
+
     public class Match : IMatch, IPenalty
     {
         [Key]
         public int Id { get; set; }
+        public string? Name { get; set; }
         public bool Done { get; set; }
         public required Position PositionA { get; set; }
         public required Position PositionB { get; set; }
@@ -22,6 +40,7 @@ namespace cjoli.Server.Models
         public int PenaltyB { get; set; }
         public string? Tournify { get; set; }
         public Position? Winner { get; set; }
+        public MatchType? MatchType { get; set; }
 
         [Ignore]
         public bool WinnerA => Winner == PositionA;
