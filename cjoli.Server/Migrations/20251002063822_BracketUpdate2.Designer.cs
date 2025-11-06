@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using cjoli.Server.Models;
 
@@ -11,9 +12,11 @@ using cjoli.Server.Models;
 namespace cjoli.Server.Migrations
 {
     [DbContext(typeof(CJoliContext))]
-    partial class CJoliContextModelSnapshot : ModelSnapshot
+    [Migration("20251002063822_BracketUpdate2")]
+    partial class BracketUpdate2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,9 +108,6 @@ namespace cjoli.Server.Migrations
 
                     b.Property<string>("Location")
                         .HasColumnType("longtext");
-
-                    b.Property<int>("MatchOrder")
-                        .HasColumnType("int");
 
                     b.Property<int>("MatchType")
                         .ValueGeneratedOnAdd()
@@ -362,9 +362,6 @@ namespace cjoli.Server.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("MatchOrder")
-                        .HasColumnType("int");
-
                     b.Property<int?>("MatchType")
                         .HasColumnType("int");
 
@@ -386,7 +383,7 @@ namespace cjoli.Server.Migrations
                     b.Property<string>("Tournify")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("TournifyPoule")
+                    b.Property<string>("TourniyPoule")
                         .HasColumnType("longtext");
 
                     b.Property<int>("Value")

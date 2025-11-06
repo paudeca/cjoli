@@ -15,8 +15,9 @@ namespace cjoli.Server.Models
         public ParentPosition? ParentPosition { get; set; }
         public IList<Event> Events { get; set; } = new List<Event>();
         public string? Tournify { get; set; }
-        public string? TourniyPoule { get; set; }
+        public string? TournifyPoule { get; set; }
         public MatchType? MatchType { get; set; }
+        public int MatchOrder { get; set; }
         public bool Winner { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using cjoli.Server.Models;
 
@@ -11,9 +12,11 @@ using cjoli.Server.Models;
 namespace cjoli.Server.Migrations
 {
     [DbContext(typeof(CJoliContext))]
-    partial class CJoliContextModelSnapshot : ModelSnapshot
+    [Migration("20251001182046_BracketSize")]
+    partial class BracketSize
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,13 +109,8 @@ namespace cjoli.Server.Migrations
                     b.Property<string>("Location")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("MatchOrder")
+                    b.Property<int?>("MatchType")
                         .HasColumnType("int");
-
-                    b.Property<int>("MatchType")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
 
                     b.Property<string>("Name")
                         .HasColumnType("longtext");
@@ -362,9 +360,6 @@ namespace cjoli.Server.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("MatchOrder")
-                        .HasColumnType("int");
-
                     b.Property<int?>("MatchType")
                         .HasColumnType("int");
 
@@ -386,7 +381,7 @@ namespace cjoli.Server.Migrations
                     b.Property<string>("Tournify")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("TournifyPoule")
+                    b.Property<string>("TourniyPoule")
                         .HasColumnType("longtext");
 
                     b.Property<int>("Value")

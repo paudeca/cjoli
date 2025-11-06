@@ -251,17 +251,19 @@ namespace cjoli.Server.Services
                 if (phase != null)
                 {
                     var evt = tourney.Phases.SelectMany(p => p.Events).SingleOrDefault(e => e.Tournify == b.id);
-                    //var evt = d.Phase.Events.SingleOrDefault(e => e.Tournify == b.id);
                     string name = b.name!;
                     if (evt == null)
                     {
                         evt = new Event() { Name = name, EventType = EventType.Info };
                         phase.Events.Add(evt);
                     }
-                    var field = tourneyTournify.fields![b.field!];
-                    if (field != null)
+                    if (b.field != null)
                     {
-                        name = $"{name} {field.name}";
+                        var field = tourneyTournify.fields![b.field!];
+                        if (field != null)
+                        {
+                            name = $"{name} {field.name}";
+                        }
                     }
 
                     evt.Name = true || tourney.HasTournifySynchroName ? name : evt.Name;
@@ -350,10 +352,9 @@ namespace cjoli.Server.Services
                 foreach (var id in mapBrackets.Keys.ToList())
                 {
                     var bracket = mapBrackets[id];
-                    session.Brackets[id] = id;
-                    if (!string.IsNullOrEmpty(bracket.subBracketTo))
+                    session.Brackets[id] = bracket;
+                    if (bracket.subBracketTo != null)
                     {
-                        session.Brackets[id] = bracket.subBracketTo;
                         continue;
                     }
                     var phase = tourney.Phases[bracket.fase];
@@ -366,8 +367,8 @@ namespace cjoli.Server.Services
                     squad.Name = tourney.HasTournifySynchroName ? bracket.name! : squad.Name;
                     squad.Tournify = id;
                     squad.Order = bracket.num;
-                    squad.Type = TypeSquad.Bracket;
-
+                    squad.Type = SquadType.Bracket;
+                    squad.BracketSize = bracket.size;
                 }
             }, session, tourney, context
             );
@@ -427,7 +428,7 @@ namespace cjoli.Server.Services
                         {
                             string poule = (string)dico[$"poule{i}"];
                             long num = (long)dico[$"numInPoule{i}"];
-                            List<(long, SpotTournify)> list;
+                            List<(long, SpotTournify)>? list;
                             map.TryGetValue(poule, out list);
                             if (list == null)
                             {
@@ -440,7 +441,7 @@ namespace cjoli.Server.Services
                     string? bracketId = null;
                     if (spot.belongsToBracket != null)
                     {
-                        bracketId = session.Brackets[spot.belongsToBracket];
+                        bracketId = session.GetRootBracket(spot.belongsToBracket);
                     }
                     var squad = squads.Single(s => bracketId != null ? s.Tournify == bracketId : s.Tournify == spot.fromPoule);
                     var position = squad.Positions.SingleOrDefault(p => p.Tournify == id);
@@ -459,8 +460,27 @@ namespace cjoli.Server.Services
                     if (bracketId != null)
                     {
                         var poule = mapPoules[spot.fromPoule!];
+                        var bracket = mapBrackets[poule.bracket!];
+                        var max = (int)Math.Log2(bracket.size);
+                        var num = poule.GetTypeMatchNum();
+                        int delta = 0;
+                        for (int i = max; i > num; i--)
+                        {
+                            delta += (int)Math.Pow(2, i);
+                        }
+
+                        position.MatchType = Match.GetMatchTypeFromNum(num + 1);
+                        position.MatchOrder = poule.bracketRound + poule.num;
+
                         position.Value = 2 * (poule.bracketRound + poule.num) - 1 + spot.rank;
-                        position.TourniyPoule = $"{spot.fromPoule}-{spot.rank}";
+                        if (bracket.subBracketTo != null)
+                        {
+                            bracket = mapBrackets[bracket.subBracketTo];
+                            position.Value += bracket.size;
+                            //position.MatchOrder -= bracket.size;
+                        }
+                        position.Value += delta;
+                        position.TournifyPoule = $"{spot.fromPoule}-{spot.rank}";
                     }
                     spot.Position = position;
 
@@ -473,88 +493,39 @@ namespace cjoli.Server.Services
                     var spot = mapSpot[id]!;
                     if (map.ContainsKey(spot.fromPoule!))
                     {
-                        List<(long, SpotTournify)> list = map[spot.fromPoule!];
 
                         var position = spot.Position!;
+                        var poule = mapPoules[spot.fromPoule!];
+
+                        List<(long, SpotTournify)> list = map[spot.fromPoule!];
                         var parentSpot = list.Single(p => p.Item1 == spot.rank).Item2;
                         var parentPosition = parentSpot.Position!;
                         var parentPoule = mapPoules[parentSpot.fromPoule!];
 
 
-                        string bracketId = null;
+                        string? bracketId = null;
+                        int level = 0;
                         if (spot.belongsToBracket != null)
                         {
-                            var bracket = mapBrackets[spot.belongsToBracket];
-                            bracketId = bracket.subBracketTo != null ? bracket.subBracketTo : spot.belongsToBracket;
+                            bracketId = session.GetRootBracket(spot.belongsToBracket);
+                            var bracket = mapBrackets[bracketId!];
+                            level = bracket.GetOrder(poule);
                         }
-                        if (bracketId != null && parentPoule.bracketRound > 0)
+                        if (bracketId != null && level > 0)
                         {
-                            var poule = mapPoules[spot.fromPoule!];
                             var round = parentPoule.bracketRound;
-                            var num = (parentPoule.bracketRound + parentPoule.num) % parentPoule.bracketRound;
+                            /*var num = (parentPoule.bracketRound + parentPoule.num) % parentPoule.bracketRound;
                             if (bracketId != parentSpot.belongsToBracket)
                             {
                                 num += 2;
-                            }
-                            //position.Name = $"{poule.name} - {parentPoule.name} - {parentSpot.rank} -round:{round}, num:{num}, w:{parentSpot.rank == 0}";
+                            }*/
+
                             var pos = parentSpot.rank == 0 ? "Gagnant" : "Perdant";
+                            position.MatchOrder = parentPosition.MatchOrder;
                             position.Name = $"{pos} {parentPoule.name}";
-                            if (round == 4)
-                            {
-                                position.Value += 16;
-                                if (spot.belongsToBracket != bracketId)
-                                {
-                                    position.Value -= 4;
-                                }
-                                if (num == 1)
-                                {
-                                    position.MatchType = Models.MatchType.Semi1;
-                                    position.Winner = parentSpot.rank == 0;
-                                }
-                                else if (num == 2)
-                                {
-                                    position.MatchType = Models.MatchType.Semi2;
-                                    position.Winner = parentSpot.rank == 0;
-                                }
-                                else if (num == 3)
-                                {
-                                    position.MatchType = Models.MatchType.Semi3;
-                                    position.Winner = parentSpot.rank == 0;
-                                }
-                                else if (num == 4)
-                                {
-                                    position.MatchType = Models.MatchType.Semi4;
-                                    position.Winner = parentSpot.rank == 0;
-                                }
-                            }
-                            if (round == 8)
-                            {
-                                position.Value += 8;
-                                if (spot.belongsToBracket != bracketId)
-                                {
-                                    position.Value -= 4;
-                                }
-                                if (num == 1)
-                                {
-                                    position.MatchType = Models.MatchType.Quarter1;
-                                    position.Winner = parentSpot.rank == 0;
-                                }
-                                else if (num == 2)
-                                {
-                                    position.MatchType = Models.MatchType.Quarter2;
-                                    position.Winner = parentSpot.rank == 0;
-                                }
-                                else if (num == 3)
-                                {
-                                    position.MatchType = Models.MatchType.Quarter3;
-                                    position.Winner = parentSpot.rank == 0;
-                                }
-                                else if (num == 4)
-                                {
-                                    position.MatchType = Models.MatchType.Quarter4;
-                                    position.Winner = parentSpot.rank == 0;
-                                }
-                            }
+
+                            position.Winner = parentSpot.rank == 0;
+                            position.ParentPosition = null;
                         }
                         else
                         {
@@ -569,14 +540,15 @@ namespace cjoli.Server.Services
                             position.ParentPosition.Phase = parentPosition.Squad!.Phase;
                             position.ParentPosition.Value = parentPosition.Value;
 
-                            var poule = mapPoules[parentPosition.Squad!.Tournify];
+                            //var poule = mapPoules[parentPosition.Squad!.Tournify];
                             string pos = parentPosition.Value == 1 ? "1er" : $"{parentPosition.Value}ème";
-                            if (poule.bracket != null)
+                            /*if (parentPoule.bracket != null)
                             {
-                                pos = parentPosition.Value == 1 ? "Gagnant" : "Perdant";
-                            }
+                                pos = spot.rank == 0 ? "Gagnant" : "Perdant";
+                            }*/
 
                             position.Name = tourney.HasTournifySynchroName || string.IsNullOrEmpty(position.Name) ? $"{pos} {parentPosition.Squad.Name}" : position.Name;
+                            position.Name += " " + position.MatchOrder;
                             position.Short = tourney.HasTournifySynchroName || string.IsNullOrEmpty(position.Short) ? $"{parentPosition.Value}" : position.Short;
                         }
 
@@ -594,6 +566,7 @@ namespace cjoli.Server.Services
             {
                 var mapDays = await GetMap<DayTournify>("days", doc);
                 var mapBrackets = await GetMap<BracketTournify>("brackets", doc);
+                var mapPoules = await GetMap<PouleTournify>("poules", doc);
                 TourneyTournify tourneyTournify = (await doc.GetSnapshotAsync()).ConvertTo<TourneyTournify>();
                 var division = (await doc.Collection("divisions").GetSnapshotAsync()).First().ConvertTo<DivisionTournify>();
 
@@ -609,74 +582,28 @@ namespace cjoli.Server.Services
                         continue;
                     }
 
-                    string bracketId = null;
+                    string? bracketId = null;
                     if (matchTournify.bracket != null)
                     {
-                        var bracket = mapBrackets[matchTournify.bracket];
-                        bracketId = bracket.subBracketTo != null ? bracket.subBracketTo : matchTournify.bracket;
+                        bracketId = session.GetRootBracket(matchTournify.bracket);
                     }
 
 
                     var squad = squads.Single(s => bracketId != null ? s.Tournify == bracketId : s.Tournify == matchTournify.poule!);
-                    var positionA = squad.Positions.Single(p => matchTournify.bracket != null ? p.TourniyPoule == $"{matchTournify.poule}-{matchTournify.team1}" : p.Value == (matchTournify.team1 + 1));
-                    var positionB = squad.Positions.Single(p => matchTournify.bracket != null ? p.TourniyPoule == $"{matchTournify.poule}-{matchTournify.team2}" : p.Value == (matchTournify.team2 + 1));
+                    var positionA = squad.Positions.Single(p => matchTournify.bracket != null ? p.TournifyPoule == $"{matchTournify.poule}-{matchTournify.team1}" : p.Value == (matchTournify.team1 + 1));
+                    var positionB = squad.Positions.Single(p => matchTournify.bracket != null ? p.TournifyPoule == $"{matchTournify.poule}-{matchTournify.team2}" : p.Value == (matchTournify.team2 + 1));
                     var match = squad.Matches.SingleOrDefault(m => m.Tournify == id);
                     if (match == null)
                     {
-                        match = new Models.Match() { PositionA = positionA, PositionB = positionB };
+                        match = new Match() { PositionA = positionA, PositionB = positionB };
                         squad.Matches.Add(match);
                     }
                     if (matchTournify.bracket != null)
                     {
-                        if (positionA.MatchType == Models.MatchType.Quarter1 && positionA.Winner)
-                        {
-                            match.MatchType = Models.MatchType.Semi1;
-                        }
-                        else if (positionA.MatchType == Models.MatchType.Quarter3 && positionA.Winner)
-                        {
-                            match.MatchType = Models.MatchType.Semi2;
-                        }
-                        else if (positionA.MatchType == Models.MatchType.Quarter1 && !positionA.Winner)
-                        {
-                            match.MatchType = Models.MatchType.Semi3;
-                        }
-                        else if (positionA.MatchType == Models.MatchType.Quarter3 && !positionA.Winner)
-                        {
-                            match.MatchType = Models.MatchType.Semi4;
-                        }
-                        else if (positionA.MatchType == Models.MatchType.Semi1 && positionA.Winner)
-                        {
-                            match.MatchType = Models.MatchType.Final1;
-                        }
-                        else if (positionA.MatchType == Models.MatchType.Semi1 && !positionA.Winner)
-                        {
-                            match.MatchType = Models.MatchType.Final2;
-                        }
-                        else if (positionA.MatchType == Models.MatchType.Semi3 && positionA.Winner)
-                        {
-                            match.MatchType = Models.MatchType.Final3;
-                        }
-                        else if (positionA.MatchType == Models.MatchType.Semi3 && !positionA.Winner)
-                        {
-                            match.MatchType = Models.MatchType.Final4;
-                        }
-                        else if (positionA.Value == 1)
-                        {
-                            match.MatchType = Models.MatchType.Quarter1;
-                        }
-                        else if (positionA.Value == 3)
-                        {
-                            match.MatchType = Models.MatchType.Quarter2;
-                        }
-                        else if (positionA.Value == 5)
-                        {
-                            match.MatchType = Models.MatchType.Quarter3;
-                        }
-                        else if (positionA.Value == 7)
-                        {
-                            match.MatchType = Models.MatchType.Quarter4;
-
-                        }
+                        var poule = mapPoules[matchTournify.poule!];
+                        match.MatchType = Match.GetMatchTypeFromNum(poule.GetTypeMatchNum());
+                        match.MatchOrder = poule.bracketRound + poule.num;
+                        match.Name = $"{poule.name}";
                     }
                     match.Tournify = id;
                     match.Shot = !string.IsNullOrEmpty(matchTournify.bracket);

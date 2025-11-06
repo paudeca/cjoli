@@ -38,7 +38,15 @@ const MatchesSetting = ({
     [tourney, squad.positions]
   );
 
-  squad.matches.sort((a, b) => (a.time < b.time ? -1 : 1));
+  squad.matches.sort((a, b) =>
+    a.time < b.time
+      ? -1
+      : a.time > b.time
+        ? 1
+        : a.matchOrder < b.matchOrder
+          ? -1
+          : 1
+  );
 
   const options = MATCH_TYPES.map((v) => ({ label: v, value: v }));
 
@@ -89,15 +97,8 @@ const MatchesSetting = ({
               </Row>
               <Row>
                 <Form.Label column lg={2}>
-                  Name
+                  Type
                 </Form.Label>
-                <Col lg={5}>
-                  <Form.Control
-                    {...register(
-                      `phases.${indexPhase}.squads.${indexSquad}.matches.${i}.name`
-                    )}
-                  />
-                </Col>
                 <Col lg={4} className="mb-3">
                   <Select
                     options={options}
@@ -112,6 +113,26 @@ const MatchesSetting = ({
                     }}
                     isClearable
                     placeholder="Select MatchType"
+                  />
+                </Col>
+                <Col lg={2} className="mb-3">
+                  <Form.Control
+                    type="number"
+                    {...register(
+                      `phases.${indexPhase}.squads.${indexSquad}.matches.${i}.matchOrder`
+                    )}
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Form.Label column lg={2}>
+                  Name
+                </Form.Label>
+                <Col lg={5}>
+                  <Form.Control
+                    {...register(
+                      `phases.${indexPhase}.squads.${indexSquad}.matches.${i}.name`
+                    )}
                   />
                 </Col>
               </Row>

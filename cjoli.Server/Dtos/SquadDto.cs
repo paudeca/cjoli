@@ -13,7 +13,8 @@ namespace cjoli.Server.Dtos
         public string? Tournify { get; set; }
         public int Order { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public TypeSquad Type { get; set; }
+        public SquadType Type { get; set; }
         public bool IsBracket { get; set; }
+        public int BracketSize { get; set; }
     }
 }

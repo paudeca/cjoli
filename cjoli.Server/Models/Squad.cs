@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace cjoli.Server.Models
 {
-    public enum TypeSquad
+    public enum SquadType
     {
         Ranking,
         Bracket
@@ -21,6 +21,7 @@ namespace cjoli.Server.Models
         public IList<Rank> Ranks { get; set; } = new List<Rank>();
         public string? Tournify { get; set; }
         public int Order { get; set; }
-        public TypeSquad Type { get; set; }
+        public SquadType Type { get; set; }
+        public int BracketSize { get; set; }
     }
 }

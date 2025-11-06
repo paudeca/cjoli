@@ -1,23 +1,19 @@
 ﻿using AutoMapper.Configuration.Annotations;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace cjoli.Server.Models
 {
 
     public enum MatchType
     {
-        Quarter1,
-        Quarter2,
-        Quarter3,
-        Quarter4,
-        Semi1,
-        Semi2,
-        Semi3,
-        Semi4,
-        Final1,
-        Final2,
-        Final3,
-        Final4
+        Normal,
+        Final,
+        Semi,
+        Quarter,
+        Match8,
+        Match16,
+        Match32
     }
 
     public class Match : IMatch, IPenalty
@@ -40,7 +36,8 @@ namespace cjoli.Server.Models
         public int PenaltyB { get; set; }
         public string? Tournify { get; set; }
         public Position? Winner { get; set; }
-        public MatchType? MatchType { get; set; }
+        public MatchType MatchType { get; set; }
+        public int MatchOrder { get; set; }
 
         [Ignore]
         public bool WinnerA => Winner == PositionA;
@@ -51,5 +48,19 @@ namespace cjoli.Server.Models
         public IList<MatchEstimate> Estimates { get; set; } = new List<MatchEstimate>();
         public IList<UserMatch> UserMatches { get; set; } = new List<UserMatch>();
         public IList<MatchResult> MatchResults { get; set; } = new List<MatchResult>();
+
+        public static MatchType GetMatchTypeFromNum(int round)
+        {
+            switch (round)
+            {
+                case 1: return MatchType.Final;
+                case 2: return MatchType.Semi;
+                case 3: return MatchType.Quarter;
+                case 4: return MatchType.Match8;
+                case 5: return MatchType.Match16;
+                case 6: return MatchType.Match32;
+                default: return MatchType.Normal;
+            }
+        }
     }
 }

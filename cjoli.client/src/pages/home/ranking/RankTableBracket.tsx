@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import {
   Card,
   Carousel,
@@ -5,6 +6,7 @@ import {
   Container,
   ProgressBar,
   Row,
+  Stack,
 } from "react-bootstrap";
 import { Match, MatchType, Phase, Squad } from "../../../models";
 import TeamName from "../../../components/TeamName";
@@ -27,16 +29,19 @@ const TeamBracket = ({
     <Row>
       <Col
         className={isMobile ? "text-center" : left ? `text-start` : `text-end`}
+        style={{ whiteSpace: "nowrap" }}
       >
-        {match.done && left && <ScoreBage match={match} mode={mode} />}
-        <TeamName
-          positionId={positionId}
-          hideFavorite
-          className="font-weight-bold"
-        />
-        {match.done && !left && (
-          <ScoreBage match={match} mode={mode} className="mx-1" />
-        )}
+        <Stack direction="horizontal">
+          {match.done && left && <ScoreBage match={match} mode={mode} />}
+          <TeamName
+            positionId={positionId}
+            hideFavorite
+            className="font-weight-bold"
+          />
+          {match.done && !left && (
+            <ScoreBage match={match} mode={mode} className="ms-auto" />
+          )}
+        </Stack>
       </Col>
     </Row>
   );
@@ -59,7 +64,7 @@ const MatchBracket = ({
       className={`d-flex align-items-center ${max ? "h-100" : isMobile ? "my-2" : "my-5"}`}
     >
       <Col>
-        <Card>
+        <Card className="p-2">
           <Card.Title>{match.name}</Card.Title>
           <TeamBracket
             match={match}
@@ -105,31 +110,35 @@ const FinalMatchBracket = ({ match }: { match: Match }) => {
   );
 };
 
-const MobileBracket = ({ bracket }: { bracket: Record<MatchType, Match> }) => {
+const MobileBracket = ({
+  bracket,
+}: {
+  bracket: Record<MatchType, Match[]>;
+}) => {
   return (
     <div className="mx-2">
       <Carousel data-bs-theme="dark">
-        {bracket.Quarter1 && (
+        {bracket.Quarter[0] && (
           <Carousel.Item>
             <Container data-bs-theme="light">
               <Row>
                 <Col xs={{ offset: 1, span: 10 }}>
-                  <MatchBracket match={bracket.Quarter1} height={20} />
+                  <MatchBracket match={bracket.Quarter[0]} height={20} />
                 </Col>
               </Row>
               <Row>
                 <Col xs={{ offset: 1, span: 10 }}>
-                  <MatchBracket match={bracket.Quarter2} height={20} />
+                  <MatchBracket match={bracket.Quarter[1]} height={20} />
                 </Col>
               </Row>
               <Row>
                 <Col xs={{ offset: 1, span: 10 }}>
-                  <MatchBracket match={bracket.Quarter3} height={20} />
+                  <MatchBracket match={bracket.Quarter[2]} height={20} />
                 </Col>
               </Row>
               <Row>
                 <Col xs={{ offset: 1, span: 10 }}>
-                  <MatchBracket match={bracket.Quarter4} height={20} />
+                  <MatchBracket match={bracket.Quarter[3]} height={20} />
                 </Col>
               </Row>
               <Row style={{ height: 60 }}></Row>
@@ -140,24 +149,24 @@ const MobileBracket = ({ bracket }: { bracket: Record<MatchType, Match> }) => {
           <Container data-bs-theme="light">
             <Row>
               <Col xs={{ offset: 1, span: 10 }}>
-                <MatchBracket match={bracket.Semi1} height={20} />
+                <MatchBracket match={bracket.Semi[0]} height={20} />
               </Col>
             </Row>
             <Row>
               <Col xs={{ offset: 1, span: 10 }}>
-                <MatchBracket match={bracket.Semi2} height={20} />
+                <MatchBracket match={bracket.Semi[1]} height={20} />
               </Col>
             </Row>
-            {bracket.Final3 && (
+            {bracket.Final[2] && (
               <>
                 <Row>
                   <Col xs={{ offset: 1, span: 10 }}>
-                    <MatchBracket match={bracket.Semi3} height={20} />
+                    <MatchBracket match={bracket.Semi[2]} height={20} />
                   </Col>
                 </Row>
                 <Row>
                   <Col xs={{ offset: 1, span: 10 }}>
-                    <MatchBracket match={bracket.Semi4} height={20} />
+                    <MatchBracket match={bracket.Semi[3]} height={20} />
                   </Col>
                 </Row>
               </>
@@ -169,27 +178,27 @@ const MobileBracket = ({ bracket }: { bracket: Record<MatchType, Match> }) => {
           <Container data-bs-theme="light">
             <Row>
               <Col xs={{ offset: 1, span: 10 }}>
-                <MatchBracket match={bracket.Final1} height={20} />
+                <MatchBracket match={bracket.Final[0]} height={20} />
               </Col>
             </Row>
-            {bracket.Final2 && (
+            {bracket.Final[1] && (
               <Row>
                 <Col xs={{ offset: 1, span: 10 }}>
-                  <MatchBracket match={bracket.Final2} height={20} />
+                  <MatchBracket match={bracket.Final[1]} height={20} />
                 </Col>
               </Row>
             )}
-            {bracket.Final3 && (
+            {bracket.Final[2] && (
               <Row>
                 <Col xs={{ offset: 1, span: 10 }}>
-                  <MatchBracket match={bracket.Final3} height={20} />
+                  <MatchBracket match={bracket.Final[2]} height={20} />
                 </Col>
               </Row>
             )}
-            {bracket.Final4 && (
+            {bracket.Final[3] && (
               <Row>
                 <Col xs={{ offset: 1, span: 10 }}>
-                  <MatchBracket match={bracket.Final4} height={20} />
+                  <MatchBracket match={bracket.Final[3]} height={20} />
                 </Col>
               </Row>
             )}
@@ -201,73 +210,77 @@ const MobileBracket = ({ bracket }: { bracket: Record<MatchType, Match> }) => {
   );
 };
 
-const DesktopBracket = ({ bracket }: { bracket: Record<MatchType, Match> }) => {
+const DesktopBracket = ({
+  bracket,
+}: {
+  bracket: Record<MatchType, Match[]>;
+}) => {
   return (
     <div className="m-4">
       <Row>
         <Col lg={2}>
-          {bracket.Quarter1 && (
+          {bracket.Quarter[0] && (
             <>
-              <MatchBracket match={bracket.Quarter1} height={40} />
-              <MatchBracket match={bracket.Quarter2} height={40} />
+              <MatchBracket match={bracket.Quarter[0]} height={40} />
+              <MatchBracket match={bracket.Quarter[1]} height={40} />
             </>
           )}
         </Col>
         <Col lg={2}>
-          {bracket.Semi1 && (
-            <MatchBracket match={bracket.Semi1} max height={120} />
+          {bracket.Semi[0] && (
+            <MatchBracket match={bracket.Semi[0]} max height={120} />
           )}
         </Col>
         <Col lg={4} className="text-center">
-          {bracket.Final1 && (
+          {bracket.Final[0] && (
             <Row className="h-50 d-flex align-items-end">
               <Col>
-                <FinalMatchBracket match={bracket.Final1} />
+                <FinalMatchBracket match={bracket.Final[0]} />
               </Col>
             </Row>
           )}
-          {bracket.Final2 && (
+          {bracket.Final[1] && (
             <Row className="h-50 d-flex align-items-center">
               <Col>
-                <FinalMatchBracket match={bracket.Final2} />
+                <FinalMatchBracket match={bracket.Final[1]} />
               </Col>
             </Row>
           )}
         </Col>
-        {bracket.Semi2 && (
+        {bracket.Semi[1] && (
           <Col lg={2}>
-            <MatchBracket match={bracket.Semi2} max left height={120} />
+            <MatchBracket match={bracket.Semi[1]} max left height={120} />
           </Col>
         )}
-        {bracket.Quarter1 && (
+        {bracket.Quarter[0] && (
           <Col lg={2}>
-            <MatchBracket match={bracket.Quarter3} left height={40} />
-            <MatchBracket match={bracket.Quarter4} left height={40} />
+            <MatchBracket match={bracket.Quarter[2]} left height={40} />
+            <MatchBracket match={bracket.Quarter[3]} left height={40} />
           </Col>
         )}
       </Row>
-      {bracket.Final3 && (
+      {bracket.Final[2] && (
         <Row>
           <Col lg={2}></Col>
           <Col lg={2}>
-            <MatchBracket match={bracket.Semi3} max height={120} />
+            <MatchBracket match={bracket.Semi[2]} max height={120} />
           </Col>
           <Col lg={4} className="text-center">
             <Row className="h-50 d-flex align-items-end">
               <Col>
-                <FinalMatchBracket match={bracket.Final3} />
+                <FinalMatchBracket match={bracket.Final[2]} />
               </Col>
             </Row>
-            {bracket.Final4 && (
+            {bracket.Final[3] && (
               <Row className="h-50 d-flex align-items-center">
                 <Col>
-                  <FinalMatchBracket match={bracket.Final4} />
+                  <FinalMatchBracket match={bracket.Final[3]} />
                 </Col>
               </Row>
             )}
           </Col>
           <Col lg={2}>
-            <MatchBracket match={bracket.Semi4} max left height={120} />
+            <MatchBracket match={bracket.Semi[3]} max left height={120} />
           </Col>
           <Col lg={2}></Col>
         </Row>
@@ -283,14 +296,23 @@ interface RankTableBracketProps {
 
 const RankTableBracket = ({ squad }: RankTableBracketProps) => {
   const { isMobile } = useScreenSize();
-  const bracket: Record<MatchType, Match> = squad.matches
+  let bracket: Record<MatchType, Match[]> = squad.matches
     .filter((m) => m.matchType)
     .reduce(
       (acc, m) => {
-        return { ...acc, [m.matchType!]: m };
+        const list = acc[m.matchType!] ?? [];
+        list[m.matchOrder] = m;
+        return { ...acc, [m.matchType!]: list };
       },
-      {} as Record<MatchType, Match>
+      {} as Record<MatchType, Match[]>
     );
+  bracket = Object.keys(bracket).reduce(
+    (acc, k) => {
+      const list = bracket[k as MatchType];
+      return { ...acc, [k]: list.filter((v) => v) };
+    },
+    {} as Record<MatchType, Match[]>
+  );
   return isMobile ? (
     <MobileBracket bracket={bracket} />
   ) : (

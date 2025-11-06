@@ -14,7 +14,8 @@ namespace cjoli.Server.Dtos
         public int SquadId { get; set; }
         public ParentPositionDto? ParentPosition { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public Models.MatchType? MatchType { get; set; }
+        public Models.MatchType MatchType { get; set; }
+        public int MatchOrder { get; set; }
         public bool Winner { get; set; }
 
     }

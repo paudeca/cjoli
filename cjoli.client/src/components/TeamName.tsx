@@ -44,7 +44,7 @@ const TeamName = ({
   const { isWhite } = useColor();
 
   const { name, logo } = positionId
-    ? getTeamInfo(positionId, defaultName)
+    ? getTeamInfo(positionId, defaultName, false)
     : getTeam(teamId!) || { name: defaultName };
 
   const team = positionId

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { Accordion, Button, Col, Form, Row } from "react-bootstrap";
 import { ParentPosition, Phase, Position, Squad } from "../../models";
 import React from "react";
@@ -199,7 +200,15 @@ const PositionsSetting = ({
                     placeholder="Select MatchType"
                   />
                 </Col>
-                <Col lg={4} className="mb-3">
+                <Col lg={2} className="mb-3">
+                  <Form.Control
+                    type="number"
+                    {...register(
+                      `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.matchOrder`
+                    )}
+                  />
+                </Col>
+                <Col lg={2} className="mb-3">
                   <Form.Check
                     type="switch"
                     label="Winner"

@@ -19,5 +19,10 @@ namespace cjoli.Server.Models.Tournify
         public int bracketRound { get; set; }
 
         public Squad? Squad { get; set; }
+
+        public int GetTypeMatchNum()
+        {
+            return (int)Math.Log2(bracketRound);
+        }
     }
 }

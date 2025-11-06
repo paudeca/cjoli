@@ -77,7 +77,7 @@ export const useCJoli = (page?: TypePage) => {
     [getPosition, getTeam]
   );
   const getTeamInfo = useCallback(
-    (positionId: number, defaultName?: string) => {
+    (positionId: number, defaultName?: string, useShort = true) => {
       const position = getPosition(positionId);
       if (!position) return { name: defaultName };
       const team = getTeam(position.teamId);
@@ -85,7 +85,7 @@ export const useCJoli = (page?: TypePage) => {
         return { name: (defaultName ?? position.name) || "noname" };
       }
       const name =
-        position.name && position.short
+        position.name && position.short && useShort
           ? `${team?.name} - ${position.short}`
           : team?.name || "noname";
       return { name, logo: team?.logo };

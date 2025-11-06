@@ -151,7 +151,7 @@ namespace cjoli.Server.Services
                 update: (squad) =>
                 {
                     squad.Name = squadDto.Name ?? squad.Name;
-                    squad.Type = squadDto.IsBracket ? TypeSquad.Bracket : TypeSquad.Ranking;
+                    squad.Type = squadDto.IsBracket ? SquadType.Bracket : SquadType.Ranking;
                 },
                 children: [
                     (squad)=>(squadDto.Positions??[]).ForEach(p=>ImportPosition(p,squad,context)),
@@ -179,6 +179,7 @@ namespace cjoli.Server.Services
                     position.Name = positionDto.Name ?? position.Name;
                     position.Short = positionDto.Short ?? position.Short;
                     position.MatchType = positionDto.MatchType;
+                    position.MatchOrder = position.MatchOrder;
                     position.Winner = positionDto.Winner;
                 },
                 children: [
@@ -239,6 +240,7 @@ namespace cjoli.Server.Services
                     match.Shot = matchDto.Shot;
                     match.Name = matchDto.Name;
                     match.MatchType = matchDto.MatchType;
+                    match.MatchOrder = matchDto.MatchOrder;
                 }
             );
         }

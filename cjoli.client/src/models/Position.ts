@@ -11,5 +11,6 @@ export interface Position {
   penalty: number;
   parentPosition?: ParentPosition;
   matchType?: MatchType;
+  matchOrder?: number;
   winner?: boolean;
 }

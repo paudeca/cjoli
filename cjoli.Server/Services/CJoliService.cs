@@ -115,7 +115,7 @@ namespace cjoli.Server.Services
         private Tourney GetTourney(string tourneyUid, User? user, CJoliContext context)
         {
             Tourney? tourney = context.Tourneys
-                .Include(t => t.Phases).ThenInclude(p => p.Squads.OrderBy(s => s.Order)).ThenInclude(s => s.Positions).ThenInclude(p => p.Team)
+                .Include(t => t.Phases).ThenInclude(p => p.Squads.OrderBy(s => s.Order)).ThenInclude(s => s.Positions.OrderBy(p => p.Value)).ThenInclude(p => p.Team)
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.ParentPosition)
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(m => m.UserMatches.Where(u => user != null && !user.IsAdminWithNoCustomEstimate(tourneyUid) && u.User == user))
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(
@@ -562,9 +562,10 @@ namespace cjoli.Server.Services
                 }
             }
             var matches = ranking.Tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Matches);
-            foreach (var position in positions.Where(p => p.MatchType != null))
+            foreach (var position in positions.Where(p => p.MatchType != 0))
             {
-                var m = matches.SingleOrDefault(m => m.SquadId == position.SquadId && m.MatchType == position.MatchType);
+                var m = matches.SingleOrDefault(m => m.SquadId == position.SquadId && m.MatchType == position.MatchType && m.MatchOrder == position.MatchOrder);
+                //var m = matches.FirstOrDefault(m => m.SquadId == position.SquadId && m.MatchType == position.MatchType && m.MatchOrder == position.MatchOrder);
                 var userMatch = m?.UserMatch;
                 IMatch? match = m != null && m.Done ? m : userMatch;
                 if (match != null)

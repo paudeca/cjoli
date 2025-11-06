@@ -32,7 +32,9 @@ namespace cjoli.Server.Dtos
         public bool WinnerA { get; set; }
         public bool WinnerB { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public Models.MatchType? MatchType { get; set; }
+        public Models.MatchType MatchType { get; set; }
+        public int MatchOrder { get; set; }
+
 
     }
 }

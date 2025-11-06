@@ -17,5 +17,16 @@ namespace cjoli.Server.Models.Tournify
         public int num { get; set; }
         [FirestoreProperty]
         public int size { get; set; }
+
+        public int GetTypeMatchNum()
+        {
+            return (int)Math.Log2(size);
+        }
+
+        public int GetOrder(PouleTournify poule)
+        {
+            return GetTypeMatchNum() - poule.GetTypeMatchNum();
+        }
+
     }
 }
