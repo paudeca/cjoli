@@ -113,6 +113,8 @@ describe("HomePage", () => {
               positions: [],
               matches: [createMatch({ done: true })],
               order: 0,
+              type: "Ranking",
+              isBracket: false,
             },
           ],
           events: [],

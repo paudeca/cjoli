@@ -203,6 +203,8 @@ export const createSquad: (squad: Partial<Squad> & { id: number }) => Squad = (
   positions: squad.positions ?? [],
   matches: squad.matches ?? [],
   order: 0,
+  type: "Ranking",
+  isBracket: false,
 });
 
 export const createPosition: (

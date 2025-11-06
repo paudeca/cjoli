@@ -40,6 +40,8 @@ const tourney = createTourney({
             })
           ),
           order: 0,
+          type: "Ranking",
+          isBracket: false,
         },
         {
           id: SQUAD_ID2,
@@ -64,6 +66,8 @@ const tourney = createTourney({
             }),
           ],
           order: 0,
+          type: "Ranking",
+          isBracket: false,
         },
       ],
       events: [],
