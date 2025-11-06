@@ -10,6 +10,7 @@ const useUid = () => {
     uidDomain != "61c140aa187f" &&
     uidDomain != "www" &&
     uidDomain != "cjoli-hockey" &&
+    uidDomain != "cjolihockey" &&
     !uidDomain.startsWith("localhost")
   ) {
     return uidDomain;
