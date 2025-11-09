@@ -106,6 +106,17 @@ namespace cjoli.Server.Migrations
                     b.Property<string>("Location")
                         .HasColumnType("longtext");
 
+                    b.Property<int>("MatchOrder")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MatchType")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
                     b.Property<int>("PenaltyA")
                         .HasColumnType("int");
 
@@ -351,6 +362,12 @@ namespace cjoli.Server.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("MatchOrder")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MatchType")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .HasColumnType("longtext");
 
@@ -366,8 +383,17 @@ namespace cjoli.Server.Migrations
                     b.Property<int?>("TeamId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Tournify")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("TournifyPoule")
+                        .HasColumnType("longtext");
+
                     b.Property<int>("Value")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Winner")
+                        .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id");
 
@@ -418,6 +444,9 @@ namespace cjoli.Server.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("BracketSize")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -430,6 +459,9 @@ namespace cjoli.Server.Migrations
 
                     b.Property<string>("Tournify")
                         .HasColumnType("longtext");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

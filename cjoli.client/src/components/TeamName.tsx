@@ -27,11 +27,13 @@ const TeamName = ({
   teamId,
   defaultName,
   hideFavorite,
+  className,
 }: {
   positionId?: number;
   teamId?: number;
   defaultName?: string;
   hideFavorite?: boolean;
+  className?: string;
 }) => {
   const { getTeamInfo, getTeam, findTeam, isXl } = useCJoli();
   const { userConfig, isConnected, handleSaveUserConfig } = useUser();
@@ -42,7 +44,7 @@ const TeamName = ({
   const { isWhite } = useColor();
 
   const { name, logo } = positionId
-    ? getTeamInfo(positionId, defaultName)
+    ? getTeamInfo(positionId, defaultName, false)
     : getTeam(teamId!) || { name: defaultName };
 
   const team = positionId
@@ -106,7 +108,7 @@ const TeamName = ({
         }}
         className={isXl ? "mx-3" : "mx-2"}
       />
-      <span>
+      <span className={className}>
         {isCurrentTeam ? <MyTeam color={color}>{fullname}</MyTeam> : fullname}
       </span>
       {team?.datas?.logo && (

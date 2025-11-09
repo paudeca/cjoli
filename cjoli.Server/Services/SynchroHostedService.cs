@@ -1,17 +1,11 @@
 ﻿
 using cjoli.Server.Models;
-using cjoli.Server.Models.AI;
 using cjoli.Server.Models.Tournify;
-using Google.Api;
 using Google.Cloud.Firestore;
 using Google.Cloud.Firestore.V1;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Caching.Memory;
-using System;
 using System.Text.Json;
-using System.Threading;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace cjoli.Server.Services
 {
@@ -22,16 +16,18 @@ namespace cjoli.Server.Services
         private readonly IConfiguration _configuration;
         private readonly IMemoryCache _memoryCache;
         private readonly ServerService _serverService;
+        private readonly SynchroService _synchroService;
 
         private Dictionary<string, CancellationTokenSource> _threads = new Dictionary<string, CancellationTokenSource>();
 
-        public SynchroHostedService(IServiceProvider service, ILogger<SynchroHostedService> logger, IConfiguration configuration, IMemoryCache memoryCache, ServerService serverService)
+        public SynchroHostedService(IServiceProvider service, ILogger<SynchroHostedService> logger, IConfiguration configuration, IMemoryCache memoryCache, ServerService serverService, SynchroService synchroService)
         {
             _service = service;
             _logger = logger;
             _configuration = configuration;
             _memoryCache = memoryCache;
             _serverService = serverService;
+            _synchroService = synchroService;
         }
 
 
@@ -67,6 +63,9 @@ namespace cjoli.Server.Services
                 var session = new SessionTournify();
 
                 var context = scope.ServiceProvider.GetService<CJoliContext>()!;
+
+                //await _synchroService.Synchro(uid, context);
+
                 var tourney = context.Tourneys
                         .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.ParentPosition)
                         .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches)
@@ -108,6 +107,12 @@ namespace cjoli.Server.Services
                 session.Listeners.Add(queryPhase.Listen(async snapshot =>
                 {
                     await UpdatePhase(snapshot, session, doc, tourney, context);
+                }));
+
+                var queryBracket = doc.Collection("brackets");
+                session.Listeners.Add(queryBracket.Listen(async snapshot =>
+                {
+                    await UpdateBracket(snapshot, session, tourney, context);
                 }));
 
                 //Squad
@@ -196,6 +201,7 @@ namespace cjoli.Server.Services
                 {
                     endTime = lastEvent.Time;
                 }
+                endTime = endTime.AddDays(360);//TO remove
 
                 tourney.EndTime = endTime;
 
@@ -206,7 +212,7 @@ namespace cjoli.Server.Services
 
         private void UpdateEvent(TourneyTournify tourneyTournify, Tourney tourney, Dictionary<string, DayTournify> mapDays)
         {
-            foreach (var b in tourneyTournify.breaks.Values.ToList())
+            foreach (var b in tourneyTournify.breaks!.Values.ToList())
             {
                 var day = b.day;
                 var date = tourney.StartTime;
@@ -214,7 +220,7 @@ namespace cjoli.Server.Services
                 {
                     date = DateTimeOffset.FromUnixTimeSeconds(mapDays[day].date).ToLocalTime().DateTime;
                 }
-                if (b.st == null)
+                if (b == null || b.st == null)
                 {
                     continue;
                 }
@@ -244,17 +250,19 @@ namespace cjoli.Server.Services
                 if (phase != null)
                 {
                     var evt = tourney.Phases.SelectMany(p => p.Events).SingleOrDefault(e => e.Tournify == b.id);
-                    //var evt = d.Phase.Events.SingleOrDefault(e => e.Tournify == b.id);
+                    string name = b.name!;
                     if (evt == null)
                     {
-                        evt = new Event() { Name = b.name, EventType = EventType.Info };
+                        evt = new Event() { Name = name, EventType = EventType.Info };
                         phase.Events.Add(evt);
                     }
-                    string name = b.name;
-                    var field = tourneyTournify.fields[b.field];
-                    if (field != null)
+                    if (b.field != null)
                     {
-                        name = $"{name} {field.name}";
+                        var field = tourneyTournify.fields![b.field!];
+                        if (field != null)
+                        {
+                            name = $"{name} {field.name}";
+                        }
                     }
 
                     evt.Name = true || tourney.HasTournifySynchroName ? name : evt.Name;
@@ -296,7 +304,8 @@ namespace cjoli.Server.Services
                         tourney.Teams.Add(team);
                     }
                     session.Teams.Add(id, team);
-                };
+                }
+                ;
 
             }, session, tourney, context);
         }
@@ -327,10 +336,42 @@ namespace cjoli.Server.Services
                     }
 
                     i++;
-                };
+                }
+                ;
 
                 UpdateEvent(tourneyTournify, tourney, mapDays);
             }, session, tourney, context);
+        }
+        private async Task UpdateBracket(QuerySnapshot snapshot, SessionTournify session, Tourney tourney, CJoliContext context)
+        {
+            await Update(async () =>
+            {
+                var mapBrackets = snapshot.ToDictionary(p => p.Id, p => p.ConvertTo<BracketTournify>());
+
+                foreach (var id in mapBrackets.Keys.ToList())
+                {
+                    var bracket = mapBrackets[id];
+                    session.Brackets[id] = bracket;
+                    if (bracket.subBracketTo != null)
+                    {
+                        continue;
+                    }
+                    var phase = tourney.Phases[bracket.fase];
+                    var squad = phase.Squads.SingleOrDefault(s => s.Name.ToLower() == bracket.name!.ToLower() || s.Tournify == id);
+                    if (squad == null)
+                    {
+                        squad = new Squad() { Name = bracket.name!, Phase = phase };
+                        phase.Squads.Add(squad);
+                    }
+                    squad.Name = tourney.HasTournifySynchroName ? bracket.name! : squad.Name;
+                    squad.Tournify = id;
+                    squad.Order = bracket.num;
+                    squad.Type = SquadType.Bracket;
+                    squad.BracketSize = bracket.size;
+                }
+            }, session, tourney, context
+            );
+
         }
 
         private async Task UpdateSquad(QuerySnapshot snapshot, SessionTournify session, Tourney tourney, CJoliContext context)
@@ -342,18 +383,22 @@ namespace cjoli.Server.Services
                 foreach (var id in mapPoules.Keys.ToList())
                 {
                     var poule = mapPoules[id]!;
-                    var phase = tourney.Phases[poule.fase];
-                    var squad = phase.Squads.SingleOrDefault(s => s.Name.ToLower() == poule.name!.ToLower() || s.Tournify == id);
-                    if (squad == null)
+                    if (poule.bracket == null) //create a squad only for poule with bracket
                     {
-                        squad = new Squad() { Name = poule.name!, Phase = phase };
-                        phase.Squads.Add(squad);
+                        var phase = tourney.Phases[poule.fase];
+                        var squad = phase.Squads.SingleOrDefault(s => s.Name.ToLower() == poule.name!.ToLower() || s.Tournify == id);
+                        if (squad == null)
+                        {
+                            squad = new Squad() { Name = poule.name!, Phase = phase };
+                            phase.Squads.Add(squad);
+                        }
+                        squad.Name = tourney.HasTournifySynchroName ? poule.name! : squad.Name;
+                        squad.Tournify = id;
+                        squad.Order = poule.num;
+                        //poule.Squad = squad;
                     }
-                    squad.Name = tourney.HasTournifySynchroName ? poule.name! : squad.Name;
-                    squad.Tournify = id;
-                    squad.Order = poule.num;
-                    //poule.Squad = squad;
-                };
+                }
+                ;
 
             }, session, tourney, context);
         }
@@ -364,9 +409,11 @@ namespace cjoli.Server.Services
             {
                 var mapTeams = await GetMap<TeamTournify>("teams", doc);
                 var mapPoules = await GetMap<PouleTournify>("poules", doc);
+                var mapBrackets = await GetMap<BracketTournify>("brackets", doc);
 
                 var mapSpot = snapshot.ToDictionary(p => p.Id, p => p.ConvertTo<SpotTournify>());
                 var dicoSpots = snapshot.ToDictionary(p => p.Id, p => p.ToDictionary());
+
                 var squads = tourney.Phases.SelectMany(p => p.Squads);
                 var map = new Dictionary<string, List<(long, SpotTournify)>>();
                 foreach (var id in mapSpot.Keys.ToList())
@@ -380,7 +427,7 @@ namespace cjoli.Server.Services
                         {
                             string poule = (string)dico[$"poule{i}"];
                             long num = (long)dico[$"numInPoule{i}"];
-                            List<(long, SpotTournify)> list;
+                            List<(long, SpotTournify)>? list;
                             map.TryGetValue(poule, out list);
                             if (list == null)
                             {
@@ -390,21 +437,54 @@ namespace cjoli.Server.Services
                             list.Add((num, spot));
                         }
                     }
-                    var squad = squads.Single(s => s.Tournify == spot.fromPoule);
-                    var position = squad.Positions.SingleOrDefault(p => p.Value == spot.rank + 1);
+                    string? bracketId = null;
+                    if (spot.belongsToBracket != null)
+                    {
+                        bracketId = session.GetRootBracket(spot.belongsToBracket);
+                    }
+                    var squad = squads.Single(s => bracketId != null ? s.Tournify == bracketId : s.Tournify == spot.fromPoule);
+                    var position = squad.Positions.SingleOrDefault(p => p.Tournify == id);
                     if (position == null)
                     {
                         position = new Position() { Value = spot.rank + 1 };
                         squad.Positions.Add(position);
                     }
                     var kvTeam = mapTeams.Where(kv => kv.Value.poule0 == spot.fromPoule && kv.Value.numInPoule0 == spot.rank).SingleOrDefault();
-                    if (kvTeam.Key != null)
+                    if (kvTeam.Key != null) // affect default team to position
                     {
                         var team = session.Teams[kvTeam.Key];
                         position.Team = team;
                     }
+                    position.Tournify = id;
+                    if (bracketId != null)
+                    {
+                        var poule = mapPoules[spot.fromPoule!];
+                        var bracket = mapBrackets[poule.bracket!];
+                        var max = (int)Math.Log2(bracket.size);
+                        var num = poule.GetTypeMatchNum();
+                        int delta = 0;
+                        for (int i = max; i > num; i--)
+                        {
+                            delta += (int)Math.Pow(2, i);
+                        }
+
+                        position.MatchType = Match.GetMatchTypeFromNum(num + 1);
+                        position.MatchOrder = poule.bracketRound + poule.num;
+
+                        position.Value = 2 * (poule.bracketRound + poule.num) - 1 + spot.rank;
+                        if (bracket.subBracketTo != null)
+                        {
+                            bracket = mapBrackets[bracket.subBracketTo];
+                            position.Value += bracket.size;
+                            //position.MatchOrder -= bracket.size;
+                        }
+                        position.Value += delta;
+                        position.TournifyPoule = $"{spot.fromPoule}-{spot.rank}";
+                    }
                     spot.Position = position;
-                };
+
+                }
+                ;
 
                 context.SaveChanges();
                 foreach (var id in mapSpot.Keys.ToList())
@@ -412,30 +492,69 @@ namespace cjoli.Server.Services
                     var spot = mapSpot[id]!;
                     if (map.ContainsKey(spot.fromPoule!))
                     {
+
+                        var position = spot.Position!;
+                        var poule = mapPoules[spot.fromPoule!];
+
                         List<(long, SpotTournify)> list = map[spot.fromPoule!];
                         var parentSpot = list.Single(p => p.Item1 == spot.rank).Item2;
                         var parentPosition = parentSpot.Position!;
-                        var position = spot.Position!;
-                        if (position.ParentPosition == null)
-                        {
-                            position.ParentPosition = new ParentPosition() { Position = position };
-                        }
-                        position.ParentPosition.Squad = parentPosition.Squad;
-                        position.ParentPosition.Phase = parentPosition.Squad!.Phase;
-                        position.ParentPosition.Value = parentPosition.Value;
+                        var parentPoule = mapPoules[parentSpot.fromPoule!];
 
-                        var poule = mapPoules[parentPosition.Squad!.Tournify];
-                        string pos = parentPosition.Value == 1 ? "1er" : $"{parentPosition.Value}ème";
-                        if (poule.bracket != null)
+
+                        string? bracketId = null;
+                        int level = 0;
+                        if (spot.belongsToBracket != null)
                         {
-                            pos = parentPosition.Value == 1 ? "Gagnant" : "Perdant";
+                            bracketId = session.GetRootBracket(spot.belongsToBracket);
+                            var bracket = mapBrackets[bracketId!];
+                            level = bracket.GetOrder(poule);
+                        }
+                        if (bracketId != null && level > 0)
+                        {
+                            var round = parentPoule.bracketRound;
+                            /*var num = (parentPoule.bracketRound + parentPoule.num) % parentPoule.bracketRound;
+                            if (bracketId != parentSpot.belongsToBracket)
+                            {
+                                num += 2;
+                            }*/
+
+                            var pos = parentSpot.rank == 0 ? "Gagnant" : "Perdant";
+                            position.MatchOrder = parentPosition.MatchOrder;
+                            position.Name = $"{pos} {parentPoule.name}";
+
+                            position.Winner = parentSpot.rank == 0;
+                            position.ParentPosition = null;
+                        }
+                        else
+                        {
+                            position.MatchType = null;
+                            position.Winner = false;
+
+                            if (position.ParentPosition == null)
+                            {
+                                position.ParentPosition = new ParentPosition() { Position = position };
+                            }
+                            position.ParentPosition.Squad = parentPosition.Squad;
+                            position.ParentPosition.Phase = parentPosition.Squad!.Phase;
+                            position.ParentPosition.Value = parentPosition.Value;
+
+                            //var poule = mapPoules[parentPosition.Squad!.Tournify];
+                            string pos = parentPosition.Value == 1 ? "1er" : $"{parentPosition.Value}ème";
+                            /*if (parentPoule.bracket != null)
+                            {
+                                pos = spot.rank == 0 ? "Gagnant" : "Perdant";
+                            }*/
+
+                            position.Name = tourney.HasTournifySynchroName || string.IsNullOrEmpty(position.Name) ? $"{pos} {parentPosition.Squad.Name}" : position.Name;
+                            position.Name += " " + position.MatchOrder;
+                            position.Short = tourney.HasTournifySynchroName || string.IsNullOrEmpty(position.Short) ? $"{parentPosition.Value}" : position.Short;
                         }
 
-                        position.Name = tourney.HasTournifySynchroName || string.IsNullOrEmpty(position.Name) ? $"{pos} {parentPosition.Squad.Name}" : position.Name;
-                        position.Short = tourney.HasTournifySynchroName || string.IsNullOrEmpty(position.Short) ? $"{parentPosition.Value}" : position.Short;
                     }
 
-                };
+                }
+                ;
 
             }, session, tourney, context);
         }
@@ -445,6 +564,8 @@ namespace cjoli.Server.Services
             await Update(async () =>
             {
                 var mapDays = await GetMap<DayTournify>("days", doc);
+                var mapBrackets = await GetMap<BracketTournify>("brackets", doc);
+                var mapPoules = await GetMap<PouleTournify>("poules", doc);
                 TourneyTournify tourneyTournify = (await doc.GetSnapshotAsync()).ConvertTo<TourneyTournify>();
                 var division = (await doc.Collection("divisions").GetSnapshotAsync()).First().ConvertTo<DivisionTournify>();
 
@@ -459,14 +580,29 @@ namespace cjoli.Server.Services
                     {
                         continue;
                     }
-                    var squad = squads.Single(s => s.Tournify == matchTournify.poule!);
-                    var positionA = squad.Positions.Single(p => p.Value == (matchTournify.team1 + 1));
-                    var positionB = squad.Positions.Single(p => p.Value == (matchTournify.team2 + 1));
+
+                    string? bracketId = null;
+                    if (matchTournify.bracket != null)
+                    {
+                        bracketId = session.GetRootBracket(matchTournify.bracket);
+                    }
+
+
+                    var squad = squads.Single(s => bracketId != null ? s.Tournify == bracketId : s.Tournify == matchTournify.poule!);
+                    var positionA = squad.Positions.Single(p => matchTournify.bracket != null ? p.TournifyPoule == $"{matchTournify.poule}-{matchTournify.team1}" : p.Value == (matchTournify.team1 + 1));
+                    var positionB = squad.Positions.Single(p => matchTournify.bracket != null ? p.TournifyPoule == $"{matchTournify.poule}-{matchTournify.team2}" : p.Value == (matchTournify.team2 + 1));
                     var match = squad.Matches.SingleOrDefault(m => m.Tournify == id);
                     if (match == null)
                     {
-                        match = new Models.Match() { PositionA = positionA, PositionB = positionB };
+                        match = new Match() { PositionA = positionA, PositionB = positionB };
                         squad.Matches.Add(match);
+                    }
+                    if (matchTournify.bracket != null)
+                    {
+                        var poule = mapPoules[matchTournify.poule!];
+                        match.MatchType = Match.GetMatchTypeFromNum(poule.GetTypeMatchNum());
+                        match.MatchOrder = poule.bracketRound + poule.num;
+                        match.Name = $"{poule.name}";
                     }
                     match.Tournify = id;
                     match.Shot = !string.IsNullOrEmpty(matchTournify.bracket);

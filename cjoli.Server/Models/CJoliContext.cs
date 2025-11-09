@@ -43,6 +43,7 @@ namespace cjoli.Server.Models
             modelBuilder.Entity<Match>().HasMany(m => m.UserMatches).WithOne(u => u.Match).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Match>().HasMany(m => m.MatchResults).WithOne(m => m.Match).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Match>().HasMany(m => m.Estimates).WithOne(e => e.Match).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Match>().Property(m => m.MatchType).HasDefaultValue(MatchType.Normal);
 
 
             modelBuilder.Entity<MatchEstimate>().HasOne(s => s.Match).WithMany(m => m.Estimates);

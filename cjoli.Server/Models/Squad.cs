@@ -1,7 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace cjoli.Server.Models
 {
+    public enum SquadType
+    {
+        Ranking,
+        Bracket
+    }
+
     public class Squad
     {
         [Key]
@@ -14,5 +21,7 @@ namespace cjoli.Server.Models
         public IList<Rank> Ranks { get; set; } = new List<Rank>();
         public string? Tournify { get; set; }
         public int Order { get; set; }
+        public SquadType Type { get; set; }
+        public int BracketSize { get; set; }
     }
 }

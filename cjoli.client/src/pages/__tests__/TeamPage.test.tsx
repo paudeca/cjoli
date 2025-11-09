@@ -40,6 +40,8 @@ describe("TeamPage", () => {
               positions: [createPosition({ id: 1, teamId: TEAM_ID })],
               matches: [],
               order: 0,
+              type: "Ranking",
+              isBracket: false,
             },
           ],
           events: [],

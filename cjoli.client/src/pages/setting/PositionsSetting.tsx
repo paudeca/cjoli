@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { Accordion, Button, Col, Form, Row } from "react-bootstrap";
 import { ParentPosition, Phase, Position, Squad } from "../../models";
 import React from "react";
@@ -6,6 +7,7 @@ import Select from "react-select";
 import { useModal } from "../../hooks/useModal";
 import { useSetting } from "../../hooks/useSetting";
 import useScreenSize from "../../hooks/useScreenSize";
+import { MATCH_TYPES, MatchType } from "../../models/Match";
 
 interface PositionsSettingProps {
   squad: Squad;
@@ -13,6 +15,7 @@ interface PositionsSettingProps {
   indexPhase: number;
   indexSquad: number;
 }
+// eslint-disable-next-line max-lines-per-function
 const PositionsSetting = ({
   squad,
   phase,
@@ -43,6 +46,8 @@ const PositionsSetting = ({
     },
     [tourney?.teams]
   );
+
+  const options = MATCH_TYPES.map((v) => ({ label: v, value: v }));
 
   return (
     <Accordion className={isMobile ? "py-3" : "p-3"}>
@@ -172,6 +177,44 @@ const PositionsSetting = ({
                     }}
                     isClearable
                     placeholder="Select Position"
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Form.Label column lg={2}>
+                  Match
+                </Form.Label>
+                <Col lg={4} className="mb-3">
+                  <Select
+                    options={options}
+                    defaultValue={options?.find(
+                      (o) => o.value == position?.matchType
+                    )}
+                    onChange={(val) => {
+                      setValue(
+                        `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.matchType`,
+                        val?.value as MatchType
+                      );
+                    }}
+                    isClearable
+                    placeholder="Select MatchType"
+                  />
+                </Col>
+                <Col lg={2} className="mb-3">
+                  <Form.Control
+                    type="number"
+                    {...register(
+                      `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.matchOrder`
+                    )}
+                  />
+                </Col>
+                <Col lg={2} className="mb-3">
+                  <Form.Check
+                    type="switch"
+                    label="Winner"
+                    {...register(
+                      `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.winner`
+                    )}
                   />
                 </Col>
               </Row>

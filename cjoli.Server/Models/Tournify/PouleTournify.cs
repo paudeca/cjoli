@@ -15,7 +15,14 @@ namespace cjoli.Server.Models.Tournify
         public string? bracket { get; set; }
         [FirestoreProperty]
         public int num { get; set; }
+        [FirestoreProperty]
+        public int bracketRound { get; set; }
 
         public Squad? Squad { get; set; }
+
+        public int GetTypeMatchNum()
+        {
+            return (int)Math.Log2(bracketRound);
+        }
     }
 }
