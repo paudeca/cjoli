@@ -1,17 +1,11 @@
 ﻿
 using cjoli.Server.Models;
-using cjoli.Server.Models.AI;
 using cjoli.Server.Models.Tournify;
-using Google.Api;
 using Google.Cloud.Firestore;
 using Google.Cloud.Firestore.V1;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Caching.Memory;
-using System;
 using System.Text.Json;
-using System.Threading;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace cjoli.Server.Services
 {
@@ -22,16 +16,18 @@ namespace cjoli.Server.Services
         private readonly IConfiguration _configuration;
         private readonly IMemoryCache _memoryCache;
         private readonly ServerService _serverService;
+        private readonly SynchroService _synchroService;
 
         private Dictionary<string, CancellationTokenSource> _threads = new Dictionary<string, CancellationTokenSource>();
 
-        public SynchroHostedService(IServiceProvider service, ILogger<SynchroHostedService> logger, IConfiguration configuration, IMemoryCache memoryCache, ServerService serverService)
+        public SynchroHostedService(IServiceProvider service, ILogger<SynchroHostedService> logger, IConfiguration configuration, IMemoryCache memoryCache, ServerService serverService, SynchroService synchroService)
         {
             _service = service;
             _logger = logger;
             _configuration = configuration;
             _memoryCache = memoryCache;
             _serverService = serverService;
+            _synchroService = synchroService;
         }
 
 
@@ -67,6 +63,9 @@ namespace cjoli.Server.Services
                 var session = new SessionTournify();
 
                 var context = scope.ServiceProvider.GetService<CJoliContext>()!;
+
+                //await _synchroService.Synchro(uid, context);
+
                 var tourney = context.Tourneys
                         .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.ParentPosition)
                         .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches)

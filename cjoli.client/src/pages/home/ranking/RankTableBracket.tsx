@@ -118,7 +118,7 @@ const MobileBracket = ({
   return (
     <div className="mx-2">
       <Carousel data-bs-theme="dark">
-        {bracket.Quarter[0] && (
+        {bracket.Quarter && bracket.Quarter[0] && (
           <Carousel.Item>
             <Container data-bs-theme="light">
               <Row>
@@ -157,7 +157,7 @@ const MobileBracket = ({
                 <MatchBracket match={bracket.Semi[1]} height={20} />
               </Col>
             </Row>
-            {bracket.Final[2] && (
+            {bracket.Final && bracket.Final[2] && (
               <>
                 <Row>
                   <Col xs={{ offset: 1, span: 10 }}>
@@ -181,21 +181,21 @@ const MobileBracket = ({
                 <MatchBracket match={bracket.Final[0]} height={20} />
               </Col>
             </Row>
-            {bracket.Final[1] && (
+            {bracket.Final && bracket.Final[1] && (
               <Row>
                 <Col xs={{ offset: 1, span: 10 }}>
                   <MatchBracket match={bracket.Final[1]} height={20} />
                 </Col>
               </Row>
             )}
-            {bracket.Final[2] && (
+            {bracket.Final && bracket.Final[2] && (
               <Row>
                 <Col xs={{ offset: 1, span: 10 }}>
                   <MatchBracket match={bracket.Final[2]} height={20} />
                 </Col>
               </Row>
             )}
-            {bracket.Final[3] && (
+            {bracket.Final && bracket.Final[3] && (
               <Row>
                 <Col xs={{ offset: 1, span: 10 }}>
                   <MatchBracket match={bracket.Final[3]} height={20} />
@@ -219,7 +219,7 @@ const DesktopBracket = ({
     <div className="m-4">
       <Row>
         <Col lg={2}>
-          {bracket.Quarter[0] && (
+          {bracket.Quarter && bracket.Quarter[0] && (
             <>
               <MatchBracket match={bracket.Quarter[0]} height={40} />
               <MatchBracket match={bracket.Quarter[1]} height={40} />
@@ -227,19 +227,19 @@ const DesktopBracket = ({
           )}
         </Col>
         <Col lg={2}>
-          {bracket.Semi[0] && (
+          {bracket.Semi && bracket.Semi[0] && (
             <MatchBracket match={bracket.Semi[0]} max height={120} />
           )}
         </Col>
         <Col lg={4} className="text-center">
-          {bracket.Final[0] && (
+          {bracket.Final && bracket.Final[0] && (
             <Row className="h-50 d-flex align-items-end">
               <Col>
                 <FinalMatchBracket match={bracket.Final[0]} />
               </Col>
             </Row>
           )}
-          {bracket.Final[1] && (
+          {bracket.Final && bracket.Final[1] && (
             <Row className="h-50 d-flex align-items-center">
               <Col>
                 <FinalMatchBracket match={bracket.Final[1]} />
@@ -247,19 +247,19 @@ const DesktopBracket = ({
             </Row>
           )}
         </Col>
-        {bracket.Semi[1] && (
+        {bracket.Semi && bracket.Semi[1] && (
           <Col lg={2}>
             <MatchBracket match={bracket.Semi[1]} max left height={120} />
           </Col>
         )}
-        {bracket.Quarter[0] && (
+        {bracket.Quarter && bracket.Quarter[0] && (
           <Col lg={2}>
             <MatchBracket match={bracket.Quarter[2]} left height={40} />
             <MatchBracket match={bracket.Quarter[3]} left height={40} />
           </Col>
         )}
       </Row>
-      {bracket.Final[2] && (
+      {bracket.Final && bracket.Final[2] && (
         <Row>
           <Col lg={2}></Col>
           <Col lg={2}>
@@ -271,7 +271,7 @@ const DesktopBracket = ({
                 <FinalMatchBracket match={bracket.Final[2]} />
               </Col>
             </Row>
-            {bracket.Final[3] && (
+            {bracket.Final && bracket.Final[3] && (
               <Row className="h-50 d-flex align-items-center">
                 <Col>
                   <FinalMatchBracket match={bracket.Final[3]} />

@@ -3,13 +3,9 @@ using cjoli.Server.Dtos;
 using cjoli.Server.Exceptions;
 using cjoli.Server.Extensions;
 using cjoli.Server.Models;
-using cjoli.Server.Models.AI;
 using cjoli.Server.Services.Rules;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Data;
 using System.Diagnostics;
 
@@ -58,6 +54,7 @@ namespace cjoli.Server.Services
             _rules.Add("simple321", new Simple321Rule(this));
 
             _rules.Add("simple310Goal", new Simple310GoalRule(this));
+            _rules.Add("simple310Average", new Simple310AverageRule(this));
 
 
             _rules.Add("lyon", new LyonRule(this));
@@ -445,8 +442,21 @@ namespace cjoli.Server.Services
 
         private ScoreSquad CalculateScoreSquad(Squad squad, Score scoreTourney, List<ScoreSquad> scoreSquads, Dictionary<int, List<Score>> scorePhases, User? user, bool? estimate)
         {
+            Dictionary<Models.MatchType, int> coefBracket = new Dictionary<Models.MatchType, int>() {
+                { Models.MatchType.Final, 1 },
+                { Models.MatchType.Semi, 2 },
+                { Models.MatchType.Quarter, 4 },
+                { Models.MatchType.Match8, 8 },
+                { Models.MatchType.Match16, 16 },
+                { Models.MatchType.Match32, 32 },
+            };
+
             IRule rule = GetRule(squad.Phase.Tourney);
             Dictionary<int, Score> scores = rule.InitScoreSquad(squad, scoreSquads, scorePhases, user);
+            if (squad.Type == SquadType.Bracket)
+            {
+                squad.Positions.Where(p => p.MatchType == Models.MatchType.Semi).ToDictionary(p => p.Id, p => new Score() { PositionId = p.Id, TeamId = p.Team?.Id ?? 0 });
+            }
             squad.Matches.Aggregate(scores, (acc, m) =>
             {
                 var userMatch = m.UserMatches.OrderByDescending(u => u.LogTime).FirstOrDefault(u => u.User == user);
@@ -465,10 +475,15 @@ namespace cjoli.Server.Services
                     }
                 }
                 IMatch match = m.Done ? m : userMatch!;
-                var scoreA = scores[m.PositionA.Id];
-                var scoreB = scores[m.PositionB.Id];
+                var scoreA = acc[m.PositionA.Id];
+                var scoreB = acc[m.PositionB.Id];
                 UpdateScore(scoreA, scoreB, scoreTourney, match, m, rule);
-                return scores;
+                if (squad.Type == SquadType.Bracket)
+                {
+                    scoreA.Total = scoreA.Win > 0 ? coefBracket[m.MatchType] : 0;
+                    scoreB.Total = scoreB.Win > 0 ? coefBracket[m.MatchType] : 0;
+                }
+                return acc;
             });
             var listScores = scores.Select(kv => kv.Value).OrderByDescending(x => x.Total).ToList();
             listScores = listScores.Select(s =>
@@ -478,6 +493,21 @@ namespace cjoli.Server.Services
                 //s.Penalty = position.Penalty;
                 return s;
             }).ToList();
+
+            if (squad.Type == SquadType.Bracket)
+            {
+                var dico = listScores.Aggregate(new Dictionary<int, Score>(), (acc, score) =>
+                {
+                    if (!acc.ContainsKey(score.TeamId))
+                    {
+                        acc.Add(score.TeamId, new Score() { TeamId = score.TeamId });
+                    }
+                    acc[score.TeamId].Total += score.Total;
+                    acc[score.TeamId].PositionId = score.PositionId;
+                    return acc;
+                });
+                listScores = dico.Select(kv => kv.Value).ToList();
+            }
 
             listScores.Sort(rule.ScoreComparison(squad.Phase, squad));
             for (int i = 0; i < listScores.Count; i++)
@@ -537,7 +567,10 @@ namespace cjoli.Server.Services
 
         private void AffectationTeams(RankingDto ranking)
         {
-            var positions = ranking.Tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Positions);
+            var squads = ranking.Tourney.Phases.SelectMany(p => p.Squads);
+            var positions = squads.SelectMany(s => s.Positions);
+            var matches = squads.SelectMany(s => s.Matches);
+
             foreach (var position in positions.Where(p => p.ParentPosition != null))
             {
                 List<Score> scores;
@@ -561,7 +594,6 @@ namespace cjoli.Server.Services
                     position.TeamId = 0;
                 }
             }
-            var matches = ranking.Tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Matches);
             foreach (var position in positions.Where(p => p.MatchType != 0))
             {
                 var m = matches.SingleOrDefault(m => m.SquadId == position.SquadId && m.MatchType == position.MatchType && m.MatchOrder == position.MatchOrder);
@@ -588,13 +620,22 @@ namespace cjoli.Server.Services
                 match.TeamIdA = positions.Single(p => p.Id == match.PositionIdA).TeamId;
                 match.TeamIdB = positions.Single(p => p.Id == match.PositionIdB).TeamId;
             }
+            //Assign rank
             foreach (var rank in ranking.Tourney.Ranks)
             {
-                var scoreSquad = ranking.Scores.ScoreSquads.SingleOrDefault(s => s.SquadId == rank.SquadId);
-                if (scoreSquad != null)
+                var squad = squads.Single(s => s.Id == rank.SquadId);
+                if (squad.Type == SquadType.Bracket)
                 {
-                    var score = scoreSquad.Scores[rank.Value - 1];
-                    rank.TeamId = positions.Single(p => p.Id == score.PositionId).TeamId;
+                    //TODO
+                }
+                else
+                {
+                    var scoreSquad = ranking.Scores.ScoreSquads.SingleOrDefault(s => s.SquadId == rank.SquadId);
+                    if (scoreSquad != null)
+                    {
+                        var score = scoreSquad.Scores[rank.Value - 1];
+                        rank.TeamId = positions.Single(p => p.Id == score.PositionId).TeamId;
+                    }
                 }
             }
         }
