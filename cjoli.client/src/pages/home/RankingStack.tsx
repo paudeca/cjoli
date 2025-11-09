@@ -39,6 +39,9 @@ const RankingStack = ({ phase, modeCast }: RankingStackProps) => {
       (phase: Phase) => !squadId || !phaseId || parseInt(phaseId) == phase.id
     ) || [];
 
+  const hasBracket = phase.squads.some((s) => s.type == "Bracket");
+  const hasMultipleSquad = phase.squads.length > 1;
+
   const handleClick = (phase: Phase) => {
     selectDay("0");
     navigate(`${path}phase/${phase.id}`);
@@ -65,38 +68,40 @@ const RankingStack = ({ phase, modeCast }: RankingStackProps) => {
                       </Nav.Item>
                     ))}
                   </Nav>
-                  <Check
-                    type="switch"
-                    id="rankingPhase"
-                    reverse
-                    role="button"
-                    label={
-                      <span>
-                        {!displayPhase && (
-                          <>
-                            <ChevronBarContract className="mx-1" />
-                            {!isMobile && (
-                              <Trans i18nKey="ranking.displayPhase">
-                                Display phase ranking
-                              </Trans>
-                            )}
-                          </>
-                        )}
-                        {displayPhase && (
-                          <>
-                            <ChevronBarExpand className="mx-1" />
-                            {!isMobile && (
-                              <Trans i18nKey="ranking.displaySquad">
-                                Display group ranking
-                              </Trans>
-                            )}
-                          </>
-                        )}
-                      </span>
-                    }
-                    checked={displayPhase}
-                    onChange={() => setDisplayPhase(!displayPhase)}
-                  />
+                  {!hasBracket && hasMultipleSquad && (
+                    <Check
+                      type="switch"
+                      id="rankingPhase"
+                      reverse
+                      role="button"
+                      label={
+                        <span>
+                          {!displayPhase && (
+                            <>
+                              <ChevronBarContract className="mx-1" />
+                              {!isMobile && (
+                                <Trans i18nKey="ranking.displayPhase">
+                                  Display phase ranking
+                                </Trans>
+                              )}
+                            </>
+                          )}
+                          {displayPhase && (
+                            <>
+                              <ChevronBarExpand className="mx-1" />
+                              {!isMobile && (
+                                <Trans i18nKey="ranking.displaySquad">
+                                  Display group ranking
+                                </Trans>
+                              )}
+                            </>
+                          )}
+                        </span>
+                      }
+                      checked={displayPhase}
+                      onChange={() => setDisplayPhase(!displayPhase)}
+                    />
+                  )}
                 </Card.Header>
               )}
               <RankTable phase={phase} displayPhase={displayPhase} />
