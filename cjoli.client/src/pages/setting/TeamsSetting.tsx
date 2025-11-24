@@ -9,12 +9,15 @@ import TeamModal from "../../modals/TeamModal";
 import { useSetting } from "../../hooks/useSetting";
 import { useApi } from "../../hooks/useApi";
 import { useMutation } from "@tanstack/react-query";
+import ReplaceTeamModal from "../../modals/ReplaceTeamModal";
 
 const TeamsSetting = () => {
   const { tourney } = useSetting();
   const { setShow: showTeam } = useModal("team");
   const { setShowWithData: showConfirmDeleteTeam } =
     useModal<Team>("confirmDeleteTeam");
+  const { setShowWithData: showReplaceTeam } = useModal<Team>("replaceTeam");
+
   const uid = useUid();
   const { removeTeam } = useApi();
 
@@ -58,6 +61,17 @@ const TeamsSetting = () => {
                   </div>
                   <div className="ms-auto">
                     <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setTeam(team);
+                        showReplaceTeam(true, team);
+                      }}
+                      className="mx-3"
+                      variant="outline-primary"
+                    >
+                      Replace Team
+                    </Button>
+                    <Button
                       variant="danger"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -74,6 +88,7 @@ const TeamsSetting = () => {
             ))}
 
             <TeamModal team={team} />
+            <ReplaceTeamModal team={team} />
             <ConfirmationModal
               id="confirmDeleteTeam"
               title="Remove Team"

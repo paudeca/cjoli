@@ -190,6 +190,28 @@ const useApiPost = () => {
       }),
     []
   );
+  const replaceTeam = useCallback(
+    (uid: string) =>
+      mutationOptions({
+        mutationKey: ["replaceTeam"],
+        mutationFn: async ({
+          team,
+          newTeam,
+        }: {
+          team: Team;
+          newTeam: Team;
+        }) => {
+          const tourney = await settingService.replaceTeam({
+            uid,
+            teamId: team.id,
+            newTeamId: newTeam.id,
+          });
+          loadTourney(tourney);
+          return true;
+        },
+      }),
+    [loadTourney]
+  );
 
   return {
     saveTourney,
@@ -197,6 +219,7 @@ const useApiPost = () => {
     updateMessage,
     deleteMessage,
     synchroTourney,
+    replaceTeam,
   };
 };
 

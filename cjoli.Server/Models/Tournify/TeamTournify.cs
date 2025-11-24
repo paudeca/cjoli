@@ -11,6 +11,8 @@ namespace cjoli.Server.Models.Tournify
         public int numInPoule0 { get; set; }
         [FirestoreProperty]
         public string? poule0 { get; set; }
+        [FirestoreProperty]
+        public string? division { get; set; }
 
     }
 }

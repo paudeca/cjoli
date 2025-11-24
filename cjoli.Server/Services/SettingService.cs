@@ -298,7 +298,7 @@ namespace cjoli.Server.Services
                 Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions)
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches)
                 .Include(t => t.Phases).ThenInclude(p => p.Events)
-                .Include(t => t.Teams)
+                .Include(t => t.Teams).ThenInclude(t => t.TeamDatas.Where(d => d.Tourney.Uid == uid))
                 .Include(t => t.Ranks.OrderBy(r => r.Order))
                 .Single(t => t.Uid == uid);
         }
@@ -309,6 +309,26 @@ namespace cjoli.Server.Services
             message.IsPublished = dto.IsPublished;
             context.SaveChanges();
         }
+
+        public Tourney ReplaceTeam(string uid, int teamId, int newTeamId, CJoliContext context)
+        {
+            Tourney tourney = GetTourney(uid, context);
+            Team team = tourney.Teams.Single(t => t.Id == teamId);
+            Team newTeam = context.Team.Single(t => t.Id == newTeamId);
+            newTeam.TeamDatas.Add(team.TeamDatas.First());
+            tourney.Teams.Add(newTeam);
+
+            tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Positions).Where(p => p.Team == team).ToList().ForEach(p => p.Team = newTeam);
+            tourney.Teams.Remove(team);
+            context.Team.Remove(team);
+
+            //tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Positions).Where(p => p.Team == team).ToList().ForEach(p => p.Team = null);
+
+            context.SaveChanges();
+            _memoryCache.Remove(uid);
+            return tourney;
+        }
+
 
         public void DeleteMessage(int msgId, string uid, CJoliContext context)
         {

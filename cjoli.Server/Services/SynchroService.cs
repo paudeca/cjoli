@@ -51,7 +51,20 @@ namespace cjoli.Server.Services
             public required Func<QuerySnapshot, Task> Action;
         }
 
-        public async Task<Tourney> Synchro(string uid, CJoliContext context)
+        public async Task<Tourney> Synchro(string uid, CJoliContext context, CancellationToken? stoppingToken)
+        {
+            try
+            {
+                return await ExecuteSynchro(uid, context, stoppingToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Unable to execute synchro, {ex}");
+                throw;
+            }
+        }
+
+        public async Task<Tourney> ExecuteSynchro(string uid, CJoliContext context, CancellationToken? stoppingToken)
         {
             var session = new SessionTournify();
 
@@ -88,359 +101,45 @@ namespace cjoli.Server.Services
             var list = new[]
             {
                 new ActionItem(){Query = queryTourney, Action=async snapshot => await UpdateTourney(snapshot, session, tourney, context)},
-                new ActionItem(){Query = queryTeam, Action=async snapshot => await UpdateTeam(snapshot, session, tourney, context)},
+                new ActionItem(){Query = queryTeam, Action=async snapshot => await UpdateTeam(snapshot, session, doc, tourney, context)},
                 new ActionItem(){Query = queryPhase, Action=async snapshot => await UpdatePhase(snapshot, session, doc, tourney, context)},
-                new ActionItem(){Query = queryBracket, Action=async snapshot => await UpdateBracket(snapshot, session, tourney, context)},
-                new ActionItem(){Query = querySquad, Action=async snapshot => await UpdateSquad(snapshot, session, tourney, context)},
+                new ActionItem(){Query = queryBracket, Action=async snapshot => await UpdateBracket(snapshot, session, doc, tourney, context)},
+                new ActionItem(){Query = querySquad, Action=async snapshot => await UpdateSquad(snapshot, session, doc, tourney, context)},
                 new ActionItem(){Query = queryPosition, Action=async snapshot => await UpdatePosition(snapshot, session, doc, tourney, context)},
                 new ActionItem(){Query = queryMatch, Action=async snapshot => await UpdateMatch(snapshot, session, doc, tourney, context)},
             };
 
-            foreach (var action in list)
+            if (stoppingToken != null)
             {
-                var snap = await action.Query.GetSnapshotAsync();
-                await action.Action(snap);
-            }
-
-            context.SaveChanges();
-            _memoryCache.Remove(tourney.Uid);
-
-            list.ToList().ForEach(async action =>
-            {
-            });
-
-            list.ToList().ForEach(action =>
-            {
-                /*var listener = action.Query.Listen(async snapshot =>
+                list.ToList().ForEach(action =>
                 {
-                    await Update(async () => await action.Action(snapshot), session, tourney, context);
+                    var listener = action.Query.Listen(async snapshot =>
+                    {
+                        await Update(async () => await action.Action(snapshot), session, tourney, context);
+                    });
+                    session.Listeners.Add(listener);
                 });
-                session.Listeners.Add(listener);*/
-            });
 
-            /*session.Listeners.Add(queryTourney.Listen(async snapshot =>
-            {
-                await UpdateTourney(snapshot, session, tourney, context);
-            }));
+                while (!stoppingToken.Value.IsCancellationRequested)
+                {
+                    await Task.Delay(1000, stoppingToken.Value);
+                }
+                session.Listeners.ForEach(async listener => await listener.StopAsync());
 
-            var doc = db.Collection("tournaments").Document(session.Id);
-
-            //Team
-            var queryTeam = doc.Collection("teams");
-            session.Listeners.Add(queryTeam.Listen(async snapshot =>
-            {
-                await UpdateTeam(snapshot, session, tourney, context);
-            }));
-
-
-            //Phase
-            var queryPhase = doc.Collection("divisions");
-            session.Listeners.Add(queryPhase.Listen(async snapshot =>
-            {
-                await UpdatePhase(snapshot, session, doc, tourney, context);
-            }));
-
-            var queryBracket = doc.Collection("brackets");
-            session.Listeners.Add(queryBracket.Listen(async snapshot =>
-            {
-                await UpdateBracket(snapshot, session, tourney, context);
-            }));
-
-            //Squad
-            var querySquad = doc.Collection("poules");
-            session.Listeners.Add(querySquad.Listen(async snapshot =>
-            {
-                await UpdateSquad(snapshot, session, tourney, context);
-            }));
-
-            //Position
-            var queryPosition = doc.Collection("resultSpots");
-            session.Listeners.Add(queryPosition.Listen(async snapshot =>
-            {
-                await UpdatePosition(snapshot, session, doc, tourney, context);
-            }));
-
-            //Match
-            var queryMatch = doc.Collection("matches");
-            session.Listeners.Add(queryMatch.Listen(async snapshot =>
-            {
-                await UpdateMatch(snapshot, session, doc, tourney, context);
-            }));*/
-
-            /*while (!stoppingToken.IsCancellationRequested)
-            {
-                await Task.Delay(1000, stoppingToken);
             }
-            session.Listeners.ForEach(async listener => await listener.StopAsync());*/
+            else
+            {
+                foreach (var action in list)
+                {
+                    var snap = await action.Query.GetSnapshotAsync();
+                    await action.Action(snap);
+                }
+                context.SaveChanges();
+                _memoryCache.Remove(tourney.Uid);
 
+            }
 
             return tourney;
-            /*var tourney = context.Tourneys
-                    .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.ParentPosition)
-                    .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches)
-                    .Include(t => t.Phases).ThenInclude(p => p.Events).ThenInclude(e => e.Positions)
-                    .Include(t => t.Teams).ThenInclude(t => t.TeamDatas.Where(t => t.Tourney.Uid == uid))
-                    .Include(t => t.Ranks)
-                    .Single(t => t.Uid == uid);
-
-            if (string.IsNullOrEmpty(tourney.Tournify))
-            {
-                return tourney;
-            }
-
-            FirestoreDb db = CreateDb();
-
-            var query = db.Collection("tournaments").WhereEqualTo("liveLink", tourney.Tournify);
-            QuerySnapshot querySnapshot = await query.GetSnapshotAsync();
-            var docTourney = querySnapshot.Documents.First();
-            string id = docTourney.Id;
-            TourneyTournify tourneyTournify = docTourney.ConvertTo<TourneyTournify>();
-
-
-            var doc = db.Collection("tournaments").Document(id);
-
-
-            query = doc.Collection("divisions");
-            querySnapshot = await query.GetSnapshotAsync();
-            var division = querySnapshot.First().ConvertTo<DivisionTournify>();
-
-            int i = 0;
-            var phases = tourney.Phases;
-            division.fases.ForEach(f =>
-            {
-                Phase phase;
-                if (phases.Count > i)
-                {
-                    phase = phases[i];
-                    phase.Name = tourney.HasTournifySynchroName ? f.name! : phase.Name;
-                }
-                else
-                {
-                    phase = new Phase() { Name = f.name!, Tourney = tourney };
-                    tourney.Phases.Add(phase);
-                }
-                f.MinTime = System.DateTime.MaxValue;
-                f.MaxTime = System.DateTime.MinValue;
-                f.Phase = phase;
-
-                i++;
-            });
-
-            query = doc.Collection("poules");
-            querySnapshot = await query.GetSnapshotAsync();
-            var mapPoules = querySnapshot.ToDictionary(p => p.Id, p => p.ConvertTo<PouleTournify>());
-
-            mapPoules.Keys.ToList().ForEach(id =>
-            {
-                var poule = mapPoules[id]!;
-                var phase = tourney.Phases[poule.fase];
-                var squad = phase.Squads.SingleOrDefault(s => s.Name.ToLower() == poule.name!.ToLower() || s.Tournify == id);
-                if (squad == null)
-                {
-                    squad = new Squad() { Name = poule.name!, Phase = phase };
-                    phase.Squads.Add(squad);
-                }
-                squad.Name = tourney.HasTournifySynchroName ? poule.name! : squad.Name;
-                squad.Tournify = id;
-                squad.Order = poule.num;
-                poule.Squad = squad;
-
-            });
-
-            query = doc.Collection("resultSpots");
-            querySnapshot = await query.GetSnapshotAsync();
-            var mapSpot = querySnapshot.ToDictionary(p => p.Id, p => p.ConvertTo<SpotTournify>());
-            var dicoSpots = querySnapshot.ToDictionary(p => p.Id, p => p.ToDictionary());
-            var squads = tourney.Phases.SelectMany(p => p.Squads);
-            var map = new Dictionary<string, List<(long, SpotTournify)>>();
-            mapSpot.Keys.ToList().ForEach(id =>
-            {
-                var spot = mapSpot[id]!;
-
-                var dico = dicoSpots[id]!;
-                for (int i = 1; i < 10; i++)
-                {
-                    if (dico.ContainsKey($"poule{i}") && dico[$"poule{i}"] != null)
-                    {
-                        string poule = (string)dico[$"poule{i}"];
-                        long num = (long)dico[$"numInPoule{i}"];
-                        List<(long, SpotTournify)> list;
-                        map.TryGetValue(poule, out list);
-                        if (list == null)
-                        {
-                            list = new List<(long, SpotTournify)>();
-                            map[poule] = list;
-                        }
-                        list.Add((num, spot));
-                    }
-                }
-                var squad = squads.Single(s => s.Tournify == spot.fromPoule);
-                var position = squad.Positions.SingleOrDefault(p => p.Value == spot.rank + 1);
-                if (position == null)
-                {
-                    position = new Position() { Value = spot.rank + 1 };
-                    squad.Positions.Add(position);
-                }
-                var kvTeam = mapTeams.Where(kv => kv.Value.poule0 == spot.fromPoule && kv.Value.numInPoule0 == spot.rank).SingleOrDefault();
-                if (kvTeam.Key != null)
-                {
-                    var team = teams[kvTeam.Key];
-                    position.Team = team;
-                }
-                spot.Position = position;
-            });
-            context.SaveChanges();
-            mapSpot.Keys.ToList().ForEach(id =>
-            {
-                var spot = mapSpot[id]!;
-                if (map.ContainsKey(spot.fromPoule!))
-                {
-                    List<(long, SpotTournify)> list = map[spot.fromPoule!];
-                    var parentSpot = list.Single(p => p.Item1 == spot.rank).Item2;
-                    var parentPosition = parentSpot.Position!;
-                    var position = spot.Position!;
-                    if (position.ParentPosition == null)
-                    {
-                        position.ParentPosition = new ParentPosition() { Position = position };
-                    }
-                    position.ParentPosition.Squad = parentPosition.Squad;
-                    position.ParentPosition.Phase = parentPosition.Squad!.Phase;
-                    position.ParentPosition.Value = parentPosition.Value;
-
-                    var poule = mapPoules[parentPosition.Squad!.Tournify];
-                    string pos = parentPosition.Value == 1 ? "1er" : $"{parentPosition.Value}ème";
-                    if (poule.bracket != null)
-                    {
-                        pos = parentPosition.Value == 1 ? "Gagnant" : "Perdant";
-                    }
-
-                    position.Name = tourney.HasTournifySynchroName || string.IsNullOrEmpty(position.Name) ? $"{pos} {parentPosition.Squad.Name}" : position.Name;
-                    position.Short = tourney.HasTournifySynchroName || string.IsNullOrEmpty(position.Short) ? $"{parentPosition.Value}" : position.Short;
-                }
-
-            });
-
-            query = doc.Collection("days");
-            querySnapshot = await query.GetSnapshotAsync();
-            var mapDays = querySnapshot.ToDictionary(p => p.Id, p => p.ConvertTo<DayTournify>());
-
-
-            query = doc.Collection("matches");
-            querySnapshot = await query.GetSnapshotAsync();
-            var mapMatches = querySnapshot.ToDictionary(p => p.Id, p => p.ConvertTo<MatchTournify>());
-            mapMatches.Keys.ToList().ForEach(id =>
-            {
-                var matchTournify = mapMatches[id];
-                if (matchTournify.st == null)
-                {
-                    return;
-                }
-                var poule = mapPoules[matchTournify.poule!];
-                var squad = poule.Squad!;
-                var positionA = squad.Positions.Single(p => p.Value == (matchTournify.team1 + 1));
-                var positionB = squad.Positions.Single(p => p.Value == (matchTournify.team2 + 1));
-                var match = squad.Matches.SingleOrDefault(m => m.Tournify == id);
-                if (match == null)
-                {
-                    match = new Models.Match() { PositionA = positionA, PositionB = positionB };
-                    squad.Matches.Add(match);
-                }
-                match.Tournify = id;
-                match.Shot = !string.IsNullOrEmpty(matchTournify.bracket);
-
-                var day = matchTournify.day;
-                var date = tourney.StartTime;
-                if (day != null && day != "0")
-                {
-                    date = DateTimeOffset.FromUnixTimeSeconds(mapDays[day].date).ToLocalTime().DateTime;
-                }
-                var times = matchTournify.st!.Split(":");
-                TimeSpan ts = new TimeSpan(int.Parse(times[0]), int.Parse(times[1]), 0);
-                date = date.Date + ts;
-                match.Time = date;
-                if (matchTournify.score1.HasValue && matchTournify.score2.HasValue)
-                {
-                    match.ScoreA = matchTournify.score1.Value;
-                    match.ScoreB = matchTournify.score2.Value;
-                    match.Done = true;
-                }
-                else
-                {
-                    match.ScoreA = 0;
-                    match.ScoreB = 0;
-                    match.Done = false;
-                }
-                var field = tourneyTournify.fields[matchTournify.field];
-                if (field != null)
-                {
-                    match.Location = field.name;
-                }
-
-                var div = division.fases.Single(f => f.Phase == squad.Phase);
-                if (match.Time < div.MinTime)
-                {
-                    div.MinTime = match.Time;
-                }
-                if (match.Time > div.MaxTime)
-                {
-                    div.MaxTime = match.Time;
-                }
-            });
-
-            tourneyTournify.breaks.Values.ToList().ForEach(b =>
-            {
-                var day = b.day;
-                var date = tourney.StartTime;
-                if (day != null && day != "0")
-                {
-                    date = DateTimeOffset.FromUnixTimeSeconds(mapDays[day].date).ToLocalTime().DateTime;
-                }
-                if (b.st == null)
-                {
-                    return;
-                }
-                var times = b.st!.Split(":");
-                TimeSpan ts = new TimeSpan(int.Parse(times[0]), int.Parse(times[1]), 0);
-                date = date.Date + ts;
-
-                var d = division.fases.FirstOrDefault(f => f.MinTime <= date && f.MaxTime >= date);
-                if (d == null)
-                {
-                    d = division.fases.LastOrDefault(f => f.MinTime <= date);
-                }
-                if (d == null)
-                {
-                    d = division.fases.FirstOrDefault(f => f.MaxTime >= date);
-                }
-                if (d != null)
-                {
-                    var evt = d.Phase.Events.SingleOrDefault(e => e.Tournify == b.id);
-                    if (evt == null)
-                    {
-                        evt = new Event() { Name = b.name, EventType = EventType.Info };
-                        d.Phase.Events.Add(evt);
-                    }
-                    string name = b.name;
-                    if (b.field != null)
-                    {
-                        var field = tourneyTournify.fields[b.field];
-                        if (field != null)
-                        {
-                            name = $"{name} {field.name}";
-                        }
-                    }
-
-                    evt.Name = tourney.HasTournifySynchroName ? name : evt.Name;
-                    evt.Tournify = b.id;
-                    evt.Time = date;
-                }
-
-            });
-
-            context.SaveChanges();
-            _memoryCache.Remove(tourney.Uid);
-
-            return tourney;*/
         }
 
 
@@ -568,12 +267,30 @@ namespace cjoli.Server.Services
 
         }
 
+        private async Task<KeyValuePair<string, DivisionTournify>> GetDivision(DocumentReference doc, Tourney tourney)
+        {
+            var divisions = await GetMap<DivisionTournify>("divisions", doc);
+            var division = divisions.SingleOrDefault(d => d.Value.name == tourney.Category);
+            if (division.Key == null && divisions != null)
+            {
+                division = divisions.FirstOrDefault();
+            }
+            if (division.Key == null)
+            {
+                throw new Exception("Unable to find division");
+            }
+            return division;
+        }
 
-        private async Task UpdateTeam(QuerySnapshot snapshot, SessionTournify session, Tourney tourney, CJoliContext context)
+
+        private async Task UpdateTeam(QuerySnapshot snapshot, SessionTournify session, DocumentReference doc, Tourney tourney, CJoliContext context)
         {
             var mapTeams = snapshot.ToDictionary(t => t.Id, t => t.ConvertTo<TeamTournify>());
             session.Teams = new Dictionary<string, Team>();
-            foreach (var id in mapTeams.Keys.ToList())
+
+            var division = await GetDivision(doc, tourney);
+
+            foreach (var id in mapTeams.Where(t => t.Value.division == division.Key).Select(k => k.Key))
             {
                 var teamTournify = mapTeams[id]!;
                 var team = context.Team.Include(t => t.TeamDatas.Where(t => t.Tourney.Uid == tourney.Uid))
@@ -603,11 +320,11 @@ namespace cjoli.Server.Services
             TourneyTournify tourneyTournify = (await doc.GetSnapshotAsync()).ConvertTo<TourneyTournify>();
             var mapDays = await GetMap<DayTournify>("days", doc);
 
-            var division = snapshot.First().ConvertTo<DivisionTournify>();
+            var division = await GetDivision(doc, tourney);//snapshot.First().ConvertTo<DivisionTournify>();
 
             int i = 0;
             var phases = tourney.Phases;
-            foreach (var f in division.fases)
+            foreach (var f in division.Value.fases)
             {
                 Phase phase;
                 if (phases.Count > i)
@@ -626,11 +343,12 @@ namespace cjoli.Server.Services
 
             UpdateEvent(tourneyTournify, tourney, mapDays);
         }
-        private async Task UpdateBracket(QuerySnapshot snapshot, SessionTournify session, Tourney tourney, CJoliContext context)
+        private async Task UpdateBracket(QuerySnapshot snapshot, SessionTournify session, DocumentReference doc, Tourney tourney, CJoliContext context)
         {
             var mapBrackets = snapshot.ToDictionary(p => p.Id, p => p.ConvertTo<BracketTournify>());
+            var division = await GetDivision(doc, tourney);
 
-            foreach (var id in mapBrackets.Keys.ToList())
+            foreach (var id in mapBrackets.Where(b => b.Value.division == division.Key).Select(b => b.Key))
             {
                 var bracket = mapBrackets[id];
                 session.Brackets[id] = bracket;
@@ -654,11 +372,12 @@ namespace cjoli.Server.Services
 
         }
 
-        private async Task UpdateSquad(QuerySnapshot snapshot, SessionTournify session, Tourney tourney, CJoliContext context)
+        private async Task UpdateSquad(QuerySnapshot snapshot, SessionTournify session, DocumentReference doc, Tourney tourney, CJoliContext context)
         {
             var mapPoules = snapshot.ToDictionary(p => p.Id, p => p.ConvertTo<PouleTournify>());
+            var division = await GetDivision(doc, tourney);
 
-            foreach (var id in mapPoules.Keys.ToList())
+            foreach (var id in mapPoules.Where(p => p.Value.division == division.Key).Select(d => d.Key))
             {
                 var poule = mapPoules[id]!;
                 if (poule.bracket == null) //create a squad only for poule with bracket
@@ -689,7 +408,9 @@ namespace cjoli.Server.Services
 
             var squads = tourney.Phases.SelectMany(p => p.Squads);
             var map = new Dictionary<string, List<(long, SpotTournify)>>();
-            foreach (var id in mapSpot.Keys.ToList())
+            var division = await GetDivision(doc, tourney);
+
+            foreach (var id in mapSpot.Where(s => s.Value.division == division.Key).Select(d => d.Key))
             {
                 var spot = mapSpot[id]!;
 
@@ -835,16 +556,22 @@ namespace cjoli.Server.Services
             var mapBrackets = await GetMap<BracketTournify>("brackets", doc);
             var mapPoules = await GetMap<PouleTournify>("poules", doc);
             TourneyTournify tourneyTournify = (await doc.GetSnapshotAsync()).ConvertTo<TourneyTournify>();
-            var division = (await doc.Collection("divisions").GetSnapshotAsync()).First().ConvertTo<DivisionTournify>();
+
+            var division = await GetDivision(doc, tourney);
+            //var division = (await doc.Collection("divisions").GetSnapshotAsync()).First().ConvertTo<DivisionTournify>();
 
             var squads = tourney.Phases.SelectMany(p => p.Squads);
 
             var mapMatches = snapshot.ToDictionary(p => p.Id, p => p.ConvertTo<MatchTournify>());
             foreach (string id in mapMatches.Keys)
             {
-
                 var matchTournify = mapMatches[id];
                 if (matchTournify.st == null)
+                {
+                    continue;
+                }
+                var poule = mapPoules[matchTournify.poule!];
+                if (poule.division != division.Key)
                 {
                     continue;
                 }
@@ -867,7 +594,6 @@ namespace cjoli.Server.Services
                 }
                 if (matchTournify.bracket != null)
                 {
-                    var poule = mapPoules[matchTournify.poule!];
                     match.MatchType = Match.GetMatchTypeFromNum(poule.GetTypeMatchNum());
                     match.MatchOrder = poule.bracketRound + poule.num;
                     match.Name = $"{poule.name}";

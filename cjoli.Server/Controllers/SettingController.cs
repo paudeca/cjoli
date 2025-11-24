@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using cjoli.Server.Dtos;
 using cjoli.Server.Models;
-using cjoli.Server.Models.AI;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -54,7 +53,7 @@ namespace cjoli.Server.Controllers
         public async Task<TourneyDto> SynchroAsync(string uid)
         {
             await _authorizationService.AuthorizeAsync(User, uid, "EditTourney");
-            return _mapper.Map<TourneyDto>(await _synchroService.Synchro(uid, _context));
+            return _mapper.Map<TourneyDto>(await _synchroService.Synchro(uid, _context, null));
         }
 
 
@@ -93,6 +92,15 @@ namespace cjoli.Server.Controllers
         {
             _settingService.RemoveTourney(uid, _context);
         }
+
+        [HttpPost]
+        [Route("Tourney/{uid}/teams/{teamId}/replace/{newTeamId}")]
+        public async Task<TourneyDto> ReplaceTeam(string uid, int teamId, int newTeamId)
+        {
+            await _authorizationService.AuthorizeAsync(User, uid, "EditTourney");
+            return _mapper.Map<TourneyDto>(_settingService.ReplaceTeam(uid, teamId, newTeamId, _context));
+        }
+
 
 
         [HttpDelete]

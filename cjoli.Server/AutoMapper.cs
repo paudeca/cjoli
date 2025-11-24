@@ -42,7 +42,7 @@ namespace cjoli.Server
                 .ForMember(x => x.SquadIds, opt => opt.MapFrom(a => a.Positions.GroupBy(p => p.Squad).Select(s => s.Key.Id)));
 
             CreateMap<Team, TeamDto>()
-                .ForMember(x => x.Datas, opt => opt.MapFrom(t => t.TeamDatas.SingleOrDefault()))
+                .ForMember(x => x.Datas, opt => opt.MapFrom(t => t.TeamDatas.FirstOrDefault()))//SingleOrDefault()))
                 .ForMember(x => x.Alias, opt => opt.MapFrom(t => t.Alias != null ? t.Alias.Name : null))
                 .ForMember(x => x.Logo, opt => opt.MapFrom(t => t.Logo == null && t.Alias != null ? t.Alias.Logo : t.Logo));
             CreateMap<TeamData, TeamDataDto>();

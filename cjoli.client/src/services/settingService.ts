@@ -167,3 +167,18 @@ export const removeEvent = async ({
   );
   return data;
 };
+
+export const replaceTeam = async ({
+  uid,
+  teamId,
+  newTeamId,
+}: {
+  uid: string;
+  teamId: number;
+  newTeamId: number;
+}) => {
+  const { data } = await axios.post<Tourney>(
+    `${url}/setting/tourney/${uid}/teams/${teamId}/replace/${newTeamId}`
+  );
+  return data;
+};
