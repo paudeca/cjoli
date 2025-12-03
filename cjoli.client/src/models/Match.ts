@@ -17,21 +17,6 @@ export interface BracketType {
   Final4?: Match;
 }
 
-export const MATCH_TYPES1 = [
-  "Quarter1",
-  "Quarter2",
-  "Quarter3",
-  "Quarter4",
-  "Semi1",
-  "Semi2",
-  "Semi3",
-  "Semi4",
-  "Final1",
-  "Final2",
-  "Final3",
-  "Final4",
-];
-
 export const MATCH_TYPES = [
   "Final",
   "Semi",
@@ -42,26 +27,13 @@ export const MATCH_TYPES = [
 ];
 
 export type MatchType =
+  | "Normal"
   | "Final"
   | "Semi"
   | "Quarter"
   | "Match8"
   | "Match16"
   | "Match32";
-
-export type MatchType1 =
-  | "Quarter1"
-  | "Quarter2"
-  | "Quarter3"
-  | "Quarter4"
-  | "Semi1"
-  | "Semi2"
-  | "Semi3"
-  | "Semi4"
-  | "Final1"
-  | "Final2"
-  | "Final3"
-  | "Final4";
 
 export interface Match extends IMatch {
   id: number;

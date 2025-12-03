@@ -121,6 +121,7 @@ namespace cjoli.Server.Services
                 .Include(t => t.Phases).ThenInclude(p => p.Events.OrderBy(e => e.Time)).ThenInclude(e => e.Positions)
                 .Include(t => t.Teams).ThenInclude(t => t.TeamDatas.Where(d => d.Tourney.Uid == tourneyUid))
                 .Include(t => t.Teams).ThenInclude(t => t.Alias)
+                .Include(t => t.Teams).ThenInclude(t => t.MatchResults)
                 //.Include(t => t.Messages.Where(m=>m.MessageType=="image").OrderByDescending(m=>m.Time))
                 .FirstOrDefault(t => t.Uid == tourneyUid);
 
@@ -177,10 +178,49 @@ namespace cjoli.Server.Services
             var ranking = GetRanking(tourneyUid, user, useEstimate, context);
             var dto = _mapper.Map<RankingDto>(ranking);
             AffectationTeams(dto);
+            UpdateMatchResult(dto, ranking.Tourney, context);
             CalculateHistory(dto, ranking.Tourney);
             CalculateHistoryByTimes(dto, ranking.Tourney, context);
             CalculateAllBetScores(dto, user, context);
             return dto;
+        }
+
+        private void UpdateMatchResult(RankingDto ranking, Tourney tourney, CJoliContext context)
+        {
+            try
+            {
+                var squads = ranking.Tourney.Phases.SelectMany(p => p.Squads);
+                var positions = squads.SelectMany(s => s.Positions);
+
+                var matchDones = tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Matches).Where(m => m.Done);
+                foreach (Match match in matchDones)
+                {
+                    var posA = match.PositionA;
+                    var posB = match.PositionB;
+                    var posADto = positions.Single(p => p.Id == posA.Id);
+                    var posBDto = positions.Single(p => p.Id == posB.Id);
+                    posA.Team = tourney.Teams.Single(t => t.Id == posADto.TeamId);
+                    posB.Team = tourney.Teams.Single(t => t.Id == posBDto.TeamId);
+
+                    if (match.MatchResults.Count > 2)
+                    {
+                        foreach (var r in match.MatchResults.Where(m => m.Team != posA.Team && m.Team != posB.Team))
+                        {
+                            context.Remove(r);
+                        }
+                    }
+
+                    SaveMatchResult(posA, posB, match, match.ScoreA, match.ScoreB);
+                    SaveMatchResult(posB, posA, match, match.ScoreB, match.ScoreA);
+
+                }
+                context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Unable to update MatchResult", e);
+            }
+
         }
 
         private RankingDto GetOrUpdateWithLock(string key, Func<RankingDto?> get, Func<RankingDto> update)
@@ -332,7 +372,7 @@ namespace cjoli.Server.Services
                     var score = scorePhase[i];
                     score.Rank = i + 1;
                     var scoreBefore = i > 0 ? scorePhase[i - 1] : null;
-                    if (scoreBefore != null && score.Sources[scoreBefore.PositionId]?.Type == SourceType.equal)
+                    if (scoreBefore != null && score.Sources.ContainsKey(scoreBefore.PositionId) && score.Sources[scoreBefore.PositionId]?.Type == SourceType.equal)
                     {
                         score.Rank = scoreBefore.Rank;
                     }
@@ -515,7 +555,7 @@ namespace cjoli.Server.Services
                 var score = listScores[i];
                 score.Rank = i + 1;
                 var scoreBefore = i > 0 ? listScores[i - 1] : null;
-                if (scoreBefore != null && score.Sources[scoreBefore.PositionId]?.Type == SourceType.equal)
+                if (scoreBefore != null && score.Sources.ContainsKey(scoreBefore.PositionId) && score.Sources[scoreBefore.PositionId]?.Type == SourceType.equal)
                 {
                     score.Rank = scoreBefore.Rank;
                 }
@@ -689,18 +729,6 @@ namespace cjoli.Server.Services
             SortTeams(scoreTeams);
             ranking.History = mapTeams;
             ranking.Scores.ScoreTeams = scoreTeams;
-        }
-
-        class IMatchResultt
-        {
-            public int Win;
-            public int Loss;
-            public int Neutral;
-            public int GoalFor;
-            public int GoalAgainst;
-            public int GoalDiff;
-            public int ShutOut;
-            public Match? Match;
         }
 
         private void CalculateHistoryByTimes(RankingDto ranking, Tourney tourney, CJoliContext context)
@@ -1234,7 +1262,7 @@ namespace cjoli.Server.Services
 
         }
 
-        private void SaveMatchResult(Position position, Position positionAgainst, Match match, int scoreA, int scoreB)
+        public void SaveMatchResult(Position position, Position positionAgainst, Match match, int scoreA, int scoreB)
         {
             Team? team = position.Team;
             Team? teamAgainst = positionAgainst.Team;
@@ -1248,6 +1276,8 @@ namespace cjoli.Server.Services
                 matchResult = new MatchResult() { Team = team, TeamAgainst = teamAgainst, Match = match };
                 team.MatchResults.Add(matchResult);
             }
+            matchResult.Team = team;
+            matchResult.TeamAgainst = teamAgainst;
             matchResult.Win = scoreA > scoreB ? 1 : 0;
             matchResult.Neutral = scoreA == scoreB ? 1 : 0;
             matchResult.Loss = scoreA < scoreB ? 1 : 0;

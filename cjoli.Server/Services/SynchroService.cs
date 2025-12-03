@@ -18,6 +18,7 @@ namespace cjoli.Server.Services
         private readonly IMapper _mapper;
         private readonly ILogger<SynchroService> _logger;
         private readonly ServerService _serverService;
+        private readonly CJoliService _cjoliService;
 
         public SynchroService(
             SettingService settingService,
@@ -25,7 +26,9 @@ namespace cjoli.Server.Services
             IConfiguration configuration,
             IMapper mapper,
             ILogger<SynchroService> logger,
-            ServerService serverService)
+            ServerService serverService,
+            CJoliService cJoliService
+            )
         {
             _settingService = settingService;
             _memoryCache = memoryCache;
@@ -33,6 +36,7 @@ namespace cjoli.Server.Services
             _mapper = mapper;
             _logger = logger;
             _serverService = serverService;
+            _cjoliService = cJoliService;
         }
 
         private FirestoreDb CreateDb()
@@ -73,6 +77,7 @@ namespace cjoli.Server.Services
             .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches)
             .Include(t => t.Phases).ThenInclude(p => p.Events).ThenInclude(e => e.Positions)
             .Include(t => t.Teams).ThenInclude(t => t.TeamDatas.Where(t => t.Tourney.Uid == uid))
+            .Include(t => t.Teams).ThenInclude(t => t.MatchResults)
             .Include(t => t.Ranks)
             .Single(t => t.Uid == uid);
 
@@ -407,7 +412,7 @@ namespace cjoli.Server.Services
             var dicoSpots = snapshot.ToDictionary(p => p.Id, p => p.ToDictionary());
 
             var squads = tourney.Phases.SelectMany(p => p.Squads);
-            var map = new Dictionary<string, List<(long, SpotTournify)>>();
+            var mapListSpotByPoule = new Dictionary<string, List<(long, SpotTournify)>>();
             var division = await GetDivision(doc, tourney);
 
             foreach (var id in mapSpot.Where(s => s.Value.division == division.Key).Select(d => d.Key))
@@ -422,11 +427,11 @@ namespace cjoli.Server.Services
                         string poule = (string)dico[$"poule{i}"];
                         long num = (long)dico[$"numInPoule{i}"];
                         List<(long, SpotTournify)>? list;
-                        map.TryGetValue(poule, out list);
+                        mapListSpotByPoule.TryGetValue(poule, out list);
                         if (list == null)
                         {
                             list = new List<(long, SpotTournify)>();
-                            map[poule] = list;
+                            mapListSpotByPoule[poule] = list;
                         }
                         list.Add((num, spot));
                     }
@@ -449,6 +454,10 @@ namespace cjoli.Server.Services
                     var team = session.Teams[kvTeam.Key];
                     position.Team = team;
                 }
+                else
+                {
+                    position.Team = null;
+                }
                 position.Tournify = id;
                 if (bracketId != null)
                 {
@@ -470,7 +479,6 @@ namespace cjoli.Server.Services
                     {
                         bracket = mapBrackets[bracket.subBracketTo];
                         position.Value += bracket.size;
-                        //position.MatchOrder -= bracket.size;
                     }
                     position.Value += delta;
                     position.TournifyPoule = $"{spot.fromPoule}-{spot.rank}";
@@ -483,14 +491,14 @@ namespace cjoli.Server.Services
             foreach (var id in mapSpot.Keys.ToList())
             {
                 var spot = mapSpot[id]!;
-                if (map.ContainsKey(spot.fromPoule!))
+                if (mapListSpotByPoule.ContainsKey(spot.fromPoule!))
                 {
 
                     var position = spot.Position!;
                     var poule = mapPoules[spot.fromPoule!];
 
-                    List<(long, SpotTournify)> list = map[spot.fromPoule!];
-                    var parentSpot = list.Single(p => p.Item1 == spot.rank).Item2;
+                    List<(long, SpotTournify)> listSpot = mapListSpotByPoule[spot.fromPoule!];
+                    var parentSpot = listSpot.Single(p => p.Item1 == spot.rank).Item2;
                     var parentPosition = parentSpot.Position!;
                     var parentPoule = mapPoules[parentSpot.fromPoule!];
 
@@ -505,19 +513,13 @@ namespace cjoli.Server.Services
                     }
                     if (bracketId != null && level > 0)
                     {
-                        var round = parentPoule.bracketRound;
-                        /*var num = (parentPoule.bracketRound + parentPoule.num) % parentPoule.bracketRound;
-                        if (bracketId != parentSpot.belongsToBracket)
-                        {
-                            num += 2;
-                        }*/
-
                         var pos = parentSpot.rank == 0 ? "Gagnant" : "Perdant";
-                        position.MatchOrder = parentPosition.MatchOrder;
+                        position.MatchOrder = parentPoule.bracketRound + parentPoule.num;
                         position.Name = $"{pos} {parentPoule.name}";
 
                         position.Winner = parentSpot.rank == 0;
                         position.ParentPosition = null;
+
                     }
                     else
                     {
@@ -532,21 +534,17 @@ namespace cjoli.Server.Services
                         position.ParentPosition.Phase = parentPosition.Squad!.Phase;
                         position.ParentPosition.Value = parentPosition.Value;
 
-                        //var poule = mapPoules[parentPosition.Squad!.Tournify];
                         string pos = parentPosition.Value == 1 ? "1er" : $"{parentPosition.Value}ème";
-                        /*if (parentPoule.bracket != null)
-                        {
-                            pos = spot.rank == 0 ? "Gagnant" : "Perdant";
-                        }*/
 
                         position.Name = tourney.HasTournifySynchroName || string.IsNullOrEmpty(position.Name) ? $"{pos} {parentPosition.Squad.Name}" : position.Name;
-                        position.Name += " " + position.MatchOrder;
                         position.Short = tourney.HasTournifySynchroName || string.IsNullOrEmpty(position.Short) ? $"{parentPosition.Value}" : position.Short;
                     }
 
                 }
 
             }
+
+            context.SaveChanges();
 
         }
 
@@ -558,7 +556,6 @@ namespace cjoli.Server.Services
             TourneyTournify tourneyTournify = (await doc.GetSnapshotAsync()).ConvertTo<TourneyTournify>();
 
             var division = await GetDivision(doc, tourney);
-            //var division = (await doc.Collection("divisions").GetSnapshotAsync()).First().ConvertTo<DivisionTournify>();
 
             var squads = tourney.Phases.SelectMany(p => p.Squads);
 
@@ -624,28 +621,27 @@ namespace cjoli.Server.Services
                     {
                         match.Winner = null;
                     }
+                    //_cjoliService.SaveMatchResult(match.PositionA, match.PositionB, match, match.ScoreA, match.ScoreB);
+                    //_cjoliService.SaveMatchResult(match.PositionB, match.PositionA, match, match.ScoreB, match.ScoreA);
                 }
                 else
                 {
                     match.ScoreA = 0;
                     match.ScoreB = 0;
                     match.Done = false;
+
+                    foreach (var matchResult in match.MatchResults)
+                    {
+                        context.Remove(matchResult);
+                    }
+
+
                 }
                 var field = tourneyTournify.fields[matchTournify.field];
                 if (field != null)
                 {
                     match.Location = field.name;
                 }
-
-                //var div = division.fases.Single(f => f.Phase == squad.Phase);
-                /*if (match.Time < div.MinTime)
-                {
-                    div.MinTime = match.Time;
-                }
-                if (match.Time > div.MaxTime)
-                {
-                    div.MaxTime = match.Time;
-                }*/
             }
         }
 

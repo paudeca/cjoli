@@ -50,15 +50,46 @@ const MatchesSetting = ({
 
   const options = MATCH_TYPES.map((v) => ({ label: v, value: v }));
 
+  const getType = React.useCallback((match: Match) => {
+    switch (match.matchType) {
+      case "Normal": {
+        return "";
+      }
+      case "Final": {
+        return `(F${match.matchOrder})`;
+      }
+      case "Semi": {
+        return `(S${match.matchOrder})`;
+      }
+      case "Quarter": {
+        return `(Q${match.matchOrder})`;
+      }
+      case "Match8": {
+        return `(M8-${match.matchOrder})`;
+      }
+      case "Match16": {
+        return `(M16-${match.matchOrder})`;
+      }
+      case "Match32": {
+        return `(M32-${match.matchOrder})`;
+      }
+    }
+    return "";
+  }, []);
+
   return (
     <Accordion className="p-3">
       {squad.matches.map((match, i) => {
         return (
           <Accordion.Item key={match.id} eventKey={match.id.toString()}>
             <Accordion.Header>
-              {match.name ? `${match.name} - ` : ""}
-              {dayjs(match.time).format()} - [{getLabel(match.positionA)} -{" "}
-              {getLabel(match.positionB)}] - {match.location}
+              <span style={{ color: "#aaaaaa", paddingRight: 5, fontSize: 14 }}>
+                (id:{match.id})
+              </span>{" "}
+              - {match.name ? `${match.name} - ` : ""}
+              {getType(match)} {dayjs(match.time).format("YYYY-MM-DD/HH:mm")} -
+              [{getLabel(match.positionA)} - {getLabel(match.positionB)}] -{" "}
+              {match.location}
             </Accordion.Header>
             <Accordion.Body>
               <Row>

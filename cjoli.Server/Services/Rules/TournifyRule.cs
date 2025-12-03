@@ -105,7 +105,7 @@ namespace cjoli.Server.Services.Rules
                 var matchesDirect = matches.OrderBy(m => m.Time)
                     .Where(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB)).ToList();
                 var scores = new Dictionary<int, Score>() { { positionA.Id, new Score() }, { positionB.Id, new Score() } };
-                matchesDirect.Aggregate(scores, (acc, m) =>
+                var m = matchesDirect.Aggregate(scores, (acc, m) =>
                 {
                     var userMatch = m.UserMatches.OrderByDescending(u => u.LogTime).FirstOrDefault(u => u.User != null);
                     IMatch match = m.Done ? m : userMatch != null ? userMatch : m;
@@ -115,7 +115,9 @@ namespace cjoli.Server.Services.Rules
                     _service.UpdateScore(scoreA, scoreB, null, match, m, this);
                     return acc;
                 });
-                return 0;
+                var scoreA = scores[positionA.Id];
+                var scoreB = scores[positionB.Id];
+                return scoreA.Win > scoreB.Win ? -1 : scoreA.Loss > scoreB.Loss ? 1 : 0;
             };
 
             var breakers = new List<TieBreakerTournify>() {

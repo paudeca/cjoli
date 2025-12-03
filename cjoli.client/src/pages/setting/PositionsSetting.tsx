@@ -34,17 +34,44 @@ const PositionsSetting = ({
     phase: Phase;
   }>("confirmDeletePosition");
 
+  const getType = React.useCallback((position: Position) => {
+    switch (position.matchType) {
+      case "Normal": {
+        return "";
+      }
+      case "Final": {
+        return `(F${position.matchOrder}${position.winner ? "W" : "L"})`;
+      }
+      case "Semi": {
+        return `(S${position.matchOrder}${position.winner ? "W" : "L"})`;
+      }
+      case "Quarter": {
+        return `(Q${position.matchOrder}${position.winner ? "W" : "L"})`;
+      }
+      case "Match8": {
+        return `(M8-${position.matchOrder}${position.winner ? "W" : "L"})`;
+      }
+      case "Match16": {
+        return `(M16-${position.matchOrder}${position.winner ? "W" : "L"})`;
+      }
+      case "Match32": {
+        return `(M32-${position.matchOrder}${position.winner ? "W" : "L"})`;
+      }
+    }
+    return "";
+  }, []);
+
   const getLabel = React.useCallback(
     (position?: Position) => {
       if (position && position.teamId > 0) {
-        return `${position?.name || ""} [ ${
+        return `${position?.name || ""} ${getType(position)} [ ${
           tourney.teams.find((t) => t.id == position.teamId)?.name
         } ]`;
       } else {
-        return `${position?.name}`;
+        return `${position?.name} ${getType(position!)}`;
       }
     },
-    [tourney?.teams]
+    [tourney?.teams, getType]
   );
 
   const options = MATCH_TYPES.map((v) => ({ label: v, value: v }));
@@ -82,6 +109,9 @@ const PositionsSetting = ({
         return (
           <Accordion.Item key={position.id} eventKey={position.id.toString()}>
             <Accordion.Header>
+              <span style={{ color: "#aaaaaa", paddingRight: 5, fontSize: 14 }}>
+                (id:{position.id})
+              </span>
               {position.value} - {getLabel(position)}
             </Accordion.Header>
             <Accordion.Body>
