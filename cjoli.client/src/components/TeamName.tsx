@@ -108,7 +108,16 @@ const TeamName = ({
         }}
         className={isXl ? "mx-3" : "mx-2"}
       />
-      <span className={className}>
+      <span
+        className={className}
+        style={{
+          maxWidth: 150,
+          textOverflow: "ellipsis",
+          overflow: "hidden",
+          display: "inline-block",
+          whiteSpace: "nowrap",
+        }}
+      >
         {isCurrentTeam ? <MyTeam color={color}>{fullname}</MyTeam> : fullname}
       </span>
       {team?.datas?.logo && (
