@@ -8,8 +8,8 @@ export const useTools = () => {
   const formatDate = useCallback(
     (date: Date, opt?: { upper?: boolean }) =>
       opt?.upper || opt == undefined
-        ? upperFirstLetter(dayjs(date).format("dddd LL"))
-        : dayjs(date).format("dddd LL"),
+        ? upperFirstLetter(dayjs(date).format("ddd LL"))
+        : dayjs(date).format("ddd LL"),
     [upperFirstLetter]
   );
   return { formatDate, upperFirstLetter };

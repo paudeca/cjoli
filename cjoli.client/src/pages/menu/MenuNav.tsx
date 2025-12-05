@@ -33,13 +33,15 @@ import { useNavigate } from "react-router-dom";
 import useScreenSize from "../../hooks/useScreenSize";
 import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useModal } from "../../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import { useServer } from "../../hooks/useServer";
 import MenuBrand from "./MenuBrand";
 import BetScoreTotal from "./BetScoreTotal";
+import TeamSelect from "../../components/TeamSelect";
+import { Team } from "../../models";
 
 const MyNavbar = styled(Navbar)`
   color: black;
@@ -55,10 +57,19 @@ const langs = [
   { key: "nl", icon: "🇳🇱" },
 ];
 
-// eslint-disable-next-line max-lines-per-function, complexity
+// eslint-disable-next-line max-lines-per-function, complexity, max-statements
 const MenuNav = () => {
-  const { loadRanking, tourney, isCastPage } = useCJoli();
-  const { user, userConfig, loadUser, handleSaveUserConfig } = useUser();
+  const { loadRanking, loadTourneys, tourney, isCastPage } = useCJoli();
+  const {
+    user,
+    userConfig,
+    loadUser,
+    handleSaveUserConfig,
+    isAdmin,
+    isRootAdmin,
+    userConfig: { useCustomEstimate },
+    saveFavoriteTeam,
+  } = useUser();
   const uid = useUid();
   const { path } = useServer();
   const { setShow: showLogin } = useModal("login");
@@ -80,17 +91,25 @@ const MenuNav = () => {
   };
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
-  const {
-    isAdmin,
-    isRootAdmin,
-    userConfig: { useCustomEstimate },
-  } = useUser();
 
   const useEstimate =
     (isAdmin && useCustomEstimate) ||
     (!isAdmin && localStorage.getItem("useEstimate") == "true");
 
   const tourneyLabel = uid && tourney?.name;
+
+  const [teams, setTeams] = useState<Team[]>([]);
+  useEffect(() => {
+    const call = async () => {
+      const teams = await cjoliService.getTeams();
+      teams.sort((a, b) => {
+        if (a.id == 6) return -1;
+        return a.name < b.name ? -1 : 1;
+      });
+      setTeams(teams);
+    };
+    call();
+  }, []);
 
   return (
     <MyNavbar
@@ -100,6 +119,21 @@ const MenuNav = () => {
     >
       <Container fluid>
         <MenuBrand setShow={setShow} />
+        {!uid && (
+          <div style={{ width: 300, paddingTop: 5, paddingBottom: 5 }}>
+            <TeamSelect
+              teams={teams}
+              value={userConfig.favoriteTeamId}
+              onChangeTeam={async (team) => {
+                const teamId = team ? team.id : 0;
+                saveFavoriteTeam(teamId, true);
+                const tourneys = await cjoliService.getTourneys(teamId);
+                loadTourneys(tourneys);
+              }}
+              placeholder={t("home.selectTeam", "Select your team to filter")}
+            />
+          </div>
+        )}
         {tourneyLabel && !isCastPage && (
           <Stack direction="horizontal" gap={3}>
             <ToggleButton

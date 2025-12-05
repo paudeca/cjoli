@@ -1,26 +1,30 @@
 import Select, { SingleValue } from "react-select";
 import { Team } from "../models";
 import { ReactNode, useCallback } from "react";
-import { useCJoli } from "../hooks/useCJoli";
 import TeamName from "./TeamName";
 
 interface TeamSelectProps {
   value?: number;
   teams: Team[];
   onChangeTeam: (team?: Team) => void;
+  placeholder?: string;
 }
-const TeamSelect = ({ value, teams, onChangeTeam }: TeamSelectProps) => {
-  const { getTeam } = useCJoli();
+const TeamSelect = ({
+  value,
+  teams,
+  onChangeTeam,
+  placeholder,
+}: TeamSelectProps) => {
   const onChange = useCallback(
     (v: SingleValue<{ label: ReactNode; value: number }>) => {
       const value = v?.value;
       if (value) {
-        onChangeTeam(getTeam(value));
+        onChangeTeam(teams.find((t) => t.id == value));
       } else {
         onChangeTeam(undefined);
       }
     },
-    [getTeam, onChangeTeam]
+    [teams, onChangeTeam]
   );
   const names: Record<number, string> = teams.reduce(
     (acc, t) => ({ ...acc, [t.id]: t.name }),
@@ -28,7 +32,7 @@ const TeamSelect = ({ value, teams, onChangeTeam }: TeamSelectProps) => {
   );
   const options = teams.map((t) => ({
     value: t.id,
-    label: <TeamName teamId={t.id} hideFavorite />,
+    label: <TeamName team={t} hideFavorite />,
   }));
 
   return (
@@ -42,6 +46,7 @@ const TeamSelect = ({ value, teams, onChangeTeam }: TeamSelectProps) => {
           .includes(search.toLocaleLowerCase());
       }}
       isClearable
+      placeholder={placeholder}
     />
   );
 };
