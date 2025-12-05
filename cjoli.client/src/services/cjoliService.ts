@@ -24,8 +24,10 @@ const setHeader = () => {
 };
 setHeader();
 
-export const getTourneys = async () => {
-  const { data } = await axios.get<Tourney[]>(`${url}/cjoli/tourneys`);
+export const getTourneys = async (teamId: number) => {
+  const { data } = await axios.get<Tourney[]>(
+    `${url}/cjoli/tourneys${teamId > 0 ? `/${teamId}` : ""}`
+  );
   return data;
 };
 
@@ -102,6 +104,11 @@ export const updateTeam = async (uid: string, team: Team) => {
       console.log("Unable to update", error);
       return undefined;
     });
+};
+
+export const getTeams = async () => {
+  const { data } = await axios.get<Team[]>(`${url}/cjoli/teams`);
+  return data;
 };
 
 export const logout = () => {

@@ -74,18 +74,30 @@ namespace cjoli.Server.Services
             return _rules.ContainsKey(ruleName) ? _rules[ruleName] : _rules["simple"];
         }
 
-        public List<Tourney> ListTourneys(CJoliContext context)
+        public List<Tourney> ListTourneys(int filterTeamId, CJoliContext context)
         {
-            return context.Tourneys.OrderByDescending(t => t.StartTime).ToList().Select(t =>
+            IQueryable<Tourney> query = context.Tourneys;
+            if (filterTeamId > 0)
+            {
+                query = query.Include(t => t.Teams).Where(t => t.Teams.Any(t => t.Id == filterTeamId));
+            }
+            return query.OrderByDescending(t => t.StartTime).ToList().Select(t =>
             {
                 t.Config = GetRule(t);
                 return t;
             }).ToList();
         }
 
-        public List<Team> ListTeams(CJoliContext context)
+        public List<Team> ListTeams(CJoliContext context, bool onlyMainTeam = false)
         {
-            return context.Team.OrderBy(t => t.Name).ToList();
+            if (onlyMainTeam)
+            {
+                return context.Team.Include(t => t.Alias).Where(t => t.Alias == null).OrderBy(t => t.Name).ToList();
+            }
+            else
+            {
+                return context.Team.OrderBy(t => t.Name).ToList();
+            }
         }
 
         private User GetUserWithConfigMatch(string login, string tourneyUid, CJoliContext context)

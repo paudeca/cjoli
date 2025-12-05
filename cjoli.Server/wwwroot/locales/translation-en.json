@@ -32,7 +32,8 @@
   },
   "home": {
     "tourneyNotConfigured": "Tourney not configured",
-    "noImage": "No photos for the tourney"
+    "noImage": "No photos for the tourney",
+    "selectTeam": "Select your team to filter"
   },
   "gallery": {
     "sendPhoto": "Send your photos",

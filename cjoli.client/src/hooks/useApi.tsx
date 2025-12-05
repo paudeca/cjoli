@@ -36,7 +36,7 @@ export const mutationOptions = <
 
 const useApiGet = () => {
   const { loadTourneys, loadRanking, loadGallery } = useCJoli();
-  const { loadUser } = useUser();
+  const { loadUser, userConfig } = useUser();
 
   const getUser = useCallback(
     () =>
@@ -68,13 +68,16 @@ const useApiGet = () => {
       queryOptions({
         queryKey: ["getTourneys"],
         queryFn: async () => {
-          const tourneys = await cjoliService.getTourneys();
+          const teamId = userConfig.favoriteTeamId
+            ? userConfig.favoriteTeamId
+            : 0;
+          const tourneys = await cjoliService.getTourneys(teamId);
           loadTourneys(tourneys);
           return tourneys;
         },
         enabled,
       }),
-    [loadTourneys]
+    [loadTourneys, userConfig.favoriteTeamId]
   );
 
   const getTeams = useCallback(

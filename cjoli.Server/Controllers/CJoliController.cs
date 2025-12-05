@@ -3,22 +3,11 @@ using cjoli.Server.Dtos;
 using cjoli.Server.Extensions;
 using cjoli.Server.Models;
 using cjoli.Server.Services;
-using Google.Apis.Auth;
-using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
-using Google.Cloud.Firestore.V1;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using Serilog;
 using Serilog.Context;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Security.Claims;
-using System.Text;
-using System.Text.RegularExpressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace cjoli.Server.Controllers
 {
@@ -75,43 +64,24 @@ namespace cjoli.Server.Controllers
 
         [HttpGet]
         [Route("Tourneys")]
-        public async Task<List<TourneyDto>> ListTourneys()
+        public List<TourneyDto> ListTourneys()
         {
-
-            var builder = new FirestoreClientBuilder();
-            builder.ApiKey = "AIzaSyDpqIP2yOZBWjAcknp1szptkyh0fk6zGQI";
-            FirestoreClient client = builder.Build();
-
-            //FirestoreClient client = FirestoreClient.Create();
-            FirestoreDb db = FirestoreDb.Create("tournamentsoftware-a1b3d",client);
-            var query = db.Collection("tournaments").WhereEqualTo("liveLink", "paudeca");
-            QuerySnapshot querySnapshot = query.GetSnapshotAsync().Result;
-            string id = querySnapshot.Documents.First().Id;
-            var doc = querySnapshot.Documents.First().ToDictionary();
-            var toto = querySnapshot.Documents.First().ConvertTo<Toto>();
-
-            var c = db.Collection("tournaments").Document(id).ListCollectionsAsync();
-            c.ForEachAsync(a =>
-            {
-                var id = a.Id;
-            });
-
-            query = db.Collection("tournaments").Document(id).Collection("matches");
-            querySnapshot = query.GetSnapshotAsync().Result;
-            querySnapshot.ToList().ForEach(q =>
-            {
-                var m = q.ToDictionary();
-            });
-
-
-            return _service.ListTourneys(_context).Select(_mapper.Map<TourneyDto>).ToList();
+            return _service.ListTourneys(0, _context).Select(_mapper.Map<TourneyDto>).ToList();
         }
+
+        [HttpGet]
+        [Route("Tourneys/{teamId}")]
+        public List<TourneyDto> ListTourneys(int teamId)
+        {
+            return _service.ListTourneys(teamId, _context).Select(_mapper.Map<TourneyDto>).ToList();
+        }
+
 
         [HttpGet]
         [Route("Teams")]
         public List<TeamDto> ListTeams()
         {
-            return _service.ListTeams(_context).Select(_mapper.Map<TeamDto>).ToList();
+            return _service.ListTeams(_context, onlyMainTeam: true).Select(_mapper.Map<TeamDto>).ToList();
         }
 
 
@@ -123,12 +93,12 @@ namespace cjoli.Server.Controllers
 
             var useEstimate = HttpContext.Request.Headers["CJoli-UseEstimate"];
 
-            return _service.CreateRanking(uuid, login, useEstimate=="true", _context);
+            return _service.CreateRanking(uuid, login, useEstimate == "true", _context);
         }
 
         [HttpGet]
         [Route("{uuid}/Gallery/{page}")]
-        public GalleryDto GetGallery(string uuid,int page,[FromQuery] bool waiting, [FromQuery] bool random)
+        public GalleryDto GetGallery(string uuid, int page, [FromQuery] bool waiting, [FromQuery] bool random)
         {
             string? login = GetLogin();
             return _service.CreateGallery(uuid, page, login, waiting, random, _context);
@@ -235,7 +205,7 @@ namespace cjoli.Server.Controllers
         public RankingDto SaveUserConfig(string uuid, UserConfigDto config)
         {
             var login = GetLogin();
-            if(login!=null)
+            if (login != null)
             {
                 _service.SaveUserConfig(uuid, login, config, _context);
             }
@@ -254,7 +224,7 @@ namespace cjoli.Server.Controllers
         [HttpPost]
         [Authorize("IsAdmin")]
         [Route("{uuid}/UpdateEvent")]
-        public RankingDto UpdatEvent([FromRoute] string uuid, [FromBody] EventDto dto,[FromQuery] bool useEstimate)
+        public RankingDto UpdatEvent([FromRoute] string uuid, [FromBody] EventDto dto, [FromQuery] bool useEstimate)
         {
             using (LogContext.PushProperty("uid", uuid))
             {
@@ -267,7 +237,7 @@ namespace cjoli.Server.Controllers
         [HttpPost]
         [Route("{uuid}/Upload")]
         [RequestSizeLimit(10_000_000)]
-        public async Task<IActionResult> OnPostUploadAsync([FromRoute] string uuid,List<IFormFile> files)
+        public async Task<IActionResult> OnPostUploadAsync([FromRoute] string uuid, List<IFormFile> files)
         {
             long size = files.Sum(f => f.Length);
 

@@ -32,7 +32,8 @@
   },
   "home": {
     "tourneyNotConfigured": "Tournoi non configuré",
-    "noImage": "Aucune photo pour le tournoi"
+    "noImage": "Aucune photo pour le tournoi",
+    "selectTeam": "Sélectionner votre équipe"
   },
   "gallery": {
     "sendPhoto": "Envoyez-nous vos photos",

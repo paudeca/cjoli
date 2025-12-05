@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import RankTableSquad from "./RankTableSquad";
 import useUid from "../../../hooks/useUid";
 import RankTableBracket from "./RankTableBracket";
+import { Fragment } from "react";
 
 interface RankTableProps {
   phase: Phase;
@@ -35,18 +36,13 @@ const RankTable = ({ phase, displayPhase }: RankTableProps) => {
 
       {!displayPhase &&
         squads.map((squad) => (
-          <>
+          <Fragment key={squad.id}>
             {squad.type == "Bracket" ? (
-              <RankTableBracket key={squad.id} phase={phase} squad={squad} />
+              <RankTableBracket phase={phase} squad={squad} />
             ) : (
-              <RankTableSquad
-                key={squad.id}
-                phase={phase}
-                squad={squad}
-                squads={squads}
-              />
+              <RankTableSquad phase={phase} squad={squad} squads={squads} />
             )}
-          </>
+          </Fragment>
         ))}
     </>
   );
