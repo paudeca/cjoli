@@ -84,6 +84,14 @@ namespace cjoli.Server.Controllers
             return _service.ListTeams(_context, onlyMainTeam: true).Select(_mapper.Map<TeamDto>).ToList();
         }
 
+        [HttpGet]
+        [Route("Team/{teamId}")]
+        public RankingDto GetTeam(int teamId)
+        {
+            return _service.GetTeamScore(teamId, _context);
+        }
+
+
 
         [HttpGet]
         [Route("{uuid}/Ranking")]

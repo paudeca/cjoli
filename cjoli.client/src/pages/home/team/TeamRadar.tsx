@@ -79,19 +79,19 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
   const score = getScoreForTeam(modeScore, team);
   const scoreB = teamB && getScoreForTeam(modeScore, teamB);
 
-  const countTeams = ranking?.tourney.teams.length || 0;
-  const winPt = ranking?.tourney.config.win || 2;
+  const countTeams = ranking?.tourney?.teams.length || 10;
+  const winPt = ranking?.tourney?.config.win || 2;
 
   const getDataRatio = useCallback((type: keyof Score, score: Score) => {
     return (
-      ((score[type] as number) / score.game / score.ranks[type].maxRatio) * 100
+      ((score[type] as number) / score.game / score.ranks[type]?.maxRatio) * 100
     );
   }, []);
 
   const getDataRatioReverse = useCallback((type: keyof Score, score: Score) => {
     return (
-      ((score.ranks[type].maxRatio - (score[type] as number) / score.game) /
-        score.ranks[type].maxRatio) *
+      ((score.ranks[type]?.maxRatio - (score[type] as number) / score.game) /
+        score.ranks[type]?.maxRatio) *
       100
     );
   }, []);
@@ -116,8 +116,8 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
         getDataRatioReverse("goalAgainst", score),
         getDataRatio("shutOut", score),
         //getDataRatio("goalDiff", score),
-        ((score.goalDiff / score.game - score.ranks!.goalDiff.minRatio) /
-          (score.ranks!.goalDiff.maxRatio - score.ranks!.goalDiff.minRatio)) *
+        ((score.goalDiff / score.game - score.ranks!.goalDiff?.minRatio) /
+          (score.ranks!.goalDiff?.maxRatio - score.ranks!.goalDiff?.minRatio)) *
           100,
       ];
       return data;

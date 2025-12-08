@@ -35,7 +35,7 @@ export const mutationOptions = <
 };
 
 const useApiGet = () => {
-  const { loadTourneys, loadRanking, loadGallery } = useCJoli();
+  const { loadTourneys, loadRanking, loadGallery, loadTeam } = useCJoli();
   const { loadUser, userConfig } = useUser();
 
   const getUser = useCallback(
@@ -91,8 +91,22 @@ const useApiGet = () => {
     []
   );
 
+  const getTeam = useCallback(
+    (teamId: number, enabled = true) =>
+      queryOptions({
+        queryKey: ["getTeam"],
+        queryFn: async () => {
+          const ranking = await cjoliService.getTeam(teamId);
+          loadTeam(ranking);
+          return ranking;
+        },
+        enabled,
+      }),
+    []
+  );
+
   const getRanking = useCallback(
-    (uid: string) =>
+    (uid: string, enabled = true) =>
       queryOptions({
         queryKey: ["getRanking", uid],
         queryFn: async () => {
@@ -100,6 +114,7 @@ const useApiGet = () => {
           loadRanking(ranking);
           return ranking;
         },
+        enabled,
       }),
     [loadRanking]
   );
@@ -122,7 +137,15 @@ const useApiGet = () => {
       }),
     []
   );
-  return { getUser, listUsers, getTourneys, getTeams, getRanking, getGallery };
+  return {
+    getUser,
+    listUsers,
+    getTourneys,
+    getTeam,
+    getTeams,
+    getRanking,
+    getGallery,
+  };
 };
 
 const useApiPost = () => {

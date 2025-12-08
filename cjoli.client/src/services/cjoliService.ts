@@ -42,6 +42,12 @@ export const getUser = async () => {
   return data;
 };
 
+export const getTeam = async (teamId: number) => {
+  setHeader();
+  const { data } = await axios.get<Ranking>(`${url}/cjoli/team/${teamId}`);
+  return data;
+};
+
 export const listUsers = async () => {
   const { data } = await axios.get<User[]>(`${url}/user/list`);
   return data;

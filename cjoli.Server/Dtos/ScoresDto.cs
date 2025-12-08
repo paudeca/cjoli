@@ -9,9 +9,9 @@ namespace cjoli.Server.Dtos
         public Dictionary<int, Score> ScoreTeams { get; set; } = new Dictionary<int, Score>();
         public Dictionary<int, Score> ScoreTeamsSeason { get; set; } = new Dictionary<int, Score>();
         public Dictionary<int, Score> ScoreTeamsAllTime { get; set; } = new Dictionary<int, Score>();
-        public required Score ScoreTourney { get; set; }
+        public Score? ScoreTourney { get; set; }
         public Score? ScoreSeason { get; set; }
         public Score? ScoreAllTime { get; set; }
-        public required BetDto Bet {  get; set; }
+        public BetDto? Bet { get; set; }
     }
 }

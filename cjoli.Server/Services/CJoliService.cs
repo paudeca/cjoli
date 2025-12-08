@@ -100,6 +100,29 @@ namespace cjoli.Server.Services
             }
         }
 
+        public RankingDto GetTeamScore(int teamId, CJoliContext context)
+        {
+            var team = context.Team.Single(t => t.Id == teamId);
+            var teamDto = _mapper.Map<TeamDto>(team);
+            var scores = CalculateFullHistory(context);
+            return new RankingDto()
+            {
+                Team = teamDto,
+                Scores = new ScoresDto()
+                {
+                    ScoreAllTime = scores.Total,
+                    //ScoreTeams = scores.Teams.ToDictionary(s => s.Key, s => s.Value.Score),
+                    ScoreTeamsAllTime = scores.Teams.ToDictionary(s => s.Key, s => s.Value.Score),
+                }
+            };
+        }
+
+        public class TeamScore
+        {
+            public required TeamDto Team { get; set; }
+            public required ScoreFull Scores { get; set; }
+        }
+
         private User GetUserWithConfigMatch(string login, string tourneyUid, CJoliContext context)
         {
             User? user = context.Users
@@ -743,6 +766,115 @@ namespace cjoli.Server.Services
             ranking.Scores.ScoreTeams = scoreTeams;
         }
 
+        private ScoreFull CalculateFullHistory(CJoliContext context)
+        {
+            var query = context.MatchResult;//.Where(r => r.Win == 1 || r.Neutral == 1);
+
+            var queryMatchAll = query.Where(r => r.Win == 1 || r.Neutral == 1)
+                .Select(r => new MatchResultBase() { Win = r.Win, Loss = r.Loss, Neutral = r.Neutral, GoalFor = r.GoalFor, GoalAgainst = r.GoalAgainst, GoalDiff = r.GoalDiff, Match = r.Match, ShutOut = r.ShutOut }).Distinct();
+
+            var func = (IQueryable<IMatchResult> query) =>
+            {
+                Score score = query.GroupBy(r => 1).Select(ISelectScore).SingleOrDefault() ?? new Score();
+                return score;
+            };
+
+            Score scoreTotal = func(queryMatchAll);
+
+            var funcMapTourney = (IQueryable<MatchResult> query) =>
+            {
+                var mapScore = query
+                    .GroupBy(r => r.Match.Squad!.Phase.Tourney.Uid)
+                    .ToDictionary(kv => kv.Key, kv => ISelectScoreSeason(kv)) ?? new Dictionary<string, Score>();
+                return mapScore;
+            };
+
+
+            var funcMapSeasonCategoryTeam = (IQueryable<MatchResult> query) =>
+            {
+                var mapScore = query
+                    .GroupBy(r => new SeasonCategoryTeam()
+                    {
+                        Tourney = r.Match.Squad!.Phase.Tourney.Uid,
+                        Season = r.Match.Squad!.Phase.Tourney.Season!,
+                        Category = r.Match.Squad!.Phase.Tourney.Category!,
+                        TeamId = r.Team.Id
+                    })
+                    .ToDictionary(kv => kv.Key, kv => ISelectScoreSeasonCategoryTeam(kv)) ?? new Dictionary<SeasonCategoryTeam, Score>();
+                return mapScore;
+            };
+
+
+            var scores = funcMapSeasonCategoryTeam(query);
+            var scoreTourney = funcMapTourney(query);
+
+
+            var mapTeams = scores.Aggregate(new Dictionary<int, ScoreTeam>(), (acc, kv) =>
+            {
+                if (!acc.ContainsKey(kv.Key.TeamId))
+                {
+                    acc.Add(kv.Key.TeamId, new ScoreTeam()
+                    {
+                        Score = new Score(),
+                        Season = new Dictionary<string, Score>(),
+                        Category = new Dictionary<string, Score>(),
+                        Tourney = new Dictionary<string, Score>(),
+                    });
+                }
+                var score = acc[kv.Key.TeamId];
+                if (!score.Season.ContainsKey(kv.Key.Season))
+                {
+                    score.Season.Add(kv.Key.Season, new Score());
+                }
+                if (!score.Category.ContainsKey(kv.Key.Category))
+                {
+                    score.Category.Add(kv.Key.Category, new Score());
+                }
+                if (!score.Tourney.ContainsKey(kv.Key.Tourney))
+                {
+                    score.Tourney.Add(kv.Key.Tourney, new Score());
+                }
+                if (!scoreTourney.ContainsKey(kv.Key.Tourney))
+                {
+                    scoreTourney.Add(kv.Key.Tourney, new Score());
+                }
+                var s = kv.Value;
+                //scoreTotal.Merge(s);
+                scoreTourney[kv.Key.Tourney].Merge(s);
+
+                score.Score.Merge(s);
+                score.Season[kv.Key.Season].Merge(s);
+                score.Category[kv.Key.Category].Merge(s);
+                //score.Tourney[kv.Key.Tourney].Merge(s);
+
+                return acc;
+            });
+            return new ScoreFull() { Total = scoreTotal, Tourneys = scoreTourney, Teams = mapTeams };
+        }
+
+        public class ScoreFull
+        {
+            public required Score Total { get; set; }
+            public required Dictionary<string, Score> Tourneys { get; set; }
+            public required Dictionary<int, ScoreTeam> Teams { get; set; }
+        }
+
+        public class ScoreTeam
+        {
+            public required Score Score { get; set; }
+            public required Dictionary<string, Score> Season { get; set; }
+            public required Dictionary<string, Score> Category { get; set; }
+            public required Dictionary<string, Score> Tourney { get; set; }
+        }
+
+        class SeasonCategoryTeam
+        {
+            public required string Tourney { get; set; }
+            public required string Season { get; set; }
+            public required string Category { get; set; }
+            public required int TeamId { get; set; }
+        }
+
         private void CalculateHistoryByTimes(RankingDto ranking, Tourney tourney, CJoliContext context)
         {
             var query = context.MatchResult.Where(r => r.Match.Squad!.Phase.Tourney.Category == tourney.Category && (r.Win == 1 || r.Neutral == 1));
@@ -800,6 +932,40 @@ namespace cjoli.Server.Services
             ranking.Scores.ScoreTeamsSeason = mapAllTeamSeason;
 
         }
+
+        private Score ISelectScoreSeasonCategoryTeam(IGrouping<SeasonCategoryTeam, IMatchResult> o)
+        {
+            return new Score
+            {
+                TeamId = o.Key.TeamId,
+                Game = o.Count(),
+                Win = o.Sum(m => m.Win),
+                Neutral = o.Sum(m => m.Neutral),
+                Loss = o.Sum(m => m.Loss),
+                GoalFor = o.Sum(m => m.GoalFor),
+                GoalAgainst = o.Sum(m => m.GoalAgainst),
+                GoalDiff = o.Sum(m => m.GoalDiff),
+                ShutOut = o.Sum(m => m.ShutOut)
+            };
+        }
+
+
+        private Score ISelectScoreSeason(IGrouping<object, IMatchResult> o)
+        {
+            return new Score
+            {
+                TeamId = 0,
+                Game = o.Count(),
+                Win = o.Sum(m => m.Win),
+                Neutral = o.Sum(m => m.Neutral),
+                Loss = o.Sum(m => m.Loss),
+                GoalFor = o.Sum(m => m.GoalFor),
+                GoalAgainst = o.Sum(m => m.GoalAgainst),
+                GoalDiff = o.Sum(m => m.GoalDiff),
+                ShutOut = o.Sum(m => m.ShutOut)
+            };
+        }
+
 
         private Score ISelectScore(IGrouping<int, IMatchResult> o)
         {
