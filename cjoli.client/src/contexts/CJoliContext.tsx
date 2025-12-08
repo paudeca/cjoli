@@ -77,7 +77,8 @@ type Action =
       payload: TypePage;
     }
   | { type: CJoliActions.LOAD_GALLERY; payload: Gallery }
-  | { type: CJoliActions.SELECT_MODESCORE; payload: ModeScoreType };
+  | { type: CJoliActions.SELECT_MODESCORE; payload: ModeScoreType }
+  | { type: CJoliActions.LOAD_TEAM; payload: Ranking };
 
 const reduceLoadRanking = (state: CJoliState, ranking: Ranking) => {
   const tourney = ranking.tourney;
@@ -159,6 +160,13 @@ const reducer = (state: CJoliState, action: Action) => {
     }
     case CJoliActions.SELECT_MODESCORE: {
       return { ...state, modeScore: action.payload };
+    }
+    case CJoliActions.LOAD_TEAM: {
+      return {
+        ...state,
+        ranking: action.payload,
+        teams: [action.payload.team],
+      };
     }
   }
 };

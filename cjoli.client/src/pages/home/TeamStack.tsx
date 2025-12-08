@@ -188,7 +188,7 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
                   direction={isMobile ? "vertical" : "horizontal"}
                   className="align-items-start"
                 >
-                  <TeamRadar team={team} teamB={teamB} />
+                  {<TeamRadar team={team} teamB={teamB} />}
                   <TeamTable team={team} teamB={teamB} />
                 </Stack>
               </Card>

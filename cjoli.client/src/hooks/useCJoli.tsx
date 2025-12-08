@@ -51,6 +51,12 @@ export const useCJoli = (page?: TypePage) => {
     [dispatch]
   );
 
+  const loadTeam = useCallback(
+    (ranking: Ranking) =>
+      dispatch({ type: CJoliActions.LOAD_TEAM, payload: ranking }),
+    [dispatch]
+  );
+
   const getSquad = useCallback(
     (squadId: number) => {
       const squad = state.squads?.find((s) => s.id === squadId);
@@ -217,6 +223,7 @@ export const useCJoli = (page?: TypePage) => {
     loadRanking,
     loadTourneys,
     loadTourney,
+    loadTeam,
     selectTourney,
     getSquad,
     getTeam,

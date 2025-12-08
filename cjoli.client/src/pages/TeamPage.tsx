@@ -12,28 +12,30 @@ import RankingMatchesStack from "./team/RankingMatchesStack";
 const TeamPage = () => {
   const { phases, isTeamInPhase, getTeam } = useCJoli("team");
   const { sendMessage, register } = useServer();
-  const { getRanking } = useApi();
+  const { getRanking, getTeam: getTeamApi } = useApi();
   const uid = useUid();
   const { teamId } = useParams();
   const [loading, setLoading] = useState(true);
 
   const team = teamId && getTeam(parseInt(teamId));
 
-  const { refetch, isFetching } = useQuery(getRanking(uid));
+  const { refetch, isFetching } = useQuery(getRanking(uid, !!uid));
+  useQuery(getTeamApi(parseInt(teamId!), !uid));
 
   useEffect(() => {
-    !isFetching && sendMessage({ type: "selectTourney", uid });
+    !isFetching && uid && sendMessage({ type: "selectTourney", uid });
     !isFetching && setLoading(false);
   }, [uid, isFetching, sendMessage]);
 
   useEffect(() => {
-    register("updateRanking", async () => {
-      refetch();
-    });
-  }, [refetch, register]);
+    uid &&
+      register("updateRanking", async () => {
+        refetch();
+      });
+  }, [uid, refetch, register]);
 
   if (!team) {
-    return <></>;
+    return <>no team</>;
   }
   return (
     <Loading ready={!loading}>
