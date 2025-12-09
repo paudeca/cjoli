@@ -160,7 +160,20 @@ export const useCJoli = (page?: TypePage) => {
   );
 
   const getScoreForTeam = useCallback(
-    (mode: "tourney" | "season" | "allTime", team: Team) => {
+    (mode: ModeScoreType, team: Team) => {
+      const merge: (scoreA: Score, scoreB: Score) => Score = (scoreA, scoreB) =>
+        ({
+          total: scoreA.total + scoreB.total,
+          game: scoreA.game + scoreB.game,
+          win: scoreA.win + scoreB.win,
+          neutral: scoreA.neutral + scoreB.neutral,
+          loss: scoreA.loss + scoreB.loss,
+          goalFor: scoreA.goalFor + scoreB.goalFor,
+          goalAgainst: scoreA.goalAgainst + scoreB.goalAgainst,
+          goalDiff: scoreA.goalDiff + scoreB.goalDiff,
+          shutOut: scoreA.shutOut + scoreB.shutOut,
+          penalty: scoreA.penalty + scoreB.penalty,
+        }) as Score;
       switch (mode) {
         case "tourney":
           return state.ranking?.scores.scoreTeams[team.id];
@@ -169,12 +182,41 @@ export const useCJoli = (page?: TypePage) => {
         case "allTime":
           return state.ranking?.scores.scoreTeamsAllTime[team.id];
       }
+      const score = state.ranking?.scores.allScoresTeams[team.id].reduce(
+        (acc, score) => {
+          if (mode.seasons?.length == 0 && mode.categories?.length == 0) {
+            return merge(acc, score);
+          }
+          if (
+            mode.seasons?.includes(score.season) &&
+            mode.categories?.includes(score.category)
+          ) {
+            return merge(acc, score);
+          }
+          return acc;
+        },
+        {
+          total: 0,
+          game: 0,
+          win: 0,
+          neutral: 0,
+          loss: 0,
+          goalFor: 0,
+          goalAgainst: 0,
+          goalDiff: 0,
+          shutOut: 0,
+          penalty: 0,
+        } as Score
+      );
+      /*score =
+        mode.seasons?.reduce((acc, season) => {
+          const score =
+            state.ranking?.scores.scoreTeamsSeasons[team.id][season];
+          return merge(acc, score!);
+        }, score) || score;*/
+      return score;
     },
-    [
-      state.ranking?.scores.scoreTeams,
-      state.ranking?.scores.scoreTeamsSeason,
-      state.ranking?.scores.scoreTeamsAllTime,
-    ]
+    [state.ranking?.scores]
   );
 
   const getScoreFromSquad = useCallback(

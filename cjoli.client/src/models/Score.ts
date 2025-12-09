@@ -26,4 +26,7 @@ export interface Score {
     }
   >;
   sources: Record<number, ScoreSource>;
+  season: string;
+  category: string;
+  tourney: string;
 }

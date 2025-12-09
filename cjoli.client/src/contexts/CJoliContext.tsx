@@ -14,7 +14,11 @@ import {
 import { CJoliActions } from "./actions";
 import dayjs from "dayjs";
 
-export type ModeScoreType = "tourney" | "season" | "allTime";
+export type ModeScoreType =
+  | "tourney"
+  | "season"
+  | "allTime"
+  | { seasons?: string[]; categories?: string[] };
 
 interface CJoliState {
   tourneys?: Tourney[];

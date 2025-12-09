@@ -16,6 +16,8 @@ export const useUser = () => {
     throw new Error("useUser has to be used within <UserProvider>");
   }
 
+  const { tourney } = useCJoli();
+
   const { state, dispatch } = ctx;
   const loadUser = useCallback(
     (user?: User) => dispatch({ type: UserActions.LOAD_USER, payload: user }),
@@ -81,8 +83,6 @@ export const useUser = () => {
     },
     [handleSaveUserConfig, userConfig, showToast, t, isConnected]
   );
-
-  const { tourney } = useCJoli();
 
   const isRootAdmin = state.user?.role === "ADMIN";
 
