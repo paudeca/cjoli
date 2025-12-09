@@ -13,6 +13,7 @@ export const useUser = () => {
   if (!ctx) {
     throw new Error("useUser has to be used within <UserProvider>");
   }
+  const { tourney } = useCJoli();
 
   const { state, dispatch } = ctx;
   const loadUser = useCallback(
@@ -42,8 +43,6 @@ export const useUser = () => {
     [loadRanking, loadUser, uid, state.user]
   );
 
-  const { tourney } = useCJoli();
-
   const findConfig = (user?: User) => {
     const localTeam = localStorage.getItem("favoriteTeamId");
     return (
@@ -54,7 +53,9 @@ export const useUser = () => {
           ? parseInt(localTeam)
           : uid == "hogly2025"
             ? 34
-            : 0,
+            : uid == "cholet2026"
+              ? 108
+              : 0,
         isAdmin: false,
       }
     );
