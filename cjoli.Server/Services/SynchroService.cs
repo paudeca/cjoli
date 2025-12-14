@@ -55,7 +55,7 @@ namespace cjoli.Server.Services
             public required Func<QuerySnapshot, Task> Action;
         }
 
-        public async Task<Tourney> Synchro(string uid, CJoliContext context, CancellationToken? stoppingToken)
+        public async Task<Tourney?> Synchro(string uid, CJoliContext context, CancellationToken? stoppingToken)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace cjoli.Server.Services
             }
         }
 
-        public async Task<Tourney> ExecuteSynchro(string uid, CJoliContext context, CancellationToken? stoppingToken)
+        public async Task<Tourney?> ExecuteSynchro(string uid, CJoliContext context, CancellationToken? stoppingToken)
         {
             var session = new SessionTournify();
 
@@ -92,6 +92,11 @@ namespace cjoli.Server.Services
             var queryTourney = db.Collection("tournaments").WhereEqualTo("liveLink", tourney.Tournify);
 
             var snapshot = await queryTourney.GetSnapshotAsync();
+            if (snapshot.Documents.Count == 0)
+            {
+                _logger.LogWarning($"no tournify found for uid:{uid}");
+                return null;
+            }
             session.Id = snapshot.Documents.First().Id;
 
             var doc = db.Collection("tournaments").Document(session.Id);
