@@ -94,7 +94,7 @@ namespace cjoli.Server.Services
             var snapshot = await queryTourney.GetSnapshotAsync();
             if (snapshot.Documents.Count == 0)
             {
-                _logger.LogWarning($"no tournify found for uid:{uid}");
+                _logger.LogWarning($"no tournify found for uid:{uid} and tournify:${tourney.Tournify}");
                 return null;
             }
             session.Id = snapshot.Documents.First().Id;
