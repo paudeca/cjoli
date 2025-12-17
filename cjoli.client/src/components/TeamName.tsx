@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import { Star, StarFill } from "react-bootstrap-icons";
 import { useCJoli } from "../hooks/useCJoli";
 import { zoomIcon } from "../styles";
@@ -9,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "@emotion/react";
 import { useParams } from "react-router-dom";
 import { useColor } from "../hooks/useColor";
+import useUid from "../hooks/useUid";
 
 const MyStar = styled(Star)`
   ${zoomIcon}
@@ -42,6 +44,7 @@ const TeamName = ({
   const theme = useTheme();
   const { teamId: currentTeamId } = useParams();
   const { isWhite } = useColor();
+  const uid = useUid();
 
   const { name, logo } = positionId
     ? getTeamInfo(positionId, defaultName, false)
@@ -53,7 +56,10 @@ const TeamName = ({
       ? getTeam(teamId)
       : undefined;
 
-  const fullname = team?.datas?.name ? `${name} - ${team.datas.name}` : name;
+  let fullname = team?.datas?.name ? `${name} - ${team.datas.name}` : name;
+  if (uid == "cholet2026") {
+    fullname = team?.datas?.name ? `${team.datas.name}` : name;
+  }
 
   const saveFavoriteTeam = React.useCallback(
     async (teamId?: number) => {
@@ -100,14 +106,22 @@ const TeamName = ({
             onClick={() => saveFavoriteTeam(team.id)}
           />
         )}
-      <img
-        src={logo}
-        style={{
-          maxWidth: isXl ? "60px" : "30px",
-          maxHeight: isXl ? "60px" : "30px",
-        }}
-        className={isXl ? "mx-3" : "mx-2"}
-      />
+      {team?.datas?.logo && uid == "cholet2026" ? (
+        <img
+          src={team.datas.logo}
+          style={{ maxWidth: "30px", maxHeight: "30px" }}
+          className="mx-2"
+        />
+      ) : (
+        <img
+          src={logo}
+          style={{
+            maxWidth: isXl ? "60px" : "30px",
+            maxHeight: isXl ? "60px" : "30px",
+          }}
+          className={isXl ? "mx-3" : "mx-2"}
+        />
+      )}
       <span
         className={className}
         style={{
@@ -120,7 +134,7 @@ const TeamName = ({
       >
         {isCurrentTeam ? <MyTeam color={color}>{fullname}</MyTeam> : fullname}
       </span>
-      {team?.datas?.logo && (
+      {team?.datas?.logo && uid != "cholet2026" && (
         <img
           src={team.datas.logo}
           style={{ maxWidth: "30px", maxHeight: "30px" }}
