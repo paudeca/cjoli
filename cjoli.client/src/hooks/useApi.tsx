@@ -22,6 +22,7 @@ import {
   User,
 } from "../models";
 import { useNavigate } from "react-router-dom";
+import { ModeScoreType, ModeScoreTypeObject } from "../contexts/CJoliContext";
 
 export const mutationOptions = <
   TData = unknown,
@@ -35,7 +36,8 @@ export const mutationOptions = <
 };
 
 const useApiGet = () => {
-  const { loadTourneys, loadRanking, loadGallery, loadTeam } = useCJoli();
+  const { loadTourneys, loadRanking, loadGallery, loadRankingTeam } =
+    useCJoli();
   const { loadUser, userConfig } = useUser();
 
   const getUser = useCallback(
@@ -91,13 +93,13 @@ const useApiGet = () => {
     []
   );
 
-  const getTeam = useCallback(
-    (teamId: number, enabled = true) =>
+  const getRankingTeam = useCallback(
+    (teamId: number, modeScore: ModeScoreTypeObject, enabled = true) =>
       queryOptions({
-        queryKey: ["getTeam"],
+        queryKey: ["getTeam", modeScore],
         queryFn: async () => {
-          const ranking = await cjoliService.getTeam(teamId);
-          loadTeam(ranking);
+          const ranking = await cjoliService.getTeam(teamId, modeScore);
+          loadRankingTeam(ranking);
           return ranking;
         },
         enabled,
@@ -141,7 +143,7 @@ const useApiGet = () => {
     getUser,
     listUsers,
     getTourneys,
-    getTeam,
+    getRankingTeam,
     getTeams,
     getRanking,
     getGallery,

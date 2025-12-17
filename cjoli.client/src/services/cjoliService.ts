@@ -11,6 +11,7 @@ import {
   EventPhase,
 } from "../models";
 import Cookie from "universal-cookie";
+import { ModeScoreTypeObject } from "../contexts/CJoliContext";
 
 const url = import.meta.env.VITE_API_URL;
 const cookie = new Cookie();
@@ -42,9 +43,21 @@ export const getUser = async () => {
   return data;
 };
 
-export const getTeam = async (teamId: number) => {
+export const getTeam = async (
+  teamId: number,
+  modeScore: ModeScoreTypeObject
+) => {
   setHeader();
-  const { data } = await axios.get<Ranking>(`${url}/cjoli/team/${teamId}`);
+  let params = "";
+  if (typeof modeScore == "object") {
+    params = [
+      ...(modeScore.categories?.map((c) => `categories=${c}`) || []),
+      ...(modeScore.seasons?.map((s) => `seasons=${s}`) || []),
+    ].join("&");
+  }
+  const { data } = await axios.get<Ranking>(
+    `${url}/cjoli/team/${teamId}?${params}`
+  );
   return data;
 };
 

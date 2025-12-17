@@ -7,6 +7,8 @@ import TeamCell from "./TeamCell";
 import { Rank, Score, Squad, Team, Tourney } from "../../../models";
 import { useCJoli } from "../../../hooks/useCJoli";
 import { Trans, useTranslation } from "react-i18next";
+import useUid from "../../../hooks/useUid";
+import { ModeScoreObject, ModeScoreType } from "../../../contexts/CJoliContext";
 
 const percent = (value: number, total: number) =>
   total == 0 ? "" : `${Math.round((value / total) * 100)}%`;
@@ -36,26 +38,31 @@ const useFormatRank = () => {
   };
 };
 
+type Column = {
+  label: string;
+  description: string;
+  callRank?: (r: Rank) => number;
+  val?: (s: Score) => number;
+  ration?: (s: Score) => string;
+  callScore?: (col: Column) => (s: Score) => number | string;
+  getLabelRank?: (r: Rank) => number | string | undefined;
+  getLabelScore?: (col: Column) => (s: Score) => number | string | undefined;
+  getInfo?: (col: Column) => (r: Score) => string | boolean;
+  up: boolean;
+  active: boolean;
+  needTeam: boolean;
+};
+
 const useColumns = (tourney?: Tourney, teamB?: Team) => {
   const { t } = useTranslation();
   const { modeScore } = useCJoli();
+  const uid = useUid();
   const formatRank = useFormatRank();
 
   const winPt = tourney?.config.win || 2;
-  let columns: {
-    label: string;
-    description: string;
-    callRank?: (r: Rank) => number;
-    callScore?: (s: Score) => number;
-    getLabelRank?: (r: Rank) => number | string | undefined;
-    getLabelScore?: (s: Score) => number | string | undefined;
-    getInfo?: (r: Score) => string | boolean;
-    up: boolean;
-    active: boolean;
-    needTeam: boolean;
-  }[] = [];
+  let columns: Column[] = [];
 
-  if (modeScore == "tourney") {
+  if (modeScore == "tourney" && uid) {
     columns = [
       {
         label: "Rang",
@@ -76,8 +83,10 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
       {
         label: "PTS",
         description: t("rank.total", "Points"),
-        callScore: (s: Score) => s.total,
-        getInfo: (s: Score) => s.game > 0 && percent(s.total, winPt * s.game),
+        val: (s: Score) => s.total,
+        callScore: (col: Column) => col.val!,
+        getInfo: () => (s: Score) =>
+          s.game > 0 && percent(s.total, winPt * s.game),
         up: true,
         active: !!teamB,
         needTeam: true,
@@ -89,7 +98,8 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
     {
       label: "PJ",
       description: t("rank.game", "Games played"),
-      callScore: (s: Score) => s.game,
+      val: (s: Score) => s.game,
+      callScore: (col: Column) => col.val!,
       up: true,
       active: false,
       needTeam: false,
@@ -97,9 +107,11 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
     {
       label: "V",
       description: t("rank.win", "Victories"),
-      callScore: (s: Score) => s.win,
-      getInfo: (s: Score) =>
-        s.game > 0 && percent(s.win, s.game) + formatRank(s.ranks?.win?.rank),
+      val: (s: Score) => s.win,
+      ration: (s: Score) => (s.game > 0 ? percent(s.win, s.game) : ""),
+      callScore: (col: Column) => (uid ? col.val! : col.ration!),
+      getInfo: (col: Column) => (s: Score) =>
+        (uid ? col.ration!(s) : col.val!(s)) + formatRank(s.ranks?.win?.rank),
       up: true,
       active: !!teamB,
       needTeam: false,
@@ -107,10 +119,12 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
     {
       label: "N",
       description: t("rank.neutral", "Drawn games"),
-      callScore: (s: Score) => s.neutral,
-      getInfo: (s: Score) =>
-        s.game > 0 &&
-        percent(s.neutral, s.game) + formatRank(s.ranks?.neutral?.rank),
+      val: (s: Score) => s.neutral,
+      ration: (s: Score) => (s.game > 0 ? percent(s.neutral, s.game) : ""),
+      callScore: (col: Column) => (uid ? col.val! : col.ration!),
+      getInfo: (col: Column) => (s: Score) =>
+        (uid ? col.ration!(s) : col.val!(s)) +
+        formatRank(s.ranks?.neutral?.rank),
       up: true,
       active: false,
       needTeam: false,
@@ -118,9 +132,11 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
     {
       label: "D",
       description: t("rank.loss", "Defeats"),
-      callScore: (s: Score) => s.loss,
-      getInfo: (s: Score) =>
-        s.game > 0 && percent(s.loss, s.game) + formatRank(s.ranks?.loss?.rank),
+      val: (s: Score) => s.loss,
+      ration: (s: Score) => (s.game > 0 ? percent(s.loss, s.game) : ""),
+      callScore: (col: Column) => (uid ? col.val! : col.ration!),
+      getInfo: (col: Column) => (s: Score) =>
+        (uid ? col.ration!(s) : col.val!(s)) + formatRank(s.ranks?.loss?.rank),
       up: false,
       active: !!teamB,
       needTeam: false,
@@ -128,14 +144,19 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
     {
       label: "BP",
       description: t("rank.goalFor", "Goals for"),
-      callScore: (s: Score) => {
+      val: (s: Score) => {
         if (!teamB) return s.goalFor / s.game;
         return s.goalFor;
       },
-      getLabelScore: (s: Score) => s.goalFor,
-      getInfo: (s: Score) =>
-        s.game > 0 &&
-        average(s.goalFor, s.game) + formatRank(s.ranks?.goalFor?.rank),
+      ration: (s: Score) => (s.game > 0 ? average(s.goalFor, s.game) : ""),
+      getLabelScore: (col: Column) => (uid ? col.val! : col.ration!),
+      callScore: () => (s: Score) => {
+        if (!teamB) return s.goalFor / s.game;
+        return s.goalFor;
+      },
+      //getLabelScore: (col: Column) => (s: Score) => s.goalFor,
+      getInfo: (col: Column) => (s: Score) =>
+        (uid ? col.ration!(s) : s.goalFor) + formatRank(s.ranks?.goalFor?.rank),
       up: true,
       active: true,
       needTeam: false,
@@ -143,14 +164,19 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
     {
       label: "BC",
       description: t("rank.goalAgainst", "Goals against"),
-      callScore: (s: Score) => {
+      val: (s: Score) => {
         if (!teamB) return s.goalAgainst / s.game;
         return s.goalAgainst;
       },
-      getLabelScore: (s: Score) => s.goalAgainst,
-      getInfo: (s: Score) =>
-        s.game > 0 &&
-        average(s.goalAgainst, s.game) + formatRank(s.ranks?.goalAgainst?.rank),
+      ration: (s: Score) => (s.game > 0 ? average(s.goalAgainst, s.game) : ""),
+      getLabelScore: (col: Column) => (uid ? col.val! : col.ration!),
+      callScore: () => (s: Score) => {
+        if (!teamB) return s.goalAgainst / s.game;
+        return s.goalAgainst;
+      },
+      getInfo: (col: Column) => (s: Score) =>
+        (uid ? col.ration!(s) : s.goalAgainst) +
+        formatRank(s.ranks?.goalAgainst?.rank),
       up: false,
       active: true,
       needTeam: false,
@@ -158,14 +184,18 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
     {
       label: "BL",
       description: t("rank.shutOut", "ShutOut"),
-      callScore: (s: Score) => {
+      val: (s: Score) => {
         if (!teamB) return s.shutOut / s.game;
         return s.shutOut;
       },
-      getLabelScore: (s: Score) => s.shutOut,
-      getInfo: (s: Score) =>
-        s.game > 0 &&
-        percent(s.shutOut, s.game) + formatRank(s.ranks?.shutOut?.rank),
+      ration: (s: Score) => (s.game > 0 ? percent(s.shutOut, s.game) : ""),
+      getLabelScore: (col: Column) => (uid ? col.val! : col.ration!),
+      callScore: () => (s: Score) => {
+        if (!teamB) return s.shutOut / s.game;
+        return s.shutOut;
+      },
+      getInfo: (col: Column) => (s: Score) =>
+        (uid ? col.ration!(s) : s.shutOut) + formatRank(s.ranks?.shutOut?.rank),
       up: true,
       active: true,
       needTeam: false,
@@ -173,14 +203,19 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
     {
       label: "+/-",
       description: t("rank.goalDiff", "Goal average"),
-      callScore: (s: Score) => {
+      val: (s: Score) => {
         if (!teamB) return s.goalDiff / s.game;
         return s.goalDiff;
       },
-      getLabelScore: (s: Score) => s.goalDiff,
-      getInfo: (s: Score) =>
-        s.game > 0 &&
-        average(s.goalDiff, s.game) + formatRank(s.ranks?.goalDiff?.rank),
+      ration: (s: Score) => (s.game > 0 ? average(s.goalDiff, s.game) : ""),
+      getLabelScore: (col: Column) => (uid ? col.val! : col.ration!),
+      callScore: () => (s: Score) => {
+        if (!teamB) return s.goalDiff / s.game;
+        return s.goalDiff;
+      },
+      getInfo: (col: Column) => (s: Score) =>
+        (uid ? col.ration!(s) : s.goalDiff) +
+        formatRank(s.ranks?.goalDiff?.rank),
       up: true,
       active: true,
       needTeam: false,
@@ -192,10 +227,12 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
       {
         label: "PEN",
         description: t("rank.penalty", "Penalties"),
-        callScore: (s: Score) => s.penalty,
-        getInfo: (s: Score) =>
-          s.game > 0 &&
-          average(s.penalty, s.game) + formatRank(s.ranks?.penalty?.rank),
+        val: (s: Score) => s.penalty,
+        ration: (s: Score) => (s.game > 0 ? average(s.penalty, s.game) : ""),
+        callScore: (col: Column) => (uid ? col.val! : col.ration!),
+        getInfo: (col: Column) => (s: Score) =>
+          (uid ? col.ration!(s) : col.val!(s)) +
+          formatRank(s.ranks?.penalty?.rank),
         up: false,
         active: true,
         needTeam: false,
@@ -206,21 +243,35 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
   return columns;
 };
 
+// eslint-disable-next-line max-statements
 const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
   const {
     ranking,
     tourney,
     getTeamRank,
     getScoreForTeam,
+    getScoreForTeamHome,
     getScoreFromSquad,
     modeScore,
     classNamesCast,
   } = useCJoli();
+  const uid = useUid();
 
   let rank = getTeamRank(team);
   let rankB = teamB && getTeamRank(teamB);
-  const score = getScoreForTeam(modeScore, team)!;
-  let scoreB = teamB && getScoreForTeam(modeScore, teamB);
+  const mode =
+    uid || typeof modeScore == "object"
+      ? modeScore
+      : { seasons: [], categories: [] };
+  const score = uid
+    ? getScoreForTeam(mode as ModeScoreType, team)!
+    : getScoreForTeamHome(mode as ModeScoreObject, team)!;
+  let scoreB: Score | undefined;
+  if (teamB) {
+    scoreB = uid
+      ? getScoreForTeam(modeScore as ModeScoreType, teamB)
+      : getScoreForTeamHome(modeScore as ModeScoreObject, teamB);
+  }
   const scoreSquad = squad && getScoreFromSquad(squad, team);
   const scoreSquadB = squad && teamB && getScoreFromSquad(squad, teamB);
   if ((!rank || !rankB) && scoreSquad && scoreSquadB) {
@@ -240,7 +291,7 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
         score: scoreB,
       },
     ];
-  } else {
+  } else if (uid) {
     const type =
       modeScore == "tourney"
         ? "scoreTourney"
@@ -253,6 +304,9 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
       ...datas,
       { team: undefined, rank: undefined, score: scoreTourney },
     ];
+  } else {
+    scoreB = getScoreForTeamHome(mode as ModeScoreObject);
+    datas = [...datas, { team: undefined, rank: undefined, score: scoreB }];
   }
 
   const columns = useColumns(tourney, teamB);
@@ -271,8 +325,10 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
                   tourney?.name
                 ) : modeScore == "season" ? (
                   <Trans i18nKey="team.currentSeason">Current season</Trans>
-                ) : (
+                ) : uid ? (
                   <Trans i18nKey="team.allSeasons">All seasons</Trans>
+                ) : (
+                  <Trans i18nKey="team.allTeams">All teams</Trans>
                 )}
               </th>
             ))}
@@ -300,9 +356,11 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
                     <TeamCell
                       value={score}
                       valueB={scoreB}
-                      call={c.callScore!}
-                      getLabel={c.getLabelScore}
-                      getInfo={c.getInfo}
+                      call={c.callScore!(c)}
+                      getLabel={
+                        c.getLabelScore ? c.getLabelScore(c) : undefined
+                      }
+                      getInfo={c.getInfo ? c.getInfo(c) : undefined}
                       active={c.active && j == 0}
                       up={c.up}
                       display={

@@ -14,11 +14,10 @@ import {
 import { CJoliActions } from "./actions";
 import dayjs from "dayjs";
 
-export type ModeScoreType =
-  | "tourney"
-  | "season"
-  | "allTime"
-  | { seasons?: string[]; categories?: string[] };
+export type ModeScoreType = "tourney" | "season" | "allTime";
+export type ModeScoreObject = { seasons?: string[]; categories?: string[] };
+
+export type ModeScoreTypeObject = ModeScoreType | ModeScoreObject;
 
 interface CJoliState {
   tourneys?: Tourney[];
@@ -37,7 +36,7 @@ interface CJoliState {
   };
   page: TypePage;
   gallery?: Gallery;
-  modeScore: ModeScoreType;
+  modeScore: ModeScoreTypeObject;
 }
 
 export const CJoliContext = React.createContext<{
@@ -81,8 +80,9 @@ type Action =
       payload: TypePage;
     }
   | { type: CJoliActions.LOAD_GALLERY; payload: Gallery }
-  | { type: CJoliActions.SELECT_MODESCORE; payload: ModeScoreType }
-  | { type: CJoliActions.LOAD_TEAM; payload: Ranking };
+  | { type: CJoliActions.SELECT_MODESCORE; payload: ModeScoreTypeObject }
+  | { type: CJoliActions.LOAD_RANKING_TEAM; payload: Ranking }
+  | { type: CJoliActions.LOAD_TEAMS; payload: Team[] };
 
 const reduceLoadRanking = (state: CJoliState, ranking: Ranking) => {
   const tourney = ranking.tourney;
@@ -165,12 +165,14 @@ const reducer = (state: CJoliState, action: Action) => {
     case CJoliActions.SELECT_MODESCORE: {
       return { ...state, modeScore: action.payload };
     }
-    case CJoliActions.LOAD_TEAM: {
+    case CJoliActions.LOAD_RANKING_TEAM: {
       return {
         ...state,
         ranking: action.payload,
-        teams: [action.payload.team],
       };
+    }
+    case CJoliActions.LOAD_TEAMS: {
+      return { ...state, teams: action.payload };
     }
   }
 };

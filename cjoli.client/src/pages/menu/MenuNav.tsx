@@ -41,7 +41,6 @@ import { useServer } from "../../hooks/useServer";
 import MenuBrand from "./MenuBrand";
 import BetScoreTotal from "./BetScoreTotal";
 import TeamSelect from "../../components/TeamSelect";
-import { Team } from "../../models";
 
 const MyNavbar = styled(Navbar)`
   color: black;
@@ -59,7 +58,8 @@ const langs = [
 
 // eslint-disable-next-line max-lines-per-function, complexity, max-statements
 const MenuNav = () => {
-  const { loadRanking, loadTourneys, tourney, isCastPage } = useCJoli();
+  const { loadRanking, loadTourneys, tourney, isCastPage, teams, loadTeams } =
+    useCJoli();
   const {
     user,
     userConfig,
@@ -98,7 +98,7 @@ const MenuNav = () => {
 
   const tourneyLabel = uid && tourney?.name;
 
-  const [teams, setTeams] = useState<Team[]>([]);
+  //const [teams, setTeams] = useState<Team[]>([]);
   useEffect(() => {
     const call = async () => {
       const teams = await cjoliService.getTeams();
@@ -106,7 +106,8 @@ const MenuNav = () => {
         if (a.id == 6) return -1;
         return a.name < b.name ? -1 : 1;
       });
-      setTeams(teams);
+      //setTeams(teams);
+      loadTeams(teams);
     };
     call();
   }, []);
@@ -122,7 +123,7 @@ const MenuNav = () => {
         {!uid && (
           <div style={{ width: 300, paddingTop: 5, paddingBottom: 5 }}>
             <TeamSelect
-              teams={teams}
+              teams={teams || []}
               value={userConfig.favoriteTeamId}
               onChangeTeam={async (team) => {
                 const teamId = team ? team.id : 0;

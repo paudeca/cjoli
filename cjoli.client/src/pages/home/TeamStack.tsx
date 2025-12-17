@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable complexity */
 import {
   Badge,
@@ -28,6 +29,9 @@ import { useModal } from "../../hooks/useModal";
 import { Trans } from "react-i18next";
 import TeamSelect from "../../components/TeamSelect";
 import { ModeScoreType } from "../../contexts/CJoliContext";
+import useUid from "../../hooks/useUid";
+import { useApi } from "../../hooks/useApi";
+import { useQuery } from "@tanstack/react-query";
 
 interface TeamStackProps extends JSX.IntrinsicAttributes {
   teamId?: number;
@@ -49,8 +53,15 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
     classNamesCast,
     isXl,
   } = useCJoli();
+  const uid = useUid();
   const { teamId: teamIdParam } = useParams();
   const { isMobile } = useScreenSize();
+  const { getRankingTeam } = useApi();
+
+  const { refetch } = useQuery(
+    getRankingTeam(parseInt(teamIdParam!), modeScore, false)
+  );
+
   const [teamB, setTeamB] = React.useState<Team | undefined>(
     teamIdB ? getTeam(teamIdB) : undefined
   );
@@ -71,11 +82,22 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
   const [categories, setCategories] = useState<string[]>([]);
 
   if (!team) {
-    return <>No team found</>;
+    return <></>;
   }
   const rank = getTeamRank(team);
 
   const optionSeasons =
+    ranking?.seasons?.map((s) => ({
+      label: s,
+      value: s,
+    })) || [];
+  const optionCategories =
+    ranking?.categories?.map((s) => ({
+      label: s,
+      value: s,
+    })) || [];
+
+  /*const optionSeasonss =
     ranking && team
       ? ranking?.scores.allScoresTeams[team.id]
           .reduce<string[]>(
@@ -99,7 +121,7 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
             label: k,
             value: k,
           }))
-      : [];
+      : [];*/
 
   return (
     <CJoliStack
@@ -119,10 +141,12 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
                 <Card.Subtitle
                   className={`ms-auto mb-2 text-muted ${classNamesCast.table}`}
                 >
-                  <Stack>
-                    <Trans i18nKey="team.position">Position</Trans>:{" "}
-                    {rank?.order}
-                  </Stack>
+                  {uid && (
+                    <Stack>
+                      <Trans i18nKey="team.position">Position</Trans>:{" "}
+                      {rank?.order}
+                    </Stack>
+                  )}
                   {tourney?.config.hasYoungest && (
                     <Stack>
                       <Trans i18nKey="team.youngest">Youngest</Trans>:
@@ -134,7 +158,7 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
             </Stack>
           </Card.Header>
           <Card.Body>
-            {!modeCast && (
+            {!modeCast && uid && (
               <Nav variant="underline" defaultActiveKey={activeKey}>
                 <Nav.Item>
                   <Nav.Link
@@ -181,35 +205,37 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
                                   onChangeTeam={(team) => setTeamB(team)}
                                 />
                               </Col>
-                              <Col xs="auto" className="py-3">
-                                <Form.Select
-                                  defaultValue={
-                                    modeScore as
-                                      | "tourney"
-                                      | "season"
-                                      | "allTime"
-                                  }
-                                  onChange={(e) =>
-                                    selectModeScore(
-                                      e.target.value as ModeScoreType
-                                    )
-                                  }
-                                >
-                                  <option value="tourney">
-                                    {tourney?.name}
-                                  </option>
-                                  <option value="season">
-                                    <Trans i18nKey="team.currentSeason">
-                                      Current season
-                                    </Trans>
-                                  </option>
-                                  <option value="allTime">
-                                    <Trans i18nKey="team.allSeasons">
-                                      All seasons
-                                    </Trans>
-                                  </option>
-                                </Form.Select>
-                              </Col>
+                              {uid && (
+                                <Col xs="auto" className="py-3">
+                                  <Form.Select
+                                    defaultValue={
+                                      modeScore as
+                                        | "tourney"
+                                        | "season"
+                                        | "allTime"
+                                    }
+                                    onChange={(e) =>
+                                      selectModeScore(
+                                        e.target.value as ModeScoreType
+                                      )
+                                    }
+                                  >
+                                    <option value="tourney">
+                                      {tourney?.name}
+                                    </option>
+                                    <option value="season">
+                                      <Trans i18nKey="team.currentSeason">
+                                        Current season
+                                      </Trans>
+                                    </option>
+                                    <option value="allTime">
+                                      <Trans i18nKey="team.allSeasons">
+                                        All seasons
+                                      </Trans>
+                                    </option>
+                                  </Form.Select>
+                                </Col>
+                              )}
                             </>
                           )}
                           {modeCast && (
@@ -223,7 +249,7 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
                       </Form>
                     </Stack>
                     <Stack>
-                      <Row>
+                      <Row className="p-2 pb-4">
                         <Col>
                           <Select
                             placeholder="Season"
@@ -236,6 +262,7 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
                                 seasons: s,
                                 categories,
                               });
+                              refetch();
                             }}
                           ></Select>
                         </Col>
@@ -251,6 +278,7 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
                                 categories: c,
                                 seasons,
                               });
+                              refetch();
                             }}
                           ></Select>
                         </Col>
@@ -262,7 +290,7 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
                   direction={isMobile ? "vertical" : "horizontal"}
                   className="align-items-start"
                 >
-                  {/*<TeamRadar team={team} teamB={teamB} />*/}
+                  <TeamRadar team={team} teamB={teamB} />
                   <TeamTable team={team} teamB={teamB} />
                 </Stack>
               </Card>
@@ -275,7 +303,7 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
               </Card>
             )}
 
-            {!modeCast && (
+            {!modeCast && uid && (
               <Stack direction="horizontal" className="p-3">
                 <Button variant="primary" onClick={() => navigate(-1)}>
                   <ArrowLeft /> <Trans i18nKey="button.back">Back</Trans>

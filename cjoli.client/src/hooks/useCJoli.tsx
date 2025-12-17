@@ -1,5 +1,11 @@
+/* eslint-disable max-lines */
 import { useCallback, useContext, useEffect } from "react";
-import { CJoliContext, ModeScoreType } from "../contexts/CJoliContext";
+import {
+  CJoliContext,
+  ModeScoreObject,
+  ModeScoreType,
+  ModeScoreTypeObject,
+} from "../contexts/CJoliContext";
 import {
   Gallery,
   Match,
@@ -51,9 +57,15 @@ export const useCJoli = (page?: TypePage) => {
     [dispatch]
   );
 
-  const loadTeam = useCallback(
+  const loadRankingTeam = useCallback(
     (ranking: Ranking) =>
-      dispatch({ type: CJoliActions.LOAD_TEAM, payload: ranking }),
+      dispatch({ type: CJoliActions.LOAD_RANKING_TEAM, payload: ranking }),
+    [dispatch]
+  );
+
+  const loadTeams = useCallback(
+    (teams: Team[]) =>
+      dispatch({ type: CJoliActions.LOAD_TEAMS, payload: teams }),
     [dispatch]
   );
 
@@ -161,6 +173,20 @@ export const useCJoli = (page?: TypePage) => {
 
   const getScoreForTeam = useCallback(
     (mode: ModeScoreType, team: Team) => {
+      switch (mode) {
+        case "tourney":
+          return state.ranking?.scores.scoreTeams[team.id];
+        case "season":
+          return state.ranking?.scores.scoreTeamsSeason[team.id];
+        case "allTime":
+          return state.ranking?.scores.scoreTeamsAllTime[team.id];
+      }
+    },
+    [state.ranking?.scores]
+  );
+
+  const getScoreForTeamHome = useCallback(
+    (mode: ModeScoreObject, team?: Team) => {
       const merge: (scoreA: Score, scoreB: Score) => Score = (scoreA, scoreB) =>
         ({
           total: scoreA.total + scoreB.total,
@@ -173,21 +199,29 @@ export const useCJoli = (page?: TypePage) => {
           goalDiff: scoreA.goalDiff + scoreB.goalDiff,
           shutOut: scoreA.shutOut + scoreB.shutOut,
           penalty: scoreA.penalty + scoreB.penalty,
+          ranks: scoreB.ranks,
         }) as Score;
-      switch (mode) {
-        case "tourney":
-          return state.ranking?.scores.scoreTeams[team.id];
-        case "season":
-          return state.ranking?.scores.scoreTeamsSeason[team.id];
-        case "allTime":
-          return state.ranking?.scores.scoreTeamsAllTime[team.id];
+      let datas = team
+        ? state.ranking?.scores.allScoresTeams[team.id]
+        : state.ranking?.scores.allScores || [];
+      if (!datas) {
+        datas = [];
       }
-      const score = state.ranking?.scores.allScoresTeams[team.id].reduce(
+      const score = datas!.reduce(
         (acc, score) => {
           if (mode.seasons?.length == 0 && mode.categories?.length == 0) {
             return merge(acc, score);
-          }
-          if (
+          } else if (
+            mode.seasons?.length == 0 &&
+            mode.categories?.includes(score.category)
+          ) {
+            return merge(acc, score);
+          } else if (
+            mode.categories?.length == 0 &&
+            mode.seasons?.includes(score.season)
+          ) {
+            return merge(acc, score);
+          } else if (
             mode.seasons?.includes(score.season) &&
             mode.categories?.includes(score.category)
           ) {
@@ -206,14 +240,9 @@ export const useCJoli = (page?: TypePage) => {
           goalDiff: 0,
           shutOut: 0,
           penalty: 0,
+          ranks: {},
         } as Score
       );
-      /*score =
-        mode.seasons?.reduce((acc, season) => {
-          const score =
-            state.ranking?.scores.scoreTeamsSeasons[team.id][season];
-          return merge(acc, score!);
-        }, score) || score;*/
       return score;
     },
     [state.ranking?.scores]
@@ -250,7 +279,7 @@ export const useCJoli = (page?: TypePage) => {
   );
 
   const selectModeScore = useCallback(
-    (mode: ModeScoreType) =>
+    (mode: ModeScoreTypeObject) =>
       dispatch({ type: CJoliActions.SELECT_MODESCORE, payload: mode }),
     [dispatch]
   );
@@ -263,9 +292,10 @@ export const useCJoli = (page?: TypePage) => {
     ...state,
     loadGallery,
     loadRanking,
+    loadRankingTeam,
     loadTourneys,
     loadTourney,
-    loadTeam,
+    loadTeams,
     selectTourney,
     getSquad,
     getTeam,
@@ -278,6 +308,7 @@ export const useCJoli = (page?: TypePage) => {
     isTeamInSquad,
     isTeamInMatch,
     getScoreForTeam,
+    getScoreForTeamHome,
     selectDay,
     getScoreFromPosition,
     getScoreFromSquad,

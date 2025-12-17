@@ -10,9 +10,9 @@ import { useApi } from "../hooks/useApi";
 import RankingMatchesStack from "./team/RankingMatchesStack";
 
 const TeamPage = () => {
-  const { phases, isTeamInPhase, getTeam } = useCJoli("team");
+  const { phases, isTeamInPhase, getTeam, modeScore } = useCJoli("team");
   const { sendMessage, register } = useServer();
-  const { getRanking, getTeam: getTeamApi } = useApi();
+  const { getRanking, getRankingTeam } = useApi();
   const uid = useUid();
   const { teamId } = useParams();
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ const TeamPage = () => {
   const team = teamId && getTeam(parseInt(teamId));
 
   const { refetch, isFetching } = useQuery(getRanking(uid, !!uid));
-  useQuery(getTeamApi(parseInt(teamId!), !uid));
+  useQuery(getRankingTeam(parseInt(teamId!), modeScore, !uid));
 
   useEffect(() => {
     !isFetching && uid && sendMessage({ type: "selectTourney", uid });

@@ -8,5 +8,7 @@ namespace cjoli.Server.Dtos
         public ScoresDto? Scores { get; set; }
         public TeamDto? Team { get; set; }
         public Dictionary<int, List<Score>> History { get; set; } = new Dictionary<int, List<Score>>();
+        public List<string>? Categories { get; set; }
+        public List<string>? Seasons { get; set; }
     }
 }

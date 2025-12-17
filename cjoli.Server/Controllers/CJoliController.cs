@@ -86,9 +86,9 @@ namespace cjoli.Server.Controllers
 
         [HttpGet]
         [Route("Team/{teamId}")]
-        public RankingDto GetTeam(int teamId)
+        public RankingDto GetTeam(int teamId, [FromQuery] string[]? seasons, [FromQuery] string[]? categories)
         {
-            return _service.GetTeamScore(teamId, _context);
+            return _service.GetTeamScore(teamId, seasons ?? [], categories ?? [], _context);
         }
 
 

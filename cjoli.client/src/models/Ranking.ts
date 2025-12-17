@@ -8,4 +8,6 @@ export interface Ranking {
   team: Team;
   scores: Scores;
   history: Record<number, Score[]>;
+  categories?: string[];
+  seasons?: string[];
 }

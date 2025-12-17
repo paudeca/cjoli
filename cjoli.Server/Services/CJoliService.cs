@@ -100,25 +100,36 @@ namespace cjoli.Server.Services
             }
         }
 
-        public RankingDto GetTeamScore(int teamId, CJoliContext context)
+        public RankingDto GetTeamScore(int teamId, string[] seasons, string[] categories, CJoliContext context)
         {
             var team = context.Team.Single(t => t.Id == teamId);
             var teamDto = _mapper.Map<TeamDto>(team);
-            var scores = CalculateFullHistory(context);
+            var scores = CalculateFullHistory(seasons, categories, context);
+            var scoresDto = new ScoresDto()
+            {
+                ScoreAllTime = scores.Total,
+                ScoreTeamsAllTime = scores.Teams.ToDictionary(s => s.Key, s => s.Value.Score),
+                //AllScores = scores.AllScores,
+                //AllScoresTeams = scores.Teams.ToDictionary(s => s.Key, s => s.Value.AllScores),
+            };
+            SortTeams(scoresDto.ScoreTeamsAllTime);
+            var cat = context.Tourneys
+                .Include(t => t.Teams)
+                .Where(t => t.Category != null && t.Teams.Contains(team))
+                .GroupBy(t => t.Category!)
+                .Select(kv => kv.Key).OrderBy(s => s).ToList();
+            var seas = context.Tourneys
+                .Include(t => t.Teams)
+                .Where(t => t.Season != null && t.Teams.Contains(team))
+                .GroupBy(t => t.Season!)
+                .Select(kv => kv.Key).OrderBy(s => s).ToList();
+
             return new RankingDto()
             {
                 Team = teamDto,
-                Scores = new ScoresDto()
-                {
-                    ScoreAllTime = scores.Total,
-                    ScoreTeamsAllTime = scores.Teams.ToDictionary(s => s.Key, s => s.Value.Score),
-                    AllScores = scores.AllScores,
-                    //ScoreSeasons = scores.Seasons,
-                    //ScoreCategories = scores.Categories,
-                    AllScoresTeams = scores.Teams.ToDictionary(s => s.Key, s => s.Value.AllScores),
-                    //ScoreTeamsSeasons = scores.Teams.ToDictionary(s => s.Key, s => s.Value.Season),
-                    //ScoreTeamsCategories = scores.Teams.ToDictionary(s => s.Key, s => s.Value.Category),
-                }
+                Scores = scoresDto,
+                Categories = cat,
+                Seasons = seas
             };
         }
 
@@ -771,9 +782,17 @@ namespace cjoli.Server.Services
             ranking.Scores.ScoreTeams = scoreTeams;
         }
 
-        private ScoreFull CalculateFullHistory(CJoliContext context)
+        private ScoreFull CalculateFullHistory(string[] seasons, string[] categories, CJoliContext context)
         {
-            var query = context.MatchResult;//.Where(r => r.Win == 1 || r.Neutral == 1);
+            IQueryable<MatchResult> query = context.MatchResult;//.Where(r => r.Win == 1 || r.Neutral == 1);
+            if (seasons.Length > 0)
+            {
+                query = query.Where(r => seasons.Contains(r.Match.Squad!.Phase.Tourney.Season));
+            }
+            if (categories.Length > 0)
+            {
+                query = query.Where(r => categories.Contains(r.Match.Squad!.Phase.Tourney.Category));
+            }
 
             var queryMatchAllWithNoLoss = query.Where(r => r.Win == 1 || r.Neutral == 1)
                 .Select(r => new MatchResultBase() { Win = r.Win, Loss = r.Loss, Neutral = r.Neutral, GoalFor = r.GoalFor, GoalAgainst = r.GoalAgainst, GoalDiff = r.GoalDiff, Match = r.Match, ShutOut = r.ShutOut }).Distinct();
@@ -838,7 +857,7 @@ namespace cjoli.Server.Services
                 {
                     acc.Add(kv.Key.TeamId, new ScoreTeam()
                     {
-                        Score = new Score(),
+                        Score = new Score() { TeamId = kv.Key.TeamId },
                         AllScores = new List<Score>()
                         //Season = new Dictionary<string, Score>(),
                         //Category = new Dictionary<string, Score>(),
@@ -1172,24 +1191,32 @@ namespace cjoli.Server.Services
                     var tmp = new List<Score>(listScores);
                     tmp.Sort((a, b) =>
                     {
-                        if (a.Game == 0 && b.Game == 0)
+                        try
                         {
-                            return a.TeamId < b.TeamId ? -1 : 1;
-                        }
-                        if (a.Game == 0)
-                        {
-                            return -1;
-                        }
-                        if (b.Game == 0)
-                        {
+                            if (a.Game == 0 && b.Game == 0)
+                            {
+                                return a.TeamId < b.TeamId ? -1 : 1;
+                            }
+                            if (a.Game == 0)
+                            {
+                                return -1;
+                            }
+                            if (b.Game == 0)
+                            {
+                                return 1;
+                            }
+                            var valueA = (double)c.Val(a) / a.Game;
+                            var valueB = (double)c.Val(b) / b.Game;
+                            if (valueA > valueB) return c.Reverse ? 1 : -1;
+                            else if (valueA < valueB) return c.Reverse ? -1 : 1;
+                            else if (a.TeamId == teamId) return -1;
+                            else if (b.TeamId == teamId) return 1;
                             return 1;
                         }
-                        var valueA = (double)c.Val(a) / a.Game;
-                        var valueB = (double)c.Val(b) / b.Game;
-                        if (valueA > valueB) return c.Reverse ? 1 : -1;
-                        else if (valueA < valueB) return c.Reverse ? -1 : 1;
-                        else if (a.TeamId == teamId) return -1;
-                        else if (b.TeamId == teamId) return 1;
+                        catch (Exception e)
+                        {
+
+                        }
                         return 1;
                     });
                     int rank = tmp.FindIndex(s => s.TeamId == teamId);
