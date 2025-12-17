@@ -216,61 +216,68 @@ namespace cjoli.Server.Services
         {
             foreach (var b in tourneyTournify.breaks!.Values.ToList())
             {
-                var day = b.day;
-                var date = tourney.StartTime;
-                if (day != null && day != "0")
+                try
                 {
-                    date = DateTimeOffset.FromUnixTimeSeconds(mapDays[day].date).ToLocalTime().DateTime;
-                }
-                if (b == null || b.st == null)
-                {
-                    continue;
-                }
-                var times = b.st!.Split(":");
-                TimeSpan ts = new TimeSpan(int.Parse(times[0]), int.Parse(times[1]), 0);
-                date = date.Date + ts;
-
-                var mapTimes = tourney.Phases.Select(p =>
-                {
-                    var matches = p.Squads.SelectMany(s => s.Matches).OrderBy(m => m.Time);
-                    if (matches.Count() == 0)
+                    var day = b.day;
+                    var date = tourney.StartTime;
+                    if (day != null && day != "0")
                     {
-                        return (Phase: p, MinTime: DateTime.MaxValue, MaxTime: DateTime.MinValue);
+                        date = DateTimeOffset.FromUnixTimeSeconds(mapDays[day].date).ToLocalTime().DateTime;
                     }
-                    return (Phase: p, MinTime: matches.First().Time, MaxTime: matches.Last().Time);
-                }).ToList();
-
-                var phase = mapTimes.FirstOrDefault(p => p.MinTime <= date && p.MaxTime >= date).Phase;
-                if (phase == null)
-                {
-                    phase = mapTimes.LastOrDefault(p => p.MinTime <= date).Phase;
-                }
-                if (phase == null)
-                {
-                    phase = mapTimes.FirstOrDefault(p => p.MaxTime >= date).Phase;
-                }
-                if (phase != null)
-                {
-                    var evt = tourney.Phases.SelectMany(p => p.Events).SingleOrDefault(e => e.Tournify == b.id);
-                    string name = b.name!;
-                    if (evt == null)
+                    if (b == null || b.st == null)
                     {
-                        evt = new Event() { Name = name, EventType = EventType.Info };
-                        phase.Events.Add(evt);
+                        continue;
                     }
-                    if (b.field != null)
+                    var times = b.st!.Split(":");
+                    TimeSpan ts = new TimeSpan(int.Parse(times[0]), int.Parse(times[1]), 0);
+                    date = date.Date + ts;
+
+                    var mapTimes = tourney.Phases.Select(p =>
                     {
-                        var field = tourneyTournify.fields![b.field!];
-                        if (field != null)
+                        var matches = p.Squads.SelectMany(s => s.Matches).OrderBy(m => m.Time);
+                        if (matches.Count() == 0)
                         {
-                            name = $"{name} {field.name}";
+                            return (Phase: p, MinTime: DateTime.MaxValue, MaxTime: DateTime.MinValue);
                         }
+                        return (Phase: p, MinTime: matches.First().Time, MaxTime: matches.Last().Time);
+                    }).ToList();
+
+                    var phase = mapTimes.FirstOrDefault(p => p.MinTime <= date && p.MaxTime >= date).Phase;
+                    if (phase == null)
+                    {
+                        phase = mapTimes.LastOrDefault(p => p.MinTime <= date).Phase;
                     }
+                    if (phase == null)
+                    {
+                        phase = mapTimes.FirstOrDefault(p => p.MaxTime >= date).Phase;
+                    }
+                    if (phase != null)
+                    {
+                        var evt = tourney.Phases.SelectMany(p => p.Events).SingleOrDefault(e => e.Tournify == b.id);
+                        string name = b.name!;
+                        if (evt == null)
+                        {
+                            evt = new Event() { Name = name, EventType = EventType.Info };
+                            phase.Events.Add(evt);
+                        }
+                        if (b.field != null)
+                        {
+                            var field = tourneyTournify.fields![b.field!];
+                            if (field != null)
+                            {
+                                name = $"{name} {field.name}";
+                            }
+                        }
 
-                    evt.Name = tourney.HasTournifySynchroName ? name : evt.Name;
-                    evt.Tournify = b.id;
-                    evt.Time = date;
+                        evt.Name = tourney.HasTournifySynchroName ? name : evt.Name;
+                        evt.Tournify = b.id;
+                        evt.Time = date;
 
+                    }
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError("Invalid event, ignore it", e);
                 }
 
             }
@@ -304,7 +311,7 @@ namespace cjoli.Server.Services
             {
                 var teamTournify = mapTeams[id]!;
                 var team = context.Team.Include(t => t.TeamDatas.Where(t => t.Tourney.Uid == tourney.Uid))
-                    .SingleOrDefault(t => t.Name.ToLower() == teamTournify.name!.ToLower() || t.TeamDatas.SingleOrDefault(d => d.Tournify == id) != null);
+                    .FirstOrDefault(t => t.Name.ToLower() == teamTournify.name!.ToLower() || t.TeamDatas.SingleOrDefault(d => d.Tournify == id) != null);
                 if (team == null)
                 {
                     team = new Team() { Name = teamTournify.name! };
