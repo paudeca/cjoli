@@ -5,6 +5,7 @@ import {
   createTeam,
   createTourney,
   mockGetRanking,
+  mockGetTeams,
   mockGetTourneys,
   mockGetUser,
   renderPage,
@@ -54,6 +55,7 @@ const renderMainPage = async ({
         ],
       }),
     () => mockGetTourneys(uid),
+    () => mockGetTeams([]),
   ];
   if (call) calls.push(call);
   const gets = calls.map((c) => c());

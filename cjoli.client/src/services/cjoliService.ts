@@ -11,7 +11,7 @@ import {
   EventPhase,
 } from "../models";
 import Cookie from "universal-cookie";
-import { ModeScoreTypeObject } from "../contexts/CJoliContext";
+import { ModeScoreType } from "../contexts/CJoliContext";
 
 const url = import.meta.env.VITE_API_URL;
 const cookie = new Cookie();
@@ -43,10 +43,7 @@ export const getUser = async () => {
   return data;
 };
 
-export const getTeam = async (
-  teamId: number,
-  modeScore: ModeScoreTypeObject
-) => {
+export const getTeam = async (teamId: number, modeScore: ModeScoreType) => {
   setHeader();
   let params = "";
   if (typeof modeScore == "object") {
