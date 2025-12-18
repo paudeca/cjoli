@@ -5,6 +5,8 @@ import { UserActions } from "../contexts/actions";
 import { useCJoli } from "./useCJoli";
 import * as cjoliService from "../services/cjoliService";
 import useUid from "./useUid";
+import { useToast } from "./useToast";
+import { useTranslation } from "react-i18next";
 
 export const useUser = () => {
   const ctx = useContext(UserContext);
@@ -13,6 +15,8 @@ export const useUser = () => {
   if (!ctx) {
     throw new Error("useUser has to be used within <UserProvider>");
   }
+
+  const { tourney } = useCJoli();
 
   const { state, dispatch } = ctx;
   const loadUser = useCallback(
@@ -42,30 +46,49 @@ export const useUser = () => {
     [loadRanking, loadUser, uid, state.user]
   );
 
-  const { tourney } = useCJoli();
-
   const findConfig = (user?: User) => {
     const localTeam = localStorage.getItem("favoriteTeamId");
     return (
       user?.configs?.find((c) => c.tourneyId == tourney?.id) || {
         tourneyId: 0,
         useCustomEstimate: false,
-        favoriteTeamId: localTeam
-          ? parseInt(localTeam)
-          : uid == "hogly2025"
-            ? 34
-            : 0,
+        favoriteTeamId: localTeam ? parseInt(localTeam) : 0,
         isAdmin: false,
       }
     );
   };
 
+  const isConnected = state.user;
+  const { showToast } = useToast();
+  const { t } = useTranslation();
   const userConfig = findConfig(state.user);
+
+  const saveFavoriteTeam = useCallback(
+    async (teamId?: number, hideNotif?: boolean) => {
+      isConnected &&
+        (await handleSaveUserConfig({
+          ...userConfig,
+          favoriteTeamId: teamId || 0,
+        }));
+      !isConnected &&
+        localStorage.setItem("favoriteTeamId", (teamId || 0) + "");
+      if (!hideNotif) {
+        teamId
+          ? showToast("success", t("user.favoriteSaved", "Favorite team saved"))
+          : showToast(
+              "success",
+              t("user.favoriteRemoved", "Favorite team removed")
+            );
+      }
+    },
+    [handleSaveUserConfig, userConfig, showToast, t, isConnected]
+  );
+
   const isRootAdmin = state.user?.role === "ADMIN";
 
   return {
     ...state,
-    isConnected: state.user,
+    isConnected,
     isRootAdmin,
     isAdmin: isRootAdmin || userConfig.isAdmin,
     findConfig,
@@ -73,5 +96,6 @@ export const useUser = () => {
     loadUser,
     setCountUser,
     handleSaveUserConfig,
+    saveFavoriteTeam,
   };
 };

@@ -5,7 +5,7 @@ import { useCJoli } from "../../../hooks/useCJoli";
 interface CellValueProps<T> {
   value?: T;
   getLabel?: (a: T) => string | number | undefined;
-  val: number | undefined;
+  val: number | string | undefined;
   display: boolean;
 }
 const CellValue = <T,>({
@@ -25,7 +25,7 @@ const CellValue = <T,>({
 
 interface CellEvolutionProps {
   result: number;
-  valB: number | undefined;
+  valB: number | string | undefined;
 }
 
 const CellEvolution = ({ result, valB }: CellEvolutionProps) => {
@@ -41,7 +41,7 @@ const CellEvolution = ({ result, valB }: CellEvolutionProps) => {
 type TeamCellProps<T> = {
   value?: T;
   valueB?: T;
-  call: (a: T) => number | undefined;
+  call: (a: T) => number | string | undefined;
   getLabel?: (a: T) => string | number | undefined;
   getInfo?: (a: T) => string | boolean;
   up?: boolean;
@@ -61,8 +61,8 @@ const TeamCell = <T,>({
 }: TeamCellProps<T>) => {
   const { isXl } = useCJoli();
   const calcul = up
-    ? (a: number, b: number) => (a > b ? 1 : a == b ? 0 : -1)
-    : (a: number, b: number) => (a < b ? 1 : a == b ? 0 : -1);
+    ? (a: number | string, b: number | string) => (a > b ? 1 : a == b ? 0 : -1)
+    : (a: number | string, b: number | string) => (a < b ? 1 : a == b ? 0 : -1);
   const val = value && call(value);
   const valB = valueB && call(valueB);
   const result =

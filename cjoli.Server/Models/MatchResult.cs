@@ -13,6 +13,8 @@ namespace cjoli.Server.Models
         public int GoalDiff { get; set; }
         public int ShutOut { get; set; }
         public Match Match { get; set; }
+
+        public Tourney Tourney { get; }
     }
 
 
@@ -26,6 +28,8 @@ namespace cjoli.Server.Models
         public int GoalDiff { get; set; }
         public int ShutOut { get; set; }
         public required Match Match { get; set; }
+
+        public Tourney Tourney => Match.Squad!.Phase.Tourney;
     }
 
 
@@ -46,5 +50,6 @@ namespace cjoli.Server.Models
         public int GoalDiff { get; set; }
         public int ShutOut { get; set; }
 
+        public Tourney Tourney => Match.Squad!.Phase.Tourney;
     }
 }

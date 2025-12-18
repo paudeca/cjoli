@@ -117,7 +117,11 @@ const MobileBracket = ({
 }) => {
   return (
     <div className="mx-2">
-      <Carousel data-bs-theme="dark">
+      <Carousel
+        data-bs-theme="dark"
+        indicators={!!bracket.Semi}
+        controls={!!bracket.Semi}
+      >
         {bracket.Quarter && bracket.Quarter[0] && (
           <Carousel.Item>
             <Container data-bs-theme="light">
@@ -145,35 +149,41 @@ const MobileBracket = ({
             </Container>
           </Carousel.Item>
         )}
-        <Carousel.Item>
-          <Container data-bs-theme="light">
-            <Row>
-              <Col xs={{ offset: 1, span: 10 }}>
-                <MatchBracket match={bracket.Semi[0]} height={20} />
-              </Col>
-            </Row>
-            <Row>
-              <Col xs={{ offset: 1, span: 10 }}>
-                <MatchBracket match={bracket.Semi[1]} height={20} />
-              </Col>
-            </Row>
-            {bracket.Final && bracket.Final[2] && (
-              <>
-                <Row>
-                  <Col xs={{ offset: 1, span: 10 }}>
-                    <MatchBracket match={bracket.Semi[2]} height={20} />
-                  </Col>
-                </Row>
-                <Row>
-                  <Col xs={{ offset: 1, span: 10 }}>
-                    <MatchBracket match={bracket.Semi[3]} height={20} />
-                  </Col>
-                </Row>
-              </>
-            )}
-            <Row style={{ height: 60 }}></Row>
-          </Container>
-        </Carousel.Item>
+        {bracket.Semi && (
+          <Carousel.Item>
+            <Container data-bs-theme="light">
+              {bracket.Semi && bracket.Semi[0] && (
+                <>
+                  <Row>
+                    <Col xs={{ offset: 1, span: 10 }}>
+                      <MatchBracket match={bracket.Semi[0]} height={20} />
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col xs={{ offset: 1, span: 10 }}>
+                      <MatchBracket match={bracket.Semi[1]} height={20} />
+                    </Col>
+                  </Row>
+                </>
+              )}
+              {bracket.Final && bracket.Final[2] && (
+                <>
+                  <Row>
+                    <Col xs={{ offset: 1, span: 10 }}>
+                      <MatchBracket match={bracket.Semi[2]} height={20} />
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col xs={{ offset: 1, span: 10 }}>
+                      <MatchBracket match={bracket.Semi[3]} height={20} />
+                    </Col>
+                  </Row>
+                </>
+              )}
+              <Row style={{ height: 60 }}></Row>
+            </Container>
+          </Carousel.Item>
+        )}
         <Carousel.Item>
           <Container data-bs-theme="light">
             <Row>

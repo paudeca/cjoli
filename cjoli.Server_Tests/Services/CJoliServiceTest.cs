@@ -35,7 +35,7 @@ namespace cjoli.Server_Tests.Services
             var tourney = CreateTourney();
 
             //Act
-            var tourneys = _service.ListTourneys(_context);
+            var tourneys = _service.ListTourneys(0, _context);
 
             //Assert
             Assert.NotEmpty(tourneys);

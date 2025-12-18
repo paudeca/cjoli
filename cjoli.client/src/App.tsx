@@ -73,6 +73,10 @@ const App = () => {
           element: <TeamPage />,
         },
         {
+          path: "team/:teamId",
+          element: <TeamPage />,
+        },
+        {
           path: isUseDomain
             ? "team/:teamId/phase/:phaseId"
             : ":uid/team/:teamId/phase/:phaseId",

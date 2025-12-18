@@ -29,6 +29,7 @@ import {
 import { Rank, Score, Team } from "../../../models";
 import { useCJoli } from "../../../hooks/useCJoli";
 import React, { useCallback } from "react";
+import useUid from "../../../hooks/useUid";
 
 ChartJS.register(
   CategoryScale,
@@ -70,28 +71,34 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
     isXl,
     classNamesCast,
   } = useCJoli();
+  const uid = useUid();
   const options = {
     responsive: true,
   };
   const rank = getTeamRank(team);
   const rankB = teamB && getTeamRank(teamB);
 
-  const score = getScoreForTeam(modeScore, team);
-  const scoreB = teamB && getScoreForTeam(modeScore, teamB);
+  const mode =
+    uid || typeof modeScore == "object"
+      ? modeScore
+      : { seasons: [], categories: [] };
 
-  const countTeams = ranking?.tourney.teams.length || 0;
-  const winPt = ranking?.tourney.config.win || 2;
+  const score = getScoreForTeam(mode, team);
+  const scoreB = teamB && getScoreForTeam(mode, teamB);
+
+  const countTeams = ranking?.tourney?.teams.length || 10;
+  const winPt = ranking?.tourney?.config.win || 2;
 
   const getDataRatio = useCallback((type: keyof Score, score: Score) => {
     return (
-      ((score[type] as number) / score.game / score.ranks[type].maxRatio) * 100
+      ((score[type] as number) / score.game / score.ranks[type]?.maxRatio) * 100
     );
   }, []);
 
   const getDataRatioReverse = useCallback((type: keyof Score, score: Score) => {
     return (
-      ((score.ranks[type].maxRatio - (score[type] as number) / score.game) /
-        score.ranks[type].maxRatio) *
+      ((score.ranks[type]?.maxRatio - (score[type] as number) / score.game) /
+        score.ranks[type]?.maxRatio) *
       100
     );
   }, []);
@@ -116,8 +123,8 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
         getDataRatioReverse("goalAgainst", score),
         getDataRatio("shutOut", score),
         //getDataRatio("goalDiff", score),
-        ((score.goalDiff / score.game - score.ranks!.goalDiff.minRatio) /
-          (score.ranks!.goalDiff.maxRatio - score.ranks!.goalDiff.minRatio)) *
+        ((score.goalDiff / score.game - score.ranks!.goalDiff?.minRatio) /
+          (score.ranks!.goalDiff?.maxRatio - score.ranks!.goalDiff?.minRatio)) *
           100,
       ];
       return data;

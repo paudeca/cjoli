@@ -22,6 +22,7 @@ import {
   User,
 } from "../models";
 import { useNavigate } from "react-router-dom";
+import { ModeScoreType } from "../contexts/CJoliContext";
 
 export const mutationOptions = <
   TData = unknown,
@@ -35,8 +36,9 @@ export const mutationOptions = <
 };
 
 const useApiGet = () => {
-  const { loadTourneys, loadRanking, loadGallery } = useCJoli();
-  const { loadUser } = useUser();
+  const { loadTourneys, loadRanking, loadGallery, loadRankingTeam } =
+    useCJoli();
+  const { loadUser, userConfig } = useUser();
 
   const getUser = useCallback(
     () =>
@@ -68,13 +70,16 @@ const useApiGet = () => {
       queryOptions({
         queryKey: ["getTourneys"],
         queryFn: async () => {
-          const tourneys = await cjoliService.getTourneys();
+          const teamId = userConfig.favoriteTeamId
+            ? userConfig.favoriteTeamId
+            : 0;
+          const tourneys = await cjoliService.getTourneys(teamId);
           loadTourneys(tourneys);
           return tourneys;
         },
         enabled,
       }),
-    [loadTourneys]
+    [loadTourneys, userConfig.favoriteTeamId]
   );
 
   const getTeams = useCallback(
@@ -88,8 +93,22 @@ const useApiGet = () => {
     []
   );
 
+  const getRankingTeam = useCallback(
+    (teamId: number, modeScore: ModeScoreType, enabled = true) =>
+      queryOptions({
+        queryKey: ["getTeam", modeScore],
+        queryFn: async () => {
+          const ranking = await cjoliService.getTeam(teamId, modeScore);
+          loadRankingTeam(ranking);
+          return ranking;
+        },
+        enabled,
+      }),
+    []
+  );
+
   const getRanking = useCallback(
-    (uid: string) =>
+    (uid: string, enabled = true) =>
       queryOptions({
         queryKey: ["getRanking", uid],
         queryFn: async () => {
@@ -97,6 +116,7 @@ const useApiGet = () => {
           loadRanking(ranking);
           return ranking;
         },
+        enabled,
       }),
     [loadRanking]
   );
@@ -119,7 +139,15 @@ const useApiGet = () => {
       }),
     []
   );
-  return { getUser, listUsers, getTourneys, getTeams, getRanking, getGallery };
+  return {
+    getUser,
+    listUsers,
+    getTourneys,
+    getRankingTeam,
+    getTeams,
+    getRanking,
+    getGallery,
+  };
 };
 
 const useApiPost = () => {

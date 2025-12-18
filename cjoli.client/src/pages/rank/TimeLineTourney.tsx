@@ -45,11 +45,13 @@ const TimeLineTourney = () => {
       label: string;
       data: {
         x:
+          | string
           | number
           | Date
           | Record<string, { rank: number; max: number; min: number }>
           | Record<number, ScoreSource>;
         y:
+          | string
           | number
           | Date
           | Record<string, { rank: number; max: number; min: number }>

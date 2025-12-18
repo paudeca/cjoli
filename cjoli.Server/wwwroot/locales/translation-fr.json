@@ -32,7 +32,8 @@
   },
   "home": {
     "tourneyNotConfigured": "Tournoi non configuré",
-    "noImage": "Aucune photo pour le tournoi"
+    "noImage": "Aucune photo pour le tournoi",
+    "selectTeam": "Sélectionner votre équipe"
   },
   "gallery": {
     "sendPhoto": "Envoyez-nous vos photos",
@@ -103,6 +104,10 @@
     "select": "Sélectionner une Équipe",
     "currentSeason": "Saison en cours",
     "allSeasons": "Toutes les saisons",
+    "allTeams": "Toutes les équipes",
+    "season": "Saison",
+    "category": "Catégorie",
+
     "chart": {
       "general": "Général",
       "timeline": "Chronologie"
