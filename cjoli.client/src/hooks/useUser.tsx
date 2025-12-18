@@ -17,8 +17,6 @@ export const useUser = () => {
   }
   const { tourney } = useCJoli();
 
-  const { tourney } = useCJoli();
-
   const { state, dispatch } = ctx;
   const loadUser = useCallback(
     (user?: User) => dispatch({ type: UserActions.LOAD_USER, payload: user }),
@@ -53,10 +51,11 @@ export const useUser = () => {
       user?.configs?.find((c) => c.tourneyId == tourney?.id) || {
         tourneyId: 0,
         useCustomEstimate: false,
-        favoriteTeamId: localTeam ? parseInt(localTeam) : 0,
-            : uid == "cholet2026"
-              ? 108
-              : 0,
+        favoriteTeamId: localTeam
+          ? parseInt(localTeam)
+          : uid == "cholet2026"
+            ? 108
+            : 0,
         isAdmin: false,
       }
     );
