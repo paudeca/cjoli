@@ -1,6 +1,4 @@
-﻿using cjoli.Server.Models.AI;
-
-namespace cjoli.Server.Models
+﻿namespace cjoli.Server.Models
 {
     public class Score
     {
@@ -23,17 +21,23 @@ namespace cjoli.Server.Models
         public DateTime Time { get; set; }
         public Dictionary<int, ScoreSource> Sources { get; set; } = new Dictionary<int, ScoreSource>();
         public Dictionary<string, RankInfo> Ranks { get; set; } = new Dictionary<string, RankInfo>();
+        public string? Season { get; set; }
+        public string? Category { get; set; }
+        public string? Tourney { get; set; }
 
         public Score Clone()
         {
             var score = new Score()
             {
-                PositionId=PositionId,
-                Rank=Rank,
-                MatchId=MatchId,
-                TeamId=TeamId,
-                TeamAgainstId=TeamAgainstId,
-                Time=Time
+                PositionId = PositionId,
+                Rank = Rank,
+                MatchId = MatchId,
+                TeamId = TeamId,
+                TeamAgainstId = TeamAgainstId,
+                Time = Time,
+                Season = Season,
+                Category = Category,
+                Tourney = Tourney
             };
             score.Merge(this);
             return score;

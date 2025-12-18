@@ -24,7 +24,7 @@ const TourneyCard = ({ tourney, isLive }: TourneyCardProps) => {
   const { formatDate } = useTools();
   return (
     <Col
-      lg="auto"
+      lg="4"
       role="button"
       className="mb-3"
       onClick={() => {

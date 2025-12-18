@@ -48,7 +48,9 @@ const render = async ({
 }) => {
   mockGetUser({ role: "ADMIN" });
   mockGetTourneys(UID);
+  mockGetTeams([]);
   mockGetRanking(UID, tourney);
+
   init && init();
 
   const mockAxios = del

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { useCallback, useContext, useEffect } from "react";
 import { CJoliContext, ModeScoreType } from "../contexts/CJoliContext";
 import {
@@ -48,6 +49,18 @@ export const useCJoli = (page?: TypePage) => {
   const loadGallery = useCallback(
     (gallery: Gallery) =>
       dispatch({ type: CJoliActions.LOAD_GALLERY, payload: gallery }),
+    [dispatch]
+  );
+
+  const loadRankingTeam = useCallback(
+    (ranking: Ranking) =>
+      dispatch({ type: CJoliActions.LOAD_RANKING_TEAM, payload: ranking }),
+    [dispatch]
+  );
+
+  const loadTeams = useCallback(
+    (teams: Team[]) =>
+      dispatch({ type: CJoliActions.LOAD_TEAMS, payload: teams }),
     [dispatch]
   );
 
@@ -154,7 +167,7 @@ export const useCJoli = (page?: TypePage) => {
   );
 
   const getScoreForTeam = useCallback(
-    (mode: "tourney" | "season" | "allTime", team: Team) => {
+    (mode: ModeScoreType, team: Team) => {
       switch (mode) {
         case "tourney":
           return state.ranking?.scores.scoreTeams[team.id];
@@ -162,13 +175,26 @@ export const useCJoli = (page?: TypePage) => {
           return state.ranking?.scores.scoreTeamsSeason[team.id];
         case "allTime":
           return state.ranking?.scores.scoreTeamsAllTime[team.id];
+        default:
+          return state.ranking?.scores.scoreTeamsAllTime[team.id];
       }
     },
-    [
-      state.ranking?.scores.scoreTeams,
-      state.ranking?.scores.scoreTeamsSeason,
-      state.ranking?.scores.scoreTeamsAllTime,
-    ]
+    [state.ranking?.scores]
+  );
+  const getScoreAllTeams = useCallback(
+    (mode: ModeScoreType) => {
+      switch (mode) {
+        case "tourney":
+          return state.ranking?.scores.scoreTourney;
+        case "season":
+          return state.ranking?.scores.scoreSeason;
+        case "allTime":
+          return state.ranking?.scores.scoreAllTime;
+        default:
+          return state.ranking?.scores.scoreAllTime;
+      }
+    },
+    [state.ranking?.scores]
   );
 
   const getScoreFromSquad = useCallback(
@@ -215,8 +241,10 @@ export const useCJoli = (page?: TypePage) => {
     ...state,
     loadGallery,
     loadRanking,
+    loadRankingTeam,
     loadTourneys,
     loadTourney,
+    loadTeams,
     selectTourney,
     getSquad,
     getTeam,
@@ -229,6 +257,7 @@ export const useCJoli = (page?: TypePage) => {
     isTeamInSquad,
     isTeamInMatch,
     getScoreForTeam,
+    getScoreAllTeams,
     selectDay,
     getScoreFromPosition,
     getScoreFromSquad,

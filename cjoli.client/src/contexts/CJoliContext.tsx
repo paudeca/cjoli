@@ -14,7 +14,11 @@ import {
 import { CJoliActions } from "./actions";
 import dayjs from "dayjs";
 
-export type ModeScoreType = "tourney" | "season" | "allTime";
+export type ModeScoreType =
+  | "tourney"
+  | "season"
+  | "allTime"
+  | { seasons?: string[]; categories?: string[] };
 
 interface CJoliState {
   tourneys?: Tourney[];
@@ -77,7 +81,9 @@ type Action =
       payload: TypePage;
     }
   | { type: CJoliActions.LOAD_GALLERY; payload: Gallery }
-  | { type: CJoliActions.SELECT_MODESCORE; payload: ModeScoreType };
+  | { type: CJoliActions.SELECT_MODESCORE; payload: ModeScoreType }
+  | { type: CJoliActions.LOAD_RANKING_TEAM; payload: Ranking }
+  | { type: CJoliActions.LOAD_TEAMS; payload: Team[] };
 
 const reduceLoadRanking = (state: CJoliState, ranking: Ranking) => {
   const tourney = ranking.tourney;
@@ -159,6 +165,15 @@ const reducer = (state: CJoliState, action: Action) => {
     }
     case CJoliActions.SELECT_MODESCORE: {
       return { ...state, modeScore: action.payload };
+    }
+    case CJoliActions.LOAD_RANKING_TEAM: {
+      return {
+        ...state,
+        ranking: action.payload,
+      };
+    }
+    case CJoliActions.LOAD_TEAMS: {
+      return { ...state, teams: action.payload, ranking: undefined };
     }
   }
 };

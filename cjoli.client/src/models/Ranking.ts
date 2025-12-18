@@ -6,4 +6,6 @@ export interface Ranking {
   tourney: Tourney;
   scores: Scores;
   history: Record<number, Score[]>;
+  categories?: string[];
+  seasons?: string[];
 }

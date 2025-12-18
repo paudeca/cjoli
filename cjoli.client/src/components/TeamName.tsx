@@ -4,13 +4,11 @@ import { useCJoli } from "../hooks/useCJoli";
 import { zoomIcon } from "../styles";
 import styled from "@emotion/styled";
 import { useUser } from "../hooks/useUser";
-import React from "react";
-import { useToast } from "../hooks/useToast";
-import { useTranslation } from "react-i18next";
 import { useTheme } from "@emotion/react";
 import { useParams } from "react-router-dom";
 import { useColor } from "../hooks/useColor";
 import useUid from "../hooks/useUid";
+import { Team } from "../models";
 
 const MyStar = styled(Star)`
   ${zoomIcon}
@@ -24,61 +22,44 @@ const MyTeam = styled("span")<{ color: string }>`
   color: ${(props) => props.color};
 `;
 
+// eslint-disable-next-line complexity
 const TeamName = ({
   positionId,
   teamId,
+  team,
   defaultName,
   hideFavorite,
   className,
 }: {
   positionId?: number;
   teamId?: number;
+  team?: Team;
   defaultName?: string;
   hideFavorite?: boolean;
   className?: string;
 }) => {
   const { getTeamInfo, getTeam, findTeam, isXl } = useCJoli();
-  const { userConfig, isConnected, handleSaveUserConfig } = useUser();
-  const { showToast } = useToast();
-  const { t } = useTranslation();
+  const { userConfig, saveFavoriteTeam } = useUser();
   const theme = useTheme();
   const { teamId: currentTeamId } = useParams();
   const { isWhite } = useColor();
   const uid = useUid();
 
+  if (!team) {
+    team = positionId
+      ? findTeam({ positionId })
+      : teamId
+        ? getTeam(teamId)
+        : undefined;
+  }
   const { name, logo } = positionId
     ? getTeamInfo(positionId, defaultName, false)
-    : getTeam(teamId!) || { name: defaultName };
-
-  const team = positionId
-    ? findTeam({ positionId })
-    : teamId
-      ? getTeam(teamId)
-      : undefined;
+    : team || getTeam(teamId!) || { name: defaultName };
 
   let fullname = team?.datas?.name ? `${name} - ${team.datas.name}` : name;
   if (uid == "cholet2026") {
     fullname = team?.datas?.name ? `${team.datas.name}` : name;
   }
-
-  const saveFavoriteTeam = React.useCallback(
-    async (teamId?: number) => {
-      isConnected &&
-        (await handleSaveUserConfig({
-          ...userConfig,
-          favoriteTeamId: teamId || 0,
-        }));
-      !isConnected &&
-        localStorage.setItem("favoriteTeamId", (teamId || 0) + "");
-      teamId
-        ? showToast("success", t("user.favoriteSaved", "Favorite team saved"))
-        : showToast(
-            "success",
-            t("user.favoriteRemoved", "Favorite team removed")
-          );
-    },
-    [handleSaveUserConfig, userConfig, showToast, t, isConnected]
-  );
 
   const isCurrentTeam =
     currentTeamId && team && team.id == parseInt(currentTeamId);
@@ -130,6 +111,7 @@ const TeamName = ({
           overflow: "hidden",
           display: "inline-block",
           whiteSpace: "nowrap",
+          verticalAlign: "middle",
         }}
       >
         {isCurrentTeam ? <MyTeam color={color}>{fullname}</MyTeam> : fullname}

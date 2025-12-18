@@ -77,6 +77,7 @@ const EventRow = ({
                 onChangeTeam={(team) =>
                   setSelected({ ...selected, first: team?.id })
                 }
+                isClearable
               />
             )}
             {!editMode && <TeamName teamId={datas.first!} hideFavorite />}
@@ -90,6 +91,7 @@ const EventRow = ({
                 onChangeTeam={(team) =>
                   setSelected({ ...selected, second: team?.id })
                 }
+                isClearable
               />
             )}
             {!editMode && <TeamName teamId={datas.second!} hideFavorite />}
@@ -103,6 +105,7 @@ const EventRow = ({
                 onChangeTeam={(team) =>
                   setSelected({ ...selected, third: team?.id })
                 }
+                isClearable
               />
             )}
             {!editMode && <TeamName teamId={datas.third!} hideFavorite />}

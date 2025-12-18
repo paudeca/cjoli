@@ -11,6 +11,7 @@ import {
   EventPhase,
 } from "../models";
 import Cookie from "universal-cookie";
+import { ModeScoreType } from "../contexts/CJoliContext";
 
 const url = import.meta.env.VITE_API_URL;
 const cookie = new Cookie();
@@ -24,8 +25,10 @@ const setHeader = () => {
 };
 setHeader();
 
-export const getTourneys = async () => {
-  const { data } = await axios.get<Tourney[]>(`${url}/cjoli/tourneys`);
+export const getTourneys = async (teamId: number) => {
+  const { data } = await axios.get<Tourney[]>(
+    `${url}/cjoli/tourneys${teamId > 0 ? `/${teamId}` : ""}`
+  );
   return data;
 };
 
@@ -37,6 +40,21 @@ export const getRanking = async (uid: string) => {
 
 export const getUser = async () => {
   const { data } = await axios.get<User>(`${url}/user`);
+  return data;
+};
+
+export const getTeam = async (teamId: number, modeScore: ModeScoreType) => {
+  setHeader();
+  let params = "";
+  if (typeof modeScore == "object") {
+    params = [
+      ...(modeScore.categories?.map((c) => `categories=${c}`) || []),
+      ...(modeScore.seasons?.map((s) => `seasons=${s}`) || []),
+    ].join("&");
+  }
+  const { data } = await axios.get<Ranking>(
+    `${url}/cjoli/team/${teamId}?${params}`
+  );
   return data;
 };
 
@@ -102,6 +120,11 @@ export const updateTeam = async (uid: string, team: Team) => {
       console.log("Unable to update", error);
       return undefined;
     });
+};
+
+export const getTeams = async () => {
+  const { data } = await axios.get<Team[]>(`${url}/cjoli/teams`);
+  return data;
 };
 
 export const logout = () => {

@@ -32,7 +32,8 @@
   },
   "home": {
     "tourneyNotConfigured": "Tourney not configured",
-    "noImage": "No photos for the tourney"
+    "noImage": "No photos for the tourney",
+    "selectTeam": "Select your team to filter"
   },
   "gallery": {
     "sendPhoto": "Send your photos",
@@ -103,6 +104,9 @@
     "select": "Select Team",
     "currentSeason": "Current season",
     "allSeasons": "All seasons",
+    "allTeams": "All teams",
+    "season": "Season",
+    "category": "Category",
     "chart": {
       "general": "General",
       "timeline": "Timeline"

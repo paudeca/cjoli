@@ -5,6 +5,7 @@ import {
   createTourney,
   createUser,
   initPage,
+  mockGetTeams,
 } from "../../__tests__/testUtils";
 import SelectPage from "../SelectPage";
 import { useCJoli } from "../../hooks/useCJoli";
@@ -48,6 +49,8 @@ describe("SelectPage", () => {
       }, [loadTourneys]);
     });
 
+    mockGetTeams([]);
+
     await renderPage(<InitSelectPage />);
 
     const t2 = screen.getByText("name-2");
@@ -72,6 +75,8 @@ describe("SelectPage", () => {
         loadTourneys(tourneys);
       }, [loadTourneys]);
     });
+
+    mockGetTeams([]);
 
     await renderPage(
       <Routes>
@@ -103,6 +108,8 @@ describe("SelectPage", () => {
         user && loadUser(user);
       }, [loadTourneys, loadUser]);
     });
+
+    mockGetTeams([]);
 
     await renderPage(
       <Routes>
