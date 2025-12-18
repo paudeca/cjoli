@@ -22,7 +22,7 @@ import {
   User,
 } from "../models";
 import { useNavigate } from "react-router-dom";
-import { ModeScoreType, ModeScoreTypeObject } from "../contexts/CJoliContext";
+import { ModeScoreType } from "../contexts/CJoliContext";
 
 export const mutationOptions = <
   TData = unknown,
@@ -94,7 +94,7 @@ const useApiGet = () => {
   );
 
   const getRankingTeam = useCallback(
-    (teamId: number, modeScore: ModeScoreTypeObject, enabled = true) =>
+    (teamId: number, modeScore: ModeScoreType, enabled = true) =>
       queryOptions({
         queryKey: ["getTeam", modeScore],
         queryFn: async () => {

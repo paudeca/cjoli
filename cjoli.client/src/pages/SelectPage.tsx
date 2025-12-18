@@ -5,7 +5,7 @@ import { useCJoli } from "../hooks/useCJoli";
 import dayjs from "dayjs";
 import { Clock, ClockHistory, PlusLg } from "react-bootstrap-icons";
 import { Tourney } from "../models";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import TourneyCard from "./select/TourneyCard";
 import { useUser } from "../hooks/useUser";
@@ -14,6 +14,7 @@ import { useModal } from "../hooks/useModal";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import styled from "@emotion/styled";
 import { useApi } from "../hooks/useApi";
+import * as cjoliService from "../services/cjoliService";
 
 const MySpinner = styled("div")`
   width: 18px;
@@ -82,7 +83,7 @@ const Title = ({ title, icon }: { title: string; icon: React.ReactNode }) => {
 };
 
 const SelectPage = () => {
-  const { tourneys } = useCJoli("welcome");
+  const { tourneys, loadTeams } = useCJoli("welcome");
   const { t } = useTranslation();
   const { isRootAdmin } = useUser();
   const { setShow: showAddTourney } = useModal("addTourney");
@@ -90,6 +91,18 @@ const SelectPage = () => {
 
   const { mutate: addTourney, isSuccess } = useMutation(saveTourney({}));
   useQuery(getTourneys({ enabled: isSuccess }));
+
+  useEffect(() => {
+    const call = async () => {
+      const teams = await cjoliService.getTeams();
+      teams.sort((a, b) => {
+        if (a.id == 6) return -1;
+        return a.name < b.name ? -1 : 1;
+      });
+      loadTeams(teams);
+    };
+    call();
+  }, []);
 
   const now = dayjs();
 

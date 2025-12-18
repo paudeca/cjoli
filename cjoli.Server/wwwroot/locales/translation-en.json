@@ -104,6 +104,9 @@
     "select": "Select Team",
     "currentSeason": "Current season",
     "allSeasons": "All seasons",
+    "allTeams": "All teams",
+    "season": "Season",
+    "category": "Category",
     "chart": {
       "general": "General",
       "timeline": "Timeline"

@@ -30,7 +30,6 @@ import { Rank, Score, Team } from "../../../models";
 import { useCJoli } from "../../../hooks/useCJoli";
 import React, { useCallback } from "react";
 import useUid from "../../../hooks/useUid";
-import { ModeScoreObject, ModeScoreType } from "../../../contexts/CJoliContext";
 
 ChartJS.register(
   CategoryScale,
@@ -68,7 +67,6 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
     ranking,
     getTeamRank,
     getScoreForTeam,
-    getScoreForTeamHome,
     modeScore,
     isXl,
     classNamesCast,
@@ -80,17 +78,18 @@ const TeamRadar = ({ team, teamB }: TeamRadarProps) => {
   const rank = getTeamRank(team);
   const rankB = teamB && getTeamRank(teamB);
 
-  const score = uid
-    ? getScoreForTeam(modeScore as ModeScoreType, team)
-    : getScoreForTeamHome(modeScore as ModeScoreObject, team);
-  const scoreB =
-    teamB && uid && getScoreForTeam(modeScore as ModeScoreType, teamB);
+  const mode =
+    uid || typeof modeScore == "object"
+      ? modeScore
+      : { seasons: [], categories: [] };
+
+  const score = getScoreForTeam(mode, team);
+  const scoreB = teamB && getScoreForTeam(mode, teamB);
 
   const countTeams = ranking?.tourney?.teams.length || 10;
   const winPt = ranking?.tourney?.config.win || 2;
 
   const getDataRatio = useCallback((type: keyof Score, score: Score) => {
-    console.log("getDataRatio", type, score, score.ranks);
     return (
       ((score[type] as number) / score.game / score.ranks[type]?.maxRatio) * 100
     );

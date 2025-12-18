@@ -8,12 +8,14 @@ interface TeamSelectProps {
   teams: Team[];
   onChangeTeam: (team?: Team) => void;
   placeholder?: string;
+  isClearable: boolean;
 }
 const TeamSelect = ({
   value,
   teams,
   onChangeTeam,
   placeholder,
+  isClearable,
 }: TeamSelectProps) => {
   const onChange = useCallback(
     (v: SingleValue<{ label: ReactNode; value: number }>) => {
@@ -45,7 +47,7 @@ const TeamSelect = ({
           .toLocaleLowerCase()
           .includes(search.toLocaleLowerCase());
       }}
-      isClearable
+      isClearable={isClearable}
       placeholder={placeholder}
     />
   );

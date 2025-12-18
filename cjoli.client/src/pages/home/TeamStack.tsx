@@ -26,12 +26,10 @@ import TeamRadar from "./team/TeamRadar";
 import TeamTable from "./team/TeamTable";
 import TeamTime from "./team/TeamTime";
 import { useModal } from "../../hooks/useModal";
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import TeamSelect from "../../components/TeamSelect";
 import { ModeScoreType } from "../../contexts/CJoliContext";
 import useUid from "../../hooks/useUid";
-import { useApi } from "../../hooks/useApi";
-import { useQuery } from "@tanstack/react-query";
 
 interface TeamStackProps extends JSX.IntrinsicAttributes {
   teamId?: number;
@@ -56,11 +54,7 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
   const uid = useUid();
   const { teamId: teamIdParam } = useParams();
   const { isMobile } = useScreenSize();
-  const { getRankingTeam } = useApi();
-
-  const { refetch } = useQuery(
-    getRankingTeam(parseInt(teamIdParam!), modeScore, false)
-  );
+  const { t } = useTranslation();
 
   const [teamB, setTeamB] = React.useState<Team | undefined>(
     teamIdB ? getTeam(teamIdB) : undefined
@@ -96,32 +90,6 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
       label: s,
       value: s,
     })) || [];
-
-  /*const optionSeasonss =
-    ranking && team
-      ? ranking?.scores.allScoresTeams[team.id]
-          .reduce<string[]>(
-            (acc, d) => (!acc.includes(d.season) ? [...acc, d.season] : acc),
-            []
-          )
-          .map((k) => ({
-            label: k,
-            value: k,
-          }))
-      : [];
-  const optionCategories =
-    ranking && team
-      ? ranking?.scores.allScoresTeams[team.id]
-          .reduce<string[]>(
-            (acc, d) =>
-              !acc.includes(d.category) ? [...acc, d.category] : acc,
-            []
-          )
-          .map((k) => ({
-            label: k,
-            value: k,
-          }))
-      : [];*/
 
   return (
     <CJoliStack
@@ -182,10 +150,10 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
               <Card className={`p-2 ${classNamesCast.table}`}>
                 {!modeCast && (
                   <>
-                    <Stack className="py-3">
-                      <Form className="mx-auto">
+                    <Stack className="py-2">
+                      <Form className="mx-autoo">
                         <Row
-                          className={`align-items-center ${!isMobile ? "flex-nowrap" : ""}`}
+                          className={`justify-content-md-center align-items-center ${!isMobile ? "flex-nowrap" : ""}`}
                         >
                           <Col xs="auto">
                             <Form.Label as={isXl ? "h1" : "h4"}>
@@ -203,6 +171,7 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
                                     teams?.filter((t) => t.id != team?.id) ?? []
                                   }
                                   onChangeTeam={(team) => setTeamB(team)}
+                                  isClearable
                                 />
                               </Col>
                               {uid && (
@@ -246,43 +215,43 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
                             </Col>
                           )}
                         </Row>
+                        {!uid && (
+                          <Row
+                            className={`mx-2 ${!isMobile ? "flex-nowrap" : ""}`}
+                          >
+                            <Col xs={12} lg={6} className="py-2">
+                              <Select
+                                placeholder={t("team.season", "Season")}
+                                options={optionSeasons}
+                                isMulti
+                                onChange={(e) => {
+                                  const s = e.map((a) => a.label);
+                                  setSeasons(s);
+                                  selectModeScore({
+                                    seasons: s,
+                                    categories,
+                                  });
+                                }}
+                              ></Select>
+                            </Col>
+                            <Col className="py-2">
+                              <Select
+                                placeholder={t("team.category", "Category")}
+                                options={optionCategories}
+                                isMulti
+                                onChange={(e) => {
+                                  const c = e.map((a) => a.label);
+                                  setCategories(c);
+                                  selectModeScore({
+                                    categories: c,
+                                    seasons,
+                                  });
+                                }}
+                              ></Select>
+                            </Col>
+                          </Row>
+                        )}
                       </Form>
-                    </Stack>
-                    <Stack>
-                      <Row className="p-2 pb-4">
-                        <Col>
-                          <Select
-                            placeholder="Season"
-                            options={optionSeasons}
-                            isMulti
-                            onChange={(e) => {
-                              const s = e.map((a) => a.label);
-                              setSeasons(s);
-                              selectModeScore({
-                                seasons: s,
-                                categories,
-                              });
-                              refetch();
-                            }}
-                          ></Select>
-                        </Col>
-                        <Col>
-                          <Select
-                            placeholder="Category"
-                            options={optionCategories}
-                            isMulti
-                            onChange={(e) => {
-                              const c = e.map((a) => a.label);
-                              setCategories(c);
-                              selectModeScore({
-                                categories: c,
-                                seasons,
-                              });
-                              refetch();
-                            }}
-                          ></Select>
-                        </Col>
-                      </Row>
                     </Stack>
                   </>
                 )}

@@ -1,11 +1,6 @@
 /* eslint-disable max-lines */
 import { useCallback, useContext, useEffect } from "react";
-import {
-  CJoliContext,
-  ModeScoreObject,
-  ModeScoreType,
-  ModeScoreTypeObject,
-} from "../contexts/CJoliContext";
+import { CJoliContext, ModeScoreType } from "../contexts/CJoliContext";
 import {
   Gallery,
   Match,
@@ -180,70 +175,24 @@ export const useCJoli = (page?: TypePage) => {
           return state.ranking?.scores.scoreTeamsSeason[team.id];
         case "allTime":
           return state.ranking?.scores.scoreTeamsAllTime[team.id];
+        default:
+          return state.ranking?.scores.scoreTeamsAllTime[team.id];
       }
     },
     [state.ranking?.scores]
   );
-
-  const getScoreForTeamHome = useCallback(
-    (mode: ModeScoreObject, team?: Team) => {
-      const merge: (scoreA: Score, scoreB: Score) => Score = (scoreA, scoreB) =>
-        ({
-          total: scoreA.total + scoreB.total,
-          game: scoreA.game + scoreB.game,
-          win: scoreA.win + scoreB.win,
-          neutral: scoreA.neutral + scoreB.neutral,
-          loss: scoreA.loss + scoreB.loss,
-          goalFor: scoreA.goalFor + scoreB.goalFor,
-          goalAgainst: scoreA.goalAgainst + scoreB.goalAgainst,
-          goalDiff: scoreA.goalDiff + scoreB.goalDiff,
-          shutOut: scoreA.shutOut + scoreB.shutOut,
-          penalty: scoreA.penalty + scoreB.penalty,
-          ranks: scoreB.ranks,
-        }) as Score;
-      let datas = team
-        ? state.ranking?.scores.allScoresTeams[team.id]
-        : state.ranking?.scores.allScores || [];
-      if (!datas) {
-        datas = [];
+  const getScoreAllTeams = useCallback(
+    (mode: ModeScoreType) => {
+      switch (mode) {
+        case "tourney":
+          return state.ranking?.scores.scoreTourney;
+        case "season":
+          return state.ranking?.scores.scoreSeason;
+        case "allTime":
+          return state.ranking?.scores.scoreAllTime;
+        default:
+          return state.ranking?.scores.scoreAllTime;
       }
-      const score = datas!.reduce(
-        (acc, score) => {
-          if (mode.seasons?.length == 0 && mode.categories?.length == 0) {
-            return merge(acc, score);
-          } else if (
-            mode.seasons?.length == 0 &&
-            mode.categories?.includes(score.category)
-          ) {
-            return merge(acc, score);
-          } else if (
-            mode.categories?.length == 0 &&
-            mode.seasons?.includes(score.season)
-          ) {
-            return merge(acc, score);
-          } else if (
-            mode.seasons?.includes(score.season) &&
-            mode.categories?.includes(score.category)
-          ) {
-            return merge(acc, score);
-          }
-          return acc;
-        },
-        {
-          total: 0,
-          game: 0,
-          win: 0,
-          neutral: 0,
-          loss: 0,
-          goalFor: 0,
-          goalAgainst: 0,
-          goalDiff: 0,
-          shutOut: 0,
-          penalty: 0,
-          ranks: {},
-        } as Score
-      );
-      return score;
     },
     [state.ranking?.scores]
   );
@@ -279,7 +228,7 @@ export const useCJoli = (page?: TypePage) => {
   );
 
   const selectModeScore = useCallback(
-    (mode: ModeScoreTypeObject) =>
+    (mode: ModeScoreType) =>
       dispatch({ type: CJoliActions.SELECT_MODESCORE, payload: mode }),
     [dispatch]
   );
@@ -308,7 +257,7 @@ export const useCJoli = (page?: TypePage) => {
     isTeamInSquad,
     isTeamInMatch,
     getScoreForTeam,
-    getScoreForTeamHome,
+    getScoreAllTeams,
     selectDay,
     getScoreFromPosition,
     getScoreFromSquad,

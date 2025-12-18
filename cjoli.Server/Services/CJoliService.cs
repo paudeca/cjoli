@@ -109,8 +109,6 @@ namespace cjoli.Server.Services
             {
                 ScoreAllTime = scores.Total,
                 ScoreTeamsAllTime = scores.Teams.ToDictionary(s => s.Key, s => s.Value.Score),
-                //AllScores = scores.AllScores,
-                //AllScoresTeams = scores.Teams.ToDictionary(s => s.Key, s => s.Value.AllScores),
             };
             SortTeams(scoresDto.ScoreTeamsAllTime);
             var cat = context.Tourneys
@@ -688,7 +686,6 @@ namespace cjoli.Server.Services
             foreach (var position in positions.Where(p => p.MatchType != 0))
             {
                 var m = matches.SingleOrDefault(m => m.SquadId == position.SquadId && m.MatchType == position.MatchType && m.MatchOrder == position.MatchOrder);
-                //var m = matches.FirstOrDefault(m => m.SquadId == position.SquadId && m.MatchType == position.MatchType && m.MatchOrder == position.MatchOrder);
                 var userMatch = m?.UserMatch;
                 IMatch? match = m != null && m.Done ? m : userMatch;
                 if (match != null)
@@ -818,22 +815,6 @@ namespace cjoli.Server.Services
                 return listScore;
             };
             var allScores = selectMapTourney(query.Where(r => r.Win == 1 || r.Neutral == 1)).Select(kv => kv.Value).ToList();
-            /*var scoreSeasons = new Dictionary<string, Score>();
-            var scoreCategories = new Dictionary<string, Score>();
-            foreach (var kv in allScores)
-            {
-                if (!scoreSeasons.ContainsKey(kv.Key.Season))
-                {
-                    scoreSeasons.Add(kv.Key.Season, new Score());
-                }
-                scoreSeasons[kv.Key.Season].Merge(kv.Value);
-                if (!scoreCategories.ContainsKey(kv.Key.Category))
-                {
-                    scoreCategories.Add(kv.Key.Category, new Score());
-                }
-                scoreCategories[kv.Key.Category].Merge(kv.Value);
-            }*/
-
 
             var funcMapSeasonCategoryTeam = (IQueryable<MatchResult> query) =>
             {
@@ -859,39 +840,16 @@ namespace cjoli.Server.Services
                     {
                         Score = new Score() { TeamId = kv.Key.TeamId },
                         AllScores = new List<Score>()
-                        //Season = new Dictionary<string, Score>(),
-                        //Category = new Dictionary<string, Score>(),
-                        //Tourney = new Dictionary<string, Score>(),
                     });
                 }
                 var score = acc[kv.Key.TeamId];
-                /*if (!score.Season.ContainsKey(kv.Key.Season))
-                {
-                    score.Season.Add(kv.Key.Season, new Score());
-                }
-                if (!score.Category.ContainsKey(kv.Key.Category))
-                {
-                    score.Category.Add(kv.Key.Category, new Score());
-                }
-                if (!score.Tourney.ContainsKey(kv.Key.Tourney))
-                {
-                    score.Tourney.Add(kv.Key.Tourney, new Score());
-                }*/
-                /*if (!scoreTourney.ContainsKey(kv.Key.Tourney))
-                {
-                    scoreTourney.Add(kv.Key.Tourney, new Score());
-                }*/
                 var s = kv.Value;
 
                 score.Score.Merge(s);
                 score.AllScores.Add(s);
-                //score.Season[kv.Key.Season].Merge(s);
-                //score.Category[kv.Key.Category].Merge(s);
-                //score.Tourney[kv.Key.Tourney].Merge(s);
 
                 return acc;
             });
-            //return new ScoreFull() { Total = scoreTotal, Seasons = scoreSeasons, Categories = scoreCategories, Teams = mapTeams };
             return new ScoreFull() { Total = scoreTotal, AllScores = allScores, Teams = mapTeams };
         }
 
@@ -899,8 +857,6 @@ namespace cjoli.Server.Services
         {
             public required Score Total { get; set; }
             public required List<Score> AllScores { get; set; }
-            //public required Dictionary<string, Score> Seasons { get; set; }
-            //public required Dictionary<string, Score> Categories { get; set; }
             public required Dictionary<int, ScoreTeam> Teams { get; set; }
         }
 
@@ -908,9 +864,6 @@ namespace cjoli.Server.Services
         {
             public required Score Score { get; set; }
             public required List<Score> AllScores { get; set; }
-            //public required Dictionary<string, Score> Season { get; set; }
-            //public required Dictionary<string, Score> Category { get; set; }
-            //public required Dictionary<string, Score> Tourney { get; set; }
         }
 
         class SeasonCategoryTourney
@@ -1026,24 +979,6 @@ namespace cjoli.Server.Services
         }
 
 
-
-        private Score ISelectScoreSeason(IGrouping<object, IMatchResult> o)
-        {
-            return new Score
-            {
-                TeamId = 0,
-                Game = o.Count(),
-                Win = o.Sum(m => m.Win),
-                Neutral = o.Sum(m => m.Neutral),
-                Loss = o.Sum(m => m.Loss),
-                GoalFor = o.Sum(m => m.GoalFor),
-                GoalAgainst = o.Sum(m => m.GoalAgainst),
-                GoalDiff = o.Sum(m => m.GoalDiff),
-                ShutOut = o.Sum(m => m.ShutOut)
-            };
-        }
-
-
         private Score ISelectScore(IGrouping<int, IMatchResult> o)
         {
             return new Score
@@ -1082,7 +1017,6 @@ namespace cjoli.Server.Services
                     }).OrderByDescending(s => s.Score).ToList();
             ranking.Scores.Bet.Scores = scores;
             var allUsers = scores.Select(s => s.UserId);
-            //ranking.Scores.Bet.Users = context.Users.Where(u=>allUsers.Contains(u.Id)).Select(u => _mapper.Map<UserDto>(u)).ToList();
             ranking.Scores.Bet.Users = _mapper.Map<List<UserDto>>(context.Users.Include(c => c.Configs.Where(c => c.Tourney.Id == tourneyId)).Where(u => allUsers.Contains(u.Id)).ToList());
 
             int index = scores.FindIndex(s => s.UserId == user?.Id);

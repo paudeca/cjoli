@@ -104,6 +104,10 @@
     "select": "Sélectionner une Équipe",
     "currentSeason": "Saison en cours",
     "allSeasons": "Toutes les saisons",
+    "allTeams": "Toutes les équipes",
+    "season": "Saison",
+    "category": "Catégorie",
+
     "chart": {
       "general": "Général",
       "timeline": "Chronologie"

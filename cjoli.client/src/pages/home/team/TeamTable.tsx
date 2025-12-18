@@ -8,7 +8,6 @@ import { Rank, Score, Squad, Team, Tourney } from "../../../models";
 import { useCJoli } from "../../../hooks/useCJoli";
 import { Trans, useTranslation } from "react-i18next";
 import useUid from "../../../hooks/useUid";
-import { ModeScoreObject, ModeScoreType } from "../../../contexts/CJoliContext";
 
 const percent = (value: number, total: number) =>
   total == 0 ? "" : `${Math.round((value / total) * 100)}%`;
@@ -145,7 +144,6 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
       label: "BP",
       description: t("rank.goalFor", "Goals for"),
       val: (s: Score) => {
-        if (!teamB) return s.goalFor / s.game;
         return s.goalFor;
       },
       ration: (s: Score) => (s.game > 0 ? average(s.goalFor, s.game) : ""),
@@ -154,7 +152,6 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
         if (!teamB) return s.goalFor / s.game;
         return s.goalFor;
       },
-      //getLabelScore: (col: Column) => (s: Score) => s.goalFor,
       getInfo: (col: Column) => (s: Score) =>
         (uid ? col.ration!(s) : s.goalFor) + formatRank(s.ranks?.goalFor?.rank),
       up: true,
@@ -165,7 +162,6 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
       label: "BC",
       description: t("rank.goalAgainst", "Goals against"),
       val: (s: Score) => {
-        if (!teamB) return s.goalAgainst / s.game;
         return s.goalAgainst;
       },
       ration: (s: Score) => (s.game > 0 ? average(s.goalAgainst, s.game) : ""),
@@ -185,7 +181,6 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
       label: "BL",
       description: t("rank.shutOut", "ShutOut"),
       val: (s: Score) => {
-        if (!teamB) return s.shutOut / s.game;
         return s.shutOut;
       },
       ration: (s: Score) => (s.game > 0 ? percent(s.shutOut, s.game) : ""),
@@ -204,7 +199,6 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
       label: "+/-",
       description: t("rank.goalDiff", "Goal average"),
       val: (s: Score) => {
-        if (!teamB) return s.goalDiff / s.game;
         return s.goalDiff;
       },
       ration: (s: Score) => (s.game > 0 ? average(s.goalDiff, s.game) : ""),
@@ -246,11 +240,10 @@ const useColumns = (tourney?: Tourney, teamB?: Team) => {
 // eslint-disable-next-line max-statements
 const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
   const {
-    ranking,
     tourney,
     getTeamRank,
     getScoreForTeam,
-    getScoreForTeamHome,
+    getScoreAllTeams,
     getScoreFromSquad,
     modeScore,
     classNamesCast,
@@ -263,14 +256,10 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
     uid || typeof modeScore == "object"
       ? modeScore
       : { seasons: [], categories: [] };
-  const score = uid
-    ? getScoreForTeam(mode as ModeScoreType, team)!
-    : getScoreForTeamHome(mode as ModeScoreObject, team)!;
+  const score = getScoreForTeam(mode, team);
   let scoreB: Score | undefined;
   if (teamB) {
-    scoreB = uid
-      ? getScoreForTeam(modeScore as ModeScoreType, teamB)
-      : getScoreForTeamHome(modeScore as ModeScoreObject, teamB);
+    scoreB = getScoreForTeam(mode, teamB);
   }
   const scoreSquad = squad && getScoreFromSquad(squad, team);
   const scoreSquadB = squad && teamB && getScoreFromSquad(squad, teamB);
@@ -291,21 +280,8 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
         score: scoreB,
       },
     ];
-  } else if (uid) {
-    const type =
-      modeScore == "tourney"
-        ? "scoreTourney"
-        : modeScore == "season"
-          ? "scoreSeason"
-          : "scoreAllTime";
-    const scoreTourney = ranking?.scores[type];
-    scoreB = scoreTourney;
-    datas = [
-      ...datas,
-      { team: undefined, rank: undefined, score: scoreTourney },
-    ];
   } else {
-    scoreB = getScoreForTeamHome(mode as ModeScoreObject);
+    scoreB = getScoreAllTeams(mode);
     datas = [...datas, { team: undefined, rank: undefined, score: scoreB }];
   }
 
@@ -318,7 +294,11 @@ const TeamTable = ({ team, teamB, squad }: TeamTableProps) => {
           <tr>
             <th />
             {datas.map(({ team }) => (
-              <th key={team?.id || 0} className={classNamesCast.padding}>
+              <th
+                key={team?.id || 0}
+                className={`${classNamesCast.padding}`}
+                style={{ fontWeight: 600 }}
+              >
                 {team ? (
                   <TeamName teamId={team.id} hideFavorite />
                 ) : modeScore == "tourney" ? (

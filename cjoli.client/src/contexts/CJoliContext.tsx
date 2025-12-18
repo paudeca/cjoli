@@ -14,10 +14,11 @@ import {
 import { CJoliActions } from "./actions";
 import dayjs from "dayjs";
 
-export type ModeScoreType = "tourney" | "season" | "allTime";
-export type ModeScoreObject = { seasons?: string[]; categories?: string[] };
-
-export type ModeScoreTypeObject = ModeScoreType | ModeScoreObject;
+export type ModeScoreType =
+  | "tourney"
+  | "season"
+  | "allTime"
+  | { seasons?: string[]; categories?: string[] };
 
 interface CJoliState {
   tourneys?: Tourney[];
@@ -36,7 +37,7 @@ interface CJoliState {
   };
   page: TypePage;
   gallery?: Gallery;
-  modeScore: ModeScoreTypeObject;
+  modeScore: ModeScoreType;
 }
 
 export const CJoliContext = React.createContext<{
@@ -80,7 +81,7 @@ type Action =
       payload: TypePage;
     }
   | { type: CJoliActions.LOAD_GALLERY; payload: Gallery }
-  | { type: CJoliActions.SELECT_MODESCORE; payload: ModeScoreTypeObject }
+  | { type: CJoliActions.SELECT_MODESCORE; payload: ModeScoreType }
   | { type: CJoliActions.LOAD_RANKING_TEAM; payload: Ranking }
   | { type: CJoliActions.LOAD_TEAMS; payload: Team[] };
 
@@ -172,7 +173,7 @@ const reducer = (state: CJoliState, action: Action) => {
       };
     }
     case CJoliActions.LOAD_TEAMS: {
-      return { ...state, teams: action.payload };
+      return { ...state, teams: action.payload, ranking: undefined };
     }
   }
 };

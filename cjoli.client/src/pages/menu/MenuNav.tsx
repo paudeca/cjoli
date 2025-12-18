@@ -17,10 +17,12 @@ import UpdateModal from "../../modals/UpdateModal";
 import * as cjoliService from "../../services/cjoliService";
 import {
   BoxArrowRight,
+  ChevronDoubleRight,
   Controller,
   DoorOpen,
   FilePerson,
   GearWide,
+  HeptagonHalf,
   House,
   Images,
   ListOl,
@@ -29,7 +31,7 @@ import {
   Tv,
 } from "react-bootstrap-icons";
 import { useUser } from "../../hooks/useUser";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useScreenSize from "../../hooks/useScreenSize";
 import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
@@ -79,6 +81,8 @@ const MenuNav = () => {
   const { isMobile } = useScreenSize();
   const { t, i18n } = useTranslation();
   const [lang, setLang] = useState(i18n.resolvedLanguage);
+  const { pathname } = useLocation();
+  const isRootPath = pathname == "/";
 
   const logout = async () => {
     await cjoliService.logout();
@@ -98,7 +102,6 @@ const MenuNav = () => {
 
   const tourneyLabel = uid && tourney?.name;
 
-  //const [teams, setTeams] = useState<Team[]>([]);
   useEffect(() => {
     const call = async () => {
       const teams = await cjoliService.getTeams();
@@ -106,7 +109,6 @@ const MenuNav = () => {
         if (a.id == 6) return -1;
         return a.name < b.name ? -1 : 1;
       });
-      //setTeams(teams);
       loadTeams(teams);
     };
     call();
@@ -121,19 +123,36 @@ const MenuNav = () => {
       <Container fluid>
         <MenuBrand setShow={setShow} />
         {!uid && (
-          <div style={{ width: 300, paddingTop: 5, paddingBottom: 5 }}>
-            <TeamSelect
-              teams={teams || []}
-              value={userConfig.favoriteTeamId}
-              onChangeTeam={async (team) => {
-                const teamId = team ? team.id : 0;
-                saveFavoriteTeam(teamId, true);
-                const tourneys = await cjoliService.getTourneys(teamId);
-                loadTourneys(tourneys);
-              }}
-              placeholder={t("home.selectTeam", "Select your team to filter")}
-            />
-          </div>
+          <Stack direction="horizontal">
+            <div style={{ width: 300, paddingTop: 5, paddingBottom: 5 }}>
+              <TeamSelect
+                teams={teams || []}
+                value={userConfig.favoriteTeamId}
+                onChangeTeam={async (team) => {
+                  const teamId = team ? team.id : 0;
+                  saveFavoriteTeam(teamId, true);
+                  const tourneys = await cjoliService.getTourneys(teamId);
+                  loadTourneys(tourneys);
+                  if (!isRootPath) {
+                    navigate(`/team/${teamId}`);
+                  }
+                }}
+                placeholder={t("home.selectTeam", "Select your team to filter")}
+                isClearable={isRootPath}
+              />
+            </div>
+            {!!userConfig.favoriteTeamId && isRootPath && (
+              <Nav className="justify-content-end flex-grow-1 pe-3">
+                <Nav.Link
+                  onClick={() => navigate(`/team/${userConfig.favoriteTeamId}`)}
+                  className="text-secondary"
+                >
+                  <HeptagonHalf size={20} className="ms-2" />
+                  <ChevronDoubleRight size={20} />
+                </Nav.Link>
+              </Nav>
+            )}
+          </Stack>
         )}
         {tourneyLabel && !isCastPage && (
           <Stack direction="horizontal" gap={3}>
