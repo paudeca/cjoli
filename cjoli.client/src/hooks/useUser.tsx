@@ -69,12 +69,12 @@ export const useUser = () => {
   const saveFavoriteTeam = useCallback(
     async (teamId?: number, hideNotif?: boolean) => {
       isConnected &&
+        uid &&
         (await handleSaveUserConfig({
           ...userConfig,
           favoriteTeamId: teamId || 0,
         }));
-      !isConnected &&
-        localStorage.setItem("favoriteTeamId", (teamId || 0) + "");
+      localStorage.setItem("favoriteTeamId", (teamId || 0) + "");
       if (!hideNotif) {
         teamId
           ? showToast("success", t("user.favoriteSaved", "Favorite team saved"))
@@ -84,7 +84,7 @@ export const useUser = () => {
             );
       }
     },
-    [handleSaveUserConfig, userConfig, showToast, t, isConnected]
+    [handleSaveUserConfig, uid, userConfig, showToast, t, isConnected]
   );
 
   const isRootAdmin = state.user?.role === "ADMIN";

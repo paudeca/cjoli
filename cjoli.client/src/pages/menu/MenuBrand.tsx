@@ -26,7 +26,10 @@ const MenuBrand = ({ setShow }: MenuBrandProps) => {
 
   const team = teams?.find((t) => t.id == userConfig.favoriteTeamId);
 
-  const logo = team?.logo ?? "/logo.png";
+  let logo = team?.logo ?? "/logo.png";
+  if (uid == "cholet2026" && team?.datas?.logo) {
+    logo = team?.datas?.logo;
+  }
   const version = __APP_VERSION__;
   const tourneyLabel = uid && tourney?.name;
 
@@ -41,7 +44,7 @@ const MenuBrand = ({ setShow }: MenuBrandProps) => {
             onClick={() => navigate("/")}
             role="button"
           />
-          {team?.datas?.logo && (
+          {team?.datas?.logo && uid != "cholet2026" && (
             <MyImg
               src={team.datas.logo}
               width="60px"

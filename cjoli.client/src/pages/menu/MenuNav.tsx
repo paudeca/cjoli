@@ -35,7 +35,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import useScreenSize from "../../hooks/useScreenSize";
 import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useModal } from "../../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
 import dayjs from "dayjs";
@@ -60,8 +60,7 @@ const langs = [
 
 // eslint-disable-next-line max-lines-per-function, complexity, max-statements
 const MenuNav = () => {
-  const { loadRanking, loadTourneys, tourney, isCastPage, teams, loadTeams } =
-    useCJoli();
+  const { loadRanking, loadTourneys, tourney, isCastPage, teams } = useCJoli();
   const {
     user,
     userConfig,
@@ -101,18 +100,6 @@ const MenuNav = () => {
     (!isAdmin && localStorage.getItem("useEstimate") == "true");
 
   const tourneyLabel = uid && tourney?.name;
-
-  useEffect(() => {
-    const call = async () => {
-      const teams = await cjoliService.getTeams();
-      teams.sort((a, b) => {
-        if (a.id == 6) return -1;
-        return a.name < b.name ? -1 : 1;
-      });
-      loadTeams(teams);
-    };
-    call();
-  }, []);
 
   return (
     <MyNavbar

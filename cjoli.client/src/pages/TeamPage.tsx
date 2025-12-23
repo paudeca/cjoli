@@ -8,9 +8,11 @@ import { useServer } from "../hooks/useServer";
 import { useEffect, useState } from "react";
 import { useApi } from "../hooks/useApi";
 import RankingMatchesStack from "./team/RankingMatchesStack";
+import * as cjoliService from "../services/cjoliService";
 
 const TeamPage = () => {
-  const { phases, isTeamInPhase, getTeam, modeScore } = useCJoli("team");
+  const { phases, isTeamInPhase, getTeam, modeScore, loadTeams } =
+    useCJoli("team");
   const { sendMessage, register } = useServer();
   const { getRanking, getRankingTeam } = useApi();
   const uid = useUid();
@@ -33,6 +35,18 @@ const TeamPage = () => {
         refetch();
       });
   }, [uid, refetch, register]);
+
+  useEffect(() => {
+    const call = async () => {
+      const teams = await cjoliService.getTeams();
+      teams.sort((a, b) => {
+        if (a.id == 6) return -1;
+        return a.name < b.name ? -1 : 1;
+      });
+      loadTeams(teams);
+    };
+    !uid && call();
+  }, [uid, loadTeams]);
 
   if (!team) {
     return <>no team</>;
