@@ -35,9 +35,9 @@ namespace cjoli.Server.Controllers
 
         [HttpGet]
         [Route("Teams")]
-        public List<TeamDto> ListTeams()
+        public async Task<List<TeamDto>> ListTeams(CancellationToken ct)
         {
-            return _service.ListTeams(_context).Select(_mapper.Map<TeamDto>).ToList();
+            return (await _service.ListTeams(_context, ct)).Select(_mapper.Map<TeamDto>).ToList();
         }
 
         [HttpPost]

@@ -14,7 +14,6 @@ using cjoli.Server.Middlewares;
 using Serilog.Enrichers.Sensitive;
 using cjoli.Server.Authorizations;
 using Microsoft.AspNetCore.Authorization;
-using Google.Apis.Auth.OAuth2;
 using PhotoSauce.MagicScaler;
 using PhotoSauce.NativeCodecs.Libpng;
 using PhotoSauce.NativeCodecs.Libjpeg;
@@ -57,6 +56,9 @@ builder.Services.AddAuthorization(opt =>
         policy.AddRequirements(new AdminTourneyRequirement());
     });
 });
+
+builder.Services
+    .AddApplicationInsightsTelemetryWorkerService();
 
 builder.Services.AddControllers();
 builder.Services.AddCors(opt => opt.AddDefaultPolicy(b => b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
@@ -104,6 +106,7 @@ builder.Services.AddSingleton<StorageService>();
 builder.Services.AddSingleton<SynchroService>();
 builder.Services.AddSingleton(new OpenAIClient(builder.Configuration["OpenAIKey"]));
 builder.Services.AddSingleton<LoggerMiddleware>();
+builder.Services.AddSingleton<CancellationMiddleware>();
 
 builder.Services.AddSingleton<IAuthorizationHandler, AdminTourneyAuthorizationHandler>();
 
@@ -159,7 +162,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<LoggerMiddleware>();
-
+app.UseMiddleware<CancellationMiddleware>();
 
 
 app.MapControllers();

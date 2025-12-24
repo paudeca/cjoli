@@ -64,24 +64,24 @@ namespace cjoli.Server.Controllers
 
         [HttpGet]
         [Route("Tourneys")]
-        public List<TourneyDto> ListTourneys()
+        public async Task<List<TourneyDto>> ListTourneys(CancellationToken ct)
         {
-            return _service.ListTourneys(0, _context).Select(_mapper.Map<TourneyDto>).ToList();
+            return (await _service.ListTourneys(0, _context, ct)).Select(_mapper.Map<TourneyDto>).ToList();
         }
 
         [HttpGet]
         [Route("Tourneys/{teamId}")]
-        public List<TourneyDto> ListTourneys(int teamId)
+        public async Task<List<TourneyDto>> ListTourneys(int teamId, CancellationToken ct)
         {
-            return _service.ListTourneys(teamId, _context).Select(_mapper.Map<TourneyDto>).ToList();
+            return (await _service.ListTourneys(teamId, _context, ct)).Select(_mapper.Map<TourneyDto>).ToList();
         }
 
 
         [HttpGet]
         [Route("Teams")]
-        public List<TeamDto> ListTeams()
+        public async Task<List<TeamDto>> ListTeams(CancellationToken ct)
         {
-            return _service.ListTeams(_context, onlyMainTeam: true).Select(_mapper.Map<TeamDto>).ToList();
+            return (await _service.ListTeams(_context, ct, onlyMainTeam: true)).Select(_mapper.Map<TeamDto>).ToList();
         }
 
         [HttpGet]

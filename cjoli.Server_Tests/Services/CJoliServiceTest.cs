@@ -29,13 +29,13 @@ namespace cjoli.Server_Tests.Services
 
 
         [Fact]
-        public void ListTourneys_Found()
+        public async Task ListTourneys_Found()
         {
             //Arrange
             var tourney = CreateTourney();
 
             //Act
-            var tourneys = _service.ListTourneys(0, _context);
+            var tourneys = await _service.ListTourneys(0, _context, new CancellationToken());
 
             //Assert
             Assert.NotEmpty(tourneys);

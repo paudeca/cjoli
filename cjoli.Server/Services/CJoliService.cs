@@ -74,29 +74,29 @@ namespace cjoli.Server.Services
             return _rules.ContainsKey(ruleName) ? _rules[ruleName] : _rules["simple"];
         }
 
-        public List<Tourney> ListTourneys(int filterTeamId, CJoliContext context)
+        public async Task<List<Tourney>> ListTourneys(int filterTeamId, CJoliContext context, CancellationToken ct)
         {
             IQueryable<Tourney> query = context.Tourneys;
             if (filterTeamId > 0)
             {
                 query = query.Include(t => t.Teams).Where(t => t.Teams.Any(t => t.Id == filterTeamId));
             }
-            return query.OrderByDescending(t => t.StartTime).ToList().Select(t =>
+            return (await query.OrderByDescending(t => t.StartTime).ToListAsync(ct)).Select(t =>
             {
                 t.Config = GetRule(t);
                 return t;
             }).ToList();
         }
 
-        public List<Team> ListTeams(CJoliContext context, bool onlyMainTeam = false)
+        public async Task<List<Team>> ListTeams(CJoliContext context, CancellationToken ct, bool onlyMainTeam = false)
         {
             if (onlyMainTeam)
             {
-                return context.Team.Include(t => t.Alias).Where(t => t.Alias == null).OrderBy(t => t.Name).ToList();
+                return await context.Team.Include(t => t.Alias).Where(t => t.Alias == null).OrderBy(t => t.Name).ToListAsync(ct);
             }
             else
             {
-                return context.Team.OrderBy(t => t.Name).ToList();
+                return await context.Team.OrderBy(t => t.Name).ToListAsync(ct);
             }
         }
 
