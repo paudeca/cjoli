@@ -1,13 +1,8 @@
 ﻿using cjoli.Server.Exceptions;
 using cjoli.Server.Models;
-using cjoli.Server.Models.AI;
 using cjoli.Server.Models.Twilio;
-using Microsoft.EntityFrameworkCore;
 using PhotoSauce.MagicScaler;
-using PhotoSauce.NativeCodecs.Libpng;
-using System;
 using System.Text.Json;
-using Twilio.Rest.Api.V2010.Account;
 
 namespace cjoli.Server.Services
 {
@@ -26,7 +21,8 @@ namespace cjoli.Server.Services
             CJoliService cjoliService,
             AIService aIService,
             ILogger<MessageService> logger,
-            IConfiguration configuration) {
+            IConfiguration configuration)
+        {
             _twilioService = twilioService;
             _storageService = storageService;
             _cjoliService = cjoliService;
@@ -35,7 +31,7 @@ namespace cjoli.Server.Services
             _configuration = configuration;
         }
 
-        public async Task InboundMessage(string uuid, MessageTwilio message, CJoliContext context)
+        public async Task InboundMessage(string uuid, MessageTwilio message, CJoliContext context, CancellationToken ct)
         {
             Tourney? tourney = context.Tourneys.SingleOrDefault(t => t.Uid == uuid);
             if (tourney == null)
@@ -45,23 +41,23 @@ namespace cjoli.Server.Services
 
             Message m = CreateMessage(tourney, message, context);
             string? answer = null;
-            if(m.MessageType == "image" && m.MediaUrl!=null && m.MediaContentType!=null)
+            if (m.MessageType == "image" && m.MediaUrl != null && m.MediaContentType != null)
             {
                 var stream = await _twilioService.LoadMedia(m.MediaUrl);
-                string name = $"{DateTime.Now.ToString("yyyy-MM-dd")}/{m.MessageId}";                
+                string name = $"{DateTime.Now.ToString("yyyy-MM-dd")}/{m.MessageId}";
                 string url = await _storageService.SaveBlob(stream, uuid, name, m.MediaContentType);
                 m.MediaUrl = url;
                 m.MediaName = name;
-                answer = await GenerateAnswer(uuid, tourney, message.From,"L'utilisateur a envoyé une image", false, context);
+                answer = await GenerateAnswer(uuid, tourney, message.From, "L'utilisateur a envoyé une image", false, context, ct);
 
                 await SendNotification(tourney, message.From);
             }
-            else if(message.Body!=null)
+            else if (message.Body != null)
             {
-                answer = await GenerateAnswer(uuid, tourney, message.From, message.Body, true, context);
+                answer = await GenerateAnswer(uuid, tourney, message.From, message.Body, true, context, ct);
             }
 
-            if (answer!=null)
+            if (answer != null)
             {
                 Message rep = await _twilioService.SendMessage(body: answer, from: message.To, to: message.From, tourney: tourney);
                 tourney.Messages.Add(rep);
@@ -70,13 +66,13 @@ namespace cjoli.Server.Services
             context.SaveChanges();
         }
 
-        private async Task<string?> GenerateAnswer(string uuid, Tourney tourney, String from, String body,bool isUser, CJoliContext context)
+        private async Task<string?> GenerateAnswer(string uuid, Tourney tourney, String from, String body, bool isUser, CJoliContext context, CancellationToken ct)
         {
-            var dto = _cjoliService.CreateRanking(uuid, null, false, context);
+            var dto = await _cjoliService.CreateRanking(uuid, null, false, context, ct);
             var session = _aiService.CreateSessionForChat(uuid, null, null, dto, context);
 
             List<Message> messages = context.Messages
-                .Where(m => m.Tourney == tourney && (m.From == from || m.To == from) && m.Body!=null && m.Time>DateTime.Now.AddMinutes(-60))
+                .Where(m => m.Tourney == tourney && (m.From == from || m.To == from) && m.Body != null && m.Time > DateTime.Now.AddMinutes(-60))
                 .OrderBy(m => m.Time).ToList();
             messages.ForEach(m =>
             {
@@ -92,10 +88,11 @@ namespace cjoli.Server.Services
                     }
                 }
             });
-            if(isUser)
+            if (isUser)
             {
                 session.AddUserMessage(body);
-            } else
+            }
+            else
             {
                 session.AddSystemMessage(body);
             }
@@ -135,7 +132,7 @@ namespace cjoli.Server.Services
             {
                 Width = 600,
             };
-            using var streamSized = new MemoryStream(); 
+            using var streamSized = new MemoryStream();
             MagicImageProcessor.ProcessImage(stream, streamSized, settings);
 
             string messageId = Guid.NewGuid().ToString();
@@ -175,7 +172,7 @@ namespace cjoli.Server.Services
         }
 
         private async Task SendNotification(Tourney tourney, string from)
-        {            
+        {
             if (!string.IsNullOrEmpty(tourney.WhatsappNotif))
             {
                 try

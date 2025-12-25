@@ -70,6 +70,8 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
     }
   }, [teamIdB, setTeamB, getTeam]);
 
+  console.log("RANKING", ranking);
+
   const team = getTeam(teamId ?? parseInt(teamIdParam!));
 
   const [seasons, setSeasons] = useState<string[]>([]);

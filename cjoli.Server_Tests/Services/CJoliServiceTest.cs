@@ -47,20 +47,20 @@ namespace cjoli.Server_Tests.Services
 
 
         [Fact]
-        public void GetTourney_NotFound()
+        public async Task GetTourney_NotFound()
         {
             //Act & Assert
-            Assert.Throws<NotFoundException>(() => _service.GetTourney("", _context));
+            Assert.Throws<NotFoundException>(() => _service.GetTourney("", _context, new CancellationToken()).Result);
         }
 
         [Fact]
-        public void GetTourney_Found()
+        public async Task GetTourney_Found()
         {
             //Arrange
             var tourney = CreateTourney();
 
             //Act
-            var result = _service.GetTourney(tourney.Uid, _context);
+            var result = await _service.GetTourney(tourney.Uid, _context, new CancellationToken());
 
             //Assert
             Assert.Same(tourney.Uid, result.Uid);
@@ -71,7 +71,7 @@ namespace cjoli.Server_Tests.Services
         [InlineData(0, 0, 0, 1)]
         [InlineData(1, 0, 0, 1)]
         [InlineData(0, 1, 1, 0)]
-        public void CreateRanking(int score1, int score2, int rank1, int rank2)
+        public async Task CreateRanking(int score1, int score2, int rank1, int rank2)
         {
             //Arrange
             var tourney = CreateTourney();
@@ -86,7 +86,8 @@ namespace cjoli.Server_Tests.Services
                 match.Done = true;
             });
             //Act
-            var ranking = _service.CreateRanking(tourney.Uid, user.Login, false, _context);
+            var ct = new CancellationToken();
+            var ranking = await _service.CreateRanking(tourney.Uid, user.Login, false, _context, ct);
             //Assert
             Assert.Same(tourney.Uid, ranking.Tourney.Uid);
             Assert.NotNull(ranking.Scores);
@@ -101,7 +102,7 @@ namespace cjoli.Server_Tests.Services
         [Theory]
         [InlineData(1, 0)]
         [InlineData(0, 1)]
-        public void CreateRanking_Order_Direct(int score1, int score2)
+        public async Task CreateRanking_Order_Direct(int score1, int score2)
         {
             //Arrange
             var tourney = CreateTourney();
@@ -133,7 +134,8 @@ namespace cjoli.Server_Tests.Services
             });
 
             //Act
-            var ranking = _service.CreateRanking(tourney.Uid, user.Login, false, _context);
+            var ct = new CancellationToken();
+            var ranking = await _service.CreateRanking(tourney.Uid, user.Login, false, _context, ct);
             var result = string.Join(' ', ranking.Scores.ScoreSquads.First().Scores.Select((s, i) => $"{i}:{s.TeamId}:{s.Total}"));
             //Assert
             Assert.Same(tourney.Uid, ranking.Tourney.Uid);
@@ -148,7 +150,7 @@ namespace cjoli.Server_Tests.Services
         [InlineData(2, 1, 0, 0)]
         [InlineData(1, 2, 0, 0)]
         [InlineData(2, 1, 1, 0)]
-        public void CreateRanking_Order_Goal(int score1, int score2, int score3_1, int score3_2)
+        public async Task CreateRanking_Order_Goal(int score1, int score2, int score3_1, int score3_2)
         {
             //Arrange
             var tourney = CreateTourney();
@@ -178,7 +180,8 @@ namespace cjoli.Server_Tests.Services
             });
 
             //Act
-            var ranking = _service.CreateRanking(tourney.Uid, user.Login, false, _context);
+            var ct = new CancellationToken();
+            var ranking = await _service.CreateRanking(tourney.Uid, user.Login, false, _context, ct);
             var result = string.Join(' ', ranking.Scores.ScoreSquads.First().Scores.Select((s, i) => $"{i}:{s.TeamId}:{s.Total}"));
             //Assert
             Assert.Same(tourney.Uid, ranking.Tourney.Uid);
@@ -191,7 +194,7 @@ namespace cjoli.Server_Tests.Services
 
 
         [Fact]
-        public void AfftectationTeams_Ok()
+        public async Task AfftectationTeams_Ok()
         {
             //Arrange
             var tourney = CreateTourney();
@@ -199,7 +202,7 @@ namespace cjoli.Server_Tests.Services
             var team2 = Team("team2", tourney);
 
             //Act
-            var dto = _service.CreateRanking(tourney.Uid, null, false, _context);
+            var dto = await _service.CreateRanking(tourney.Uid, null, false, _context, new CancellationToken());
             var match = dto.Tourney.Phases.First().Squads.First().Matches.First();
             //Assert
             Assert.Equal(team1.Id, match.TeamIdA);
@@ -207,7 +210,7 @@ namespace cjoli.Server_Tests.Services
         }
 
         [Fact]
-        public void AfftectationTeams_ParentPosition()
+        public async Task AfftectationTeams_ParentPosition()
         {
             //Arrange
             var tourney = CreateTourney();
@@ -221,7 +224,7 @@ namespace cjoli.Server_Tests.Services
 
 
             //Act
-            var dto = _service.CreateRanking(tourney.Uid, null, false, _context);
+            var dto = await _service.CreateRanking(tourney.Uid, null, false, _context, new CancellationToken());
             //Assert
             var positions = dto.Tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Positions);
             var position1 = positions.Single(p => p.Name == "position2-1");
@@ -233,7 +236,7 @@ namespace cjoli.Server_Tests.Services
 
 
         [Fact]
-        public void CalculateHistory_Ok()
+        public async Task CalculateHistory_Ok()
         {
             //Arrange
             var tourney = CreateTourney();
@@ -241,7 +244,7 @@ namespace cjoli.Server_Tests.Services
             var team2 = Team("team2", tourney);
 
             //Act
-            var dto = _service.CreateRanking(tourney.Uid, null, false, _context);
+            var dto = await _service.CreateRanking(tourney.Uid, null, false, _context, new CancellationToken());
             //Assert
             Assert.True(dto.History.ContainsKey(team1.Id));
             Assert.True(dto.History.ContainsKey(team2.Id));
@@ -250,13 +253,13 @@ namespace cjoli.Server_Tests.Services
         }
 
         [Fact]
-        public void SetConfig()
+        public async Task SetConfig()
         {
             //Arrange
             var tourney = CreateTourney();
 
             //Act
-            var ranking = _service.CreateRanking(tourney.Uid, null, false, _context);
+            var ranking = await _service.CreateRanking(tourney.Uid, null, false, _context, new CancellationToken());
             var dto = _mapper.Map<RankingDto>(ranking);
             //Assert
             Assert.NotNull(dto.Tourney.Config);
@@ -295,7 +298,7 @@ namespace cjoli.Server_Tests.Services
         }
 
         [Fact]
-        public void SaveMatch()
+        public async Task SaveMatch()
         {
             //Arrange
             var user = CreateUser();
@@ -311,7 +314,7 @@ namespace cjoli.Server_Tests.Services
             Assert.Equal(0, match.ScoreA);
             Assert.Equal(0, match.ScoreB);
             //Act
-            _service.SaveMatch(dto, user.Login, tourney.Uid, _context);
+            await _service.SaveMatch(dto, user.Login, tourney.Uid, _context, new CancellationToken());
             //Assert
             Assert.True(match.Done);
             Assert.Equal(1, match.ScoreA);
@@ -319,20 +322,20 @@ namespace cjoli.Server_Tests.Services
         }
 
         [Fact]
-        public void SaveMatch_NotFound()
+        public async Task SaveMatch_NotFound()
         {
             //Arrange
             var user = CreateUser();
             var tourney = CreateTourney();
             //Act            
             //Assert
-            Assert.Throws<NotFoundException>(() => _service.SaveMatch(new MatchDto(), user.Login, tourney.Uid, _context));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await _service.SaveMatch(new MatchDto(), user.Login, tourney.Uid, _context, new CancellationToken()));
         }
 
         [Theory]
         [InlineData("ADMIN")]
         [InlineData("USER")]
-        public void SaveMatch_Forfeit(string role)
+        public async Task SaveMatch_Forfeit(string role)
         {
             //Arrange
             var user = CreateUser(role);
@@ -342,7 +345,7 @@ namespace cjoli.Server_Tests.Services
             dto.ForfeitB = true;
 
             //Act
-            _service.SaveMatch(dto, user.Login, tourney.Uid, _context);
+            await _service.SaveMatch(dto, user.Login, tourney.Uid, _context, new CancellationToken());
             //Assert
             if (role == "ADMIN")
             {
@@ -359,7 +362,7 @@ namespace cjoli.Server_Tests.Services
 
 
         [Fact]
-        public void SaveMatch_User_Admin()
+        public async Task SaveMatch_User_Admin()
         {
             //Arrange
             var user = CreateUser("User");
@@ -369,7 +372,8 @@ namespace cjoli.Server_Tests.Services
             dto.ScoreA = 1;
             dto.ScoreB = 0;
 
-            _service.SaveMatch(dto, user.Login, tourney.Uid, _context);
+            var ct = new CancellationToken();
+            await _service.SaveMatch(dto, user.Login, tourney.Uid, _context, ct);
             Assert.False(match.Done);
             Assert.Equal(1, match.UserMatches.First().ScoreA);
             Assert.Equal(0, match.UserMatches.First().ScoreB);
@@ -377,7 +381,7 @@ namespace cjoli.Server_Tests.Services
             user = CreateUser("ADMIN");
 
             //Act
-            _service.SaveMatch(dto, user.Login, tourney.Uid, _context);
+            await _service.SaveMatch(dto, user.Login, tourney.Uid, _context, ct);
             //Assert
             Assert.True(match.Done);
             Assert.Equal(1, match.ScoreA);
@@ -386,7 +390,7 @@ namespace cjoli.Server_Tests.Services
 
 
         [Fact]
-        public void ClearMatch()
+        public async Task ClearMatch()
         {
             //Arrange
             var user = CreateUser();
@@ -396,9 +400,10 @@ namespace cjoli.Server_Tests.Services
             dto.ScoreA = 1;
             dto.ScoreB = 0;
 
-            _service.SaveMatch(dto, user.Login, tourney.Uid, _context);
+            var ct = new CancellationToken();
+            await _service.SaveMatch(dto, user.Login, tourney.Uid, _context, ct);
             //Act
-            _service.ClearMatch(dto, user.Login, tourney.Uid, _context);
+            await _service.ClearMatch(dto, user.Login, tourney.Uid, _context, ct);
             //Assert
             Assert.False(match.Done);
             Assert.Equal(0, match.ScoreA);
@@ -407,7 +412,7 @@ namespace cjoli.Server_Tests.Services
         }
 
         [Fact]
-        public void ClearMatch_NotFound()
+        public async Task ClearMatch_NotFound()
         {
             //Arrange
             var user = CreateUser();
@@ -415,12 +420,12 @@ namespace cjoli.Server_Tests.Services
 
             //Act
             //Assert
-            Assert.Throws<NotFoundException>(() => _service.ClearMatch(new MatchDto(), user.Login, tourney.Uid, _context));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await _service.ClearMatch(new MatchDto(), user.Login, tourney.Uid, _context, new CancellationToken()));
 
         }
 
         [Fact]
-        public void ClearMatch_User()
+        public async Task ClearMatch_User()
         {
             //Arrange
             var user = CreateUser("USER");
@@ -430,12 +435,13 @@ namespace cjoli.Server_Tests.Services
             dto.ScoreA = 1;
             dto.ScoreB = 0;
 
-            _service.SaveMatch(dto, user.Login, tourney.Uid, _context);
+            var ct = new CancellationToken();
+            await _service.SaveMatch(dto, user.Login, tourney.Uid, _context, ct);
             Assert.False(match.Done);
             Assert.Equal(1, match.UserMatches.First().ScoreA);
             Assert.Equal(0, match.UserMatches.First().ScoreB);
             //Act
-            _service.ClearMatch(dto, user.Login, tourney.Uid, _context);
+            await _service.ClearMatch(dto, user.Login, tourney.Uid, _context, ct);
             //Assert
             Assert.Empty(match.UserMatches);
 
@@ -444,7 +450,7 @@ namespace cjoli.Server_Tests.Services
 
 
         [Fact]
-        public void SaveUserConfig()
+        public async Task SaveUserConfig()
         {
             //Arrange
             var tourney = CreateTourney();
@@ -452,59 +458,60 @@ namespace cjoli.Server_Tests.Services
             var dto = new UserConfigDto() { UseCustomEstimate = true };
             Assert.Empty(user.UserMatches.ToList());
             //Act
-            _service.SaveUserConfig(tourney.Uid, user.Login, dto, _context);
+            await _service.SaveUserConfig(tourney.Uid, user.Login, dto, _context, new CancellationToken());
             var config = Assert.Single(user.Configs.Where(c => c.Tourney == tourney));
             Assert.True(config.UseCustomEstimate);
         }
 
         [Fact]
-        public void SaveUserConfig_NoTourney()
+        public async Task SaveUserConfig_NoTourney()
         {
             //Arrange
             var dto = new UserConfigDto() { UseCustomEstimate = true };
             //Act
             //Assert
-            Assert.Throws<NotFoundException>(() => _service.SaveUserConfig("", "", dto, _context));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await _service.SaveUserConfig("", "", dto, _context, new CancellationToken()));
         }
 
         [Fact]
-        public void SaveUserConfig_NoUser()
+        public async Task SaveUserConfig_NoUser()
         {
             //Arrange
             var tourney = CreateTourney();
             var dto = new UserConfigDto() { UseCustomEstimate = true };
             //Act
             //Assert
-            Assert.Throws<NotFoundException>(() => _service.SaveUserConfig(tourney.Uid, "", dto, _context));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await _service.SaveUserConfig(tourney.Uid, "", dto, _context, new CancellationToken()));
         }
 
 
         [Fact]
-        public void ClearSimulations()
+        public async Task ClearSimulations()
         {
             //Arrange
             var tourney = CreateTourney();
             var user = CreateUser();
             var config = new UserConfigDto() { UseCustomEstimate = true };
-            _service.SaveUserConfig(tourney.Uid, user.Login, config, _context);
+            var ct = new CancellationToken();
+            await _service.SaveUserConfig(tourney.Uid, user.Login, config, _context, ct);
 
             var match = Match(tourney);
             var dto = _mapper.Map<MatchDto>(match);
             dto.ScoreA = 1;
             dto.ScoreB = 0;
-            _service.SaveMatch(dto, user.Login, tourney.Uid, _context);
+            await _service.SaveMatch(dto, user.Login, tourney.Uid, _context, ct);
 
             var userMatch = Assert.Single(user.UserMatches.Where(u => u.Match == match));
 
             //Act
-            _service.ClearSimulations([userMatch.Id], user.Login, tourney.Uid, _context);
+            await _service.ClearSimulations([userMatch.Id], user.Login, tourney.Uid, _context, ct);
 
             //Assert
             Assert.Empty(user.UserMatches);
         }
 
         [Fact]
-        public void UpdatePosition()
+        public async Task UpdatePosition()
         {
             //Arrange
             var tourney = CreateTourney();
@@ -513,13 +520,13 @@ namespace cjoli.Server_Tests.Services
             dto.Penalty = 1;
             Assert.Equal(0, position.Penalty);
             //Act
-            _service.UpdatePosition(tourney.Uid, dto, _context);
+            await _service.UpdatePosition(tourney.Uid, dto, _context, new CancellationToken());
             //Assert
             Assert.Equal(1, position.Penalty);
         }
 
         [Fact]
-        public void UpdateTeam()
+        public async Task UpdateTeam()
         {
             //Arrange
             var tourney = CreateTourney();
@@ -530,29 +537,29 @@ namespace cjoli.Server_Tests.Services
             Assert.Null(team.Logo);
             Assert.Null(team.Youngest);
             //Act
-            _service.UpdateTeam(tourney.Uid, dto, _context);
+            await _service.UpdateTeam(tourney.Uid, dto, _context, new CancellationToken());
             //Assert
             Assert.Equal(dto.Logo, team.Logo);
             Assert.Equal(dto.Youngest, team.Youngest);
         }
 
         [Fact]
-        public void UpdateTeam_NoTourney()
+        public async Task UpdateTeam_NoTourney()
         {
             //Arrange
             //Act
             //Assert
-            Assert.Throws<NotFoundException>(() => _service.UpdateTeam("", new TeamDto() { Name = "name" }, _context));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await _service.UpdateTeam("", new TeamDto() { Name = "name" }, _context, new CancellationToken()));
         }
 
         [Fact]
-        public void UpdateTeam_NoTeam()
+        public async Task UpdateTeam_NoTeam()
         {
             //Arrange
             var tourney = CreateTourney();
             //Act
             //Assert
-            Assert.Throws<NotFoundException>(() => _service.UpdateTeam(tourney.Uid, new TeamDto() { Name = "name" }, _context));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await _service.UpdateTeam(tourney.Uid, new TeamDto() { Name = "name" }, _context, new CancellationToken()));
         }
 
 

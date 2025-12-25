@@ -28,17 +28,18 @@ namespace cjoli.Server_Tests.Services
         }
 
         [Fact]
-        public void CalculateEstimates()
+        public async Task CalculateEstimates()
         {
             //Arrange
             var tourney = CreateTourney();
             var user = CreateUser();
-            var ranking = _cjoliService.CreateRanking(tourney.Uid, null, false, _context);
+            var ct = new CancellationToken();
+            var ranking = await _cjoliService.CreateRanking(tourney.Uid, null, false, _context, ct);
             var match = Match(tourney);
 
             Assert.Empty(match.Estimates);
             //Act
-            _service.CalculateEstimates(tourney, ranking.Scores, user, _context);
+            await _service.CalculateEstimates(tourney, ranking.Scores, user, _context, ct);
             var estimate = Assert.Single(match.Estimates);
             Assert.Equal(0, estimate.ScoreA);
             Assert.Equal(0, estimate.ScoreB);
@@ -47,7 +48,7 @@ namespace cjoli.Server_Tests.Services
         [Theory]
         [InlineData("ADMIN")]
         [InlineData("USER")]
-        public void CalculateEstimates_Win(string role)
+        public async Task CalculateEstimates_Win(string role)
         {
             //Arrange
             var tourney = CreateTourney();
@@ -56,21 +57,22 @@ namespace cjoli.Server_Tests.Services
             var match = Match(tourney);
             match.ScoreA = 1;
             var dto = _mapper.Map<MatchDto>(match);
-            _cjoliService.SaveMatch(dto, user.Login, tourney.Uid, _context);
+            var ct = new CancellationToken();
+            await _cjoliService.SaveMatch(dto, user.Login, tourney.Uid, _context, ct);
 
-            var ranking = _cjoliService.CreateRanking(tourney.Uid, user.Login, true, _context);
+            var ranking = await _cjoliService.CreateRanking(tourney.Uid, user.Login, true, _context, ct);
             var match2 = Match(tourney, "squad2");
 
             //Assert.Empty(match2.Estimates);
             //Act
-            _service.CalculateEstimates(tourney, ranking.Scores, user, _context);
+            await _service.CalculateEstimates(tourney, ranking.Scores, user, _context, ct);
             //Assert
             var estimate = match2.Estimates.First();
             Assert.True(estimate.ScoreA > estimate.ScoreB);
         }
 
         [Fact]
-        public void CalculateEstimates_User_Phase2()
+        public async Task CalculateEstimates_User_Phase2()
         {
             //Arrange
             var tourney = CreateTourney();
@@ -79,7 +81,8 @@ namespace cjoli.Server_Tests.Services
             var match = Match(tourney);
             match.ScoreA = 1;
             var dto = _mapper.Map<MatchDto>(match);
-            _cjoliService.SaveMatch(dto, user.Login, tourney.Uid, _context);
+            var ct = new CancellationToken();
+            await _cjoliService.SaveMatch(dto, user.Login, tourney.Uid, _context, ct);
 
             var squad2 = Squad("squad2", tourney);
             var position1 = Position("position2-1", tourney);
@@ -87,20 +90,20 @@ namespace cjoli.Server_Tests.Services
             var match3 = new Match() { PositionA = position1, PositionB = position2 };
             squad2.Matches.Add(match3);
             _context.SaveChanges();
-            _cjoliService.SaveMatch(_mapper.Map<MatchDto>(match3), user.Login, tourney.Uid, _context);
+            await _cjoliService.SaveMatch(_mapper.Map<MatchDto>(match3), user.Login, tourney.Uid, _context, ct);
 
-            var ranking = _cjoliService.CreateRanking(tourney.Uid, user.Login, true, _context);
+            var ranking = await _cjoliService.CreateRanking(tourney.Uid, user.Login, true, _context, ct);
             var match2 = Match(tourney, "squad2");
 
             //Act
-            _service.CalculateEstimates(tourney, ranking.Scores, user, _context);
+            await _service.CalculateEstimates(tourney, ranking.Scores, user, _context, ct);
             //Assert
             var estimate = Assert.Single(match2.Estimates);
             Assert.True(estimate.ScoreA > estimate.ScoreB);
         }
 
         [Fact]
-        public void CalculateEstimates_Shot()
+        public async Task CalculateEstimates_Shot()
         {
             //Arrange
             var tourney = CreateTourney();
@@ -112,10 +115,10 @@ namespace cjoli.Server_Tests.Services
                 m.Shot = true;
             });
 
-
-            var ranking = _cjoliService.CreateRanking(tourney.Uid, user.Login, false, _context);
+            var ct = new CancellationToken();
+            var ranking = await _cjoliService.CreateRanking(tourney.Uid, user.Login, false, _context, ct);
             //Act
-            _service.CalculateEstimates(tourney, ranking.Scores, user, _context);
+            await _service.CalculateEstimates(tourney, ranking.Scores, user, _context, ct);
             //Assert
             var estimate = Assert.Single(match.Estimates);
             Assert.True(estimate.ScoreB != estimate.ScoreA);

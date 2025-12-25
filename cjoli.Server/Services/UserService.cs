@@ -1,6 +1,5 @@
 ﻿using cjoli.Server.Dtos;
 using cjoli.Server.Exceptions;
-using cjoli.Server.Extensions;
 using cjoli.Server.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -29,7 +28,7 @@ namespace cjoli.Server.Services
                 throw new IllegalArgumentException("Password");
             }
             var invalidLogin = _aiService.CheckLogin(userDto.Login, context).Result;
-            if(invalidLogin=="true")
+            if (invalidLogin == "true")
             {
                 throw new IllegalArgumentException("Login");
             }
@@ -41,7 +40,7 @@ namespace cjoli.Server.Services
             }
             var source = _configuration["Source"] ?? "prod";
 
-            user = new User() { Login = userDto.Login, Password = userDto.Password, Source=source };
+            user = new User() { Login = userDto.Login, Password = userDto.Password, Source = source };
             context.Users.Add(user);
             context.SaveChanges();
             return user;
@@ -73,7 +72,7 @@ namespace cjoli.Server.Services
         public List<User> ListUsers(CJoliContext context)
         {
             var source = _configuration["Source"];
-            return context.Users.Where(u => u.Role != "ADMIN" && u.Source==source).Include(u => u.Configs).ThenInclude(c => c.Tourney).ToList();
+            return context.Users.Where(u => u.Role != "ADMIN" && u.Source == source).Include(u => u.Configs).ThenInclude(c => c.Tourney).ToList();
         }
 
 
@@ -107,8 +106,8 @@ namespace cjoli.Server.Services
                     new Claim(ClaimTypes.Role, user.Role ?? "AGENT"),
             };
 
-            var adminTourneys = user.Configs.Where(c=>c.IsAdmin).Select(c => new Claim(ClaimTypes.Role,$"ADMIN_{c.Tourney.Uid}")).ToList();
-            if(adminTourneys.Count>0)
+            var adminTourneys = user.Configs.Where(c => c.IsAdmin).Select(c => new Claim(ClaimTypes.Role, $"ADMIN_{c.Tourney.Uid}")).ToList();
+            if (adminTourneys.Count > 0)
             {
                 claims.Add(new Claim(ClaimTypes.Role, "ADMIN_LOCAL"));
                 claims.AddRange(adminTourneys);
@@ -129,7 +128,7 @@ namespace cjoli.Server.Services
 
         }
 
-        public void SaveUserConfig(Tourney tourney, User user, UserConfigDto dto, CJoliContext context)
+        public async Task SaveUserConfig(Tourney tourney, User user, UserConfigDto dto, CJoliContext context, CancellationToken ct)
         {
             UserConfig? config = user.Configs.SingleOrDefault(c => c.Id == dto.Id);
             if (config == null)
@@ -139,12 +138,12 @@ namespace cjoli.Server.Services
             }
             config.UseCustomEstimate = dto.UseCustomEstimate;
             config.FavoriteTeam = dto.FavoriteTeamId > 0 ? tourney.Teams.Single(t => t.Id == dto.FavoriteTeamId) : null;
-            context.SaveChanges();
+            await context.SaveChangesAsync(ct);
         }
 
         public void SaveUserAdmins(int userId, int[] tourneys, CJoliContext context)
         {
-            User? user = context.Users.Include(u=>u.Configs).SingleOrDefault(u => u.Id == userId);
+            User? user = context.Users.Include(u => u.Configs).SingleOrDefault(u => u.Id == userId);
             if (user == null)
             {
                 throw new NotFoundException("User", userId);
@@ -157,7 +156,7 @@ namespace cjoli.Server.Services
             {
                 Tourney tourney = context.Tourneys.Single(t => t.Id == tourneyId);
                 UserConfig? config = user.Configs.SingleOrDefault(c => c.Tourney == tourney);
-                if(config == null)
+                if (config == null)
                 {
                     config = new UserConfig() { User = user, Tourney = tourney };
                     user.Configs.Add(config);

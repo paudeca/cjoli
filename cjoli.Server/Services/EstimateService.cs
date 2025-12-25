@@ -1,14 +1,14 @@
 ﻿using cjoli.Server.Dtos;
-using cjoli.Server.Extensions;
 using cjoli.Server.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace cjoli.Server.Services
 {
     public class EstimateService
     {
-        public void CalculateEstimates(Tourney tourney, ScoresDto scores, User? user, CJoliContext context)
+        public async Task CalculateEstimates(Tourney tourney, ScoresDto scores, User? user, CJoliContext context, CancellationToken ct)
         {
-            var userMatches = context.UserMatch.Where(u => user!=null && u.User == user && u.Match!=null).ToList();
+            var userMatches = await context.UserMatch.Where(u => user != null && u.User == user && u.Match != null).ToListAsync(ct);
 
             var scoreUserA = userMatches.Where(u => u.Match != null).Select(u => CreateScore(u.Match.PositionA, u.Match.PositionB, u.ScoreA, u.ScoreB, u.Match, scores.ScoreSquads, scores.ScorePhases[u.Match.Squad!.Phase.Id]));
             var scoreUserB = userMatches.Where(u => u.Match != null).Select(u => CreateScore(u.Match.PositionB, u.Match.PositionA, u.ScoreB, u.ScoreA, u.Match, scores.ScoreSquads, scores.ScorePhases[u.Match.Squad!.Phase.Id]));
@@ -42,57 +42,57 @@ namespace cjoli.Server.Services
             coef["user"] = coef["directSeason"] * 2;
 
 
-            var func = (int coef, IQueryable<MatchResult> query) =>
+            var func = async (int coef, IQueryable<MatchResult> query) =>
             {
-                Score score = query.GroupBy(r => 1).Select(SelectScore<int>(coef)).SingleOrDefault() ?? new Score();
+                Score score = await query.GroupBy(r => 1).Select(a => SelectScore<int>(coef)(a)).SingleOrDefaultAsync(ct) ?? new Score();
                 scoreUsers.ForEach(score.Merge);
                 return score;
             };
 
 
-            Score scoreTotal = func(coef["total"], queryMatch);
+            Score scoreTotal = await func(coef["total"], queryMatch);
             int totalGame = 1;// scoreTotal.Game;
 
-            Score scoreTotalSeason = func(coef["totalSeason"] * totalGame, queryMatchSeason);
+            Score scoreTotalSeason = await func(coef["totalSeason"] * totalGame, queryMatchSeason);
 
             var getTeamId = (Team? team) => team?.Alias != null ? team.Alias.Id : team != null ? team.Id : 0;
 
-            var funcMap = (int coef, IQueryable<MatchResult> query) =>
+            var funcMap = async (int coef, IQueryable<MatchResult> query) =>
             {
-                var mapScore = query
+                var mapScore = await query
                     .Where(r => r.Match.Squad!.Phase.Tourney != tourney)
                     .GroupBy(r => r.Team.Alias != null ? r.Team.Alias.Id : r.Team.Id)
-                    .ToDictionary(kv => kv.Key, kv => SelectScore<int>(coef)(kv)) ?? new Dictionary<int, Score>();
+                    .ToDictionaryAsync(kv => kv.Key, kv => SelectScore<int>(coef)(kv), ct) ?? new Dictionary<int, Score>();
                 return mapScore;
             };
-            var mapAllTeam = funcMap(coef["allTeam"] * totalGame, queryMatch);
-            var mapAllTeamSeason = funcMap(coef["allTeamSeason"] * totalGame, queryMatchSeason);
+            var mapAllTeam = await funcMap(coef["allTeam"] * totalGame, queryMatch);
+            var mapAllTeamSeason = await funcMap(coef["allTeamSeason"] * totalGame, queryMatchSeason);
 
 
-            var mapCurrentTeam = queryMatch
+            var mapCurrentTeam = await queryMatch
                 .Where(r => r.Match.Squad!.Phase.Tourney == tourney)
                 .GroupBy(r => r.Team.Id)
-                .ToDictionary(kv => kv.Key, kv => SelectScore<int>(coef["team"] * totalGame)(kv)) ?? new Dictionary<int, Score>();
+                .ToDictionaryAsync(kv => kv.Key, kv => SelectScore<int>(coef["team"] * totalGame)(kv), ct) ?? new Dictionary<int, Score>();
 
-            var funcDirect = (int coef, IQueryable<MatchResult> query) =>
+            var funcDirect = async (int coef, IQueryable<MatchResult> query) =>
             {
-                var mapScore = query.Where(r => r.Match.Squad!.Phase.Tourney != tourney && r.TeamAgainst != null)
+                var mapScore = await query.Where(r => r.Match.Squad!.Phase.Tourney != tourney && r.TeamAgainst != null)
                     .GroupBy(r => new MyKv { TeamA = r.Team.Alias != null ? r.Team.Alias.Id : r.Team.Id, TeamB = r.TeamAgainst.Alias != null ? r.TeamAgainst.Alias.Id : r.TeamAgainst.Id })
-                    .ToDictionary(kv => kv.Key, kv => SelectScore<MyKv>(coef)(kv));
+                    .ToDictionaryAsync(kv => kv.Key, kv => SelectScore<MyKv>(coef)(kv), ct);
                 return mapScore;
             };
-            var mapDirects = funcDirect(coef["direct"] * totalGame, queryMatch);
-            var mapDirectSeasons = funcDirect(coef["directSeason"] * totalGame, queryMatchSeason);
+            var mapDirects = await funcDirect(coef["direct"] * totalGame, queryMatch);
+            var mapDirectSeasons = await funcDirect(coef["directSeason"] * totalGame, queryMatchSeason);
 
-            var funcOther = (IQueryable<MatchResult> query) =>
+            var funcOther = async (IQueryable<MatchResult> query) =>
             {
-                return query
+                return await query
                     .GroupBy(r => r.Team)
-                    .ToDictionary(kv => kv.Key, kv => kv.Where(r => r.TeamAgainst != null)
-                    .Select(r => r.TeamAgainst.Id).ToList());
+                    .ToDictionaryAsync(kv => kv.Key, kv => kv.Where(r => r.TeamAgainst != null)
+                    .Select(r => r.TeamAgainst.Id).ToList(), ct);
             };
-            var mapOtherTeams = funcOther(queryMatch);
-            var mapOtherTeamSeasons = funcOther(queryMatchSeason);
+            var mapOtherTeams = await funcOther(queryMatch);
+            var mapOtherTeamSeasons = await funcOther(queryMatchSeason);
 
             var MergeScore = (Dictionary<int, Score> map, int key, Score score, int coefficient) =>
             {
@@ -190,12 +190,13 @@ namespace cjoli.Server.Services
             {
                 IList<Score> scores;
                 IEnumerable<Position> positions;
-                if(position.ParentPosition.Squad!=null)
+                if (position.ParentPosition.Squad != null)
                 {
                     var squad = position.ParentPosition.Squad;
                     positions = squad.Positions;
                     scores = squadScores.Single(s => s.SquadId == squad.Id).Scores;
-                } else
+                }
+                else
                 {
                     positions = position.Squad?.Phase.Squads.SelectMany(s => s.Positions) ?? new List<Position>();
                     scores = phaseScores;
@@ -309,10 +310,10 @@ namespace cjoli.Server.Services
             var winA = (double)scoreA.Win / scoreA.Game;
             var winB = (double)scoreB.Win / scoreB.Game;
 
-            var estimatesToDelete = match.Estimates.Where(s => s.User == user).OrderByDescending(s=>s.Id).Skip(1);
-            if(estimatesToDelete.Count()>0)
+            var estimatesToDelete = match.Estimates.Where(s => s.User == user).OrderByDescending(s => s.Id).Skip(1);
+            if (estimatesToDelete.Count() > 0)
             {
-                foreach(var e in estimatesToDelete)
+                foreach (var e in estimatesToDelete)
                 {
                     match.Estimates.Remove(e);
                 }

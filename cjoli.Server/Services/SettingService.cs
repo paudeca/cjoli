@@ -29,6 +29,14 @@ namespace cjoli.Server.Services
             return model;
         }
 
+        private void ClearCache(Tourney tourney)
+        {
+            _memoryCache.Remove(tourney.Uid);
+            _memoryCache.Remove("teamScores");
+            _memoryCache.Remove("teams");
+            _memoryCache.Remove("tourneys");
+        }
+
 
         public Tourney Import(TourneyDto tourneyDto, CJoliContext context)
         {
@@ -68,7 +76,7 @@ namespace cjoli.Server.Services
                     (tourney)=>(tourneyDto.Ranks??[]).ForEach(r=>ImportRank(r,tourney,context))
                 ]
             );
-            _memoryCache.Remove(tourney.Uid);
+            ClearCache(tourney);
             return tourney;
         }
 
@@ -325,7 +333,8 @@ namespace cjoli.Server.Services
             //tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Positions).Where(p => p.Team == team).ToList().ForEach(p => p.Team = null);
 
             context.SaveChanges();
-            _memoryCache.Remove(uid);
+            ClearCache(tourney);
+
             return tourney;
         }
 
@@ -347,7 +356,8 @@ namespace cjoli.Server.Services
             Tourney tourney = GetTourney(uid, context);
             context.Tourneys.Remove(tourney);
             context.SaveChanges();
-            _memoryCache.Remove(uid);
+            ClearCache(tourney);
+
         }
 
 
@@ -358,7 +368,8 @@ namespace cjoli.Server.Services
             tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Positions).Where(p => p.Team == team).ToList().ForEach(p => p.Team = null);
             tourney.Teams.Remove(team);
             context.SaveChanges();
-            _memoryCache.Remove(uid);
+            ClearCache(tourney);
+
             return tourney;
         }
 
@@ -368,7 +379,8 @@ namespace cjoli.Server.Services
             Phase phase = tourney.Phases.Single(p => p.Id == phaseId);
             context.Remove(phase);
             context.SaveChanges();
-            _memoryCache.Remove(uid);
+            ClearCache(tourney);
+
             return tourney;
         }
         public Tourney RemoveSquad(string uid, int phaseId, int squadId, CJoliContext context)
@@ -377,7 +389,8 @@ namespace cjoli.Server.Services
             Squad squad = tourney.Phases.Single(p => p.Id == phaseId).Squads.Single(s => s.Id == squadId);
             context.Remove(squad);
             context.SaveChanges();
-            _memoryCache.Remove(uid);
+            ClearCache(tourney);
+
             return tourney;
         }
         public Tourney RemovePosition(string uid, int phaseId, int squadId, int positionId, CJoliContext context)
@@ -386,7 +399,8 @@ namespace cjoli.Server.Services
             Position position = tourney.Phases.Single(p => p.Id == phaseId).Squads.Single(s => s.Id == squadId).Positions.Single(p => p.Id == positionId);
             context.Remove(position);
             context.SaveChanges();
-            _memoryCache.Remove(uid);
+            ClearCache(tourney);
+
             return tourney;
         }
         public Tourney RemoveMatch(string uid, int phaseId, int squadId, int matchId, CJoliContext context)
@@ -395,7 +409,8 @@ namespace cjoli.Server.Services
             Match match = tourney.Phases.Single(p => p.Id == phaseId).Squads.Single(s => s.Id == squadId).Matches.Single(p => p.Id == matchId);
             context.Remove(match);
             context.SaveChanges();
-            _memoryCache.Remove(uid);
+            ClearCache(tourney);
+
             return tourney;
         }
         public Tourney RemoveRank(string uid, int rankId, CJoliContext context)
@@ -409,7 +424,8 @@ namespace cjoli.Server.Services
                 tourney.Ranks[i].Order = i + 1;
             }
             context.SaveChanges();
-            _memoryCache.Remove(uid);
+            ClearCache(tourney);
+
             return tourney;
         }
         public Tourney RemoveEvent(string uid, int phaseId, int eventId, CJoliContext context)
@@ -418,7 +434,8 @@ namespace cjoli.Server.Services
             Event e = tourney.Phases.Single(p => p.Id == phaseId).Events.Single(s => s.Id == eventId);
             context.Remove(e);
             context.SaveChanges();
-            _memoryCache.Remove(uid);
+            ClearCache(tourney);
+
             return tourney;
         }
     }

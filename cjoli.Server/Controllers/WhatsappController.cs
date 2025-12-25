@@ -1,14 +1,7 @@
-﻿using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using cjoli.Server.Models;
+﻿using cjoli.Server.Models;
 using cjoli.Server.Models.Twilio;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Headers;
-using System.Text;
-using Twilio;
-using Twilio.Rest.Api.V2010.Account;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace cjoli.Server.Controllers
 {
@@ -37,9 +30,9 @@ namespace cjoli.Server.Controllers
         }
         [HttpPost]
         [Route("{uid}/Inbound")]
-        public async Task Inbound([FromRoute] string uid, [FromForm] MessageTwilio message)
+        public async Task Inbound([FromRoute] string uid, [FromForm] MessageTwilio message, CancellationToken ct)
         {
-            await _messageService.InboundMessage(uid, message,_context);
+            await _messageService.InboundMessage(uid, message, _context, ct);
         }
 
     }

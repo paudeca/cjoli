@@ -173,7 +173,8 @@ const reducer = (state: CJoliState, action: Action) => {
       };
     }
     case CJoliActions.LOAD_TEAMS: {
-      return { ...state, teams: action.payload, ranking: undefined };
+      //return { ...state, teams: action.payload, rankingg: undefined };
+      return { ...state, teams: action.payload };
     }
   }
 };

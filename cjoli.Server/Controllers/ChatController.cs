@@ -28,7 +28,7 @@ namespace cjoli.Server.Controllers
 
         [HttpGet]
         [Route("{uuid}/ws")]
-        public async Task Get(string uuid, [FromQuery] string lang, [FromQuery] string? login)
+        public async Task Get(string uuid, [FromQuery] string lang, [FromQuery] string? login, CancellationToken ct)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace cjoli.Server.Controllers
                     {
                         using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
                         _logger.LogDebug("webSocket created");
-                        await Bot(webSocket, uuid, lang, login);
+                        await Bot(webSocket, uuid, lang, login, ct);
                     }
                     else
                     {
@@ -54,9 +54,9 @@ namespace cjoli.Server.Controllers
             }
         }
 
-        private async Task Bot(WebSocket webSocket, string uuid, string lang, string login)
+        private async Task Bot(WebSocket webSocket, string uuid, string lang, string login, CancellationToken ct)
         {
-            var dto = _cjoliService.CreateRanking(uuid, login, false, _context);
+            var dto = await _cjoliService.CreateRanking(uuid, login, false, _context, ct);
             var session = _service.CreateSessionForChat(uuid, lang, login, dto, _context);
             session.OnReply += async (sender, e) => { await SendMessage(e.Message, webSocket); };
             await _service.PromptMessage(session);

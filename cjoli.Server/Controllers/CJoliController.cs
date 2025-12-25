@@ -15,7 +15,6 @@ namespace cjoli.Server.Controllers
     [FirestoreData]
     public class Toto
     {
-        //public string bgURL { get; set; }
         [FirestoreProperty]
         public string? name { get; set; }
     }
@@ -86,44 +85,44 @@ namespace cjoli.Server.Controllers
 
         [HttpGet]
         [Route("Team/{teamId}")]
-        public RankingDto GetTeam(int teamId, [FromQuery] string[]? seasons, [FromQuery] string[]? categories)
+        public async Task<RankingDto> GetTeam(int teamId, [FromQuery] string[]? seasons, [FromQuery] string[]? categories, CancellationToken ct)
         {
-            return _service.GetTeamScore(teamId, seasons ?? [], categories ?? [], _context);
+            return await _service.GetTeamScore(teamId, seasons ?? [], categories ?? [], _context, ct);
         }
 
 
 
         [HttpGet]
         [Route("{uuid}/Ranking")]
-        public RankingDto GetRanking(string uuid)
+        public async Task<RankingDto> GetRanking(string uuid, CancellationToken ct)
         {
             string? login = GetLogin();
 
             var useEstimate = HttpContext.Request.Headers["CJoli-UseEstimate"];
 
-            return _service.CreateRanking(uuid, login, useEstimate == "true", _context);
+            return await _service.CreateRanking(uuid, login, useEstimate == "true", _context, ct);
         }
 
         [HttpGet]
         [Route("{uuid}/Gallery/{page}")]
-        public GalleryDto GetGallery(string uuid, int page, [FromQuery] bool waiting, [FromQuery] bool random)
+        public async Task<GalleryDto> GetGallery(string uuid, int page, [FromQuery] bool waiting, [FromQuery] bool random, CancellationToken ct)
         {
             string? login = GetLogin();
-            return _service.CreateGallery(uuid, page, login, waiting, random, _context);
+            return await _service.CreateGallery(uuid, page, login, waiting, random, _context, ct);
         }
 
 
 
         [HttpGet]
         [Route("{uuid}/Export")]
-        public TourneyDto Export(string uuid)
+        public async Task<TourneyDto> Export(string uuid, CancellationToken ct)
         {
-            return _mapper.Map<TourneyDto>(_service.GetTourney(uuid, _context));
+            return _mapper.Map<TourneyDto>(await _service.GetTourney(uuid, _context, ct));
         }
 
         [HttpPost]
         [Route("Import")]
-        public string Import(TourneyDto tourneyDto)
+        public string Import(TourneyDto tourneyDto, CancellationToken ct)
         {
             var tourney = _settingService.Import(tourneyDto, _context);
             return tourney.Uid;
@@ -132,28 +131,28 @@ namespace cjoli.Server.Controllers
         [HttpPost]
         [Authorize]
         [Route("{uuid}/SaveMatch")]
-        public RankingDto SaveMatch([FromRoute] string uuid, [FromBody] MatchDto match)
+        public async Task<RankingDto> SaveMatch([FromRoute] string uuid, [FromBody] MatchDto match, CancellationToken ct)
         {
             using (LogContext.PushProperty("uid", uuid))
             {
                 var login = GetLogin();
-                _service.SaveMatch(match, login!, uuid, _context);
+                await _service.SaveMatch(match, login!, uuid, _context, ct);
                 _logger.LogInformationWithData("SaveMatch", match);
-                return GetRanking(uuid);
+                return await GetRanking(uuid, ct);
             }
         }
 
         [HttpPost]
         [Authorize]
         [Route("{uuid}/UpdateMatch")]
-        public RankingDto UpdateMatch([FromRoute] string uuid, [FromBody] MatchDto match)
+        public async Task<RankingDto> UpdateMatch([FromRoute] string uuid, [FromBody] MatchDto match, CancellationToken ct)
         {
             using (LogContext.PushProperty("uid", uuid))
             {
                 var login = GetLogin();
-                _service.UpdateMatch(match, login!, uuid, _context);
+                await _service.UpdateMatch(match, login!, uuid, _context, ct);
                 _logger.LogInformationWithData("SaveMatch", match);
-                return GetRanking(uuid);
+                return await GetRanking(uuid, ct);
             }
         }
 
@@ -161,28 +160,28 @@ namespace cjoli.Server.Controllers
         [HttpPost]
         [Authorize]
         [Route("{uuid}/ClearMatch")]
-        public RankingDto ClearMatch([FromRoute] string uuid, [FromBody] MatchDto match)
+        public async Task<RankingDto> ClearMatch([FromRoute] string uuid, [FromBody] MatchDto match, CancellationToken ct)
         {
             using (LogContext.PushProperty("uid", uuid))
             {
                 var login = GetLogin();
-                _service.ClearMatch(match, login!, uuid, _context);
+                await _service.ClearMatch(match, login!, uuid, _context, ct);
                 _logger.LogInformationWithData("ClearMatch", match);
-                return GetRanking(uuid);
+                return await GetRanking(uuid, ct);
             }
         }
 
         [HttpPost]
         [Authorize]
         [Route("{uuid}/ClearSimulations")]
-        public RankingDto ClearSimulations([FromRoute] string uuid, [FromBody] int[] ids)
+        public async Task<RankingDto> ClearSimulations([FromRoute] string uuid, [FromBody] int[] ids, CancellationToken ct)
         {
             using (LogContext.PushProperty("uid", uuid))
             {
                 var login = GetLogin();
-                _service.ClearSimulations(ids, login!, uuid, _context);
+                await _service.ClearSimulations(ids, login!, uuid, _context, ct);
                 _logger.LogInformationWithData("ClearSimulation", ids);
-                return GetRanking(uuid);
+                return await GetRanking(uuid, ct);
             }
         }
 
@@ -190,62 +189,62 @@ namespace cjoli.Server.Controllers
         [HttpPost]
         [Authorize]
         [Route("{uuid}/UpdateTeam")]
-        public RankingDto UpdateTeam([FromRoute] string uuid, [FromBody] TeamDto teamDto)
+        public async Task<RankingDto> UpdateTeam([FromRoute] string uuid, [FromBody] TeamDto teamDto, CancellationToken ct)
         {
             var login = GetLogin();
-            _service.UpdateTeam(uuid, teamDto, _context);
-            return GetRanking(uuid);
+            await _service.UpdateTeam(uuid, teamDto, _context, ct);
+            return await GetRanking(uuid, ct);
         }
 
         [HttpPost]
         [Authorize]
         [Route("{uuid}/UpdatePosition")]
-        public RankingDto UpdatePosition([FromRoute] string uuid, [FromBody] PositionDto positionDto)
+        public async Task<RankingDto> UpdatePosition([FromRoute] string uuid, [FromBody] PositionDto positionDto, CancellationToken ct)
         {
             var login = GetLogin();
-            _service.UpdatePosition(uuid, positionDto, _context);
-            return GetRanking(uuid);
+            await _service.UpdatePosition(uuid, positionDto, _context, ct);
+            return await GetRanking(uuid, ct);
         }
 
 
         [HttpPost]
         [Route("{uuid}/SaveUserConfig")]
-        public RankingDto SaveUserConfig(string uuid, UserConfigDto config)
+        public async Task<RankingDto> SaveUserConfig(string uuid, UserConfigDto config, CancellationToken ct)
         {
             var login = GetLogin();
             if (login != null)
             {
-                _service.SaveUserConfig(uuid, login, config, _context);
+                await _service.SaveUserConfig(uuid, login, config, _context, ct);
             }
-            return GetRanking(uuid);
+            return await GetRanking(uuid, ct);
         }
 
         [HttpGet]
         [Route("{uuid}/Prompt")]
-        public async Task<string?> Prompt(string uuid, [FromQuery] string lang, [FromQuery] bool useEstimate)
+        public async Task<string?> Prompt(string uuid, [FromQuery] string lang, [FromQuery] bool useEstimate, CancellationToken ct)
         {
             var login = GetLogin();
-            var dto = _service.CreateRanking(uuid, login, useEstimate, _context);
+            var dto = await _service.CreateRanking(uuid, login, useEstimate, _context, ct);
             return await _aiService.Prompt(uuid, lang, login, dto, _context);
         }
 
         [HttpPost]
         [Authorize("IsAdmin")]
         [Route("{uuid}/UpdateEvent")]
-        public RankingDto UpdatEvent([FromRoute] string uuid, [FromBody] EventDto dto, [FromQuery] bool useEstimate)
+        public async Task<RankingDto> UpdatEvent([FromRoute] string uuid, [FromBody] EventDto dto, [FromQuery] bool useEstimate, CancellationToken ct)
         {
             using (LogContext.PushProperty("uid", uuid))
             {
                 var login = GetLogin();
-                _service.UpdateEvent(uuid, login, dto, _context);
-                return GetRanking(uuid);
+                await _service.UpdateEvent(uuid, login, dto, _context, ct);
+                return await GetRanking(uuid, ct);
             }
         }
 
         [HttpPost]
         [Route("{uuid}/Upload")]
         [RequestSizeLimit(10_000_000)]
-        public async Task<IActionResult> OnPostUploadAsync([FromRoute] string uuid, List<IFormFile> files)
+        public async Task<IActionResult> OnPostUploadAsync([FromRoute] string uuid, List<IFormFile> files, CancellationToken ct)
         {
             long size = files.Sum(f => f.Length);
 

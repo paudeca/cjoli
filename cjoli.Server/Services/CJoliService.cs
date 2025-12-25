@@ -76,59 +76,92 @@ namespace cjoli.Server.Services
 
         public async Task<List<Tourney>> ListTourneys(int filterTeamId, CJoliContext context, CancellationToken ct)
         {
-            IQueryable<Tourney> query = context.Tourneys;
-            if (filterTeamId > 0)
+            return await GetCache("tourneys", $"{filterTeamId}", async () =>
             {
-                query = query.Include(t => t.Teams).Where(t => t.Teams.Any(t => t.Id == filterTeamId));
-            }
-            return (await query.OrderByDescending(t => t.StartTime).ToListAsync(ct)).Select(t =>
-            {
-                t.Config = GetRule(t);
-                return t;
-            }).ToList();
+                IQueryable<Tourney> query = context.Tourneys;
+                if (filterTeamId > 0)
+                {
+                    query = query.Include(t => t.Teams).Where(t => t.Teams.Any(t => t.Id == filterTeamId));
+                }
+                return (await query.OrderByDescending(t => t.StartTime).ToListAsync(ct)).Select(t =>
+                {
+                    t.Config = GetRule(t);
+                    return t;
+                }).ToList();
+            });
         }
 
         public async Task<List<Team>> ListTeams(CJoliContext context, CancellationToken ct, bool onlyMainTeam = false)
         {
-            if (onlyMainTeam)
+            return await GetCache("teams", $"{onlyMainTeam}", async () =>
             {
-                return await context.Team.Include(t => t.Alias).Where(t => t.Alias == null).OrderBy(t => t.Name).ToListAsync(ct);
-            }
-            else
-            {
-                return await context.Team.OrderBy(t => t.Name).ToListAsync(ct);
-            }
+                if (onlyMainTeam)
+                {
+                    return await context.Team.Include(t => t.Alias).Where(t => t.Alias == null).OrderBy(t => t.Name).ToListAsync(ct);
+                }
+                else
+                {
+                    return await context.Team.OrderBy(t => t.Name).ToListAsync(ct);
+                }
+            });
         }
 
-        public RankingDto GetTeamScore(int teamId, string[] seasons, string[] categories, CJoliContext context)
+        private async Task<T> GetCache<T>(string key, string keyItem, Func<Task<T>> create)
         {
-            var team = context.Team.Single(t => t.Id == teamId);
-            var teamDto = _mapper.Map<TeamDto>(team);
-            var scores = CalculateFullHistory(seasons, categories, context);
-            var scoresDto = new ScoresDto()
-            {
-                ScoreAllTime = scores.Total,
-                ScoreTeamsAllTime = scores.Teams.ToDictionary(s => s.Key, s => s.Value.Score),
-            };
-            SortTeams(scoresDto.ScoreTeamsAllTime);
-            var cat = context.Tourneys
-                .Include(t => t.Teams)
-                .Where(t => t.Category != null && t.Teams.Contains(team))
-                .GroupBy(t => t.Category!)
-                .Select(kv => kv.Key).OrderBy(s => s).ToList();
-            var seas = context.Tourneys
-                .Include(t => t.Teams)
-                .Where(t => t.Season != null && t.Teams.Contains(team))
-                .GroupBy(t => t.Season!)
-                .Select(kv => kv.Key).OrderBy(s => s).ToList();
+            Stopwatch sw = Stopwatch.StartNew();
 
-            return new RankingDto()
+            var map = _memoryCache.GetOrCreate(key, entry => new Dictionary<string, T>())!;
+
+            var dto = await GetOrUpdateWithLock(keyItem, get: () =>
             {
-                Team = teamDto,
-                Scores = scoresDto,
-                Categories = cat,
-                Seasons = seas
-            };
+                return map.GetValueOrDefault(keyItem, default(T));
+            }, update: async () =>
+            {
+                _logger.LogInformation($"Generate item");
+                var dto = await create();
+                map[keyItem] = dto;
+
+                return dto;
+            });
+            _logger.LogInformation($"Time[{key}]:{sw.ElapsedMilliseconds}ms");
+            return dto;
+        }
+
+        public async Task<RankingDto> GetTeamScore(int teamId, string[] seasons, string[] categories, CJoliContext context, CancellationToken ct)
+        {
+            return await GetCache("teamScores", $"team-{teamId}-{string.Join(",", seasons)}-{string.Join(",", categories)}",
+                async () =>
+                {
+                    var team = context.Team.Single(t => t.Id == teamId);
+                    var teamDto = _mapper.Map<TeamDto>(team);
+                    var scores = await CalculateFullHistory(seasons, categories, context, ct);
+                    var scoresDto = new ScoresDto()
+                    {
+                        ScoreAllTime = scores.Total,
+                        ScoreTeamsAllTime = scores.Teams.ToDictionary(s => s.Key, s => s.Value.Score),
+                    };
+                    SortTeams(scoresDto.ScoreTeamsAllTime);
+                    var cat = context.Tourneys
+                        .Include(t => t.Teams)
+                        .Where(t => t.Category != null && t.Teams.Contains(team))
+                        .GroupBy(t => t.Category!)
+                        .Select(kv => kv.Key).OrderBy(s => s).ToList();
+                    var seas = context.Tourneys
+                        .Include(t => t.Teams)
+                        .Where(t => t.Season != null && t.Teams.Contains(team))
+                        .GroupBy(t => t.Season!)
+                        .Select(kv => kv.Key).OrderBy(s => s).ToList();
+
+                    return new RankingDto()
+                    {
+                        Team = teamDto,
+                        Scores = scoresDto,
+                        Categories = cat,
+                        Seasons = seas
+                    };
+
+                }
+                );
         }
 
         public class TeamScore
@@ -137,12 +170,12 @@ namespace cjoli.Server.Services
             public required ScoreFull Scores { get; set; }
         }
 
-        private User GetUserWithConfigMatch(string login, string tourneyUid, CJoliContext context)
+        private async Task<User> GetUserWithConfigMatch(string login, string tourneyUid, CJoliContext context, CancellationToken ct)
         {
-            User? user = context.Users
+            User? user = await context.Users
                 .Include(u => u.Configs.Where(c => c.Tourney.Uid == tourneyUid)).ThenInclude(c => c.Tourney)
                 .Include(u => u.Configs.Where(c => c.Tourney.Uid == tourneyUid)).ThenInclude(c => c.FavoriteTeam)
-                .Include(u => u.UserMatches).SingleOrDefault(u => u.Login == login);
+                .Include(u => u.UserMatches).SingleOrDefaultAsync(u => u.Login == login, ct);
             if (user == null)
             {
                 throw new NotFoundException("User", login);
@@ -150,17 +183,17 @@ namespace cjoli.Server.Services
             return user;
         }
 
-        private User? GetUserWithConfig(string? login, string tourneyUid, CJoliContext context)
+        private async Task<User?> GetUserWithConfig(string? login, string tourneyUid, CJoliContext context, CancellationToken ct)
         {
-            return context.Users
+            return await context.Users
                 .Include(u => u.Configs.Where(c => c.Tourney.Uid == tourneyUid)).ThenInclude(c => c.Tourney)
                 .Include(u => u.Configs.Where(c => c.Tourney.Uid == tourneyUid)).ThenInclude(c => c.FavoriteTeam)
-                .SingleOrDefault(u => u.Login == login);
+                .SingleOrDefaultAsync(u => u.Login == login, ct);
         }
 
-        private Tourney GetTourney(string tourneyUid, User? user, CJoliContext context)
+        private async Task<Tourney> GetTourney(string tourneyUid, User? user, CJoliContext context, CancellationToken ct)
         {
-            Tourney? tourney = context.Tourneys
+            Tourney? tourney = await context.Tourneys
                 .Include(t => t.Phases).ThenInclude(p => p.Squads.OrderBy(s => s.Order)).ThenInclude(s => s.Positions.OrderBy(p => p.Value)).ThenInclude(p => p.Team)
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Positions).ThenInclude(p => p.ParentPosition)
                 .Include(t => t.Phases).ThenInclude(p => p.Squads).ThenInclude(s => s.Matches).ThenInclude(m => m.UserMatches.Where(u => user != null && !user.IsAdminWithNoCustomEstimate(tourneyUid) && u.User == user))
@@ -172,13 +205,13 @@ namespace cjoli.Server.Services
                 .Include(t => t.Teams).ThenInclude(t => t.Alias)
                 .Include(t => t.Teams).ThenInclude(t => t.MatchResults)
                 //.Include(t => t.Messages.Where(m=>m.MessageType=="image").OrderByDescending(m=>m.Time))
-                .FirstOrDefault(t => t.Uid == tourneyUid);
+                .FirstOrDefaultAsync(t => t.Uid == tourneyUid, ct);
 
             if (tourney == null)
             {
                 throw new NotFoundException("Tourney", tourneyUid);
             }
-            tourney.Ranks = context.Tourneys.Include(t => t.Ranks.OrderBy(r => r.Order)).First(t => t.Uid == tourneyUid).Ranks;
+            tourney.Ranks = (await context.Tourneys.Include(t => t.Ranks.OrderBy(r => r.Order)).FirstAsync(t => t.Uid == tourneyUid, ct)).Ranks;
 
             tourney.Config = GetRule(tourney);
 
@@ -186,20 +219,20 @@ namespace cjoli.Server.Services
             return tourney;
         }
 
-        public Tourney GetTourney(string tourneyUid, CJoliContext context)
+        public async Task<Tourney> GetTourney(string tourneyUid, CJoliContext context, CancellationToken ct)
         {
-            return GetTourney(tourneyUid, null, context);
+            return await GetTourney(tourneyUid, null, context, ct);
         }
 
 
-        private Ranking GetRanking(string tourneyUid, User? user, bool? useEstimate, CJoliContext context)
+        private async Task<Ranking> GetRanking(string tourneyUid, User? user, bool? useEstimate, CJoliContext context, CancellationToken ct)
         {
-            var tourney = GetTourney(tourneyUid, user, context);
+            var tourney = await GetTourney(tourneyUid, user, context, ct);
             if (tourney.DisplayTime > DateTime.Now && !user.IsAdmin(tourneyUid))
             {
                 tourney = new Tourney() { Uid = tourney.Uid, Name = tourney.Name };
             }
-            var scores = CalculateScores(tourney, user, estimate: useEstimate);
+            var scores = await CalculateScores(tourney, user, estimate: useEstimate, ct);
 
             return new Ranking() { Tourney = tourney, Scores = scores };
         }
@@ -212,27 +245,33 @@ namespace cjoli.Server.Services
             if (isAdmin)
             {
                 _memoryCache.Remove(uuid);
+                _memoryCache.Remove("teamScores");
             }
             else if (user != null)
             {
                 var map = _memoryCache.GetOrCreate(uuid, entry => new Dictionary<string, RankingDto>());
-                map!.Remove($"{user.Login}-True");
-                map!.Remove($"{user.Login}-False");
+                map!.Remove($"{uuid}-{user.Login}-True");
+                map!.Remove($"{uuid}-{user.Login}-False");
             }
         }
 
-        private RankingDto CreateRankingImpl(string tourneyUid, string? login, bool? useEstimate, CJoliContext context)
+
+        public async Task<RankingDto> CreateRanking(string tourneyUid, string? login, bool? useEstimate, CJoliContext context, CancellationToken ct)
         {
-            User? user = GetUserWithConfig(login, tourneyUid, context);
-            var ranking = GetRanking(tourneyUid, user, useEstimate, context);
-            var dto = _mapper.Map<RankingDto>(ranking);
-            AffectationTeams(dto);
-            UpdateMatchResult(dto, ranking.Tourney, context);
-            CalculateHistory(dto, ranking.Tourney);
-            CalculateHistoryByTimes(dto, ranking.Tourney, context);
-            CalculateAllBetScores(dto, user, context);
-            return dto;
+            return await GetCache(tourneyUid, $"{tourneyUid}-{login ?? "anonymous"}-{useEstimate}", async () =>
+            {
+                User? user = await GetUserWithConfig(login, tourneyUid, context, ct);
+                var ranking = await GetRanking(tourneyUid, user, useEstimate, context, ct);
+                var dto = _mapper.Map<RankingDto>(ranking);
+                AffectationTeams(dto);
+                UpdateMatchResult(dto, ranking.Tourney, context);
+                CalculateHistory(dto, ranking.Tourney);
+                CalculateHistoryByTimes(dto, ranking.Tourney, context);
+                CalculateAllBetScores(dto, user, context);
+                return dto;
+            });
         }
+
 
         private void UpdateMatchResult(RankingDto ranking, Tourney tourney, CJoliContext context)
         {
@@ -272,7 +311,7 @@ namespace cjoli.Server.Services
 
         }
 
-        private RankingDto GetOrUpdateWithLock(string key, Func<RankingDto?> get, Func<RankingDto> update)
+        private async Task<T> GetOrUpdateWithLock<T>(string key, Func<T?> get, Func<Task<T>> update)
         {
             ReaderWriterLockSlim? cacheLock;
             if (!locks.TryGetValue(key, out cacheLock))
@@ -284,7 +323,7 @@ namespace cjoli.Server.Services
             cacheLock.EnterUpgradeableReadLock();
             try
             {
-                RankingDto? data;
+                T? data;
                 cacheLock.EnterReadLock();
                 try
                 {
@@ -303,7 +342,7 @@ namespace cjoli.Server.Services
                         data = get();
                         if (data == null)
                         {
-                            data = update();
+                            data = update().Result;
                         }
                     }
                     finally
@@ -319,38 +358,10 @@ namespace cjoli.Server.Services
             }
         }
 
-        public RankingDto CreateRanking(string tourneyUid, string? login, bool? useEstimate, CJoliContext context)
+
+        public async Task<GalleryDto> CreateGallery(string uuid, int page, string? login, bool waiting, bool random, CJoliContext context, CancellationToken ct)
         {
-            Stopwatch sw = Stopwatch.StartNew();
-            string loginKey = $"{login ?? "anonymous"}-{useEstimate}";
-
-            var map = _memoryCache.GetOrCreate(tourneyUid, entry => new Dictionary<string, RankingDto>());
-
-            var dto = GetOrUpdateWithLock($"{tourneyUid}-{loginKey}", get: () =>
-            {
-                return map!.GetValueOrDefault(loginKey, null);
-            }, update: () =>
-            {
-                _logger.LogInformation($"Generate RankingDto");
-                var dto = CreateRankingImpl(tourneyUid, login, useEstimate, context);
-                if (!map!.ContainsKey(loginKey))
-                {
-                    map.Add(loginKey, dto);
-                }
-                else
-                {
-                    map.Remove(loginKey);
-                    map.Add(loginKey, dto);
-                }
-                return dto;
-            });
-            _logger.LogInformation($"Time[CreateRanking]:{sw.ElapsedMilliseconds}ms");
-            return dto;
-        }
-
-        public GalleryDto CreateGallery(string uuid, int page, string? login, bool waiting, bool random, CJoliContext context)
-        {
-            User? user = GetUserWithConfig(login, uuid, context);
+            User? user = await GetUserWithConfig(login, uuid, context, ct);
             bool isAdmin = user.IsAdmin(uuid);
             if (!isAdmin)
             {
@@ -359,27 +370,27 @@ namespace cjoli.Server.Services
 
 
             var query = context.Messages.Where(m => m.Tourney.Uid == uuid && m.MessageType == "image").OrderByDescending(m => m.Time);
-            int countWaiting = query.Where(m => !m.IsPublished).Count();
-            int count = query.Where(m => m.IsPublished == !waiting).Count();
+            int countWaiting = await query.Where(m => !m.IsPublished).CountAsync(ct);
+            int count = await query.Where(m => m.IsPublished == !waiting).CountAsync(ct);
             int pageSize = 12;
             List<Message> messages;
             if (random && count > pageSize)
             {
                 Random rand = new Random();
                 int skipper = rand.Next(0, count - pageSize);
-                messages = query.Where(m => m.IsPublished == !waiting).Skip(skipper).Take(pageSize).ToList();
+                messages = await query.Where(m => m.IsPublished == !waiting).Skip(skipper).Take(pageSize).ToListAsync(ct);
             }
             else
             {
-                messages = query.Where(m => m.IsPublished == !waiting).Skip(pageSize * page).Take(pageSize).ToList();
+                messages = await query.Where(m => m.IsPublished == !waiting).Skip(pageSize * page).Take(pageSize).ToListAsync(ct);
             }
             var m = _mapper.Map<List<MessageDto>>(messages);
             return new GalleryDto() { Page = page, PageSize = pageSize, Total = count, TotalWaiting = countWaiting, Messages = m };
         }
 
-        private void UpdateEstimate(string uuid, string login, CJoliContext context)
+        private async Task UpdateEstimate(string uuid, string login, CJoliContext context, CancellationToken ct)
         {
-            User? user = GetUserWithConfig(login, uuid, context);
+            User? user = await GetUserWithConfig(login, uuid, context, ct);
             User? originalUser = user;
 
             bool isAdmin = user.IsAdminWithNoCustomEstimate(uuid);
@@ -387,9 +398,9 @@ namespace cjoli.Server.Services
             {
                 user = null;
             }
-            Tourney tourney = GetTourney(uuid, user, context);
-            var scores = CalculateScores(tourney, user, estimate: true);
-            _estimateService.CalculateEstimates(tourney, scores, user, context);
+            Tourney tourney = await GetTourney(uuid, user, context, ct);
+            var scores = await CalculateScores(tourney, user, estimate: true, ct);
+            await _estimateService.CalculateEstimates(tourney, scores, user, context, ct);
             ClearCache(uuid, originalUser, context);
             if (isAdmin)
             {
@@ -397,7 +408,7 @@ namespace cjoli.Server.Services
             }
         }
 
-        private ScoresDto CalculateScores(Tourney tourney, User? user, bool? estimate)
+        private async Task<ScoresDto> CalculateScores(Tourney tourney, User? user, bool? estimate, CancellationToken ct)
         {
             IRule rule = GetRule(tourney);
 
@@ -411,7 +422,7 @@ namespace cjoli.Server.Services
                 var scorePhase = new List<Score>();
                 foreach (var squad in phase.Squads)
                 {
-                    var scoreSquad = CalculateScoreSquad(squad, scoreTourney, scoreSquads, scorePhases, user, estimate);
+                    var scoreSquad = await CalculateScoreSquad(squad, scoreTourney, scoreSquads, scorePhases, user, estimate, ct);
                     scoreSquads.Add(scoreSquad);
                     scorePhase.AddRange(scoreSquad.Scores.Select(s => s.Clone()));
                 }
@@ -529,7 +540,7 @@ namespace cjoli.Server.Services
         };
 
 
-        private ScoreSquad CalculateScoreSquad(Squad squad, Score scoreTourney, List<ScoreSquad> scoreSquads, Dictionary<int, List<Score>> scorePhases, User? user, bool? estimate)
+        private async Task<ScoreSquad> CalculateScoreSquad(Squad squad, Score scoreTourney, List<ScoreSquad> scoreSquads, Dictionary<int, List<Score>> scorePhases, User? user, bool? estimate, CancellationToken ct)
         {
             Dictionary<Models.MatchType, int> coefBracket = new Dictionary<Models.MatchType, int>() {
                 { Models.MatchType.Final, 1 },
@@ -779,7 +790,7 @@ namespace cjoli.Server.Services
             ranking.Scores.ScoreTeams = scoreTeams;
         }
 
-        private ScoreFull CalculateFullHistory(string[] seasons, string[] categories, CJoliContext context)
+        private async Task<ScoreFull> CalculateFullHistory(string[] seasons, string[] categories, CJoliContext context, CancellationToken ct)
         {
             IQueryable<MatchResult> query = context.MatchResult;//.Where(r => r.Win == 1 || r.Neutral == 1);
             if (seasons.Length > 0)
@@ -794,31 +805,31 @@ namespace cjoli.Server.Services
             var queryMatchAllWithNoLoss = query.Where(r => r.Win == 1 || r.Neutral == 1)
                 .Select(r => new MatchResultBase() { Win = r.Win, Loss = r.Loss, Neutral = r.Neutral, GoalFor = r.GoalFor, GoalAgainst = r.GoalAgainst, GoalDiff = r.GoalDiff, Match = r.Match, ShutOut = r.ShutOut }).Distinct();
 
-            var selectAll = (IQueryable<IMatchResult> query) =>
+            var selectAll = async (IQueryable<IMatchResult> query) =>
             {
                 Score score = query.GroupBy(r => 1).Select(ISelectScore).SingleOrDefault() ?? new Score();
                 return score;
             };
 
-            Score scoreTotal = selectAll(queryMatchAllWithNoLoss);
+            Score scoreTotal = await selectAll(queryMatchAllWithNoLoss);
 
-            var selectMapTourney = (IQueryable<IMatchResult> query) =>
+            var selectMapTourney = async (IQueryable<IMatchResult> query) =>
             {
-                var listScore = query
+                var listScore = await query
                     .GroupBy(r => new SeasonCategoryTourney()
                     {
                         Season = r.Match.Squad.Phase.Tourney.Season!,
                         Category = r.Match.Squad.Phase.Tourney.Category!,
                         Tourney = r.Match.Squad.Phase.Tourney.Uid,
                     })
-                .ToDictionary(kv => kv.Key, kv => ISelectScoreSeasonCategoryTourney(kv)) ?? new Dictionary<SeasonCategoryTourney, Score>();
+                .ToDictionaryAsync(kv => kv.Key, kv => ISelectScoreSeasonCategoryTourney(kv), ct) ?? new Dictionary<SeasonCategoryTourney, Score>();
                 return listScore;
             };
-            var allScores = selectMapTourney(query.Where(r => r.Win == 1 || r.Neutral == 1)).Select(kv => kv.Value).ToList();
+            var allScores = (await selectMapTourney(query.Where(r => r.Win == 1 || r.Neutral == 1))).Select(kv => kv.Value).ToList();
 
-            var funcMapSeasonCategoryTeam = (IQueryable<MatchResult> query) =>
+            var funcMapSeasonCategoryTeam = async (IQueryable<MatchResult> query) =>
             {
-                var mapScore = query
+                var mapScore = await query
                     .GroupBy(r => new SeasonCategoryTeam()
                     {
                         Season = r.Match.Squad.Phase.Tourney.Season!,
@@ -826,10 +837,10 @@ namespace cjoli.Server.Services
                         Tourney = r.Match.Squad.Phase.Tourney.Uid,
                         TeamId = r.Team.Id
                     })
-                    .ToDictionary(kv => kv.Key, kv => ISelectScoreSeasonCategoryTeam(kv)) ?? new Dictionary<SeasonCategoryTeam, Score>();
+                    .ToDictionaryAsync(kv => kv.Key, kv => ISelectScoreSeasonCategoryTeam(kv), ct) ?? new Dictionary<SeasonCategoryTeam, Score>();
                 return mapScore;
             };
-            var scores = funcMapSeasonCategoryTeam(query);
+            var scores = await funcMapSeasonCategoryTeam(query);
 
 
             var mapTeams = scores.Aggregate(new Dictionary<int, ScoreTeam>(), (acc, kv) =>
@@ -1284,18 +1295,18 @@ namespace cjoli.Server.Services
         }
 
 
-        public void SaveMatch(MatchDto dto, string login, string uuid, CJoliContext context)
+        public async Task SaveMatch(MatchDto dto, string login, string uuid, CJoliContext context, CancellationToken ct)
         {
             var source = _configuration["Source"];
 
-            User user = GetUserWithConfigMatch(login, uuid, context);
-            Match? match = context.Match
+            User user = await GetUserWithConfigMatch(login, uuid, context, ct);
+            Match? match = await context.Match
                 .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
                 .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
                 .Include(m => m.UserMatches.Where(u => u.User == null || u.User.Source == source)).ThenInclude(u => u.User)
                 .Include(m => m.Squad).ThenInclude(s => s.Phase).ThenInclude(p => p.Tourney)
                 .Include(m => m.Estimates.Where(e => e.User == null))
-                .SingleOrDefault(m => m.Id == dto.Id);
+                .SingleOrDefaultAsync(m => m.Id == dto.Id, ct);
             if (match == null)
             {
                 throw new NotFoundException("Match", dto.Id);
@@ -1333,17 +1344,17 @@ namespace cjoli.Server.Services
             {
                 UpsertUserMatch(dto, match, user);
             }
-            context.SaveChanges();
+            await context.SaveChangesAsync(ct);
             ClearCache(uuid, user, context);
-            RunThread((CJoliContext context) => UpdateEstimate(uuid, login, context), context);
+            RunThread(async (CJoliContext context) => await UpdateEstimate(uuid, login, context, ct), context);
         }
 
-        public void UpdateMatch(MatchDto dto, string login, string uuid, CJoliContext context)
+        public async Task UpdateMatch(MatchDto dto, string login, string uuid, CJoliContext context, CancellationToken ct)
         {
             var source = _configuration["Source"];
 
-            User user = GetUserWithConfigMatch(login, uuid, context);
-            Match? match = context.Match.SingleOrDefault(m => m.Id == dto.Id);
+            User user = await GetUserWithConfigMatch(login, uuid, context, ct);
+            Match? match = await context.Match.SingleOrDefaultAsync(m => m.Id == dto.Id, ct);
             if (match == null)
             {
                 throw new NotFoundException("Match", dto.Id);
@@ -1354,7 +1365,7 @@ namespace cjoli.Server.Services
                 match.PenaltyA = dto.PenaltyA;
                 match.PenaltyB = dto.PenaltyB;
             }
-            context.SaveChanges();
+            await context.SaveChangesAsync(ct);
             ClearCache(uuid, user, context);
         }
 
@@ -1402,16 +1413,16 @@ namespace cjoli.Server.Services
             userMatch.LogTime = DateTime.Now;
         }
 
-        public void ClearMatch(MatchDto dto, string login, string uuid, CJoliContext context)
+        public async Task ClearMatch(MatchDto dto, string login, string uuid, CJoliContext context, CancellationToken ct)
         {
             Stopwatch sw = Stopwatch.StartNew();
-            User user = GetUserWithConfigMatch(login, uuid, context);
-            Match? match = context.Match
+            User user = await GetUserWithConfigMatch(login, uuid, context, ct);
+            Match? match = await context.Match
                 .Include(m => m.UserMatches.Where(u => u.User == user))
                 .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
                 .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
                 .Include(m => m.UserMatches)
-                .SingleOrDefault(m => m.Id == dto.Id);
+                .SingleOrDefaultAsync(m => m.Id == dto.Id, ct);
 
             if (match == null)
             {
@@ -1447,9 +1458,9 @@ namespace cjoli.Server.Services
                     context.Remove(userMatch);
                 }
             }
-            context.SaveChanges();
+            await context.SaveChangesAsync(ct);
             ClearCache(uuid, user, context);
-            RunThread((CJoliContext context) => UpdateEstimate(uuid, login, context), context);
+            RunThread(async (CJoliContext context) => await UpdateEstimate(uuid, login, context, ct), context);
 
             if (user.IsAdmin(uuid))
             {
@@ -1484,56 +1495,57 @@ namespace cjoli.Server.Services
             matchResult.ShutOut = scoreB == 0 ? 1 : 0;
         }
 
-        public void SaveUserConfig(string uuid, string? login, UserConfigDto dto, CJoliContext context)
+        public async Task SaveUserConfig(string uuid, string? login, UserConfigDto dto, CJoliContext context, CancellationToken ct)
         {
-            Tourney? tourney = context.Tourneys.Include(t => t.Teams).SingleOrDefault(t => t.Uid == uuid);
+            Tourney? tourney = await context.Tourneys.Include(t => t.Teams).SingleOrDefaultAsync(t => t.Uid == uuid, ct);
             if (tourney == null)
             {
                 throw new NotFoundException("Touney", uuid);
             }
-            User? user = GetUserWithConfig(login, uuid, context);
+            User? user = await GetUserWithConfig(login, uuid, context, ct);
             if (user == null)
             {
                 throw new NotFoundException("User", login ?? "no login");
             }
-            _userService.SaveUserConfig(tourney, user, dto, context);
+            await _userService.SaveUserConfig(tourney, user, dto, context, ct);
             ClearCache(uuid, user, context);
         }
 
-        public void UpdateEvent(string uuid, string? login, EventDto dto, CJoliContext context)
+        public async Task UpdateEvent(string uuid, string? login, EventDto dto, CJoliContext context, CancellationToken ct)
         {
-            User? user = GetUserWithConfig(login, uuid, context);
+            User? user = await GetUserWithConfig(login, uuid, context, ct);
             Event evt = context.Event.Single(e => e.Id == dto.Id);
             evt.Datas = dto.Datas;
-            context.SaveChanges();
+            await context.SaveChangesAsync(ct);
             ClearCache(uuid, user, context);
             _serverService.UpdateRanking(uuid);
         }
 
 
-        public void ClearSimulations(int[] ids, string login, string uuid, CJoliContext context)
+        public async Task ClearSimulations(int[] ids, string login, string uuid, CJoliContext context, CancellationToken ct)
         {
-            User user = GetUserWithConfigMatch(login, uuid, context);
+            User user = await GetUserWithConfigMatch(login, uuid, context, ct);
             var userMatches = user.UserMatches.Where(u => ids.Contains(u.Id));
             foreach (var userMatch in userMatches)
             {
                 context.Remove(userMatch);
             }
-            context.SaveChanges();
+            await context.SaveChangesAsync(ct);
             ClearCache(uuid, user, context);
         }
 
-        public void UpdatePosition(string uuid, PositionDto positionDto, CJoliContext context)
+        public async Task UpdatePosition(string uuid, PositionDto positionDto, CJoliContext context, CancellationToken ct)
         {
             Position position = context.Position.Single(p => p.Id == positionDto.Id);
             position.Penalty = positionDto.Penalty;
-            context.SaveChanges();
+            await context.SaveChangesAsync(ct);
             _memoryCache.Remove(uuid);
+            _memoryCache.Remove("teamScores");
         }
 
-        public Team UpdateTeam(string uuid, TeamDto teamDto, CJoliContext context)
+        public async Task<Team> UpdateTeam(string uuid, TeamDto teamDto, CJoliContext context, CancellationToken ct)
         {
-            Tourney? tourney = context.Tourneys.Include(t => t.Teams).ThenInclude(t => t.TeamDatas.Where(d => d.Tourney.Uid == uuid)).SingleOrDefault(t => t.Uid == uuid);
+            Tourney? tourney = await context.Tourneys.Include(t => t.Teams).ThenInclude(t => t.TeamDatas.Where(d => d.Tourney.Uid == uuid)).SingleOrDefaultAsync(t => t.Uid == uuid, ct);
             if (tourney == null)
             {
                 throw new NotFoundException("Tourney", uuid);
@@ -1559,8 +1571,10 @@ namespace cjoli.Server.Services
                 team.TeamDatas.Add(data);
             }
             data.Penalty = teamDto.Datas?.Penalty ?? data.Penalty;
-            context.SaveChanges();
+            await context.SaveChangesAsync(ct);
             _memoryCache.Remove(uuid);
+            _memoryCache.Remove("teamScores");
+            _memoryCache.Remove("teams");
             return team;
         }
 
