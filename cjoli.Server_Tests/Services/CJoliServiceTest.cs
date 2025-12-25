@@ -50,7 +50,7 @@ namespace cjoli.Server_Tests.Services
         public async Task GetTourney_NotFound()
         {
             //Act & Assert
-            Assert.Throws<NotFoundException>(() => _service.GetTourney("", _context, new CancellationToken()).Result);
+            await Assert.ThrowsAsync<NotFoundException>(async () => await _service.GetTourney("", _context, new CancellationToken()));
         }
 
         [Fact]

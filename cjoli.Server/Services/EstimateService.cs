@@ -44,7 +44,7 @@ namespace cjoli.Server.Services
 
             var func = async (int coef, IQueryable<MatchResult> query) =>
             {
-                Score score = await query.GroupBy(r => 1).Select(a => SelectScore<int>(coef)(a)).SingleOrDefaultAsync(ct) ?? new Score();
+                Score score = query.GroupBy(r => 1).Select(SelectScore<int>(coef)).SingleOrDefault() ?? new Score();
                 scoreUsers.ForEach(score.Merge);
                 return score;
             };
