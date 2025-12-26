@@ -47,8 +47,9 @@ export const useUser = () => {
 
   const findConfig = (user?: User) => {
     const localTeam = localStorage.getItem("favoriteTeamId");
-    return (
-      user?.configs?.find((c) => c.tourneyId == tourney?.id) || {
+    const filteredTeamId = localStorage.getItem("filteredTeamId");
+    return {
+      ...(user?.configs?.find((c) => c.tourneyId == tourney?.id) ?? {
         tourneyId: 0,
         useCustomEstimate: false,
         favoriteTeamId: localTeam
@@ -57,8 +58,9 @@ export const useUser = () => {
             ? 108
             : 0,
         isAdmin: false,
-      }
-    );
+      }),
+      filteredTeamId: filteredTeamId ? parseInt(filteredTeamId) : 0,
+    } as UserConfig;
   };
 
   const isConnected = state.user;
@@ -87,6 +89,10 @@ export const useUser = () => {
     [handleSaveUserConfig, uid, userConfig, showToast, t, isConnected]
   );
 
+  const saveFilteredTeam = useCallback((teamId: number) => {
+    localStorage.setItem("filteredTeamId", teamId + "");
+  }, []);
+
   const isRootAdmin = state.user?.role === "ADMIN";
 
   return {
@@ -100,5 +106,6 @@ export const useUser = () => {
     setCountUser,
     handleSaveUserConfig,
     saveFavoriteTeam,
+    saveFilteredTeam,
   };
 };

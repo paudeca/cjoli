@@ -17,7 +17,7 @@ interface MenuBrandProps {
 }
 
 const MenuBrand = ({ setShow }: MenuBrandProps) => {
-  const { tourney, teams, isCastPage } = useCJoli();
+  const { tourney, teams, isCastPage, getTeamLogo } = useCJoli();
   const { userConfig, countUser } = useUser();
   const navigate = useNavigate();
   const uid = useUid();
@@ -26,10 +26,7 @@ const MenuBrand = ({ setShow }: MenuBrandProps) => {
 
   const team = teams?.find((t) => t.id == userConfig.favoriteTeamId);
 
-  let logo = team?.logo ?? "/logo.png";
-  if (uid == "cholet2026" && team?.datas?.logo) {
-    logo = team?.datas?.logo;
-  }
+  const logo = getTeamLogo(team) ?? "/logo.png";
   const version = __APP_VERSION__;
   const tourneyLabel = uid && tourney?.name;
 

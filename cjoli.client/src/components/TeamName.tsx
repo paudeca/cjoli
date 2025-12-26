@@ -38,7 +38,7 @@ const TeamName = ({
   hideFavorite?: boolean;
   className?: string;
 }) => {
-  const { getTeamInfo, getTeam, findTeam, isXl } = useCJoli();
+  const { getTeamInfo, getTeam, findTeam, isXl, getTeamLogo } = useCJoli();
   const { userConfig, saveFavoriteTeam } = useUser();
   const theme = useTheme();
   const { teamId: currentTeamId } = useParams();
@@ -52,7 +52,7 @@ const TeamName = ({
         ? getTeam(teamId)
         : undefined;
   }
-  const { name, logo } = positionId
+  const { name } = positionId
     ? getTeamInfo(positionId, defaultName, false)
     : team || getTeam(teamId!) || { name: defaultName };
 
@@ -87,22 +87,14 @@ const TeamName = ({
             onClick={() => saveFavoriteTeam(team.id)}
           />
         )}
-      {team?.datas?.logo && uid == "cholet2026" ? (
-        <img
-          src={team.datas.logo}
-          style={{ maxWidth: "30px", maxHeight: "30px" }}
-          className="mx-2"
-        />
-      ) : (
-        <img
-          src={logo}
-          style={{
-            maxWidth: isXl ? "60px" : "30px",
-            maxHeight: isXl ? "60px" : "30px",
-          }}
-          className={isXl ? "mx-3" : "mx-2"}
-        />
-      )}
+      <img
+        src={getTeamLogo(team)}
+        style={{
+          maxWidth: isXl ? "60px" : "30px",
+          maxHeight: isXl ? "60px" : "30px",
+        }}
+        className={isXl ? "mx-3" : "mx-2"}
+      />
       <span
         className={className}
         style={{

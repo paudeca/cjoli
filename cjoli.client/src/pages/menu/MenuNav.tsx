@@ -69,7 +69,7 @@ const MenuNav = () => {
     isAdmin,
     isRootAdmin,
     userConfig: { useCustomEstimate },
-    saveFavoriteTeam,
+    saveFilteredTeam,
   } = useUser();
   const uid = useUid();
   const { path } = useServer();
@@ -114,10 +114,10 @@ const MenuNav = () => {
             <div style={{ width: 300, paddingTop: 5, paddingBottom: 5 }}>
               <TeamSelect
                 teams={teams || []}
-                value={userConfig.favoriteTeamId}
+                value={userConfig.filteredTeamId}
                 onChangeTeam={async (team) => {
                   const teamId = team ? team.id : 0;
-                  saveFavoriteTeam(teamId, true);
+                  saveFilteredTeam(teamId);
                   const tourneys = await cjoliService.getTourneys(teamId);
                   loadTourneys(tourneys);
                   if (!isRootPath) {
@@ -128,10 +128,10 @@ const MenuNav = () => {
                 isClearable={isRootPath}
               />
             </div>
-            {!!userConfig.favoriteTeamId && isRootPath && (
+            {!!userConfig.filteredTeamId && isRootPath && (
               <Nav className="justify-content-end flex-grow-1 pe-3">
                 <Nav.Link
-                  onClick={() => navigate(`/team/${userConfig.favoriteTeamId}`)}
+                  onClick={() => navigate(`/team/${userConfig.filteredTeamId}`)}
                   className="text-secondary"
                 >
                   <HeptagonHalf size={20} className="ms-2" />

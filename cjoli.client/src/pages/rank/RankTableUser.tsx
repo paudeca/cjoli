@@ -8,7 +8,7 @@ import { useUser } from "../../hooks/useUser";
 import { Robot } from "react-bootstrap-icons";
 
 const useColumnsTourney = () => {
-  const { ranking, getTeam } = useCJoli();
+  const { ranking, getTeam, getTeamLogo } = useCJoli();
   const { t } = useTranslation();
   const { findConfig } = useUser();
 
@@ -45,7 +45,7 @@ const useColumnsTourney = () => {
     return (
       <span>
         <img
-          src={team?.logo}
+          src={getTeamLogo(team)}
           style={{ maxWidth: "30px", maxHeight: "30px" }}
           className="mx-2"
         />

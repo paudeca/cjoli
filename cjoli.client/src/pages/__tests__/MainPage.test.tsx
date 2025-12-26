@@ -50,6 +50,7 @@ const renderMainPage = async ({
             tourneyId: 1,
             useCustomEstimate: false,
             isAdmin: false,
+            filteredTeamId: 0,
           },
         ],
       }),

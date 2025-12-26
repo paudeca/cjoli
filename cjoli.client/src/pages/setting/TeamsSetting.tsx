@@ -58,6 +58,13 @@ const TeamsSetting = () => {
                       className="mx-2"
                     />
                     {team.name}
+                    {team.datas?.logo && (
+                      <img
+                        src={team.datas.logo}
+                        style={{ width: 30 }}
+                        className="mx-2"
+                      />
+                    )}
                   </div>
                   <div className="ms-auto">
                     <Button

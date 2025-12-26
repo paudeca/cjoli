@@ -81,7 +81,9 @@ namespace cjoli.Server.Services
                 IQueryable<Tourney> query = context.Tourneys;
                 if (filterTeamId > 0)
                 {
-                    query = query.Include(t => t.Teams).Where(t => t.Teams.Any(t => t.Id == filterTeamId));
+                    query = query
+                    .Include(t => t.Teams).ThenInclude(t => t.Alias)
+                    .Where(t => t.Teams.Any(t => t.Id == filterTeamId || (t.Alias != null && t.Alias.Id == filterTeamId)));
                 }
                 return (await query.OrderByDescending(t => t.StartTime).ToListAsync(ct)).Select(t =>
                 {

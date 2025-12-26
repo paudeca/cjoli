@@ -50,6 +50,7 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
     selectModeScore,
     classNamesCast,
     isXl,
+    getTeamLogo,
   } = useCJoli();
   const uid = useUid();
   const { teamId: teamIdParam } = useParams();
@@ -69,8 +70,6 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
       setTeamB(getTeam(teamIdB));
     }
   }, [teamIdB, setTeamB, getTeam]);
-
-  console.log("RANKING", ranking);
 
   const team = getTeam(teamId ?? parseInt(teamIdParam!));
 
@@ -103,7 +102,11 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
         <CJoliCard>
           <Card.Header>
             <Stack direction="horizontal" gap={5}>
-              <Card.Img variant="top" src={team.logo} style={{ width: 100 }} />
+              <Card.Img
+                variant="top"
+                src={getTeamLogo(team)}
+                style={{ width: 100 }}
+              />
               <Stack>
                 <Card.Title className={`ms-auto ${classNamesCast.table}`}>
                   {team?.name}

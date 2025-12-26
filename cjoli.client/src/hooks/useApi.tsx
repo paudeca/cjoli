@@ -70,8 +70,8 @@ const useApiGet = () => {
       queryOptions({
         queryKey: ["getTourneys"],
         queryFn: async () => {
-          const teamId = userConfig.favoriteTeamId
-            ? userConfig.favoriteTeamId
+          const teamId = userConfig.filteredTeamId
+            ? userConfig.filteredTeamId
             : 0;
           const tourneys = await cjoliService.getTourneys(teamId);
           loadTourneys(tourneys);
@@ -79,7 +79,7 @@ const useApiGet = () => {
         },
         enabled,
       }),
-    [loadTourneys, userConfig.favoriteTeamId]
+    [loadTourneys, userConfig.filteredTeamId]
   );
 
   const getTeams = useCallback(

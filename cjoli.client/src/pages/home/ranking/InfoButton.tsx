@@ -33,9 +33,11 @@ interface InfoButtonProps {
 }
 
 const InfoButton = ({ score, phase, squad }: InfoButtonProps) => {
-  const { getTeamInfo, tourney, getScoreFromPosition } = useCJoli();
+  const { getTeamInfo, tourney, getScoreFromPosition, findTeam, getTeamLogo } =
+    useCJoli();
 
-  const { name, logo } = getTeamInfo(score.positionId);
+  const { name } = getTeamInfo(score.positionId);
+  const team = findTeam(score);
   if (!tourney) {
     return <></>;
   }
@@ -99,7 +101,7 @@ const InfoButton = ({ score, phase, squad }: InfoButtonProps) => {
     <Popover {...props}>
       <Popover.Header style={{ color: "black" }}>
         <img
-          src={logo}
+          src={getTeamLogo(team)}
           style={{ maxWidth: "20px", maxHeight: "20px" }}
           className="mx-2"
         />
@@ -135,6 +137,7 @@ const InfoButton = ({ score, phase, squad }: InfoButtonProps) => {
             const positionB = s.positionId;
             const source = score.sources[positionB];
             const infoB = getTeamInfo(positionB);
+            const teamB = findTeam({ positionId: positionB });
             const scoreB = getScoreFromPosition(positionB, phase, squad);
 
             return (
@@ -161,7 +164,7 @@ const InfoButton = ({ score, phase, squad }: InfoButtonProps) => {
                   <Row>
                     <Col>
                       <img
-                        src={infoB.logo}
+                        src={getTeamLogo(teamB)}
                         style={{ maxWidth: "20px", maxHeight: "20px" }}
                         className="mx-2"
                       />

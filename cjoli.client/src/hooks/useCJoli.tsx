@@ -14,10 +14,12 @@ import {
   TypePage,
 } from "../models";
 import { CJoliActions } from "../contexts/actions";
+import useUid from "./useUid";
 
 // eslint-disable-next-line max-lines-per-function
 export const useCJoli = (page?: TypePage) => {
   const ctx = useContext(CJoliContext);
+  const uid = useUid();
   if (!ctx) {
     throw new Error("useCJoli has to be used within <CJoliProvider>");
   }
@@ -104,6 +106,16 @@ export const useCJoli = (page?: TypePage) => {
       return { name, logo: team?.logo };
     },
     [getPosition, getTeam]
+  );
+
+  const getTeamLogo = useCallback(
+    (team?: Team) => {
+      if (uid == "cholet2026" && team?.datas?.logo) {
+        return team.datas.logo;
+      }
+      return team?.logo;
+    },
+    [uid]
   );
 
   const getScoreFromPosition = useCallback(
@@ -251,6 +263,7 @@ export const useCJoli = (page?: TypePage) => {
     findTeam,
     getPosition,
     getTeamInfo,
+    getTeamLogo,
     getRankPosition,
     getTeamRank,
     isTeamInPhase,
