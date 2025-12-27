@@ -4,12 +4,10 @@ using cjoli.Server.Dtos;
 using cjoli.Server.Models;
 using cjoli.Server.Services;
 using cjoli.Server_Tests.Models;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Moq;
 
 namespace cjoli.Server_Tests
@@ -29,6 +27,9 @@ namespace cjoli.Server_Tests
             services.AddSingleton<ServerService>();
             services.AddSingleton<StorageService>();
             services.AddSingleton<SynchroService>();
+
+            services.AddApplicationInsightsTelemetryWorkerService();
+
 
             var openAIClient = new Mock<OpenAIClient>();
             var response = new Mock<Response<ChatCompletions>>();
