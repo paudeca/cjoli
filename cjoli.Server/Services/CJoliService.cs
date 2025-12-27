@@ -1348,7 +1348,7 @@ namespace cjoli.Server.Services
             }
             await context.SaveChangesAsync(ct);
             ClearCache(uuid, user, context);
-            RunThread(async (CJoliContext context) => await UpdateEstimate(uuid, login, context, ct), context);
+            RunThread(async (CJoliContext context) => await UpdateEstimate(uuid, login, context, new CancellationToken()), context);
         }
 
         public async Task UpdateMatch(MatchDto dto, string login, string uuid, CJoliContext context, CancellationToken ct)
@@ -1372,7 +1372,7 @@ namespace cjoli.Server.Services
         }
 
 
-        private void RunThread(Action<CJoliContext> callback, CJoliContext context)
+        private void RunThread(Func<CJoliContext, Task> callback, CJoliContext context)
         {
             if (_configuration.GetValue<string>("IsTesting") == "true")
             {
@@ -1380,18 +1380,24 @@ namespace cjoli.Server.Services
             }
             else
             {
-                var thread = new Thread(new ThreadStart(() =>
+                Task.Run(async () =>
                 {
                     using (var scope = _service.CreateScope())
                     {
-                        var context = scope.ServiceProvider.GetService<CJoliContext>();
-                        if (context != null)
+                        var newContext = scope.ServiceProvider.GetService<CJoliContext>();
+                        if (newContext != null)
                         {
-                            callback(context);
+                            try
+                            {
+                                await callback(newContext);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, "Error executing background task.");
+                            }
                         }
                     }
-                }));
-                thread.Start();
+                });
             }
         }
 
