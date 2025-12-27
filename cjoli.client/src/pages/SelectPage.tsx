@@ -15,6 +15,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import styled from "@emotion/styled";
 import { useApi } from "../hooks/useApi";
 import * as cjoliService from "../services/cjoliService";
+import { useServer } from "../hooks/useServer";
 
 const MySpinner = styled("div")`
   width: 18px;
@@ -86,6 +87,7 @@ const SelectPage = () => {
   const { tourneys, loadTeams } = useCJoli("welcome");
   const { t } = useTranslation();
   const { isRootAdmin } = useUser();
+  const { sendMessage } = useServer();
   const { setShow: showAddTourney } = useModal("addTourney");
   const { getTourneys, saveTourney } = useApi();
 
@@ -103,6 +105,10 @@ const SelectPage = () => {
     };
     call();
   }, []);
+
+  useEffect(() => {
+    sendMessage({ type: "selectTourney", uid: "default" });
+  }, [sendMessage]);
 
   const now = dayjs();
 

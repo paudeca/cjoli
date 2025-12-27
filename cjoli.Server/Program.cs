@@ -111,6 +111,7 @@ builder.Services.AddSingleton<CancellationMiddleware>();
 builder.Services.AddSingleton<IAuthorizationHandler, AdminTourneyAuthorizationHandler>();
 
 builder.Services.AddHostedService<SynchroHostedService>();
+builder.Services.AddHostedService<MetricHostedService>();
 
 builder.Services.AddDbContextPool<CJoliContext>(options =>
 {

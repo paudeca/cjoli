@@ -1,4 +1,5 @@
 ﻿using cjoli.Server.Server;
+using Microsoft.ApplicationInsights;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
@@ -17,10 +18,12 @@ namespace cjoli.Server.Services
     {
         private readonly ConcurrentDictionary<string, SessionSocket> _clients = new ConcurrentDictionary<string, SessionSocket>();
         private readonly ILogger<ServerService> _logger;
+        private readonly TelemetryClient _telemetryClient;
 
-        
-        public ServerService(ILogger<ServerService> logger) {
+        public ServerService(ILogger<ServerService> logger, TelemetryClient telemetryClient)
+        {
             _logger = logger;
+            _telemetryClient = telemetryClient;
         }
 
         public void Read(string socketId, ServerMessage message)
@@ -30,24 +33,29 @@ namespace cjoli.Server.Services
                 case ServerMessageType.selectTourney:
                     {
                         var m = message as SelectTourneyMessage;
-                        _clients.First(s => s.Key == socketId).Value.TourneyUid = m!.Uid;
+                        var session = _clients.Single(s => s.Key == socketId).Value;
+                        session.TourneyUid = m!.Uid;
                         _logger.LogInformation("users connected to {@uid} count:{@count}", m!.Uid, _clients.Where(c => c.Value.TourneyUid == m!.Uid).Count());
                         break;
                     }
             }
         }
 
+        public int CountUser => _clients.Count;
+        public Dictionary<string, int> GetUsersByTourney => _clients.GroupBy(c => c.Value.TourneyUid).ToDictionary(kv => kv.Key ?? "default", kv => kv.Count());
+
         public string AddClient(WebSocket ws)
         {
             string socketId = Guid.NewGuid().ToString();
-            _clients.TryAdd(socketId, new SessionSocket() { WebSocket = ws });
-            _logger.LogInformation("new user connected count:{@count}",_clients.Count);
+            _clients.TryAdd(socketId, new SessionSocket() { WebSocket = ws, TourneyUid = "default" });
+            _logger.LogInformation("new user connected count:{@count}", _clients.Count);
             return socketId;
         }
 
         public void RemoveClient(string socketId, WebSocket ws)
         {
-            _clients.TryRemove(socketId, out _);
+            SessionSocket? session = null;
+            _clients.TryRemove(socketId, out session);
             _logger.LogInformation("user leaves count:{@count}", _clients.Count);
         }
 
