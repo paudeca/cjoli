@@ -62,6 +62,8 @@ namespace cjoli.Server.Services
             _rules.Add("henderson", new HendersonRule(this));
             _rules.Add("hogly", new HoglyRule(this));
             _rules.Add("nordcup", new NordCupRule(this));
+            _rules.Add("cholet", new CholetRule(this));
+
         }
 
         private IRule GetRule(Tourney tourney)
@@ -428,7 +430,7 @@ namespace cjoli.Server.Services
                     scoreSquads.Add(scoreSquad);
                     scorePhase.AddRange(scoreSquad.Scores.Select(s => s.Clone()));
                 }
-                scorePhase.Sort(rule.ScoreComparison(phase, null));
+                scorePhase.Sort(rule.ScoreComparison(phase, null, rule));
                 for (int i = 0; i < scorePhase.Count; i++)
                 {
                     var score = scorePhase[i];
@@ -466,60 +468,89 @@ namespace cjoli.Server.Services
             }
         }
 
-        public Func<Phase, Squad?, Comparison<Score>> DefaultScoreComparison = (Phase phase, Squad? squad) => (Score a, Score b) =>
+        private static int CompareItem(Score a, Score b, Func<Score, double> get, SourceType source, bool orderAsc, Func<double, double, double> getValue)
         {
-            var positions = squad?.Positions ?? phase.Squads.SelectMany(s => s.Positions).ToList();
-            var matches = squad?.Matches ?? phase.Squads.SelectMany(s => s.Matches).ToList();
-
-            var positionA = positions.Single(p => p.Id == a.PositionId);
-            var positionB = positions.Single(p => p.Id == b.PositionId);
-
-
-            var diff = a.Total.CompareTo(b.Total);
+            var valA = get(a);
+            var valB = get(b);
+            var diff = valA.CompareTo(valB);
             if (diff != 0)
             {
-                UpdateSource(a, b, SourceType.total, a.Total - b.Total, true);
-                return -diff;
-            }
-
-            var match = matches.OrderBy(m => m.Time).LastOrDefault(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB));
-            if (match != null)
-            {
-                var userMatch = match.UserMatches.FirstOrDefault(u => u.User != null);
-                IMatch m = match.Done ? match : userMatch != null ? userMatch : match;
-                if (m.ScoreA > m.ScoreB || m.ForfeitB)
+                if (orderAsc)
                 {
-                    int result = match.PositionA == positionA ? -1 : 1;
-                    UpdateSource(a, b, SourceType.direct, -result, true);
-                    return result;
+                    UpdateSource(a, b, source, getValue(valA, valB), orderAsc);
+                    return -diff;
                 }
-                else if (m.ScoreB > m.ScoreA || m.ForfeitA)
+                else
                 {
-                    int result = match.PositionB == positionA ? -1 : 1;
-                    UpdateSource(a, b, SourceType.direct, -result, true);
-                    return result;
+                    UpdateSource(a, b, source, getValue(valA, valB), !orderAsc);
+                    return diff;
                 }
             }
-            diff = a.GoalDiff.CompareTo(b.GoalDiff);
-            if (diff != 0)
+            return 0;
+        }
+
+
+        private Dictionary<string, Comparison<Score>> compares = new Dictionary<string, Comparison<Score>> {
+            { "total", (a, b) => CompareItem(a,b,s=>s.Total,SourceType.total, true, (valA,valB)=>valA-valB) },
+            { "goalDiff", (a, b) => CompareItem(a,b,s=>s.GoalDiff,SourceType.goalDiff, true, (valA,valB)=>valA-valB) },
+            { "goalFor", (a, b) => CompareItem(a,b,s=>s.GoalFor,SourceType.goalFor, true, (valA,valB)=>valA-valB) },
+            { "goalAgainst", (a, b) => CompareItem(a,b,s=>s.GoalAgainst,SourceType.goalAgainst, false, (valA,valB)=>valB-valA) },
+            { "win", (a, b) => CompareItem(a,b,s=>s.Win,SourceType.win, true, (valA,valB)=>valA-valB) },
+            { "loss", (a, b) => CompareItem(a,b,s=>s.Loss,SourceType.loss, false, (valA,valB)=>valB-valA) },
+            { "shutOut", (a, b) => CompareItem(a,b,s=>s.ShutOut,SourceType.shutOut, true, (valA,valB)=>valA-valB) },
+            { "avg", (a, b) => CompareItem(a,b,s=>s.Total/s.Game,SourceType.avg, true, (valA,valB)=>valA-valB) },
+            { "penalty", (a, b) => CompareItem(a,b,s=>s.Penalty,SourceType.penalty, false, (valA,valB)=>valB-valA) },
+
+        };
+
+
+
+        private int CompareBreakers(List<Breaker> breakers, Score a, Score b)
+        {
+            foreach (var breaker in breakers)
             {
-                UpdateSource(a, b, SourceType.goalDiff, a.GoalDiff - b.GoalDiff, true);
-                return -diff;
+                var id = breaker.id!;
+                var func = compares[id]!;
+                var diff = func(a, b);
+                if (diff != 0)
+                {
+                    return diff;
+                }
             }
-            diff = a.GoalFor.CompareTo(b.GoalFor);
-            if (diff != 0)
+            return 0;
+        }
+
+
+
+        private Func<IList<Match>, Position, Position, IRule, Breaker, Comparison<Score>> CompareDirect =>
+            (IList<Match> matches, Position positionA, Position positionB, IRule rule, Breaker breaker) => (Score a, Score b) =>
+        {
+            var matchesDirect = matches.OrderBy(m => m.Time)
+                .Where(m => (m.PositionA == positionA && m.PositionB == positionB) || (m.PositionB == positionA && m.PositionA == positionB)).ToList();
+            var scores = new Dictionary<int, Score>() { { positionA.Id, new Score() }, { positionB.Id, new Score() } };
+            var m = matchesDirect.Aggregate(scores, (acc, m) =>
             {
-                UpdateSource(a, b, SourceType.goalFor, a.GoalFor - b.GoalFor, true);
-                return -diff;
-            }
-            diff = a.GoalAgainst.CompareTo(b.GoalAgainst);
-            if (diff != 0)
+                var userMatch = m.UserMatches.OrderByDescending(u => u.LogTime).FirstOrDefault(u => u.User != null);
+                IMatch match = m.Done ? m : userMatch != null ? userMatch : m;
+
+                var scoreA = scores[m.PositionA.Id];
+                var scoreB = scores[m.PositionB.Id];
+                UpdateScore(scoreA, scoreB, null, match, m, rule);
+                return acc;
+            });
+            var scoreA = scores[positionA.Id];
+            var scoreB = scores[positionB.Id];
+            int result = CompareBreakers(breaker.children, scoreA, scoreB);
+            if (result != 0)
             {
-                UpdateSource(a, b, SourceType.goalAgainst, b.GoalAgainst - a.GoalAgainst, false);
-                return diff;
+                UpdateSource(a, b, SourceType.direct, result, false);
+                return result;
             }
-            var teamA = positionA.Team;
-            var teamB = positionB.Team;
+            return 0;
+        };
+
+        private Func<Team?, Team?, Comparison<Score>> CompareYoungest => (Team? teamA, Team? teamB) => (Score a, Score b) =>
+        {
             if (teamA != null && teamB != null)
             {
                 int result = -teamA.Youngest?.CompareTo(teamB.Youngest) ?? 0;
@@ -529,9 +560,51 @@ namespace cjoli.Server.Services
                     return result;
                 }
             }
-            UpdateSource(a, b, SourceType.equal, 0, true);
-            return positionA.Value < positionB.Value ? -1 : 1;
+            return 0;
         };
+
+        private List<Breaker> DefaultBreakers = new List<Breaker>() {
+                new Breaker { id = "total" },
+                new Breaker { id = "direct", children = new List<Breaker>{
+                    new Breaker { id = "win" },
+                    new Breaker { id = "loss" },
+                }},
+                new Breaker { id = "goalDiff" },
+                new Breaker { id = "goalFor" },
+                new Breaker { id = "goalAgainst" },
+                new Breaker { id = "penalty" },
+            };
+
+
+        public Func<Phase, Squad?, IRule, Comparison<Score>> DefaultScoreComparison => CustomScoreComparison(DefaultBreakers);
+
+
+        public Func<List<Breaker>, Func<Phase, Squad?, IRule, Comparison<Score>>> CustomScoreComparison
+            => (List<Breaker> breakers)
+            => (Phase phase, Squad? squad, IRule rule)
+            => (Score a, Score b) =>
+            {
+                var positions = squad?.Positions ?? phase.Squads.SelectMany(s => s.Positions).ToList();
+                var matches = squad?.Matches ?? phase.Squads.SelectMany(s => s.Matches).ToList();
+
+                var positionA = positions.Single(p => p.Id == a.PositionId);
+                var positionB = positions.Single(p => p.Id == b.PositionId);
+                var teamA = positionA.Team;
+                var teamB = positionB.Team;
+
+                compares["direct"] = CompareDirect(matches, positionA, positionB, rule, breakers.Single(b => b.id == "direct"));
+                compares["youngest"] = CompareYoungest(teamA, teamB);
+
+
+                var diff = CompareBreakers(breakers, a, b);
+                if (diff != 0)
+                {
+                    return diff;
+                }
+                UpdateSource(a, b, SourceType.equal, 0, true);
+                return positionA.Value < positionB.Value ? -1 : 1;
+
+            };
 
         public Action<Match, MatchDto> DefaultApplyForfeit = (Match match, MatchDto dto) =>
         {
@@ -611,7 +684,7 @@ namespace cjoli.Server.Services
                 listScores = dico.Select(kv => kv.Value).ToList();
             }
 
-            listScores.Sort(rule.ScoreComparison(squad.Phase, squad));
+            listScores.Sort(rule.ScoreComparison(squad.Phase, squad, rule));
             for (int i = 0; i < listScores.Count; i++)
             {
                 var score = listScores[i];
@@ -1587,4 +1660,11 @@ namespace cjoli.Server.Services
         }
 
     }
+
+    public class Breaker
+    {
+        public required string id { get; set; }
+        public List<Breaker> children { get; set; } = new List<Breaker>();
+    }
+
 }

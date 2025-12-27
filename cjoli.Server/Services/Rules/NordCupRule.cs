@@ -29,7 +29,7 @@ namespace cjoli.Server.Services.Rules
         public bool HasForfeit => false;
         public bool HasYoungest => false;
 
-        public Func<Phase, Squad?, Comparison<Score>> ScoreComparison => (Phase phase, Squad? squad) => (Score a, Score b) =>
+        public Func<Phase, Squad?, IRule, Comparison<Score>> ScoreComparison => (Phase phase, Squad? squad, IRule rule) => (Score a, Score b) =>
         {
             var positions = squad?.Positions ?? phase.Squads.SelectMany(s => s.Positions).ToList();
             var matches = squad?.Matches ?? phase.Squads.SelectMany(s => s.Matches).ToList();
@@ -90,7 +90,7 @@ namespace cjoli.Server.Services.Rules
             }
 
 
-            return _service.DefaultScoreComparison(phase, squad)(a, b);
+            return _service.DefaultScoreComparison(phase, squad, rule)(a, b);
         };
 
 
@@ -106,13 +106,13 @@ namespace cjoli.Server.Services.Rules
             switch (type)
             {
                 case ScoreType.Win:
-                    return Math.Round(total + Win + score * GoalFor,1);
+                    return Math.Round(total + Win + score * GoalFor, 1);
                 case ScoreType.Loss:
                     return Math.Round(total + Loss + score * GoalFor, 1);
                 case ScoreType.Neutral:
                     return Math.Round(total + Neutral + score * GoalFor, 1);
                 case ScoreType.Forfeit:
-                    return Math.Round(total + Forfeit,1);
+                    return Math.Round(total + Forfeit, 1);
             }
             return total;
 

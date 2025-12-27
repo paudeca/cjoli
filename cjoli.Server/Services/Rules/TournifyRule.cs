@@ -92,7 +92,7 @@ namespace cjoli.Server.Services.Rules
         }
 
 
-        public Func<Phase, Squad?, Comparison<Score>> ScoreComparison => (Phase phase, Squad? squad) => (Score a, Score b) =>
+        public Func<Phase, Squad?, IRule, Comparison<Score>> ScoreComparison => (Phase phase, Squad? squad, IRule rule) => (Score a, Score b) =>
         {
             var positions = squad?.Positions ?? phase.Squads.SelectMany(s => s.Positions).ToList();
             var matches = squad?.Matches ?? phase.Squads.SelectMany(s => s.Matches).ToList();
@@ -140,7 +140,7 @@ namespace cjoli.Server.Services.Rules
             {
                 return diff;
             }
-            return _service.DefaultScoreComparison(phase, squad)(a, b);
+            return _service.DefaultScoreComparison(phase, squad, rule)(a, b);
         };
 
         public Action<Match, MatchDto> ApplyForfeit => _service.DefaultApplyForfeit;

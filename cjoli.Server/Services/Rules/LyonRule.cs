@@ -27,7 +27,7 @@ namespace cjoli.Server.Services.Rules
         public bool HasForfeit => false;
         public bool HasYoungest => false;
 
-        public Func<Phase, Squad?, Comparison<Score>> ScoreComparison => (Phase phase, Squad? squad) => (Score a, Score b) =>
+        public Func<Phase, Squad?, IRule, Comparison<Score>> ScoreComparison => (Phase phase, Squad? squad, IRule rule) => (Score a, Score b) =>
         {
             var positions = squad?.Positions ?? phase.Squads.SelectMany(s => s.Positions).ToList();
 

@@ -26,7 +26,7 @@ namespace cjoli.Server.Services.Rules
         public bool HasYoungest => true;
 
 
-        public Func<Phase, Squad?, Comparison<Score>> ScoreComparison => _service.DefaultScoreComparison;
+        public Func<Phase, Squad?, IRule, Comparison<Score>> ScoreComparison => _service.DefaultScoreComparison;
 
         public Action<Match, MatchDto> ApplyForfeit => _service.DefaultApplyForfeit;
 
@@ -76,7 +76,7 @@ namespace cjoli.Server.Services.Rules
             Dictionary<int, Score> initScores = new Dictionary<int, Score>();
             matches.Aggregate(initScores, (acc, m) =>
             {
-                var userMatch = m.UserMatches.OrderByDescending(u=>u.LogTime).FirstOrDefault(u=>u.User==user);
+                var userMatch = m.UserMatches.OrderByDescending(u => u.LogTime).FirstOrDefault(u => u.User == user);
                 bool useCustom = user != null && user.HasCustomEstimate();
 
                 if ((userMatch == null || !useCustom) && !m.Done)
@@ -107,7 +107,7 @@ namespace cjoli.Server.Services.Rules
             scores = squad.Positions.ToDictionary(p => p.Id, p =>
             {
                 var id = mapPositions[p.Id];
-                var score = initScores.ContainsKey(id)?initScores[id]:new Score() { PositionId=id};
+                var score = initScores.ContainsKey(id) ? initScores[id] : new Score() { PositionId = id };
                 score.PositionId = p.Id;
                 return score;
             });

@@ -15,7 +15,7 @@ namespace cjoli.Server.Services.Rules
         bool HasPenalty { get; }
         bool HasForfeit { get; }
         bool HasYoungest { get; }
-        Func<Phase, Squad?, Comparison<Score>> ScoreComparison { get; }
+        Func<Phase, Squad?, IRule, Comparison<Score>> ScoreComparison { get; }
         Action<Match, MatchDto> ApplyForfeit { get; }
 
 

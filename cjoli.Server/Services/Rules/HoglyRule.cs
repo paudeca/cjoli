@@ -30,7 +30,7 @@ namespace cjoli.Server.Services.Rules
         public bool HasYoungest => false;
 
 
-        public Func<Phase, Squad?, Comparison<Score>> ScoreComparison => (Phase phase, Squad? squad) => (Score a, Score b) =>
+        public Func<Phase, Squad?, IRule, Comparison<Score>> ScoreComparison => (Phase phase, Squad? squad, IRule rule) => (Score a, Score b) =>
         {
             var positions = squad?.Positions ?? phase.Squads.SelectMany(s => s.Positions).ToList();
             var matches = squad?.Matches ?? phase.Squads.SelectMany(s => s.Matches).ToList();
@@ -58,21 +58,21 @@ namespace cjoli.Server.Services.Rules
                 return diff;
             }
 
-            return _service.DefaultScoreComparison(phase, squad)(a,b);
+            return _service.DefaultScoreComparison(phase, squad, rule)(a, b);
         };
 
         public Action<Match, MatchDto> ApplyForfeit => (Match match, MatchDto dto) =>
         {
             match.ForfeitA = dto.ForfeitA;
             match.ForfeitB = dto.ForfeitB;
-            match.ScoreA = dto.ForfeitA?0:4;
-            match.ScoreB = dto.ForfeitB?0:4;
+            match.ScoreA = dto.ForfeitA ? 0 : 4;
+            match.ScoreB = dto.ForfeitB ? 0 : 4;
         };
 
 
         private Position FindParentPosition(Position position, IList<ScoreSquad> squadScores, IList<Score> phaseScores)
         {
-            if (position.ParentPosition != null && (position.ParentPosition.Squad != null || position.ParentPosition.Phase != null)) 
+            if (position.ParentPosition != null && (position.ParentPosition.Squad != null || position.ParentPosition.Phase != null))
             {
                 IList<Score> scores;
                 IEnumerable<Position> positions;
@@ -97,11 +97,11 @@ namespace cjoli.Server.Services.Rules
         }
 
 
-        public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads, Dictionary<int,List<Score>> scorePhases, User? user)
+        public Dictionary<int, Score> InitScoreSquad(Squad squad, List<ScoreSquad> scoreSquads, Dictionary<int, List<Score>> scorePhases, User? user)
         {
             var mapPositions = squad.Positions.Where(p => p.ParentPosition != null).ToDictionary(p => p.Id, p =>
             {
-                var parentPosition = FindParentPosition(p, scoreSquads, p.ParentPosition!.Phase!=null?scorePhases[p.ParentPosition!.Phase.Id]:new List<Score>());
+                var parentPosition = FindParentPosition(p, scoreSquads, p.ParentPosition!.Phase != null ? scorePhases[p.ParentPosition!.Phase.Id] : new List<Score>());
                 return parentPosition.Id;
             });
             var scores = squad.Positions.ToDictionary(p => p.Id, p => new Score() { PositionId = p.Id, TeamId = p.Team?.Id ?? 0 });
@@ -116,18 +116,18 @@ namespace cjoli.Server.Services.Rules
             Dictionary<int, Score> initScores = new Dictionary<int, Score>();
             matches.Aggregate(initScores, (acc, m) =>
             {
-                var userMatch = m.UserMatches.OrderByDescending(u=>u.LogTime).FirstOrDefault(u=>u.User==user);
+                var userMatch = m.UserMatches.OrderByDescending(u => u.LogTime).FirstOrDefault(u => u.User == user);
                 bool useCustom = user != null && user.HasCustomEstimate();
                 if ((userMatch == null || !useCustom) && !m.Done)
                 {
                     return acc;
                 }
                 IMatch? match = m.Done ? m : userMatch;
-                if(match == null)
+                if (match == null)
                 {
                     return acc;
                 }
-                if(!initScores.ContainsKey(m.PositionA.Id))
+                if (!initScores.ContainsKey(m.PositionA.Id))
                 {
                     acc.Add(m.PositionA.Id, new Score() { PositionId = m.PositionA.Id });
                 }
