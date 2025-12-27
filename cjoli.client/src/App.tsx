@@ -36,6 +36,7 @@ const TeamPage = lazy(() => import("./pages/TeamPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const GalleryPage = lazy(() => import("./pages/GalleryPage"));
 const CastPage = lazy(() => import("./pages/CastPage"));
+const GamePage = lazy(() => import("./pages/GamePage"));
 
 const App = () => {
   const { isUseDomain } = useServer();
@@ -98,6 +99,10 @@ const App = () => {
         {
           path: isUseDomain ? "gallery/:mode?" : ":uid/gallery/:mode?",
           element: <GalleryPage />,
+        },
+        {
+          path: isUseDomain ? "game" : ":uid/game",
+          element: <GamePage />,
         },
       ],
     },

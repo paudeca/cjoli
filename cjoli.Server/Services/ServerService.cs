@@ -1,4 +1,5 @@
 ﻿using cjoli.Server.Server;
+using Microsoft.ApplicationInsights;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
@@ -17,10 +18,16 @@ namespace cjoli.Server.Services
     {
         private readonly ConcurrentDictionary<string, SessionSocket> _clients = new ConcurrentDictionary<string, SessionSocket>();
         private readonly ILogger<ServerService> _logger;
+        private readonly TelemetryClient _telemetryClient;
 
-        
-        public ServerService(ILogger<ServerService> logger) {
+
+        public ServerService(ILogger<ServerService> logger, TelemetryClient telemetryClient)
+        {
             _logger = logger;
+            _telemetryClient = telemetryClient;
+
+            var metric = _telemetryClient.GetMetric("CJoli.LiveUser");
+
         }
 
         public void Read(string socketId, ServerMessage message)
@@ -37,11 +44,14 @@ namespace cjoli.Server.Services
             }
         }
 
+        public int CountUser => _clients.Count;
+        public Dictionary<string, int> GetUsersByTourney => _clients.GroupBy(c => c.Value.TourneyUid).ToDictionary(kv => kv.Key ?? "default", kv => kv.Count());
+
         public string AddClient(WebSocket ws)
         {
             string socketId = Guid.NewGuid().ToString();
             _clients.TryAdd(socketId, new SessionSocket() { WebSocket = ws });
-            _logger.LogInformation("new user connected count:{@count}",_clients.Count);
+            _logger.LogInformation("new user connected count:{@count}", _clients.Count);
             return socketId;
         }
 

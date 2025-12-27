@@ -47,6 +47,7 @@
     <PackageReference Include="Serilog.Expressions" Version="5.0.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="Serilog.Sinks.Datadog.Logs" Version="0.5.4" />
+    <PackageReference Include="Stripe.net" Version="50.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Twilio.AspNet.Core" Version="8.1.1" />
   </ItemGroup>

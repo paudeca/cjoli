@@ -225,6 +225,15 @@ const MenuNav = () => {
                     </Nav.Link>
                     <Nav.Link
                       onClick={() => {
+                        navigate(`${path}game`);
+                        setShow(false);
+                      }}
+                    >
+                      <Controller size={30} className="mx-2" />
+                      <Trans i18nKey="menu.game">Game</Trans>
+                    </Nav.Link>
+                    <Nav.Link
+                      onClick={() => {
                         navigate(`${path}ranking`);
                         setShow(false);
                       }}

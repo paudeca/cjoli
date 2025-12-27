@@ -1,22 +1,23 @@
 using Azure.AI.OpenAI;
+using cjoli.Server.Authorizations;
+using cjoli.Server.Exceptions;
+using cjoli.Server.Middlewares;
 using cjoli.Server.Models;
 using cjoli.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Serilog.Sinks.Datadog.Logs;
-using Serilog;
-using System.Text;
-using Serilog.Exceptions;
-using cjoli.Server.Exceptions;
-using cjoli.Server.Middlewares;
-using Serilog.Enrichers.Sensitive;
-using cjoli.Server.Authorizations;
-using Microsoft.AspNetCore.Authorization;
 using PhotoSauce.MagicScaler;
-using PhotoSauce.NativeCodecs.Libpng;
 using PhotoSauce.NativeCodecs.Libjpeg;
+using PhotoSauce.NativeCodecs.Libpng;
+using Serilog;
+using Serilog.Enrichers.Sensitive;
+using Serilog.Exceptions;
+using Serilog.Sinks.Datadog.Logs;
+using Stripe;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -104,6 +105,7 @@ builder.Services.AddSingleton<MessageService>();
 builder.Services.AddSingleton<TwilioService>();
 builder.Services.AddSingleton<StorageService>();
 builder.Services.AddSingleton<SynchroService>();
+builder.Services.AddSingleton<PayService>();
 builder.Services.AddSingleton(new OpenAIClient(builder.Configuration["OpenAIKey"]));
 builder.Services.AddSingleton<LoggerMiddleware>();
 builder.Services.AddSingleton<CancellationMiddleware>();
@@ -111,6 +113,7 @@ builder.Services.AddSingleton<CancellationMiddleware>();
 builder.Services.AddSingleton<IAuthorizationHandler, AdminTourneyAuthorizationHandler>();
 
 builder.Services.AddHostedService<SynchroHostedService>();
+builder.Services.AddHostedService<MetricHostedService>();
 
 builder.Services.AddDbContextPool<CJoliContext>(options =>
 {
@@ -174,6 +177,9 @@ CodecManager.Configure(c =>
     c.UseLibpng();
     c.UseLibjpeg();
 });
+
+
+StripeConfiguration.ApiKey = builder.Configuration["StripeApiKey"];
 
 
 app.Run();
