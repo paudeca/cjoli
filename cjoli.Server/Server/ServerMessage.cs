@@ -10,6 +10,7 @@ namespace cjoli.Server.Server
         users,
         selectTourney,
         updateRanking,
+        estimation
     }
 
     public abstract class ServerMessage
@@ -63,6 +64,16 @@ namespace cjoli.Server.Server
     {
         public UpdateRankingMessage() : base(ServerMessageType.updateRanking)
         {
+        }
+    }
+
+    public class EstimationMessage : ServerMessage
+    {
+        [JsonPropertyName("started")]
+        public bool Started { get; set; }
+        public EstimationMessage(bool started) : base(ServerMessageType.estimation)
+        {
+            Started = started;
         }
     }
 

@@ -35,7 +35,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import useScreenSize from "../../hooks/useScreenSize";
 import { useCJoli } from "../../hooks/useCJoli";
 import useUid from "../../hooks/useUid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useModal } from "../../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
 import dayjs from "dayjs";
@@ -43,6 +43,7 @@ import { useServer } from "../../hooks/useServer";
 import MenuBrand from "./MenuBrand";
 import BetScoreTotal from "./BetScoreTotal";
 import TeamSelect from "../../components/TeamSelect";
+import { MyProgressBar } from "../../components/Loading";
 
 const MyNavbar = styled(Navbar)`
   color: black;
@@ -72,7 +73,7 @@ const MenuNav = () => {
     saveFilteredTeam,
   } = useUser();
   const uid = useUid();
-  const { path } = useServer();
+  const { path, register } = useServer();
   const { setShow: showLogin } = useModal("login");
   const { setShow: showRegister } = useModal("register");
   const { setShow: showUpdate } = useModal("update");
@@ -100,6 +101,14 @@ const MenuNav = () => {
     (!isAdmin && localStorage.getItem("useEstimate") == "true");
 
   const tourneyLabel = uid && tourney?.name;
+
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    register("estimation", async ({ started }) => {
+      setStarted(started!);
+    });
+  }, [register]);
 
   return (
     <MyNavbar
@@ -173,6 +182,7 @@ const MenuNav = () => {
                 <Controller className="mx-2" />
               )}
               <Trans i18nKey="simulation.tooltip">Simulation</Trans>
+              {started && <MyProgressBar />}
             </ToggleButton>
             <div>
               <BetScoreTotal />

@@ -21,9 +21,9 @@ export const useServer = () => {
     });
 
   const register = useCallback(
-    (type: string, callback: (value: number) => void) => {
+    (type: string, callback: (msg: MessageServer) => void) => {
       if (lastMessage != null && lastMessage.type == type) {
-        callback(lastMessage.value);
+        callback(lastMessage);
       }
     },
     [lastMessage]

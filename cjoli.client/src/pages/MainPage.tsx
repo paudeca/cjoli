@@ -80,8 +80,8 @@ const MainPage = () => {
   }, [uid, tourneys, selectTourney]);
 
   useEffect(() => {
-    register("users", (value) => {
-      setCountUser(value);
+    register("users", ({ value }) => {
+      setCountUser(value!);
     });
   }, [register, setCountUser]);
 

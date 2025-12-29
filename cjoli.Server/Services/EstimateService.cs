@@ -6,8 +6,16 @@ namespace cjoli.Server.Services
 {
     public class EstimateService
     {
+        private readonly ServerService _serverService;
+
+        public EstimateService(ServerService serverService)
+        {
+            _serverService = serverService;
+        }
+
         public async Task CalculateEstimates(Tourney tourney, ScoresDto scores, User? user, CJoliContext context, CancellationToken ct)
         {
+            _serverService.Estimation(tourney.Uid, true);
             var userMatches = await context.UserMatch.Where(u => user != null && u.User == user && u.Match != null).ToListAsync(ct);
 
             var scoreUserA = userMatches.Where(u => u.Match != null).Select(u => CreateScore(u.Match.PositionA, u.Match.PositionB, u.ScoreA, u.ScoreB, u.Match, scores.ScoreSquads, scores.ScorePhases[u.Match.Squad!.Phase.Id]));
@@ -264,6 +272,7 @@ namespace cjoli.Server.Services
                 }
             }
             context.SaveChanges();
+            _serverService.Estimation(tourney.Uid, false);
         }
 
 

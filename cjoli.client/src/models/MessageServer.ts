@@ -1,4 +1,5 @@
 export interface MessageServer {
-  type: "users";
-  value: number;
+  type: "users" | "estimation";
+  value?: number;
+  started?: boolean;
 }

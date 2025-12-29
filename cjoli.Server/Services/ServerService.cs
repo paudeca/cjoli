@@ -71,6 +71,12 @@ namespace cjoli.Server.Services
             _ = Broadcast(JsonSerializer.Serialize(message), _clients.Where(s => s.Value.TourneyUid == uid).Select(s => s.Value).ToList());
         }
 
+        public void Estimation(string uid, bool started)
+        {
+            var message = new EstimationMessage(started);
+            _ = Broadcast(JsonSerializer.Serialize(message), _clients.Where(s => s.Value.TourneyUid == uid).Select(s => s.Value).ToList());
+        }
+
         private async Task Broadcast(string message, List<SessionSocket>? sockets = null)
         {
             byte[] buffer = Encoding.UTF8.GetBytes(message);
