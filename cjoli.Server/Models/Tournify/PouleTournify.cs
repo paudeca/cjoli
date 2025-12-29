@@ -17,6 +17,10 @@ namespace cjoli.Server.Models.Tournify
         public int num { get; set; }
         [FirestoreProperty]
         public int bracketRound { get; set; }
+        [FirestoreProperty]
+        public Dictionary<string, int> minusPoints { get; set; } = new Dictionary<string, int>();
+        [FirestoreProperty]
+        public Dictionary<string, int> plusPoints { get; set; } = new Dictionary<string, int>();
 
         public Squad? Squad { get; set; }
 

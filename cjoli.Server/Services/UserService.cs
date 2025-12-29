@@ -137,7 +137,7 @@ namespace cjoli.Server.Services
                 user.Configs.Add(config);
             }
             config.UseCustomEstimate = dto.UseCustomEstimate;
-            config.FavoriteTeam = dto.FavoriteTeamId > 0 ? tourney.Teams.Single(t => t.Id == dto.FavoriteTeamId) : null;
+            config.FavoriteTeam = dto.FavoriteTeamId > 0 ? tourney.Teams.SingleOrDefault(t => t.Id == dto.FavoriteTeamId) : null;
             await context.SaveChangesAsync(ct);
         }
 

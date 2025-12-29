@@ -39,7 +39,7 @@ const PenaltyIcon = ({ positionId }: { positionId: number }) => {
     loadRanking(ranking);
     document.body.click();
   };
-  const hasPenalty = position.penalty > 0;
+  const hasPenalty = position.penalty != 0;
 
   const PenaltyTooltip = (props: TooltipProps) => (
     <Tooltip {...props}>
@@ -57,7 +57,7 @@ const PenaltyIcon = ({ positionId }: { positionId: number }) => {
           <Col>
             <Form.Control
               type="number"
-              min={0}
+              min={-99}
               max={99}
               {...register("penalty")}
             />
@@ -95,10 +95,12 @@ const PenaltyIcon = ({ positionId }: { positionId: number }) => {
         pill
         className="ms-2"
         data-penalty={hasPenalty}
-        bg={hasPenalty ? "danger" : "warning"}
+        bg={
+          hasPenalty ? (position.penalty > 0 ? "danger" : "success") : "warning"
+        }
         role="button"
       >
-        {position.penalty}P
+        {-position.penalty}P
       </MyBadge>
     </OverlayTrigger>
   );

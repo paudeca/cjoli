@@ -14,8 +14,9 @@ namespace cjoli.Server.Services
             var scoreUserB = userMatches.Where(u => u.Match != null).Select(u => CreateScore(u.Match.PositionB, u.Match.PositionA, u.ScoreB, u.ScoreA, u.Match, scores.ScoreSquads, scores.ScorePhases[u.Match.Squad!.Phase.Id]));
             var scoreUsers = scoreUserA.Concat(scoreUserB).ToList();
 
-            var queryMatch = context.MatchResult.Where(r => r.Match.Squad!.Phase.Tourney.Category == tourney.Category);
-            var queryMatchSeason = queryMatch.Where(r => r.Match.Squad!.Phase.Tourney.Season == tourney.Season);
+            var queryMatch = context.MatchResult;
+            var queryMatchCategory = context.MatchResult.Where(r => r.Match.Squad!.Phase.Tourney.Category == tourney.Category);
+            var queryMatchSeason = queryMatchCategory.Where(r => r.Match.Squad!.Phase.Tourney.Season == tourney.Season);
 
             Dictionary<string, int> coef = new Dictionary<string, int> {
                 { "total", 0 },
@@ -31,14 +32,18 @@ namespace cjoli.Server.Services
             };
 
             coef["total"] = 1;
-            coef["totalSeason"] = coef["total"] * 2;
+            coef["totalCategory"] = coef["total"] * 2;
+            coef["totalSeason"] = coef["totalCategory"] * 2;
             coef["allTeam"] = coef["totalSeason"] * 2;
-            coef["allTeamSeason"] = coef["allTeam"] * 2;
+            coef["allTeamCategory"] = coef["allTeam"] * 2;
+            coef["allTeamSeason"] = coef["allTeamCategory"] * 2;
             coef["team"] = coef["allTeamSeason"] * 2;
             coef["indirect"] = coef["team"] * 2;
-            coef["indirectSeason"] = coef["indirect"] * 2;
+            coef["indirectCategory"] = coef["indirect"] * 2;
+            coef["indirectSeason"] = coef["indirectCategory"] * 2;
             coef["direct"] = coef["indirectSeason"] * 2;
-            coef["directSeason"] = coef["direct"] * 2;
+            coef["directCategory"] = coef["direct"] * 2;
+            coef["directSeason"] = coef["directCategory"] * 2;
             coef["user"] = coef["directSeason"] * 2;
 
 
@@ -53,6 +58,7 @@ namespace cjoli.Server.Services
             Score scoreTotal = await func(coef["total"], queryMatch);
             int totalGame = 1;// scoreTotal.Game;
 
+            Score scoreTotalCategory = await func(coef["totalCategory"], queryMatchCategory);
             Score scoreTotalSeason = await func(coef["totalSeason"] * totalGame, queryMatchSeason);
 
             var getTeamId = (Team? team) => team?.Alias != null ? team.Alias.Id : team != null ? team.Id : 0;
@@ -66,6 +72,7 @@ namespace cjoli.Server.Services
                 return mapScore;
             };
             var mapAllTeam = await funcMap(coef["allTeam"] * totalGame, queryMatch);
+            var mapAllTeamCategory = await funcMap(coef["allTeam"] * totalGame, queryMatchCategory);
             var mapAllTeamSeason = await funcMap(coef["allTeamSeason"] * totalGame, queryMatchSeason);
 
 
@@ -74,7 +81,13 @@ namespace cjoli.Server.Services
                 .GroupBy(r => r.Team.Id)
                 .ToDictionaryAsync(kv => kv.Key, kv => SelectScore<int>(coef["team"] * totalGame)(kv), ct) ?? new Dictionary<int, Score>();
 
-
+            var funcDirectOld = async (int coef, IQueryable<MatchResult> query) =>
+            {
+                var mapScore = await query.Where(r => r.Match.Squad!.Phase.Tourney != tourney && r.TeamAgainst != null)
+                    .GroupBy(r => new MyKv { TeamA = r.Team.Alias != null ? r.Team.Alias.Id : r.Team.Id, TeamB = r.TeamAgainst.Alias != null ? r.TeamAgainst.Alias.Id : r.TeamAgainst.Id })
+                    .ToDictionaryAsync(kv => kv.Key, kv => SelectScore<MyKv>(coef)(kv), ct);
+                return mapScore;
+            };
             var funcDirect = async (int coef, IQueryable<MatchResult> query) =>
             {
                 var results = await query.Where(r => r.Match.Squad!.Phase.Tourney != tourney && r.TeamAgainst != null)
@@ -92,7 +105,7 @@ namespace cjoli.Server.Services
                     .ToListAsync(ct);
 
                 var mapScore = results
-                    .GroupBy(r => new MyKv { TeamA = r.TeamA, TeamB = r.TeamB })
+                    .GroupBy(r => $"{r.TeamA}-{r.TeamB}")
                     .ToDictionary(g => g.Key, g => new Score
                     {
                         Game = g.Count(),
@@ -106,14 +119,26 @@ namespace cjoli.Server.Services
                     });
                 return mapScore;
             };
+
+
             var mapDirects = await funcDirect(coef["direct"] * totalGame, queryMatch);
+            var mapDirectCategories = await funcDirect(coef["directCategory"] * totalGame, queryMatchCategory);
             var mapDirectSeasons = await funcDirect(coef["directSeason"] * totalGame, queryMatchSeason);
 
+            var funcOtherOld = async (IQueryable<MatchResult> query) =>
+            {
+                return await query
+                    .GroupBy(r => r.Team)
+                    .ToDictionaryAsync(kv => kv.Key, kv => kv.Where(r => r.TeamAgainst != null)
+                    .Select(r => r.TeamAgainst.Id).ToList(), ct);
+            };
             var funcOther = async (IQueryable<MatchResult> query) =>
             {
-                var results = await query
+                var results = await query.Where(m => m.Team != null).ToListAsync(ct);
+                /*var results = await query
+                    .Where(r => r.Team != null)
                     .Select(r => new { r.Team, r.TeamAgainst })
-                    .ToListAsync(ct);
+                    .ToListAsync(ct);*/
 
                 return results
                     .Where(r => r.Team != null)
@@ -123,6 +148,7 @@ namespace cjoli.Server.Services
                                                       .ToList());
             };
             var mapOtherTeams = await funcOther(queryMatch);
+            var mapOtherTeamCategories = await funcOther(queryMatchCategory);
             var mapOtherTeamSeasons = await funcOther(queryMatchSeason);
 
             var MergeScore = (Dictionary<int, Score> map, int key, Score score, int coefficient) =>
@@ -149,25 +175,35 @@ namespace cjoli.Server.Services
 
             List<Func<Team, Team, Score>> scoreList = [
                 (Team teamA, Team teamB)=>scoreTotal,
+                (Team teamA, Team teamB)=>scoreTotalCategory,
                 (Team teamA, Team teamB)=>scoreTotalSeason,
                 (Team teamA, Team teamB)=>mapAllTeam.GetValueOrDefault(getTeamId(teamA))?? new Score(),
+                (Team teamA, Team teamB)=>mapAllTeamCategory.GetValueOrDefault(getTeamId(teamA))?? new Score(),
                 (Team teamA, Team teamB)=>mapAllTeamSeason.GetValueOrDefault(getTeamId(teamA))?? new Score(),
                 (Team teamA, Team teamB)=>mapCurrentTeam.GetValueOrDefault(teamA.Id)?? new Score(),
                 (Team teamA, Team teamB)=>{
-                    var score = mapDirects.SingleOrDefault(kv => kv.Key.TeamA == getTeamId(teamA) && kv.Key.TeamB == getTeamId(teamB)).Value ?? new Score();
+                    var score = mapDirects.SingleOrDefault(kv => kv.Key == $"{getTeamId(teamA)}-{getTeamId(teamB)}").Value ?? new Score();
                     List<Score> userScore = scoreUsers.Where(s => s.TeamId == teamA.Id && s.TeamAgainstId == teamB.Id).ToList();
                     userScore.ForEach(score.Merge);
                     return score;
                 },
                 (Team teamA, Team teamB)=>{
-                    var score = mapDirectSeasons.SingleOrDefault(kv => kv.Key.TeamA == getTeamId(teamA) && kv.Key.TeamB == getTeamId(teamB)).Value ?? new Score();
+                    var score = mapDirectCategories.SingleOrDefault(kv => kv.Key == $"{getTeamId(teamA)}-{getTeamId(teamB)}").Value ?? new Score();
+                    List<Score> userScore = scoreUsers.Where(s => s.TeamId == teamA.Id && s.TeamAgainstId == teamB.Id).ToList();
+                    userScore.ForEach(score.Merge);
+                    return score;
+                },
+                (Team teamA, Team teamB)=>{
+                    var score = mapDirectSeasons.SingleOrDefault(kv => kv.Key == $"{getTeamId(teamA)}-{getTeamId(teamB)}").Value ?? new Score();
                     List<Score> userScore = scoreUsers.Where(s => s.TeamId == teamA.Id && s.TeamAgainstId == teamB.Id).ToList();
                     userScore.ForEach(score.Merge);
                     return score;
                 },
                 (Team teamA, Team teamB)=>{
                     var otherTeams = mapOtherTeams.SingleOrDefault(m => m.Key.Id == teamB.Id).Value ?? new List<int>();
-                    var listScoreIndirects = mapDirects.Where(kv => kv.Key.TeamA == teamA.Id && otherTeams.Contains(kv.Key.TeamB));
+                    var keys = otherTeams.Select(otherId=>$"{teamA.Id}-{otherId}");
+                    //var listScoreIndirects = mapDirects.Where(kv => kv.Key.TeamA == teamA.Id && otherTeams.Contains(kv.Key.TeamB));
+                    var listScoreIndirects = mapDirects.Where(kv => keys.Contains(kv.Key));
                     var score = listScoreIndirects.Aggregate(new Score() { Coefficient = coef["indirect"] }, (acc, item) =>
                     {
                         acc.Merge(item.Value);
@@ -181,8 +217,25 @@ namespace cjoli.Server.Services
                     return score;
                 },
                 (Team teamA, Team teamB)=>{
+                    var otherTeams = mapOtherTeamCategories.SingleOrDefault(m => m.Key.Id == teamB.Id).Value ?? new List<int>();
+                    var keys = otherTeams.Select(otherId=>$"{teamA.Id}-{otherId}");
+                    var listScoreIndirects = mapDirectCategories.Where(kv => keys.Contains(kv.Key));
+                    var score = listScoreIndirects.Aggregate(new Score() { Coefficient = coef["indirectCategory"] }, (acc, item) =>
+                    {
+                        acc.Merge(item.Value);
+                        return acc;
+                    });
+                    var listUser = scoreUsers.Where(s => s.TeamId == teamA.Id && otherTeams.Contains(s.TeamAgainstId));
+                    foreach (var u in listUser)
+                    {
+                        score.Merge(u);
+                    }
+                    return score;
+                },
+                (Team teamA, Team teamB)=>{
                     var otherTeams = mapOtherTeamSeasons.SingleOrDefault(m => m.Key.Id == teamB.Id).Value ?? new List<int>();
-                    var listScoreIndirects = mapDirectSeasons.Where(kv => kv.Key.TeamA == teamA.Id && otherTeams.Contains(kv.Key.TeamB));
+                    var keys = otherTeams.Select(otherId=>$"{teamA.Id}-{otherId}");
+                    var listScoreIndirects = mapDirectSeasons.Where(kv => keys.Contains(kv.Key));
                     var score = listScoreIndirects.Aggregate(new Score() { Coefficient = coef["indirectSeason"] }, (acc, item) =>
                     {
                         acc.Merge(item.Value);
@@ -388,7 +441,7 @@ namespace cjoli.Server.Services
         }
     }
 
-    public record MyKv
+    public class MyKv
     {
         public int TeamA;
         public int TeamB;

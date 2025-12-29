@@ -17,7 +17,7 @@ namespace cjoli.Server.Services.Rules
             _tourney = JsonSerializer.Deserialize<TourneyTournify>(tourney.RuleConfig!)!;
         }
 
-        public int Win => string.IsNullOrEmpty(_tourney.pointsWin) ? 2 : int.Parse(_tourney.pointsWin);
+        public int Win => string.IsNullOrEmpty(_tourney.pointsWin) ? 3 : int.Parse(_tourney.pointsWin);
 
         public int Neutral => string.IsNullOrEmpty(_tourney.pointsTie) ? 1 : int.Parse(_tourney.pointsTie);
 

@@ -5,7 +5,7 @@ import TeamName from "../../../components/TeamName";
 import { useCJoli } from "../../../hooks/useCJoli";
 import useScreenSize from "../../../hooks/useScreenSize";
 import { Match, Phase, Score, Squad, Tourney } from "../../../models";
-//import PenaltyIcon from "../../../components/PenaltyIcon";
+import PenaltyIcon from "../../../components/PenaltyIcon";
 import useUid from "../../../hooks/useUid";
 import CJoliTooltip from "../../../components/CJoliTooltip";
 import styled from "@emotion/styled";
@@ -88,9 +88,9 @@ const RankTableScore = ({ score, phase, squad }: RankTableScoreProps) => {
                 title={`${t("rank.simulation", "Simulation")} - ${name}`}
                 onRemove={handleRemove(userMatches)}
               />
-              {/*tourney.config?.hasPenalty && (
+              {(tourney?.config?.hasPenalty || true) && (
                 <PenaltyIcon positionId={score.positionId} />
-              )*/}
+              )}
               {team && !isCastPage && <ButtonTeam team={team} />}
             </LeftCenterDiv>
             {position && !isCastPage && (

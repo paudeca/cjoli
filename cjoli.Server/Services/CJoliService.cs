@@ -404,7 +404,14 @@ namespace cjoli.Server.Services
             }
             Tourney tourney = await GetTourney(uuid, user, context, ct);
             var scores = await CalculateScores(tourney, user, estimate: true, ct);
-            await _estimateService.CalculateEstimates(tourney, scores, user, context, ct);
+            try
+            {
+                await _estimateService.CalculateEstimates(tourney, scores, user, context, ct);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Unable to calculate Estimation", e);
+            }
             ClearCache(uuid, originalUser, context);
             if (isAdmin)
             {

@@ -391,6 +391,8 @@ namespace cjoli.Server.Services
 
         private async Task UpdateSquad(QuerySnapshot snapshot, SessionTournify session, DocumentReference doc, Tourney tourney, CJoliContext context)
         {
+            var dicoPoules = snapshot.ToDictionary(p => p.Id, p => p.ToDictionary());
+
             var mapPoules = snapshot.ToDictionary(p => p.Id, p => p.ConvertTo<PouleTournify>());
             var division = await GetDivision(doc, tourney);
 
@@ -409,9 +411,30 @@ namespace cjoli.Server.Services
                     squad.Name = tourney.HasTournifySynchroName ? poule.name! : squad.Name;
                     squad.Tournify = id;
                     squad.Order = poule.num;
+
+                    foreach (var position in squad.Positions)
+                    {
+                        position.Penalty = GetBonus(poule, position.Value - 1);
+                    }
+
                     //poule.Squad = squad;
                 }
             }
+        }
+
+        private int GetBonus(PouleTournify poule, int rank)
+        {
+            int bonus = 0;
+            string sRank = rank + "";
+            if (poule.minusPoints.ContainsKey(sRank))
+            {
+                bonus += poule.minusPoints[sRank];
+            }
+            if (poule.plusPoints.ContainsKey(sRank))
+            {
+                bonus += poule.plusPoints[sRank];
+            }
+            return -bonus;
         }
 
         private async Task UpdatePosition(QuerySnapshot snapshot, SessionTournify session, DocumentReference doc, Tourney tourney, CJoliContext context)
@@ -430,20 +453,22 @@ namespace cjoli.Server.Services
             foreach (var id in mapSpot.Where(s => s.Value.division == division.Key).Select(d => d.Key))
             {
                 var spot = mapSpot[id]!;
+                var poule = mapPoules[spot.fromPoule!];
+
 
                 var dico = dicoSpots[id]!;
                 for (int i = 1; i < 10; i++)
                 {
                     if (dico.ContainsKey($"poule{i}") && dico[$"poule{i}"] != null)
                     {
-                        string poule = (string)dico[$"poule{i}"];
+                        string pouleId = (string)dico[$"poule{i}"];
                         long num = (long)dico[$"numInPoule{i}"];
                         List<(long, SpotTournify)>? list;
-                        mapListSpotByPoule.TryGetValue(poule, out list);
+                        mapListSpotByPoule.TryGetValue(pouleId, out list);
                         if (list == null)
                         {
                             list = new List<(long, SpotTournify)>();
-                            mapListSpotByPoule[poule] = list;
+                            mapListSpotByPoule[pouleId] = list;
                         }
                         list.Add((num, spot));
                     }
@@ -471,9 +496,11 @@ namespace cjoli.Server.Services
                     position.Team = null;
                 }
                 position.Tournify = id;
+
+                position.Penalty = GetBonus(poule, spot.rank);
+
                 if (bracketId != null)
                 {
-                    var poule = mapPoules[spot.fromPoule!];
                     var bracket = mapBrackets[poule.bracket!];
                     var max = (int)Math.Log2(bracket.size);
                     var num = poule.GetTypeMatchNum();
@@ -655,6 +682,7 @@ namespace cjoli.Server.Services
                     match.Location = field.name;
                 }
             }
+            context.SaveChanges();
         }
 
 
