@@ -1,15 +1,18 @@
 ﻿
 using Microsoft.ApplicationInsights;
+using System.Text.Json;
 
 namespace cjoli.Server.Services
 {
     public class MetricHostedService : BackgroundService
     {
+        private readonly ILogger<MetricHostedService> _logger;
         private readonly TelemetryClient _telemetryClient;
         private readonly ServerService _serverService;
 
-        public MetricHostedService(TelemetryClient telemetryClient, ServerService serverService)
+        public MetricHostedService(ILogger<MetricHostedService> logger, TelemetryClient telemetryClient, ServerService serverService)
         {
+            _logger = logger;
             _telemetryClient = telemetryClient;
             _serverService = serverService;
         }
@@ -20,6 +23,7 @@ namespace cjoli.Server.Services
             while (!stoppingToken.IsCancellationRequested)
             {
                 var map = _serverService.GetUsersByTourney;
+                _logger.LogInformation($"Current map:{JsonSerializer.Serialize(map)}");
                 foreach (var kv in map)
                 {
                     metric.TrackValue(kv.Value, kv.Key);
