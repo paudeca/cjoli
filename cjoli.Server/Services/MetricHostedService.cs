@@ -32,6 +32,7 @@ namespace cjoli.Server.Services
                 {
                     metric.TrackValue(0, "default");
                 }
+                await _telemetryClient.FlushAsync(stoppingToken);
                 await Task.Delay(60 * 1000, stoppingToken);
             }
         }
