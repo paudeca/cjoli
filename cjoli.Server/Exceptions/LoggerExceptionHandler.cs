@@ -11,8 +11,10 @@ namespace cjoli.Server.Exceptions
 
         public ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
-            _logger.LogError(exception, exception.Message);
-            return ValueTask.FromResult(false);
+            var trace = exception.StackTrace;
+            var message = exception.Message;
+            _logger.LogError("An unhandled exception has occurred: {errorMessage} Stack: {stackTrace}", message, trace);
+            return ValueTask.FromResult(true);
         }
     }
 }
