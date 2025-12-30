@@ -55,7 +55,7 @@ namespace cjoli.Server.Services
             coef["user"] = coef["directSeason"] * 2;
 
 
-            var func = async (int coef, IQueryable<MatchResult> query) =>
+            var func = (int coef, IQueryable<MatchResult> query) =>
             {
                 Score score = query.GroupBy(r => 1).Select(SelectScore<int>(coef)).SingleOrDefault() ?? new Score();
                 scoreUsers.ForEach(score.Merge);
@@ -63,11 +63,11 @@ namespace cjoli.Server.Services
             };
 
 
-            Score scoreTotal = await func(coef["total"], queryMatch);
+            Score scoreTotal = func(coef["total"], queryMatch);
             int totalGame = 1;// scoreTotal.Game;
 
-            Score scoreTotalCategory = await func(coef["totalCategory"], queryMatchCategory);
-            Score scoreTotalSeason = await func(coef["totalSeason"] * totalGame, queryMatchSeason);
+            Score scoreTotalCategory = func(coef["totalCategory"], queryMatchCategory);
+            Score scoreTotalSeason = func(coef["totalSeason"] * totalGame, queryMatchSeason);
 
             var getTeamId = (Team? team) => team?.Alias != null ? team.Alias.Id : team != null ? team.Id : 0;
 

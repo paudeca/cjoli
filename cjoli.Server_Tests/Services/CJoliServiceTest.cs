@@ -89,7 +89,7 @@ namespace cjoli.Server_Tests.Services
             var ct = new CancellationToken();
             var ranking = await _service.CreateRanking(tourney.Uid, user.Login, false, _context, ct);
             //Assert
-            Assert.Same(tourney.Uid, ranking.Tourney.Uid);
+            Assert.Same(tourney.Uid, ranking.Tourney!.Uid);
             Assert.NotNull(ranking.Scores);
             Assert.NotNull(ranking.Scores.ScoreTourney);
             var FindIndex = (int teamId) => ranking.Scores.ScoreSquads.First().Scores.FindIndex(s => s.TeamId == teamId);
@@ -136,9 +136,9 @@ namespace cjoli.Server_Tests.Services
             //Act
             var ct = new CancellationToken();
             var ranking = await _service.CreateRanking(tourney.Uid, user.Login, false, _context, ct);
-            var result = string.Join(' ', ranking.Scores.ScoreSquads.First().Scores.Select((s, i) => $"{i}:{s.TeamId}:{s.Total}"));
+            var result = string.Join(' ', ranking.Scores!.ScoreSquads.First().Scores.Select((s, i) => $"{i}:{s.TeamId}:{s.Total}"));
             //Assert
-            Assert.Same(tourney.Uid, ranking.Tourney.Uid);
+            Assert.Same(tourney.Uid, ranking.Tourney!.Uid);
             Assert.NotNull(ranking.Scores);
             Assert.NotNull(ranking.Scores.ScoreTourney);
             var first = score1 > score2 ? 1 : 2;
@@ -182,9 +182,9 @@ namespace cjoli.Server_Tests.Services
             //Act
             var ct = new CancellationToken();
             var ranking = await _service.CreateRanking(tourney.Uid, user.Login, false, _context, ct);
-            var result = string.Join(' ', ranking.Scores.ScoreSquads.First().Scores.Select((s, i) => $"{i}:{s.TeamId}:{s.Total}"));
+            var result = string.Join(' ', ranking.Scores!.ScoreSquads.First().Scores.Select((s, i) => $"{i}:{s.TeamId}:{s.Total}"));
             //Assert
-            Assert.Same(tourney.Uid, ranking.Tourney.Uid);
+            Assert.Same(tourney.Uid, ranking.Tourney!.Uid);
             Assert.NotNull(ranking.Scores);
             Assert.NotNull(ranking.Scores.ScoreTourney);
             var first = score1 > score2 ? 1 : 2;
@@ -203,7 +203,7 @@ namespace cjoli.Server_Tests.Services
 
             //Act
             var dto = await _service.CreateRanking(tourney.Uid, null, false, _context, new CancellationToken());
-            var match = dto.Tourney.Phases.First().Squads.First().Matches.First();
+            var match = dto.Tourney!.Phases.First().Squads.First().Matches.First();
             //Assert
             Assert.Equal(team1.Id, match.TeamIdA);
             Assert.Equal(team2.Id, match.TeamIdB);
@@ -226,7 +226,7 @@ namespace cjoli.Server_Tests.Services
             //Act
             var dto = await _service.CreateRanking(tourney.Uid, null, false, _context, new CancellationToken());
             //Assert
-            var positions = dto.Tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Positions);
+            var positions = dto.Tourney!.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Positions);
             var position1 = positions.Single(p => p.Name == "position2-1");
             var position2 = positions.Single(p => p.Name == "position2-2");
             Assert.Equal(team1.Id, position1.TeamId);
@@ -248,7 +248,7 @@ namespace cjoli.Server_Tests.Services
             //Assert
             Assert.True(dto.History.ContainsKey(team1.Id));
             Assert.True(dto.History.ContainsKey(team2.Id));
-            Assert.True(dto.Scores.ScoreTeams.ContainsKey(team1.Id));
+            Assert.True(dto.Scores!.ScoreTeams.ContainsKey(team1.Id));
             Assert.True(dto.Scores.ScoreTeams.ContainsKey(team2.Id));
         }
 
@@ -262,7 +262,7 @@ namespace cjoli.Server_Tests.Services
             var ranking = await _service.CreateRanking(tourney.Uid, null, false, _context, new CancellationToken());
             var dto = _mapper.Map<RankingDto>(ranking);
             //Assert
-            Assert.NotNull(dto.Tourney.Config);
+            Assert.NotNull(dto.Tourney!.Config);
         }
 
         [Fact]

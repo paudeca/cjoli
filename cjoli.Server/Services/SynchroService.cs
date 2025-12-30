@@ -676,7 +676,7 @@ namespace cjoli.Server.Services
 
 
                 }
-                var field = tourneyTournify.fields[matchTournify.field];
+                var field = tourneyTournify.fields![matchTournify.field!];
                 if (field != null)
                 {
                     match.Location = field.name;

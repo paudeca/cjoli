@@ -39,7 +39,7 @@ namespace cjoli.Server_Tests.Services
 
             Assert.Empty(match.Estimates);
             //Act
-            await _service.CalculateEstimates(tourney, ranking.Scores, user, _context, ct);
+            await _service.CalculateEstimates(tourney, ranking.Scores!, user, _context, ct);
             var estimate = Assert.Single(match.Estimates);
             Assert.Equal(0, estimate.ScoreA);
             Assert.Equal(0, estimate.ScoreB);
@@ -65,7 +65,7 @@ namespace cjoli.Server_Tests.Services
 
             //Assert.Empty(match2.Estimates);
             //Act
-            await _service.CalculateEstimates(tourney, ranking.Scores, user, _context, ct);
+            await _service.CalculateEstimates(tourney, ranking.Scores!, user, _context, ct);
             //Assert
             var estimate = match2.Estimates.First();
             Assert.True(estimate.ScoreA > estimate.ScoreB);
@@ -96,7 +96,7 @@ namespace cjoli.Server_Tests.Services
             var match2 = Match(tourney, "squad2");
 
             //Act
-            await _service.CalculateEstimates(tourney, ranking.Scores, user, _context, ct);
+            await _service.CalculateEstimates(tourney, ranking.Scores!, user, _context, ct);
             //Assert
             var estimate = Assert.Single(match2.Estimates);
             Assert.True(estimate.ScoreA > estimate.ScoreB);
@@ -118,7 +118,7 @@ namespace cjoli.Server_Tests.Services
             var ct = new CancellationToken();
             var ranking = await _cjoliService.CreateRanking(tourney.Uid, user.Login, false, _context, ct);
             //Act
-            await _service.CalculateEstimates(tourney, ranking.Scores, user, _context, ct);
+            await _service.CalculateEstimates(tourney, ranking.Scores!, user, _context, ct);
             //Assert
             var estimate = Assert.Single(match.Estimates);
             Assert.True(estimate.ScoreB != estimate.ScoreA);

@@ -118,7 +118,8 @@ namespace cjoli.Server.Services
 
             var dto = await GetOrUpdateWithLock(keyItem, get: () =>
             {
-                return map.GetValueOrDefault(keyItem, default);
+                map.TryGetValue(keyItem, out var value);
+                return value;
             }, update: async () =>
             {
                 _logger.LogInformation($"Generate item");
@@ -281,7 +282,7 @@ namespace cjoli.Server.Services
         {
             try
             {
-                var squads = ranking.Tourney.Phases.SelectMany(p => p.Squads);
+                var squads = ranking.Tourney!.Phases.SelectMany(p => p.Squads);
                 var positions = squads.SelectMany(s => s.Positions);
 
                 var matchDones = tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Matches).Where(m => m.Done);
@@ -310,12 +311,14 @@ namespace cjoli.Server.Services
             }
             catch (Exception e)
             {
-                _logger.LogError("Unable to update MatchResult", e);
+                _logger.LogError(e, "Unable to update MatchResult");
             }
 
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         private async Task<T> GetOrUpdateWithLock<T>(string key, Func<T?> get, Func<Task<T>> update)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             ReaderWriterLockSlim? cacheLock;
             if (!locks.TryGetValue(key, out cacheLock))
@@ -410,7 +413,7 @@ namespace cjoli.Server.Services
             }
             catch (Exception e)
             {
-                _logger.LogError("Unable to calculate Estimation", e);
+                _logger.LogError(e, "Unable to calculate Estimation");
             }
             ClearCache(uuid, originalUser, context);
             if (isAdmin)
@@ -622,7 +625,9 @@ namespace cjoli.Server.Services
         };
 
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         private async Task<ScoreSquad> CalculateScoreSquad(Squad squad, Score scoreTourney, List<ScoreSquad> scoreSquads, Dictionary<int, List<Score>> scorePhases, User? user, bool? estimate, CancellationToken ct)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             Dictionary<Models.MatchType, int> coefBracket = new Dictionary<Models.MatchType, int>() {
                 { Models.MatchType.Final, 1 },
@@ -749,7 +754,7 @@ namespace cjoli.Server.Services
 
         private void AffectationTeams(RankingDto ranking)
         {
-            var squads = ranking.Tourney.Phases.SelectMany(p => p.Squads);
+            var squads = ranking.Tourney!.Phases.SelectMany(p => p.Squads);
             var positions = squads.SelectMany(s => s.Positions);
             var matches = squads.SelectMany(s => s.Matches);
 
@@ -758,12 +763,12 @@ namespace cjoli.Server.Services
                 List<Score> scores;
                 if (position.ParentPosition!.SquadId > 0)
                 {
-                    var scoreSquad = ranking.Scores.ScoreSquads.Find(s => s.SquadId == position.ParentPosition!.SquadId);
+                    var scoreSquad = ranking.Scores!.ScoreSquads.Find(s => s.SquadId == position.ParentPosition!.SquadId);
                     scores = scoreSquad?.Scores ?? new List<Score>();
                 }
                 else
                 {
-                    scores = ranking.Scores.ScorePhases[position.ParentPosition!.PhaseId];
+                    scores = ranking.Scores!.ScorePhases[position.ParentPosition!.PhaseId];
                 }
                 var score = scores[(position.ParentPosition?.Value ?? 1) - 1];
                 if (score != null && score.Game > 0)
@@ -786,11 +791,11 @@ namespace cjoli.Server.Services
                     var positionId = 0;
                     if (position.Winner)
                     {
-                        positionId = match.ScoreA > match.ScoreB || match.ForfeitB || match.WinnerA ? m.PositionIdA : m.PositionIdB;
+                        positionId = match.ScoreA > match.ScoreB || match.ForfeitB || match.WinnerA ? m!.PositionIdA : m!.PositionIdB;
                     }
                     else
                     {
-                        positionId = match.ScoreA > match.ScoreB || match.ForfeitB || match.WinnerA ? m.PositionIdB : m.PositionIdA;
+                        positionId = match.ScoreA > match.ScoreB || match.ForfeitB || match.WinnerA ? m!.PositionIdB : m!.PositionIdA;
                     }
                     var positionParent = positions.Single(p => p.Id == positionId);
                     position.TeamId = positionParent.TeamId;
@@ -811,7 +816,7 @@ namespace cjoli.Server.Services
                 }
                 else
                 {
-                    var scoreSquad = ranking.Scores.ScoreSquads.SingleOrDefault(s => s.SquadId == rank.SquadId);
+                    var scoreSquad = ranking.Scores!.ScoreSquads.SingleOrDefault(s => s.SquadId == rank.SquadId);
                     if (scoreSquad != null)
                     {
                         var score = scoreSquad.Scores[rank.Value - 1];
@@ -824,7 +829,7 @@ namespace cjoli.Server.Services
         private void CalculateHistory(RankingDto ranking, Tourney tourney)
         {
 
-            var mapTeams = ranking.Tourney.Teams.ToDictionary(t => t.Id, t => new List<Score>());
+            var mapTeams = ranking.Tourney!.Teams.ToDictionary(t => t.Id, t => new List<Score>());
 
             var teams = ranking.Tourney.Teams;
             var positions = ranking.Tourney.Phases.SelectMany(p => p.Squads).SelectMany(s => s.Positions);
@@ -869,7 +874,7 @@ namespace cjoli.Server.Services
             var scoreTeams = mapTeams.ToDictionary(kv => kv.Key, kv => kv.Value.LastOrDefault() ?? new Score() { TeamId = kv.Key });
             SortTeams(scoreTeams);
             ranking.History = mapTeams;
-            ranking.Scores.ScoreTeams = scoreTeams;
+            ranking.Scores!.ScoreTeams = scoreTeams;
         }
 
         private async Task<ScoreFull> CalculateFullHistory(string[] seasons, string[] categories, CJoliContext context, CancellationToken ct)
@@ -887,20 +892,20 @@ namespace cjoli.Server.Services
             var queryMatchAllWithNoLoss = query.Where(r => r.Win == 1 || r.Neutral == 1)
                 .Select(r => new MatchResultBase() { Win = r.Win, Loss = r.Loss, Neutral = r.Neutral, GoalFor = r.GoalFor, GoalAgainst = r.GoalAgainst, GoalDiff = r.GoalDiff, Match = r.Match, ShutOut = r.ShutOut }).Distinct();
 
-            var selectAll = async (IQueryable<IMatchResult> query) =>
+            var selectAll = (IQueryable<IMatchResult> query) =>
             {
                 Score score = query.GroupBy(r => 1).Select(ISelectScore).SingleOrDefault() ?? new Score();
                 return score;
             };
 
-            Score scoreTotal = await selectAll(queryMatchAllWithNoLoss);
+            Score scoreTotal = selectAll(queryMatchAllWithNoLoss);
 
             var selectMapTourney = async (IQueryable<IMatchResult> query) =>
             {
                 var listScore = await query
                     .GroupBy(r => new SeasonCategoryTourney()
                     {
-                        Season = r.Match.Squad.Phase.Tourney.Season!,
+                        Season = r.Match.Squad!.Phase.Tourney.Season!,
                         Category = r.Match.Squad.Phase.Tourney.Category!,
                         Tourney = r.Match.Squad.Phase.Tourney.Uid,
                     })
@@ -914,7 +919,7 @@ namespace cjoli.Server.Services
                 var mapScore = await query
                     .GroupBy(r => new SeasonCategoryTeam()
                     {
-                        Season = r.Match.Squad.Phase.Tourney.Season!,
+                        Season = r.Match.Squad!.Phase.Tourney.Season!,
                         Category = r.Match.Squad.Phase.Tourney.Category!,
                         Tourney = r.Match.Squad.Phase.Tourney.Uid,
                         TeamId = r.Team.Id
@@ -992,7 +997,7 @@ namespace cjoli.Server.Services
             Score scoreTotal = func(queryMatchAll);
             Score scoreTotalSeason = func(queryMatchAllSeason);
 
-            ranking.Scores.ScoreAllTime = scoreTotal;
+            ranking.Scores!.ScoreAllTime = scoreTotal;
             ranking.Scores.ScoreSeason = scoreTotalSeason;
 
 
@@ -1093,7 +1098,7 @@ namespace cjoli.Server.Services
         private void CalculateAllBetScores(RankingDto ranking, User? user, CJoliContext context)
         {
             var source = _configuration["Source"];
-            int tourneyId = ranking.Tourney.Id;
+            int tourneyId = ranking.Tourney!.Id;
             var query = context.UserMatch
                 .Where(u => u.Match.Squad!.Phase.Tourney.Id == tourneyId && u.Match.Done && (u.User!.Source == source || u.User == null))
                 .Include(u => u.User).ThenInclude(u => u != null ? u.Configs : null);
@@ -1108,7 +1113,7 @@ namespace cjoli.Server.Services
                         Diff = kv.Count(u => u.BetDiff),
                         Goal = kv.Count(u => u.BetGoal)
                     }).OrderByDescending(s => s.Score).ToList();
-            ranking.Scores.Bet.Scores = scores;
+            ranking.Scores!.Bet!.Scores = scores;
             var allUsers = scores.Select(s => s.UserId);
             ranking.Scores.Bet.Users = _mapper.Map<List<UserDto>>(context.Users.Include(c => c.Configs.Where(c => c.Tourney.Id == tourneyId)).Where(u => allUsers.Contains(u.Id)).ToList());
 
@@ -1218,32 +1223,24 @@ namespace cjoli.Server.Services
                     var tmp = new List<Score>(listScores);
                     tmp.Sort((a, b) =>
                     {
-                        try
+                        if (a.Game == 0 && b.Game == 0)
                         {
-                            if (a.Game == 0 && b.Game == 0)
-                            {
-                                return a.TeamId < b.TeamId ? -1 : 1;
-                            }
-                            if (a.Game == 0)
-                            {
-                                return -1;
-                            }
-                            if (b.Game == 0)
-                            {
-                                return 1;
-                            }
-                            var valueA = (double)c.Val(a) / a.Game;
-                            var valueB = (double)c.Val(b) / b.Game;
-                            if (valueA > valueB) return c.Reverse ? 1 : -1;
-                            else if (valueA < valueB) return c.Reverse ? -1 : 1;
-                            else if (a.TeamId == teamId) return -1;
-                            else if (b.TeamId == teamId) return 1;
+                            return a.TeamId < b.TeamId ? -1 : 1;
+                        }
+                        if (a.Game == 0)
+                        {
+                            return -1;
+                        }
+                        if (b.Game == 0)
+                        {
                             return 1;
                         }
-                        catch (Exception e)
-                        {
-
-                        }
+                        var valueA = (double)c.Val(a) / a.Game;
+                        var valueB = (double)c.Val(b) / b.Game;
+                        if (valueA > valueB) return c.Reverse ? 1 : -1;
+                        else if (valueA < valueB) return c.Reverse ? -1 : 1;
+                        else if (a.TeamId == teamId) return -1;
+                        else if (b.TeamId == teamId) return 1;
                         return 1;
                     });
                     int rank = tmp.FindIndex(s => s.TeamId == teamId);
@@ -1386,7 +1383,7 @@ namespace cjoli.Server.Services
                 .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
                 .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
                 .Include(m => m.UserMatches.Where(u => u.User == null || u.User.Source == source)).ThenInclude(u => u.User)
-                .Include(m => m.Squad).ThenInclude(s => s.Phase).ThenInclude(p => p.Tourney)
+                .Include(m => m.Squad).ThenInclude(s => s!.Phase).ThenInclude(p => p.Tourney)
                 .Include(m => m.Estimates.Where(e => e.User == null))
                 .SingleOrDefaultAsync(m => m.Id == dto.Id, ct);
             if (match == null)
