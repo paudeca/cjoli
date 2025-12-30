@@ -114,11 +114,11 @@ namespace cjoli.Server.Services
         {
             Stopwatch sw = Stopwatch.StartNew();
 
-            var map = _memoryCache.GetOrCreate(key, entry => new Dictionary<string, T>())!;
+            Dictionary<string, T> map = _memoryCache.GetOrCreate(key, entry => new Dictionary<string, T>())!;
 
             var dto = await GetOrUpdateWithLock(keyItem, get: () =>
             {
-                return map.GetValueOrDefault(keyItem, default(T));
+                return map.GetValueOrDefault(keyItem, default);
             }, update: async () =>
             {
                 _logger.LogInformation($"Generate item");

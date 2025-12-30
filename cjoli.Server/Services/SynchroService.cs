@@ -214,21 +214,21 @@ namespace cjoli.Server.Services
 
         private void UpdateEvent(TourneyTournify tourneyTournify, Tourney tourney, Dictionary<string, DayTournify> mapDays)
         {
-            foreach (var b in tourneyTournify.breaks!.Values.ToList())
+            foreach (var breakTournify in tourneyTournify.breaks!.Values.ToList())
             {
                 try
                 {
-                    var day = b.day;
+                    var day = breakTournify.day;
                     var date = tourney.StartTime;
                     if (day != null && day != "0")
                     {
                         date = DateTimeOffset.FromUnixTimeSeconds(mapDays[day].date).ToLocalTime().DateTime;
                     }
-                    if (b == null || b.st == null)
+                    if (breakTournify == null || breakTournify.st == null)
                     {
                         continue;
                     }
-                    var times = b.st!.Split(":");
+                    var times = breakTournify.st!.Split(":");
                     TimeSpan ts = new TimeSpan(int.Parse(times[0]), int.Parse(times[1]), 0);
                     date = date.Date + ts;
 
@@ -253,16 +253,16 @@ namespace cjoli.Server.Services
                     }
                     if (phase != null)
                     {
-                        var evt = tourney.Phases.SelectMany(p => p.Events).SingleOrDefault(e => e.Tournify == b.id);
-                        string name = b.name!;
+                        var evt = tourney.Phases.SelectMany(p => p.Events).SingleOrDefault(e => e.Tournify == breakTournify.id);
+                        string name = breakTournify.name!;
                         if (evt == null)
                         {
                             evt = new Event() { Name = name, EventType = EventType.Info };
                             phase.Events.Add(evt);
                         }
-                        if (b.field != null)
+                        if (breakTournify.field != null)
                         {
-                            var field = tourneyTournify.fields![b.field!];
+                            var field = tourneyTournify.fields![breakTournify.field!];
                             if (field != null)
                             {
                                 name = $"{name} {field.name}";
@@ -270,14 +270,14 @@ namespace cjoli.Server.Services
                         }
 
                         evt.Name = tourney.HasTournifySynchroName ? name : evt.Name;
-                        evt.Tournify = b.id;
+                        evt.Tournify = breakTournify.id;
                         evt.Time = date;
 
                     }
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError("Invalid event, ignore it", e);
+                    _logger.LogError(e, $"Invalid event, ignore it, event:{JsonSerializer.Serialize(breakTournify)}");
                 }
 
             }

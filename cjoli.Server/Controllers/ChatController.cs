@@ -54,7 +54,7 @@ namespace cjoli.Server.Controllers
             }
         }
 
-        private async Task Bot(WebSocket webSocket, string uuid, string lang, string login, CancellationToken ct)
+        private async Task Bot(WebSocket webSocket, string uuid, string lang, string? login, CancellationToken ct)
         {
             var dto = await _cjoliService.CreateRanking(uuid, login, false, _context, ct);
             var session = _service.CreateSessionForChat(uuid, lang, login, dto, _context);

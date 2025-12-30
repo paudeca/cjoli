@@ -7,10 +7,8 @@ using cjoli.Server.Exceptions;
 using cjoli.Server.Models;
 using cjoli.Server.Models.AI;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Twilio.Base;
 
 namespace cjoli.Server.Services
 {
@@ -137,7 +135,7 @@ Les réponses ne doivent pas dépasser 3 phrases.
             {
                 r.Team = tourneyAI.Teams.SingleOrDefault(t => t.Id == r.TeamId)?.Name;
             });
-            dto.Scores.ScoreTeams.ToList().ForEach(kv =>
+            dto.Scores?.ScoreTeams.ToList().ForEach(kv =>
             {
                 var score = new ScoreAI();
                 score.Merge(kv.Value);
