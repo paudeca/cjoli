@@ -58,31 +58,50 @@ namespace cjoli.Server.Controllers
         {
             var dto = await _cjoliService.CreateRanking(uuid, login, false, _context, ct);
             var session = _service.CreateSessionForChat(uuid, lang, login, dto, _context);
-            session.OnReply += async (sender, e) => { await SendMessage(e.Message, webSocket); };
+            session.OnReply += async (sender, e) =>
+            {
+                if (webSocket.State == WebSocketState.Open)
+                {
+                    await SendMessage(e.Message, webSocket);
+                }
+            };
             await _service.PromptMessage(session);
 
-            var buffer = new byte[1024 * 4];
-            var receiveResult = await webSocket.ReceiveAsync(
-                new ArraySegment<byte>(buffer), CancellationToken.None);
-
-            while (!receiveResult.CloseStatus.HasValue)
+            try
             {
-                string message = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
-                session.AddUserMessage(message);
-
-                await _service.PromptMessage(session);
-
-                receiveResult = await webSocket.ReceiveAsync(
+                var buffer = new byte[1024 * 4];
+                var receiveResult = await webSocket.ReceiveAsync(
                     new ArraySegment<byte>(buffer), CancellationToken.None);
+
+                while (!receiveResult.CloseStatus.HasValue)
+                {
+                    string message = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
+                    session.AddUserMessage(message);
+
+                    await _service.PromptMessage(session);
+
+                    receiveResult = await webSocket.ReceiveAsync(
+                        new ArraySegment<byte>(buffer), CancellationToken.None);
+                }
+
+                _logger.LogInformationWithData("chat done", session.ChatMessages);
+
+                if (webSocket.State == WebSocketState.Open)
+                {
+                    await webSocket.CloseAsync(
+                        receiveResult.CloseStatus.Value,
+                        receiveResult.CloseStatusDescription,
+                        CancellationToken.None);
+                }
             }
-
-            _logger.LogInformationWithData("chat done", session.ChatMessages);
-
-
-            await webSocket.CloseAsync(
-                receiveResult.CloseStatus.Value,
-                receiveResult.CloseStatusDescription,
-                CancellationToken.None);
+            catch (WebSocketException ex) when (ex.WebSocketErrorCode == WebSocketError.ConnectionClosedPrematurely || ex.WebSocketErrorCode == WebSocketError.InvalidState)
+            {
+                _logger.LogWarning($"WebSocket connection closed prematurely. Uuid: {uuid}, Login: {login}. Error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred in the Bot WebSocket loop. Uuid: {uuid}, Login: {login}.");
+            }
         }
 
         private async Task SendMessage(string message, WebSocket webSocket)

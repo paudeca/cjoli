@@ -14,12 +14,14 @@ namespace cjoli.Server.Controllers
         private readonly ServerService _service;
         private readonly AIService _aiService;
         private readonly CJoliContext _context;
+        private readonly ILogger<ServerController> _logger;
 
-        public ServerController(ServerService service, AIService aiService, CJoliContext context)
+        public ServerController(ServerService service, AIService aiService, CJoliContext context, ILogger<ServerController> logger)
         {
             _service = service;
             _aiService = aiService;
             _context = context;
+            _logger = logger;
         }
 
 
@@ -49,26 +51,40 @@ namespace cjoli.Server.Controllers
 
         private async Task Run(string socketId, WebSocket webSocket)
         {
-            await _service.SendUsers();
-            var buffer = new byte[1024 * 4];
-            var receiveResult = await webSocket.ReceiveAsync(
-                new ArraySegment<byte>(buffer), CancellationToken.None);
-
-            while (!receiveResult.CloseStatus.HasValue)
+            try
             {
-                string message = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
-                var m = ServerMessage.Parse(message);
-                _service.Read(socketId, m);
-
-
-                receiveResult = await webSocket.ReceiveAsync(
+                await _service.SendUsers();
+                var buffer = new byte[1024 * 4];
+                var receiveResult = await webSocket.ReceiveAsync(
                     new ArraySegment<byte>(buffer), CancellationToken.None);
-            }
 
-            await webSocket.CloseAsync(
-                receiveResult.CloseStatus.Value,
-                receiveResult.CloseStatusDescription,
-                CancellationToken.None);
+                while (webSocket.State == WebSocketState.Open && !receiveResult.CloseStatus.HasValue)
+                {
+                    string message = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
+                    var m = ServerMessage.Parse(message);
+                    _service.Read(socketId, m);
+
+
+                    receiveResult = await webSocket.ReceiveAsync(
+                        new ArraySegment<byte>(buffer), CancellationToken.None);
+                }
+
+                if (receiveResult.CloseStatus.HasValue && webSocket.State == WebSocketState.Open)
+                {
+                    await webSocket.CloseAsync(
+                        receiveResult.CloseStatus.Value,
+                        receiveResult.CloseStatusDescription,
+                        CancellationToken.None);
+                }
+            }
+            catch (WebSocketException ex) when (ex.WebSocketErrorCode == WebSocketError.ConnectionClosedPrematurely || ex.WebSocketErrorCode == WebSocketError.InvalidState)
+            {
+                _logger.LogWarning($"WebSocket connection closed prematurely. SocketId: {socketId}. Error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred in the Run WebSocket loop. SocketId: {socketId}.");
+            }
         }
 
         private async Task SendMessage(string message, WebSocket webSocket)
