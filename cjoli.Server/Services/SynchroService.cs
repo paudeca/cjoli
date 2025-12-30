@@ -166,7 +166,7 @@ namespace cjoli.Server.Services
             }
             catch (Exception e)
             {
-                _logger.LogError("Unable to update", e);
+                _logger.LogError(e, $"Unable to update tourney:{tourney.Uid}");
             }
             finally
             {
