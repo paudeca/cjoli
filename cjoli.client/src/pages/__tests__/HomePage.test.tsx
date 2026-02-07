@@ -32,13 +32,13 @@ const renderHomePage = async ({
       createTourney({
         id: 1,
         phases: [{ id: phaseId, name: "phase1", squads: [], events: [] }],
-      })
+      }),
   );
   await renderPage(
     <Routes>
       <Route path={path} element={<HomePage />} />
     </Routes>,
-    initialPath
+    initialPath,
   );
   expect(get).toHaveBeenCalledTimes(1);
   screen.getByTestId("ranking");
@@ -115,6 +115,7 @@ describe("HomePage", () => {
               order: 0,
               type: "Ranking",
               isBracket: false,
+              bracketSize: 0,
             },
           ],
           events: [],

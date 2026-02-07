@@ -160,6 +160,8 @@ namespace cjoli.Server.Services
                 {
                     squad.Name = squadDto.Name ?? squad.Name;
                     squad.Type = squadDto.IsBracket ? SquadType.Bracket : SquadType.Ranking;
+                    squad.Order = squadDto.Order;
+                    squad.BracketSize = squadDto.BracketSize;
                 },
                 children: [
                     (squad)=>(squadDto.Positions??[]).ForEach(p=>ImportPosition(p,squad,context)),
@@ -187,7 +189,7 @@ namespace cjoli.Server.Services
                     position.Name = positionDto.Name ?? position.Name;
                     position.Short = positionDto.Short ?? position.Short;
                     position.MatchType = positionDto.MatchType;
-                    position.MatchOrder = position.MatchOrder;
+                    position.MatchOrder = positionDto.MatchOrder;
                     position.Winner = positionDto.Winner;
                 },
                 children: [

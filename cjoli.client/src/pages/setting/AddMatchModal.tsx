@@ -1,6 +1,5 @@
 import CJoliModal, { Field } from "../../components/CJoliModal";
-import { Match, Phase, Position, Squad } from "../../models";
-import React from "react";
+import { Match, Phase, Squad } from "../../models";
 import { useSetting } from "../../hooks/useSetting";
 import { useModal } from "../../hooks/useModal";
 import dayjs from "dayjs";
@@ -9,23 +8,14 @@ import { useToast } from "../../hooks/useToast";
 interface AddMatchModalProps {
   onAddMatch: (
     match: Match,
-    { phase, squad }: { phase: Phase; squad: Squad }
+    { phase, squad }: { phase: Phase; squad: Squad },
   ) => Promise<boolean>;
 }
 
 const AddMatchModal = ({ onAddMatch }: AddMatchModalProps) => {
-  const { tourney } = useSetting();
+  const { tourney, getLabel } = useSetting();
   const { showToast } = useToast();
   const { data } = useModal<{ phase: Phase; squad: Squad }>("addMatch");
-
-  const getLabel = React.useCallback(
-    (position: Position) => {
-      return position.teamId > 0
-        ? tourney.teams.find((t) => t.id == position.teamId)?.name || "noname"
-        : (position.name ?? position.value.toString());
-    },
-    [tourney]
-  );
 
   const onSubmit = async (match: Match) => {
     if (!data) {
@@ -54,7 +44,7 @@ const AddMatchModal = ({ onAddMatch }: AddMatchModalProps) => {
       label: "PositionA",
       type: "select",
       options: data?.squad.positions.map((p) => ({
-        label: getLabel(p),
+        label: getLabel(p, tourney),
         value: p.value,
       })),
       autoFocus: true,
@@ -64,7 +54,7 @@ const AddMatchModal = ({ onAddMatch }: AddMatchModalProps) => {
       label: "PositionB",
       type: "select",
       options: data?.squad.positions.map((p) => ({
-        label: getLabel(p),
+        label: getLabel(p, tourney),
         value: p.value,
       })),
     },

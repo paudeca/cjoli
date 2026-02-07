@@ -57,7 +57,7 @@ const render = async ({
     : mockPost<Tourney>(
         "tourney",
         check ? check : (data) => data,
-        "saveTourney"
+        "saveTourney",
       );
 
   await renderPage(
@@ -66,7 +66,7 @@ const render = async ({
         <Route path=":uid/setting" element={<SettingPage />} />
       </Route>
     </Routes>,
-    `/${UID}/setting`
+    `/${UID}/setting`,
   );
 
   screen.getByText("Tourney");
@@ -153,6 +153,7 @@ const deleteItem = async (path: string, name: string, btn: string) => {
             order: 0,
             type: "Ranking",
             isBracket: false,
+            bracketSize: 0,
           },
         ],
         events: [],
@@ -172,6 +173,7 @@ const deleteItem = async (path: string, name: string, btn: string) => {
   await yes(btn);
 };
 
+// eslint-disable-next-line max-lines-per-function
 describe("SettingPage", () => {
   beforeEach(() => {
     vi.resetAllMocks();
@@ -278,6 +280,7 @@ describe("SettingPage", () => {
           order: 0,
           type: "Ranking",
           isBracket: false,
+          bracketSize: 0,
         })),
         events: [],
       })),
@@ -315,6 +318,7 @@ describe("SettingPage", () => {
           order: 0,
           type: "Ranking",
           isBracket: false,
+          bracketSize: 0,
         })),
         events: [],
       })),
@@ -359,7 +363,7 @@ describe("SettingPage", () => {
     await deleteItem(
       `tourney/${UID}/teams/${TEAM_ID}`,
       "removeTeam",
-      "deleteTeam"
+      "deleteTeam",
     );
   });
 
@@ -367,7 +371,7 @@ describe("SettingPage", () => {
     await deleteItem(
       `tourney/${UID}/phases/${PHASE_ID}`,
       "removePhase",
-      "deletePhase"
+      "deletePhase",
     );
   });
 
@@ -375,7 +379,7 @@ describe("SettingPage", () => {
     await deleteItem(
       `tourney/${UID}/phases/${PHASE_ID}/squads/${SQUAD_ID}`,
       "removeSquad",
-      "deleteSquad"
+      "deleteSquad",
     );
   });
 
@@ -383,7 +387,7 @@ describe("SettingPage", () => {
     await deleteItem(
       `tourney/${UID}/phases/${PHASE_ID}/squads/${SQUAD_ID}/positions/${POSITION_ID}`,
       "removePosition",
-      "deletePosition"
+      "deletePosition",
     );
   });
 
@@ -391,7 +395,7 @@ describe("SettingPage", () => {
     await deleteItem(
       `tourney/${UID}/phases/${PHASE_ID}/squads/${SQUAD_ID}/matches/${MATCH_ID}`,
       "removeMatch",
-      "deleteMatch"
+      "deleteMatch",
     );
   });
 
@@ -399,7 +403,7 @@ describe("SettingPage", () => {
     await deleteItem(
       `tourney/${UID}/ranks/${RANK_ID}`,
       "removeRank",
-      "deleteRank"
+      "deleteRank",
     );
   });
 });

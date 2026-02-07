@@ -14,12 +14,14 @@ const AddRankModal = ({ onAddRank }: AddRankModalProps) => {
 
   const [phase, setPhase] = React.useState<Phase | undefined>(
     //tourney?.phases.length == 1 ? tourney?.phases[0] : undefined
-    undefined
+    undefined,
   );
   const [squad, setSquad] = React.useState<Squad | undefined>(
     //phase?.squads.length == 1 ? phase?.squads[0] : undefined
-    undefined
+    undefined,
   );
+
+  console.log("SQUAD", squad);
 
   const fields: Field<Rank>[] = [
     {
@@ -43,7 +45,11 @@ const AddRankModal = ({ onAddRank }: AddRankModalProps) => {
       id: "value",
       label: "Value",
       type: "select",
-      options: [...Array(squad?.positions.length).keys()].map((i) => ({
+      options: [
+        ...Array(
+          squad?.isBracket ? squad?.bracketSize : squad?.positions.length,
+        ).keys(),
+      ].map((i) => ({
         label: (i + 1).toString(),
         value: i + 1,
       })),

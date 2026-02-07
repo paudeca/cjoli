@@ -66,7 +66,7 @@ const renderMainPage = async ({
         <Route path=":uid" element={page ?? <div>content</div>} />
       </Route>
     </Routes>,
-    `/${uid}`
+    `/${uid}`,
   );
 
   return {
@@ -123,7 +123,7 @@ describe("MainPage", async () => {
           createTourney({
             id: 1,
             teams: [createTeam({ id: 1 })],
-          })
+          }),
         ),
     });
     check();
@@ -146,7 +146,7 @@ describe("MainPage", async () => {
                 secondaryColor: "#000000",
               } as Team,
             ],
-          })
+          }),
         ),
     });
     check();
@@ -175,6 +175,7 @@ describe("MainPage", async () => {
               order: 0,
               type: "Ranking",
               isBracket: false,
+              bracketSize: 0,
             },
           ],
           events: [],
@@ -211,6 +212,7 @@ describe("MainPage", async () => {
               order: 0,
               type: "Ranking",
               isBracket: false,
+              bracketSize: 0,
             },
           ],
           events: [],
