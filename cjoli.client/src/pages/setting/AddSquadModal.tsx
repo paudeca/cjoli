@@ -45,8 +45,9 @@ const AddSquadModal = ({ onAddSquad, fieldLabel }: AddSquadModalProps) => {
           order: 0,
           type: isBracket ? "Bracket" : "Ranking",
           isBracket,
+          bracketSize: 0,
         },
-        phase
+        phase,
       ))
     ) {
       showToast("danger", t("team.error.add", "Unable to add item"));

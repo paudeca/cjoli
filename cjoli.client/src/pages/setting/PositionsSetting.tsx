@@ -22,57 +22,17 @@ const PositionsSetting = ({
   indexPhase,
   indexSquad,
 }: PositionsSettingProps) => {
-  const { tourney, register, setValue } = useSetting();
+  const { tourney, register, setValue, getLabel } = useSetting();
   const { isMobile } = useScreenSize();
 
   const [parents, setParents] = React.useState(
-    squad.positions.map((p) => p.parentPosition)
+    squad.positions.map((p) => p.parentPosition),
   );
   const { setShowWithData: showConfirmDelete } = useModal<{
     position: Position;
     squad: Squad;
     phase: Phase;
   }>("confirmDeletePosition");
-
-  const getType = React.useCallback((position: Position) => {
-    switch (position.matchType) {
-      case "Normal": {
-        return "";
-      }
-      case "Final": {
-        return `(F${position.matchOrder}${position.winner ? "W" : "L"})`;
-      }
-      case "Semi": {
-        return `(S${position.matchOrder}${position.winner ? "W" : "L"})`;
-      }
-      case "Quarter": {
-        return `(Q${position.matchOrder}${position.winner ? "W" : "L"})`;
-      }
-      case "Match8": {
-        return `(M8-${position.matchOrder}${position.winner ? "W" : "L"})`;
-      }
-      case "Match16": {
-        return `(M16-${position.matchOrder}${position.winner ? "W" : "L"})`;
-      }
-      case "Match32": {
-        return `(M32-${position.matchOrder}${position.winner ? "W" : "L"})`;
-      }
-    }
-    return "";
-  }, []);
-
-  const getLabel = React.useCallback(
-    (position?: Position) => {
-      if (position && position.teamId > 0) {
-        return `${position?.name || ""} ${getType(position)} [ ${
-          tourney.teams.find((t) => t.id == position.teamId)?.name
-        } ]`;
-      } else {
-        return `${position?.name} ${getType(position!)}`;
-      }
-    },
-    [tourney?.teams, getType]
-  );
 
   const options = MATCH_TYPES.map((v) => ({ label: v, value: v }));
 
@@ -95,7 +55,7 @@ const PositionsSetting = ({
           value: s.id,
         }));
         const parentSquad = parentPhase?.squads.find(
-          (s) => s.id == parent?.squadId
+          (s) => s.id == parent?.squadId,
         );
         const optionsValue = parentSquad
           ? parentSquad.positions.map((p) => ({
@@ -112,7 +72,7 @@ const PositionsSetting = ({
               <span style={{ color: "#aaaaaa", paddingRight: 5, fontSize: 14 }}>
                 (id:{position.id})
               </span>
-              {position.value} - {getLabel(position)}
+              {position.value} - {getLabel(position, tourney)}
             </Accordion.Header>
             <Accordion.Body>
               <Form.Group
@@ -130,7 +90,7 @@ const PositionsSetting = ({
                     onChange={(val) =>
                       setValue(
                         `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.teamId`,
-                        val?.value || 0
+                        val?.value || 0,
                       )
                     }
                     isClearable
@@ -143,7 +103,7 @@ const PositionsSetting = ({
                   <Select
                     options={optionsPhase}
                     defaultValue={optionsPhase?.find(
-                      (o) => o.value == parent?.phaseId
+                      (o) => o.value == parent?.phaseId,
                     )}
                     onChange={(val) => {
                       setParents(
@@ -154,12 +114,12 @@ const PositionsSetting = ({
                                 squadId: 0,
                                 value: 0,
                               } as ParentPosition)
-                            : p
-                        )
+                            : p,
+                        ),
                       );
                       setValue(
                         `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.parentPosition.phaseId`,
-                        val?.value || 0
+                        val?.value || 0,
                       );
                     }}
                     isClearable
@@ -170,7 +130,7 @@ const PositionsSetting = ({
                   <Select
                     options={optionsSquad}
                     defaultValue={optionsSquad?.find(
-                      (o) => o.value == parent?.squadId
+                      (o) => o.value == parent?.squadId,
                     )}
                     onChange={(val) => {
                       setParents(
@@ -181,12 +141,12 @@ const PositionsSetting = ({
                                 squadId: val?.value,
                                 value: 0,
                               } as ParentPosition)
-                            : p
-                        )
+                            : p,
+                        ),
                       );
                       setValue(
                         `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.parentPosition.squadId`,
-                        val?.value || 0
+                        val?.value || 0,
                       );
                     }}
                     isClearable
@@ -197,12 +157,12 @@ const PositionsSetting = ({
                   <Select
                     options={optionsValue}
                     defaultValue={optionsValue?.find(
-                      (o) => o.value == parent?.value
+                      (o) => o.value == parent?.value,
                     )}
                     onChange={(val) => {
                       setValue(
                         `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.parentPosition.value`,
-                        val?.value || 0
+                        val?.value || 0,
                       );
                     }}
                     isClearable
@@ -218,12 +178,12 @@ const PositionsSetting = ({
                   <Select
                     options={options}
                     defaultValue={options?.find(
-                      (o) => o.value == position?.matchType
+                      (o) => o.value == position?.matchType,
                     )}
                     onChange={(val) => {
                       setValue(
                         `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.matchType`,
-                        val?.value as MatchType
+                        val?.value as MatchType,
                       );
                     }}
                     isClearable
@@ -234,7 +194,8 @@ const PositionsSetting = ({
                   <Form.Control
                     type="number"
                     {...register(
-                      `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.matchOrder`
+                      `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.matchOrder`,
+                      { valueAsNumber: true },
                     )}
                   />
                 </Col>
@@ -243,7 +204,7 @@ const PositionsSetting = ({
                     type="switch"
                     label="Winner"
                     {...register(
-                      `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.winner`
+                      `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.winner`,
                     )}
                   />
                 </Col>
@@ -256,7 +217,7 @@ const PositionsSetting = ({
                 <Col lg={5}>
                   <Form.Control
                     {...register(
-                      `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.name`
+                      `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.name`,
                     )}
                   />
                 </Col>
@@ -266,7 +227,7 @@ const PositionsSetting = ({
                 <Col lg={4} className="mb-3">
                   <Form.Control
                     {...register(
-                      `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.short`
+                      `phases.${indexPhase}.squads.${indexSquad}.positions.${i}.short`,
                     )}
                   />
                 </Col>

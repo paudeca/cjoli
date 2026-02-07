@@ -75,7 +75,7 @@ export const renderPageWithRoute = (uid: string, page: ReactNode) => {
     <Routes>
       <Route path="/:uid" element={page} />
     </Routes>,
-    `/${uid}`
+    `/${uid}`,
   );
 };
 export const renderPage = (page: ReactNode, path?: string) => {
@@ -97,7 +97,7 @@ export const renderPage = (page: ReactNode, path?: string) => {
             </ToastProvider>
           </UserProvider>
         </CJoliProvider>
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   });
 };
@@ -178,7 +178,7 @@ export const createRanking = (ranking: Partial<Ranking>) => {
 };
 
 export const createTeam: (team: Partial<Team> & { id: number }) => Team = (
-  team
+  team,
 ) =>
   ({
     id: team.id,
@@ -187,7 +187,7 @@ export const createTeam: (team: Partial<Team> & { id: number }) => Team = (
   }) as Team;
 
 export const createPhase: (phase: Partial<Phase> & { id: number }) => Phase = (
-  phase
+  phase,
 ) => ({
   id: phase.id,
   name: phase.name ?? `phase${phase.id}`,
@@ -196,7 +196,7 @@ export const createPhase: (phase: Partial<Phase> & { id: number }) => Phase = (
 });
 
 export const createSquad: (squad: Partial<Squad> & { id: number }) => Squad = (
-  squad
+  squad,
 ) => ({
   id: squad.id,
   name: squad.name ?? `squad${squad.id}`,
@@ -205,15 +205,16 @@ export const createSquad: (squad: Partial<Squad> & { id: number }) => Squad = (
   order: 0,
   type: "Ranking",
   isBracket: false,
+  bracketSize: 0,
 });
 
 export const createPosition: (
-  position: Partial<Position> & { id: number }
+  position: Partial<Position> & { id: number },
 ) => Position = (position) =>
   ({ id: position.id, teamId: position.teamId ?? 0 }) as Position;
 
 export const createRank: (rank: Partial<Rank> & { id: number }) => Rank = (
-  rank
+  rank,
 ) =>
   ({
     id: rank.id,
@@ -262,7 +263,7 @@ export const mockGet = <T,>(uri: string, data: T, name: string) => {
 export const mockPost = <T, R = T>(
   uri: string,
   check: (data: T) => R,
-  name: string
+  name: string,
 ) => {
   const post = vi.mocked(axios.post).mockImplementationOnce((url, data) => {
     try {
@@ -282,7 +283,7 @@ export const mockPost = <T, R = T>(
 export const mockDelete = <T,>(
   uri: string,
   callback: () => T,
-  name: string
+  name: string,
 ) => {
   const del = vi.mocked(axios.delete).mockImplementationOnce((url) => {
     try {
@@ -305,7 +306,7 @@ export const mockGetRanking = (uid: string, tourney?: Partial<Tourney>) =>
     createRanking({
       tourney: (tourney as Tourney) ?? createTourney({ id: 1 }),
     }),
-    "mockGetRanking"
+    "mockGetRanking",
   );
 
 export const mockGetUser = (user: Partial<User>) =>
@@ -319,7 +320,7 @@ export const mockGetTeams = (teams: Team[]) =>
 
 export const initPage = <T extends JSX.IntrinsicAttributes, P = Partial<T>>(
   Component: ComponentType<T>,
-  init: () => P
+  init: () => P,
 ) => {
   const component = (props: Omit<T, keyof P>) => {
     const p = init();

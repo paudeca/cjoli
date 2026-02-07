@@ -42,6 +42,7 @@ describe("TeamPage", () => {
               order: 0,
               type: "Ranking",
               isBracket: false,
+              bracketSize: 0,
             },
           ],
           events: [],
@@ -53,7 +54,7 @@ describe("TeamPage", () => {
       <Routes>
         <Route path="/:uid/:teamId" element={<TeamPage />} />
       </Routes>,
-      `/${UID}/${TEAM_ID}`
+      `/${UID}/${TEAM_ID}`,
     );
     screen.getAllByText(TEAM_NAME);
   });
@@ -70,7 +71,7 @@ describe("TeamPage", () => {
       <Routes>
         <Route path="/:uid/:teamId" element={<TeamPage />} />
       </Routes>,
-      `/${UID}/${TEAM_ID}`
+      `/${UID}/${TEAM_ID}`,
     );
     screen.getAllByText(TEAM_NAME);
 

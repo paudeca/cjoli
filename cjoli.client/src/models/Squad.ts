@@ -9,4 +9,5 @@ export interface Squad {
   order: number;
   type: "Ranking" | "Bracket";
   isBracket: boolean;
+  bracketSize: number;
 }

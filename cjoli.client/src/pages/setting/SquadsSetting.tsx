@@ -54,51 +54,81 @@ const SquadsSetting = ({ indexPhase }: SquadsSettingProps) => {
                         controlId={`squad.name.${squad.id}`}
                         className="p-3"
                       >
-                        <Form.Label column lg={1}>
-                          Name
-                        </Form.Label>
-                        <Col lg={3} className="mb-3">
-                          <Form.Control
-                            {...register(
-                              `phases.${indexPhase}.squads.${i}.name`
-                            )}
-                          />
-                        </Col>
-                        <Col lg={2}>
-                          <Form.Check
-                            type="switch"
-                            label="Bracket"
-                            {...register(
-                              `phases.${indexPhase}.squads.${i}.isBracket`
-                            )}
-                          />
-                        </Col>
-                        <Col lg={6}>
-                          <Button
-                            className="mx-3 mb-3"
-                            onClick={() =>
-                              showAddPosition(true, { phase, squad })
-                            }
-                          >
-                            Add Position
-                          </Button>
-                          <Button
-                            className="mx-3 mb-3"
-                            onClick={() => showAddMatch(true, { phase, squad })}
-                          >
-                            Add Match
-                          </Button>
-                          <Button
-                            variant="danger"
-                            className="mb-3"
-                            onClick={() =>
-                              showConfirmDelete(true, { squad, phase })
-                            }
-                            data-testid="deleteSquad"
-                          >
-                            <Trash3 />
-                          </Button>
-                        </Col>
+                        <Row>
+                          <Form.Label column lg={1}>
+                            Name
+                          </Form.Label>
+                          <Col lg={3} className="mb-3">
+                            <Form.Control
+                              {...register(
+                                `phases.${indexPhase}.squads.${i}.name`,
+                              )}
+                            />
+                          </Col>
+                          <Form.Label column lg={1}>
+                            Order
+                          </Form.Label>
+                          <Col lg={2}>
+                            <Form.Control
+                              {...register(
+                                `phases.${indexPhase}.squads.${i}.order`,
+                              )}
+                              type="number"
+                            />
+                          </Col>
+                        </Row>
+                        <Row className="pb-3">
+                          <Col lg={2}>
+                            <Form.Check
+                              type="switch"
+                              label="Bracket"
+                              {...register(
+                                `phases.${indexPhase}.squads.${i}.isBracket`,
+                              )}
+                            />
+                          </Col>
+                          <Form.Label column lg={2}>
+                            Bracket Size
+                          </Form.Label>
+                          <Col lg={2}>
+                            <Form.Control
+                              {...register(
+                                `phases.${indexPhase}.squads.${i}.bracketSize`,
+                              )}
+                              type="number"
+                            />
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col lg={6}>
+                            <Button
+                              className="mx-3 mb-3"
+                              onClick={() =>
+                                showAddPosition(true, { phase, squad })
+                              }
+                            >
+                              Add Position
+                            </Button>
+                            <Button
+                              className="mx-3 mb-3"
+                              onClick={() =>
+                                showAddMatch(true, { phase, squad })
+                              }
+                            >
+                              Add Match
+                            </Button>
+                            <Button
+                              variant="danger"
+                              className="mb-3"
+                              onClick={() =>
+                                showConfirmDelete(true, { squad, phase })
+                              }
+                              data-testid="deleteSquad"
+                            >
+                              <Trash3 />
+                            </Button>
+                          </Col>
+                        </Row>
                       </Form.Group>
                       <PositionsSetting
                         squad={squad}

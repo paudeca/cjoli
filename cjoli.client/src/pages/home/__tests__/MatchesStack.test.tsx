@@ -37,11 +37,12 @@ const tourney = createTourney({
               squadId: SQUAD_ID,
               location: `loc${i % 2}`,
               time: dayjs().add(1, "hour").toDate(),
-            })
+            }),
           ),
           order: 0,
           type: "Ranking",
           isBracket: false,
+          bracketSize: 0,
         },
         {
           id: SQUAD_ID2,
@@ -68,6 +69,7 @@ const tourney = createTourney({
           order: 0,
           type: "Ranking",
           isBracket: false,
+          bracketSize: 0,
         },
       ],
       events: [],
@@ -142,7 +144,7 @@ describe("MatchesStack", () => {
       <Routes>
         <Route path="/:squadId" element={<Page phase={phase} />} />
       </Routes>,
-      `/${SQUAD_ID}`
+      `/${SQUAD_ID}`,
     );
     screen.getByTestId("matches");
     screen.getByTestId("match-3");
