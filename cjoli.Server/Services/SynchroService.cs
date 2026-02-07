@@ -654,7 +654,11 @@ namespace cjoli.Server.Services
                     match.Done = true;
                     if (matchTournify.winner.HasValue)
                     {
-                        match.Winner = squad.Positions.Single(p => p.Value == (matchTournify.winner.Value + 1));
+                        match.Winner = squad.Positions.SingleOrDefault(p => p.Value == (matchTournify.winner.Value + 1));
+                        if (match.Winner == null && squad.Positions.Count > matchTournify.winner.Value)
+                        {
+                            match.Winner = squad.Positions.OrderBy(p => p.Value).ToArray()[matchTournify.winner.Value];
+                        }
                     }
                     else
                     {
