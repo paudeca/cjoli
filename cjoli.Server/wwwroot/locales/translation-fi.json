@@ -1,0 +1,210 @@
+{
+  "title": "CJoli - Jääkiekkoturnaus",
+  "lang": {
+    "en": "Englanti",
+    "fr": "Ranska",
+    "pt": "Portugali",
+    "es": "Espanja",
+    "de": "Saksa",
+    "nl": "Hollanti",
+    "fi": "Suomi",
+    "cs": "Tšekki"
+  },
+  "user": {
+    "guest": "Vieraspelaaja",
+    "favoriteSaved": "Suosikkijoukkue tallennettu",
+    "favoriteRemoved": "Suosikkijoukkue poistettu"
+  },
+  "menu": {
+    "home": "Etusivu",
+    "ranking": "Sarjataulukko",
+    "login": "Kirjaudu",
+    "register": "Rekisteröidy",
+    "update": "Päivitä",
+    "logout": "Kirjaudu ulos",
+    "refresh": "Päivitä",
+    "refreshEstimate": "Päivitä ennuste",
+    "custom": "Mukautettu",
+    "useCustom": "käytä omaa ennustetta",
+    "menu": "Valikko",
+    "setting": "Asetukset",
+    "admin": "Hallinta",
+    "gallery": "Kuvat",
+    "cast": "Diaesitys"
+  },
+  "home": {
+    "tourneyNotConfigured": "Turnausta ei ole määritetty",
+    "noImage": "Turnauksesta ei ole kuvia",
+    "selectTeam": "Valitse joukkue suodattaaksesi"
+  },
+  "gallery": {
+    "sendPhoto": "Lähetä kuvia",
+    "whatsapp": "WhatsApp",
+    "qrCode": "QR-koodi",
+    "selectImage": "Valitse kuva napsauttamalla"
+  },
+  "event": {
+    "friendly": "🤝 Harjoitusottelu",
+    "resurfacing": "🚛 Jäänajo"
+  },
+  "error": {
+    "invalid": "{{field}} on virheellinen",
+    "required": "{{field}} on pakollinen",
+    "notAuthorize": "Käyttöoikeus puuttuu"
+  },
+  "button": {
+    "submit": "Vahvista",
+    "cancel": "Peruuta",
+    "close": "Sulje",
+    "save": "Tallenna",
+    "send": "Lähetä",
+    "botAI": "Keskustele BotAI:n kanssa",
+    "back": "Takaisin",
+    "edit": "Muokkaa",
+    "yes": "Kyllä",
+    "no": "Ei",
+    "newTourney": "Uusi turnaus"
+  },
+  "penalty": {
+    "label": "Jäähyt",
+    "tooltip_zero": "Ei jäähyjä",
+    "tooltip_one": "1 jäähy",
+    "tooltip_other": "{{count}} jäähyä"
+  },
+  "simulation": {
+    "tooltip": "Simulointi",
+    "removeAll": "Poista kaikki simuloinnit"
+  },
+  "estimate": {
+    "calculated": "Ennuste laskettu"
+  },
+  "login": {
+    "title": {
+      "login": "Kirjautuminen",
+      "register": "Rekisteröityminen",
+      "update": "Päivitys"
+    },
+    "form": {
+      "login": "Käyttäjätunnus",
+      "password": "Salasana",
+      "confirmPassword": "Vahvista salasana"
+    },
+    "error": {
+      "invalidLogin": "Virheellinen kirjautuminen",
+      "register": "Tilin luonti epäonnistui",
+      "update": "Tilin päivitys epäonnistui"
+    },
+    "success": {
+      "register": "Tili luotu",
+      "update": "Tili päivitetty"
+    }
+  },
+  "team": {
+    "title": "Muokkaa joukkuetta {{team}}",
+    "position": "Sijoitus",
+    "youngest": "Nuorin pelaaja",
+    "select": "Valitse joukkue",
+    "currentSeason": "Nykyinen kausi",
+    "allSeasons": "Kaikki kaudet",
+    "allTeams": "Kaikki joukkueet",
+    "season": "Kausi",
+    "category": "Sarja",
+    "chart": {
+      "general": "Yhteenveto",
+      "timeline": "Otteluhistoria"
+    },
+    "form": {
+      "logo": "Logo",
+      "youngest": "Nuorin (syntymäaika)",
+      "name": "Nimi",
+      "shortName": "Lyhenne",
+      "fullName": "Virallinen nimi",
+      "alias": "Lempinimi",
+      "primaryColor": "Pääväri",
+      "secondaryColor": "Tehosteväri"
+    },
+    "error": {
+      "update": "Joukkueen päivitys epäonnistui"
+    }
+  },
+  "ranking": {
+    "rank": "Sija",
+    "calculation": "Laskentaperuste",
+    "equality": "Tasapisteet",
+    "victory": "Voitto",
+    "victory-direct": "Keskinäinen voitto",
+    "defeat": "Tappio",
+    "defeat-direct": "Keskinäinen tappio",
+    "displayPhase": "Näytä sarjataulukko vaiheittain",
+    "displaySquad": "Näytä sarjataulukko lohkoittain",
+    "source": {
+      "win": "Enemmän voittoja",
+      "win-min": "Vähemmän voittoja",
+      "loss": "Vähemmän tappioita",
+      "loss-min": "Enemmän tappioita",
+      "goalDiff": "Parempi maaliero",
+      "goalDiff-min": "Heikompi maaliero",
+      "goalDiffDirect": "Parempi maaliero (keskinäinen)",
+      "goalDiffDirect-min": "Heikompi maaliero (keskinäinen)",
+      "goalFor": "Enemmän tehtyjä maaleja",
+      "goalFormin": "Vähemmän tehtyjä maaleja",
+      "goalForDirect": "Enemmän tehtyjä maaleja (keskinäinen)",
+      "goalForDirect-min": "Vähemmän tehtyjä maaleja (keskinäinen)",
+      "goalAgainst": "Enemmän päästettyjä maaleja",
+      "goalAgainst-min": "Vähemmän päästettyjä maaleja",
+      "goalAgainstDirect": "Enemmän päästettyjä maaleja (keskinäinen)",
+      "goalAgainstDirect-min": "Vähemmän päästettyjä maaleja (keskinäinen)",
+      "youngest": "Nuorin pelaaja",
+      "equal": "Tasatilanne",
+      "penalty": "Vähemmän jäähyjä",
+      "penalty-min": "Enemmän jäähyjä"
+    }
+  },
+  "message": "Viesti",
+  "rank": {
+    "title": "Sarjataulukko",
+    "ranking": "Sarjataulukko",
+    "team": "Joukkue",
+    "total": "Pisteet",
+    "game": "Ottelut",
+    "win": "Voitot",
+    "neutral": "Tasapelit",
+    "loss": "Tappiot",
+    "goalFor": "Tehdyt maalit",
+    "goalAgainst": "Päästetyt maalit",
+    "shutOut": "Nollapelit",
+    "goalDiff": "Maaliero",
+    "penalty": "Jäähyt",
+    "simulation": "Simulointi",
+    "first": "1.",
+    "second": "2.",
+    "third": "3.",
+    "rankth": "{{rank}}.",
+    "users": "Käyttäjät",
+    "score": "Tulos",
+    "perfect": "Täydellinen",
+    "winner": "Voittaja",
+    "diff": "Erotus",
+    "goal": "Maali"
+  },
+  "select": {
+    "live": "Käynnissä",
+    "coming": "Tulossa",
+    "past": "Päättyneet",
+    "addTourney": "Lisää turnaus"
+  },
+  "match": {
+    "blockShot": {
+      "title": "Tallenna lopputulos",
+      "error": "Tulosta ei voi tallentaa.<br/>Ottelun on ratkettava voittolaukauskilpailussa.<br/>Valitse voittaja."
+    },
+    "compare": "Vertaa",
+    "forfeit": "Luovutus",
+    "simulated": "Simuloitu tulos"
+  },
+  "betScore": {
+    "finalScore": "Lopputulos",
+    "forecastScore": "Ennustettu tulos",
+    "point": "Pisteet"
+  }
+}

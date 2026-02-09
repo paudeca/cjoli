@@ -57,6 +57,8 @@ const langs = [
   { key: "es", icon: "🇪🇸" },
   { key: "de", icon: "🇩🇪" },
   { key: "nl", icon: "🇳🇱" },
+  { key: "fi", icon: "🇫🇮" },
+  { key: "cs", icon: "🇨🇿" },
 ];
 
 // eslint-disable-next-line max-lines-per-function, complexity, max-statements
@@ -162,7 +164,7 @@ const MenuNav = () => {
                 setLoading(true);
                 localStorage.setItem(
                   "useEstimate",
-                  e.currentTarget.checked ? "true" : "false"
+                  e.currentTarget.checked ? "true" : "false",
                 );
                 if (isAdmin) {
                   await handleSaveUserConfig({

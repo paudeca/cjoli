@@ -6,7 +6,9 @@
     "pt": "Portugiesisch",
     "es": "Spanisch",
     "de": "Deutsch",
-    "nl": "Niederländisch"
+    "nl": "Niederländisch",
+    "fi": "Finnisch",
+    "cs": "Tschechisch"
   },
   "user": {
     "guest": "Gast",
@@ -15,30 +17,31 @@
   },
   "menu": {
     "home": "Startseite",
-    "ranking": "Rangliste",
+    "ranking": "Tabelle",
     "login": "Anmelden",
     "register": "Registrieren",
     "update": "Aktualisieren",
     "logout": "Abmelden",
     "refresh": "Aktualisieren",
-    "refreshEstimate": "Schätzung aktualisieren",
+    "refreshEstimate": "Prognose aktualisieren",
     "custom": "Benutzerdefiniert",
-    "useCustom": "persönliche Schätzung verwenden",
+    "useCustom": "eigene Prognose verwenden",
     "menu": "Menü",
     "setting": "Einstellungen",
-    "admin": "Verwaltung",
+    "admin": "Administration",
     "gallery": "Fotos",
     "cast": "Diashow"
   },
   "home": {
     "tourneyNotConfigured": "Turnier nicht konfiguriert",
-    "noImage": "Keine Fotos für das Turnier"
+    "noImage": "Keine Fotos für dieses Turnier",
+    "selectTeam": "Team zum Filtern auswählen"
   },
   "gallery": {
-    "sendPhoto": "Sende deine Fotos",
+    "sendPhoto": "Fotos senden",
     "whatsapp": "WhatsApp",
     "qrCode": "QR-Code",
-    "selectImage": "Klicke, um ein Bild auszuwählen"
+    "selectImage": "Klicken, um ein Bild auszuwählen"
   },
   "event": {
     "friendly": "🤝 Freundschaftsspiel",
@@ -50,7 +53,7 @@
     "notAuthorize": "Benutzer nicht autorisiert"
   },
   "button": {
-    "submit": "Absenden",
+    "submit": "Bestätigen",
     "cancel": "Abbrechen",
     "close": "Schließen",
     "save": "Speichern",
@@ -64,7 +67,7 @@
   },
   "penalty": {
     "label": "Strafen",
-    "tooltip_zero": "Keine Strafe",
+    "tooltip_zero": "Keine Strafen",
     "tooltip_one": "1 Strafe",
     "tooltip_other": "{{count}} Strafen"
   },
@@ -73,22 +76,22 @@
     "removeAll": "Alle Simulationen entfernen"
   },
   "estimate": {
-    "calculated": "Schätzung berechnet"
+    "calculated": "Prognose berechnet"
   },
   "login": {
     "title": {
-      "login": "Anmelden",
-      "register": "Registrieren",
-      "update": "Aktualisieren"
+      "login": "Anmeldung",
+      "register": "Registrierung",
+      "update": "Aktualisierung"
     },
     "form": {
-      "login": "Anmeldung",
+      "login": "Benutzername",
       "password": "Passwort",
       "confirmPassword": "Passwort bestätigen"
     },
     "error": {
       "invalidLogin": "Ungültige Anmeldung",
-      "register": "Konto konnte nicht registriert werden",
+      "register": "Konto konnte nicht erstellt werden",
       "update": "Konto konnte nicht aktualisiert werden"
     },
     "success": {
@@ -97,24 +100,27 @@
     }
   },
   "team": {
-    "title": "{{team}} bearbeiten",
-    "position": "Position",
-    "youngest": "Jüngstes",
+    "title": "Team {{team}} bearbeiten",
+    "position": "Platzierung",
+    "youngest": "Jüngster Spieler",
     "select": "Team auswählen",
     "currentSeason": "Aktuelle Saison",
     "allSeasons": "Alle Saisons",
+    "allTeams": "Alle Teams",
+    "season": "Saison",
+    "category": "Liga",
     "chart": {
-      "general": "Allgemein",
-      "timeline": "Zeitverlauf"
+      "general": "Übersicht",
+      "timeline": "Saisonverlauf"
     },
     "form": {
       "logo": "Logo",
-      "youngest": "Jüngstes (Datum)",
+      "youngest": "Jüngster (Geburtsdatum)",
       "name": "Name",
       "shortName": "Kurzname",
-      "fullName": "Vollständiger Name",
+      "fullName": "Offizieller Name",
       "alias": "Spitzname",
-      "primaryColor": "Primärfarbe",
+      "primaryColor": "Hauptfarbe",
       "secondaryColor": "Sekundärfarbe"
     },
     "error": {
@@ -124,13 +130,13 @@
   "ranking": {
     "rank": "Rang",
     "calculation": "Berechnung",
-    "equality": "Gleichstand",
+    "equality": "Punktgleichheit",
     "victory": "Sieg",
-    "victory-direct": "Direkter Sieg",
+    "victory-direct": "Direkter Vergleich (Sieg)",
     "defeat": "Niederlage",
-    "defeat-direct": "Direkte Niederlage",
-    "displayPhase": "Phasenwertung anzeigen",
-    "displaySquad": "Gruppenwertung anzeigen",
+    "defeat-direct": "Direkter Vergleich (Niederlage)",
+    "displayPhase": "Tabelle nach Phase anzeigen",
+    "displaySquad": "Tabelle nach Gruppe anzeigen",
     "source": {
       "win": "Mehr Siege",
       "win-min": "Weniger Siege",
@@ -138,17 +144,17 @@
       "loss-min": "Mehr Niederlagen",
       "goalDiff": "Bessere Tordifferenz",
       "goalDiff-min": "Schlechtere Tordifferenz",
-      "goalDiffDirect": "Bessere Tordifferenz (direkt)",
-      "goalDiffDirect-min": "Schlechtere Tordifferenz (direkt)",
+      "goalDiffDirect": "Bessere Tordifferenz (direkter Vergleich)",
+      "goalDiffDirect-min": "Schlechtere Tordifferenz (direkter Vergleich)",
       "goalFor": "Mehr erzielte Tore",
       "goalFormin": "Weniger erzielte Tore",
-      "goalForDirect": "Mehr erzielte Tore (direkt)",
-      "goalForDirect-min": "Weniger erzielte Tore (direkt)",
+      "goalForDirect": "Mehr erzielte Tore (direkter Vergleich)",
+      "goalForDirect-min": "Weniger erzielte Tore (direkter Vergleich)",
       "goalAgainst": "Mehr Gegentore",
       "goalAgainst-min": "Weniger Gegentore",
-      "goalAgainstDirect": "Mehr Gegentore (direkt)",
-      "goalAgainstDirect-min": "Weniger Gegentore (direkt)",
-      "youngest": "Jüngstes",
+      "goalAgainstDirect": "Mehr Gegentore (direkter Vergleich)",
+      "goalAgainstDirect-min": "Weniger Gegentore (direkter Vergleich)",
+      "youngest": "Jüngster Spieler",
       "equal": "Gleichstand",
       "penalty": "Weniger Strafen",
       "penalty-min": "Mehr Strafen"
@@ -156,17 +162,17 @@
   },
   "message": "Nachricht",
   "rank": {
-    "title": "Rangliste",
-    "ranking": "Rangliste",
+    "title": "Tabelle",
+    "ranking": "Tabelle",
     "team": "Team",
     "total": "Punkte",
-    "game": "Spiele gespielt",
+    "game": "Spiele",
     "win": "Siege",
     "neutral": "Unentschieden",
     "loss": "Niederlagen",
     "goalFor": "Erzielte Tore",
     "goalAgainst": "Gegentore",
-    "shutOut": "Zu null",
+    "shutOut": "Shutouts",
     "goalDiff": "Tordifferenz",
     "penalty": "Strafen",
     "simulation": "Simulation",
@@ -175,30 +181,30 @@
     "third": "3.",
     "rankth": "{{rank}}.",
     "users": "Benutzer",
-    "score": "Punktzahl",
+    "score": "Ergebnis",
     "perfect": "Perfekt",
-    "winner": "Gewinner",
-    "diff": "Diff",
+    "winner": "Sieger",
+    "diff": "Differenz",
     "goal": "Tor"
   },
   "select": {
     "live": "Live",
-    "coming": "Demnächst...",
-    "past": "Vergangen",
+    "coming": "Demnächst",
+    "past": "Beendet",
     "addTourney": "Turnier hinzufügen"
   },
   "match": {
     "blockShot": {
-      "title": "Ergebnis speichern",
-      "error": "Ergebnis konnte nicht gespeichert werden.<br/>Das Spiel muss mit einem Penaltyschießen enden.<br/>Bitte gib einen Sieger an."
+      "title": "Endergebnis speichern",
+      "error": "Das Ergebnis kann nicht gespeichert werden.<br/>Das Spiel muss im Penaltyschießen entschieden werden.<br/>Bitte wählen Sie einen Sieger."
     },
     "compare": "Vergleichen",
-    "forfeit": "Wertung",
+    "forfeit": "Kampflos",
     "simulated": "Simuliertes Ergebnis"
   },
   "betScore": {
-    "finalScore": "Endstand",
-    "forecastScore": "Prognose",
+    "finalScore": "Endergebnis",
+    "forecastScore": "Getipptes Ergebnis",
     "point": "Punkte"
   }
 }

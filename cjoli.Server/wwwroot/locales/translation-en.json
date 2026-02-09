@@ -6,7 +6,9 @@
     "pt": "Portuguese",
     "es": "Spanish",
     "de": "Deutsch",
-    "nl": "Dutch"
+    "nl": "Dutch",
+    "fi": "Finnish",
+    "cs": "Czech"
   },
   "user": {
     "guest": "Guest",

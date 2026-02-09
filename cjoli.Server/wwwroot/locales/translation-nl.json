@@ -6,43 +6,46 @@
     "pt": "Portugees",
     "es": "Spaans",
     "de": "Duits",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "fi": "Fins",
+    "cs": "Tsjechisch"
   },
   "user": {
     "guest": "Gast",
-    "favoriteSaved": "Favoriete team opgeslagen",
-    "favoriteRemoved": "Favoriete team verwijderd"
+    "favoriteSaved": "Favoriet team opgeslagen",
+    "favoriteRemoved": "Favoriet team verwijderd"
   },
   "menu": {
     "home": "Startpagina",
-    "ranking": "Ranglijst",
+    "ranking": "Stand",
     "login": "Inloggen",
     "register": "Registreren",
     "update": "Bijwerken",
     "logout": "Uitloggen",
     "refresh": "Vernieuwen",
-    "refreshEstimate": "Schatting vernieuwen",
+    "refreshEstimate": "Prognose vernieuwen",
     "custom": "Aangepast",
-    "useCustom": "persoonlijke schatting gebruiken",
+    "useCustom": "persoonlijke prognose gebruiken",
     "menu": "Menu",
     "setting": "Instellingen",
-    "admin": "Administratie",
-    "gallery": "Foto's",
+    "admin": "Beheer",
+    "gallery": "Foto’s",
     "cast": "Diavoorstelling"
   },
   "home": {
     "tourneyNotConfigured": "Toernooi niet geconfigureerd",
-    "noImage": "Geen foto's voor het toernooi"
+    "noImage": "Geen foto’s voor dit toernooi",
+    "selectTeam": "Selecteer een team om te filteren"
   },
   "gallery": {
-    "sendPhoto": "Stuur je foto's",
+    "sendPhoto": "Stuur je foto’s",
     "whatsapp": "WhatsApp",
     "qrCode": "QR-code",
-    "selectImage": "Klik om je afbeelding te selecteren"
+    "selectImage": "Klik om een afbeelding te selecteren"
   },
   "event": {
-    "friendly": "🤝 Vriendschappelijke wedstrijd",
-    "resurfacing": "🚛 IJsreparatie"
+    "friendly": "🤝 Oefenwedstrijd",
+    "resurfacing": "🚛 IJsonderhoud"
   },
   "error": {
     "invalid": "{{field}} is ongeldig",
@@ -50,11 +53,11 @@
     "notAuthorize": "Gebruiker niet geautoriseerd"
   },
   "button": {
-    "submit": "Verzenden",
+    "submit": "Bevestigen",
     "cancel": "Annuleren",
     "close": "Sluiten",
     "save": "Opslaan",
-    "send": "Versturen",
+    "send": "Verzenden",
     "botAI": "Chat met BotAI",
     "back": "Terug",
     "edit": "Bewerken",
@@ -63,17 +66,17 @@
     "newTourney": "Nieuw toernooi"
   },
   "penalty": {
-    "label": "Strafpunten",
-    "tooltip_zero": "Geen strafpunten",
-    "tooltip_one": "1 strafpunt",
-    "tooltip_other": "{{count}} strafpunten"
+    "label": "Strafminuten",
+    "tooltip_zero": "Geen straffen",
+    "tooltip_one": "1 straf",
+    "tooltip_other": "{{count}} straffen"
   },
   "simulation": {
     "tooltip": "Simulatie",
     "removeAll": "Alle simulaties verwijderen"
   },
   "estimate": {
-    "calculated": "Schatting berekend"
+    "calculated": "Prognose berekend"
   },
   "login": {
     "title": {
@@ -87,9 +90,9 @@
       "confirmPassword": "Bevestig wachtwoord"
     },
     "error": {
-      "invalidLogin": "Ongeldige inloggegevens",
-      "register": "Accountregistratie mislukt",
-      "update": "Bijwerken van account mislukt"
+      "invalidLogin": "Ongeldige login",
+      "register": "Account aanmaken mislukt",
+      "update": "Account bijwerken mislukt"
     },
     "success": {
       "register": "Account aangemaakt",
@@ -97,78 +100,81 @@
     }
   },
   "team": {
-    "title": "Bewerk {{team}}",
+    "title": "Team {{team}} bewerken",
     "position": "Positie",
-    "youngest": "Jongste",
+    "youngest": "Jongste speler",
     "select": "Selecteer team",
     "currentSeason": "Huidig seizoen",
     "allSeasons": "Alle seizoenen",
+    "allTeams": "Alle teams",
+    "season": "Seizoen",
+    "category": "Competitie",
     "chart": {
-      "general": "Algemeen",
-      "timeline": "Tijdlijn"
+      "general": "Overzicht",
+      "timeline": "Seizoensverloop"
     },
     "form": {
       "logo": "Logo",
-      "youngest": "Jongste (datum)",
+      "youngest": "Jongste (geboortedatum)",
       "name": "Naam",
       "shortName": "Korte naam",
       "fullName": "Volledige naam",
-      "alias": "Alias",
+      "alias": "Bijnaam",
       "primaryColor": "Primaire kleur",
       "secondaryColor": "Secundaire kleur"
     },
     "error": {
-      "update": "Kan team niet bijwerken"
+      "update": "Team bijwerken mislukt"
     }
   },
   "ranking": {
     "rank": "Rang",
     "calculation": "Berekening",
-    "equality": "Gelijkheid",
+    "equality": "Gelijkstand",
     "victory": "Overwinning",
-    "victory-direct": "Directe overwinning",
-    "defeat": "Verlies",
-    "defeat-direct": "Direct verlies",
-    "displayPhase": "Toon ranglijst per fase",
-    "displaySquad": "Toon ranglijst per groep",
+    "victory-direct": "Onderlinge overwinning",
+    "defeat": "Nederlaag",
+    "defeat-direct": "Onderlinge nederlaag",
+    "displayPhase": "Stand per fase tonen",
+    "displaySquad": "Stand per groep tonen",
     "source": {
       "win": "Meer overwinningen",
       "win-min": "Minder overwinningen",
-      "loss": "Minder verliezen",
-      "loss-min": "Meer verliezen",
-      "goalDiff": "Beste doelsaldo",
-      "goalDiff-min": "Slecht doelsaldo",
-      "goalDiffDirect": "Beste doelsaldo (direct)",
-      "goalDiffDirect-min": "Slecht doelsaldo (direct)",
-      "goalFor": "Meer gescoorde doelpunten",
-      "goalFormin": "Minder gescoorde doelpunten",
-      "goalForDirect": "Meer gescoorde doelpunten (direct)",
-      "goalForDirect-min": "Minder gescoorde doelpunten (direct)",
-      "goalAgainst": "Meer tegendoelpunten",
-      "goalAgainst-min": "Minder tegendoelpunten",
-      "goalAgainstDirect": "Meer tegendoelpunten (direct)",
-      "goalAgainstDirect-min": "Minder tegendoelpunten (direct)",
-      "youngest": "Jongste",
+      "loss": "Minder nederlagen",
+      "loss-min": "Meer nederlagen",
+      "goalDiff": "Beter doelsaldo",
+      "goalDiff-min": "Slechter doelsaldo",
+      "goalDiffDirect": "Beter doelsaldo (onderling)",
+      "goalDiffDirect-min": "Slechter doelsaldo (onderling)",
+      "goalFor": "Meer gescoorde goals",
+      "goalFormin": "Minder gescoorde goals",
+      "goalForDirect": "Meer gescoorde goals (onderling)",
+      "goalForDirect-min": "Minder gescoorde goals (onderling)",
+      "goalAgainst": "Meer tegengoals",
+      "goalAgainst-min": "Minder tegengoals",
+      "goalAgainstDirect": "Meer tegengoals (onderling)",
+      "goalAgainstDirect-min": "Minder tegengoals (onderling)",
+      "youngest": "Jongste speler",
       "equal": "Gelijk",
-      "penalty": "Minder strafpunten",
-      "penalty-min": "Meer strafpunten"
+      "penalty": "Minder straffen",
+      "penalty-min": "Meer straffen"
     }
   },
   "message": "Bericht",
   "rank": {
-    "title": "Ranglijst",
-    "ranking": "Ranglijst",
+    "title": "Stand",
+    "ranking": "Stand",
     "team": "Team",
     "total": "Punten",
-    "game": "Gespeelde wedstrijden",
+    "game": "Wedstrijden",
     "win": "Overwinningen",
-    "neutral": "Gelijke spelen",
-    "loss": "Verliezen",
-    "goalFor": "Doelpunten voor",
-    "goalAgainst": "Doelpunten tegen",
-    "shutOut": "Nul gehouden",
+    "neutral": "Gelijkspelen",
+    "loss": "Nederlagen",
+    "goalFor": "Goals voor",
+    "goalAgainst": "Goals tegen",
+    "shutOut": "Shut-outs",
     "goalDiff": "Doelsaldo",
-    "penalty": "Strafpunten",
+    "penalty": "Strafminuten",
     "simulation": "Simulatie",
     "first": "1e",
     "second": "2e",
@@ -179,26 +185,26 @@
     "perfect": "Perfect",
     "winner": "Winnaar",
     "diff": "Verschil",
-    "goal": "Doelpunt"
+    "goal": "Goal"
   },
   "select": {
     "live": "Live",
-    "coming": "Binnenkort...",
-    "past": "Verleden",
+    "coming": "Binnenkort",
+    "past": "Afgelopen",
     "addTourney": "Toernooi toevoegen"
   },
   "match": {
     "blockShot": {
-      "title": "Score opslaan",
-      "error": "Kan de score niet registreren.<br/>De wedstrijd moet eindigen in een strafschoppenserie.<br/>Geef een winnaar aan."
+      "title": "Eindscore opslaan",
+      "error": "De score kan niet worden opgeslagen.<br/>De wedstrijd moet worden beslist via een strafschoppenserie.<br/>Selecteer een winnaar."
     },
     "compare": "Vergelijken",
-    "forfeit": "Forfait",
+    "forfeit": "Reglementair verlies",
     "simulated": "Gesimuleerd resultaat"
   },
   "betScore": {
     "finalScore": "Eindscore",
-    "forecastScore": "Voorspelling",
+    "forecastScore": "Voorspelde score",
     "point": "Punten"
   }
 }

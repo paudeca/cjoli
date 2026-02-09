@@ -1,0 +1,210 @@
+{
+  "title": "CJoli - Hokejový turnaj",
+  "lang": {
+    "en": "Angličtina",
+    "fr": "Francouzština",
+    "pt": "Portugalština",
+    "es": "Španělština",
+    "de": "Němčina",
+    "nl": "Nizozemština",
+    "fi": "Finština",
+    "cz": "Čeština"
+  },
+  "user": {
+    "guest": "Host",
+    "favoriteSaved": "Oblíbený tým uložen",
+    "favoriteRemoved": "Oblíbený tým odebrán"
+  },
+  "menu": {
+    "home": "Domů",
+    "ranking": "Tabulka",
+    "login": "Přihlásit se",
+    "register": "Registrovat se",
+    "update": "Aktualizovat",
+    "logout": "Odhlásit se",
+    "refresh": "Obnovit",
+    "refreshEstimate": "Obnovit odhad",
+    "custom": "Vlastní",
+    "useCustom": "použít vlastní odhad",
+    "menu": "Menu",
+    "setting": "Nastavení",
+    "admin": "Administrace",
+    "gallery": "Fotky",
+    "cast": "Prezentace"
+  },
+  "home": {
+    "tourneyNotConfigured": "Turnaj není nastaven",
+    "noImage": "K turnaji nejsou žádné fotografie",
+    "selectTeam": "Vyberte tým pro filtrování"
+  },
+  "gallery": {
+    "sendPhoto": "Pošlete své fotografie",
+    "whatsapp": "WhatsApp",
+    "qrCode": "QR kód",
+    "selectImage": "Klikněte pro výběr obrázku"
+  },
+  "event": {
+    "friendly": "🤝 Přátelské utkání",
+    "resurfacing": "🚛 Úprava ledu"
+  },
+  "error": {
+    "invalid": "{{field}} je neplatné",
+    "required": "{{field}} je povinné",
+    "notAuthorize": "Uživatel nemá oprávnění"
+  },
+  "button": {
+    "submit": "Potvrdit",
+    "cancel": "Zrušit",
+    "close": "Zavřít",
+    "save": "Uložit",
+    "send": "Odeslat",
+    "botAI": "Chat s BotAI",
+    "back": "Zpět",
+    "edit": "Upravit",
+    "yes": "Ano",
+    "no": "Ne",
+    "newTourney": "Nový turnaj"
+  },
+  "penalty": {
+    "label": "Tresty",
+    "tooltip_zero": "Žádné tresty",
+    "tooltip_one": "1 trest",
+    "tooltip_other": "{{count}} tresty"
+  },
+  "simulation": {
+    "tooltip": "Simulace",
+    "removeAll": "Odstranit všechny simulace"
+  },
+  "estimate": {
+    "calculated": "Odhad vypočítán"
+  },
+  "login": {
+    "title": {
+      "login": "Přihlášení",
+      "register": "Registrace",
+      "update": "Aktualizace"
+    },
+    "form": {
+      "login": "Uživatelské jméno",
+      "password": "Heslo",
+      "confirmPassword": "Potvrdit heslo"
+    },
+    "error": {
+      "invalidLogin": "Neplatné přihlášení",
+      "register": "Registrace účtu se nezdařila",
+      "update": "Aktualizace účtu se nezdařila"
+    },
+    "success": {
+      "register": "Účet vytvořen",
+      "update": "Účet aktualizován"
+    }
+  },
+  "team": {
+    "title": "Upravit tým {{team}}",
+    "position": "Pozice",
+    "youngest": "Nejmladší hráč",
+    "select": "Vybrat tým",
+    "currentSeason": "Aktuální sezóna",
+    "allSeasons": "Všechny sezóny",
+    "allTeams": "Všechny týmy",
+    "season": "Sezóna",
+    "category": "Soutěž",
+    "chart": {
+      "general": "Přehled",
+      "timeline": "Průběh sezóny"
+    },
+    "form": {
+      "logo": "Logo",
+      "youngest": "Nejmladší (datum narození)",
+      "name": "Název",
+      "shortName": "Zkratka",
+      "fullName": "Oficiální název",
+      "alias": "Přezdívka",
+      "primaryColor": "Hlavní barva",
+      "secondaryColor": "Vedlejší barva"
+    },
+    "error": {
+      "update": "Aktualizace týmu se nezdařila"
+    }
+  },
+  "ranking": {
+    "rank": "Pořadí",
+    "calculation": "Výpočet",
+    "equality": "Rovnost",
+    "victory": "Výhra",
+    "victory-direct": "Vzájemná výhra",
+    "defeat": "Prohra",
+    "defeat-direct": "Vzájemná prohra",
+    "displayPhase": "Zobrazit tabulku podle fáze",
+    "displaySquad": "Zobrazit tabulku podle skupiny",
+    "source": {
+      "win": "Více výher",
+      "win-min": "Méně výher",
+      "loss": "Méně proher",
+      "loss-min": "Více proher",
+      "goalDiff": "Lepší rozdíl skóre",
+      "goalDiff-min": "Horší rozdíl skóre",
+      "goalDiffDirect": "Lepší rozdíl skóre (vzájemné)",
+      "goalDiffDirect-min": "Horší rozdíl skóre (vzájemné)",
+      "goalFor": "Více vstřelených gólů",
+      "goalFormin": "Méně vstřelených gólů",
+      "goalForDirect": "Více vstřelených gólů (vzájemné)",
+      "goalForDirect-min": "Méně vstřelených gólů (vzájemné)",
+      "goalAgainst": "Více inkasovaných gólů",
+      "goalAgainst-min": "Méně inkasovaných gólů",
+      "goalAgainstDirect": "Více inkasovaných gólů (vzájemné)",
+      "goalAgainstDirect-min": "Méně inkasovaných gólů (vzájemné)",
+      "youngest": "Nejmladší hráč",
+      "equal": "Shoda",
+      "penalty": "Méně trestů",
+      "penalty-min": "Více trestů"
+    }
+  },
+  "message": "Zpráva",
+  "rank": {
+    "title": "Tabulka",
+    "ranking": "Tabulka",
+    "team": "Tým",
+    "total": "Body",
+    "game": "Zápasy",
+    "win": "Výhry",
+    "neutral": "Remízy",
+    "loss": "Prohry",
+    "goalFor": "Vstřelené góly",
+    "goalAgainst": "Inkasované góly",
+    "shutOut": "Nuly",
+    "goalDiff": "Rozdíl skóre",
+    "penalty": "Tresty",
+    "simulation": "Simulace",
+    "first": "1.",
+    "second": "2.",
+    "third": "3.",
+    "rankth": "{{rank}}.",
+    "users": "Uživatelé",
+    "score": "Skóre",
+    "perfect": "Perfektní",
+    "winner": "Vítěz",
+    "diff": "Rozdíl",
+    "goal": "Gól"
+  },
+  "select": {
+    "live": "Živě",
+    "coming": "Připravuje se",
+    "past": "Ukončené",
+    "addTourney": "Přidat turnaj"
+  },
+  "match": {
+    "blockShot": {
+      "title": "Uložit výsledek",
+      "error": "Výsledek nelze uložit.<br/>Zápas musí být rozhodnut v samostatných nájezdech.<br/>Vyberte vítěze."
+    },
+    "compare": "Porovnat",
+    "forfeit": "Kontumace",
+    "simulated": "Simulovaný výsledek"
+  },
+  "betScore": {
+    "finalScore": "Konečné skóre",
+    "forecastScore": "Tipované skóre",
+    "point": "Body"
+  }
+}

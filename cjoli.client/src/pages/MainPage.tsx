@@ -89,8 +89,8 @@ const MainPage = () => {
     const team = teams?.find((t) => t.id == userConfig.favoriteTeamId);
     if (team) {
       setColor(
-        team.datas?.primaryColor ?? team.primaryColor ?? "#2c2a37", //"#202644",
-        team.datas?.secondaryColor ?? team.secondaryColor ?? "#932829",
+        team.datas?.primaryColor ?? team.primaryColor ?? "#2b2937f2", //"#202644",
+        team.datas?.secondaryColor ?? team.secondaryColor ?? "#952721", //"#932829",
       );
     }
   }, [teams, userConfig.favoriteTeamId, setColor]);
@@ -131,7 +131,7 @@ const MainPage = () => {
       <Loading ready={!isLoading}>
         {!isXl && !isInFrame && <MenuNav />}
         <Outlet />
-        {!isCastPage && (
+        {!isCastPage && !isInFrame && (
           <ButtonFixed>
             <Stack gap={1}>
               {isHomePage && (

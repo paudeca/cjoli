@@ -50,8 +50,8 @@ const initialState: CJoliState = {
   matches: [],
   events: [],
   theme: {
-    primary: "#2c2a37", //"#202644",
-    secondary: "#932829",
+    primary: "#2b2937f2", //"#202644",
+    secondary: "#952721",
   },
   page: "welcome",
   modeScore: "tourney",
