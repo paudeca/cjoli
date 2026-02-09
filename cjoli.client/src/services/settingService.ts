@@ -1,12 +1,10 @@
 import axios from "axios";
 import { Message, Team, Tourney, User } from "../models";
-import Cookie from "universal-cookie";
 
 const url = import.meta.env.VITE_API_URL;
-const cookie = new Cookie();
 
 const setHeader = () => {
-  const token = cookie.get("CJOLI_AUTH_TOKEN");
+  const token = localStorage.getItem("CJOLI_AUTH_TOKEN");
   axios.defaults.headers.common = {
     Authorization: `Bearer ${token}`,
     "CJoli-UseEstimate": localStorage.getItem("useEstimate"),
@@ -22,7 +20,7 @@ export const getTeams = async () => {
 export const synchroTourney = async (uid: string) => {
   const { data } = await axios.post<Tourney>(
     `${url}/setting/tourney/${uid}/synchro`,
-    {}
+    {},
   );
   return data;
 };
@@ -69,7 +67,7 @@ export const removeTeam = async ({
   teamId: number;
 }) => {
   const { data } = await axios.delete<Tourney>(
-    `${url}/setting/tourney/${uid}/teams/${teamId}`
+    `${url}/setting/tourney/${uid}/teams/${teamId}`,
   );
   return data;
 };
@@ -82,7 +80,7 @@ export const removePhase = async ({
   phaseId: number;
 }) => {
   const { data } = await axios.delete<Tourney>(
-    `${url}/setting/tourney/${uid}/phases/${phaseId}`
+    `${url}/setting/tourney/${uid}/phases/${phaseId}`,
   );
   return data;
 };
@@ -97,7 +95,7 @@ export const removeSquad = async ({
   squadId: number;
 }) => {
   const { data } = await axios.delete<Tourney>(
-    `${url}/setting/tourney/${uid}/phases/${phaseId}/squads/${squadId}`
+    `${url}/setting/tourney/${uid}/phases/${phaseId}/squads/${squadId}`,
   );
   return data;
 };
@@ -114,7 +112,7 @@ export const removePosition = async ({
   positionId: number;
 }) => {
   const { data } = await axios.delete<Tourney>(
-    `${url}/setting/tourney/${uid}/phases/${phaseId}/squads/${squadId}/positions/${positionId}`
+    `${url}/setting/tourney/${uid}/phases/${phaseId}/squads/${squadId}/positions/${positionId}`,
   );
   return data;
 };
@@ -131,7 +129,7 @@ export const removeMatch = async ({
   matchId: number;
 }) => {
   const { data } = await axios.delete<Tourney>(
-    `${url}/setting/tourney/${uid}/phases/${phaseId}/squads/${squadId}/matches/${matchId}`
+    `${url}/setting/tourney/${uid}/phases/${phaseId}/squads/${squadId}/matches/${matchId}`,
   );
   return data;
 };
@@ -144,7 +142,7 @@ export const removeRank = async ({
   rankId: number;
 }) => {
   const { data } = await axios.delete<Tourney>(
-    `${url}/setting/tourney/${uid}/ranks/${rankId}`
+    `${url}/setting/tourney/${uid}/ranks/${rankId}`,
   );
   return data;
 };
@@ -163,7 +161,7 @@ export const removeEvent = async ({
   eventId: number;
 }) => {
   const { data } = await axios.delete<Tourney>(
-    `${url}/setting/tourney/${uid}/phases/${phaseId}/events/${eventId}`
+    `${url}/setting/tourney/${uid}/phases/${phaseId}/events/${eventId}`,
   );
   return data;
 };
@@ -178,7 +176,7 @@ export const replaceTeam = async ({
   newTeamId: number;
 }) => {
   const { data } = await axios.post<Tourney>(
-    `${url}/setting/tourney/${uid}/teams/${teamId}/replace/${newTeamId}`
+    `${url}/setting/tourney/${uid}/teams/${teamId}/replace/${newTeamId}`,
   );
   return data;
 };

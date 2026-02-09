@@ -50,7 +50,7 @@ const initialState: CJoliState = {
   matches: [],
   events: [],
   theme: {
-    primary: "#202644",
+    primary: "#2c2a37", //"#202644",
     secondary: "#932829",
   },
   page: "welcome",
@@ -92,20 +92,20 @@ const reduceLoadRanking = (state: CJoliState, ranking: Ranking) => {
   const phases = tourney.phases;
   const squads = phases.reduce<Squad[]>(
     (acc, phase) => [...acc, ...phase.squads],
-    []
+    [],
   );
   squads.sort((a, b) => (a.id > b.id ? 1 : -1));
   const events = phases.reduce<EventPhase[]>(
     (acc, phase) => [...acc, ...phase.events],
-    []
+    [],
   );
   const positions = squads.reduce<Position[]>(
     (acc, squad) => [...acc, ...squad.positions],
-    []
+    [],
   );
   const matches = squads.reduce<Match[]>(
     (acc, squad) => [...acc, ...squad.matches],
-    []
+    [],
   );
   matches.sort((a, b) => {
     if (a.time < b.time) return -1;

@@ -23,6 +23,7 @@ const useScreenSize = () => {
   return {
     ...screenSize,
     isMobile: screenSize.width < 1200,
+    isInFrame: window.self !== window.top,
   };
 };
 

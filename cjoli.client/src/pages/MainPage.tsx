@@ -69,7 +69,7 @@ const MainPage = () => {
       secondary,
     },
   };
-  const { isMobile } = useScreenSize();
+  const { isMobile, isInFrame } = useScreenSize();
 
   useQuery(getUser());
 
@@ -89,8 +89,8 @@ const MainPage = () => {
     const team = teams?.find((t) => t.id == userConfig.favoriteTeamId);
     if (team) {
       setColor(
-        team.datas?.primaryColor ?? team.primaryColor ?? "#202644",
-        team.datas?.secondaryColor ?? team.secondaryColor ?? "#932829"
+        team.datas?.primaryColor ?? team.primaryColor ?? "#2c2a37", //"#202644",
+        team.datas?.secondaryColor ?? team.secondaryColor ?? "#932829",
       );
     }
   }, [teams, userConfig.favoriteTeamId, setColor]);
@@ -107,7 +107,7 @@ const MainPage = () => {
   const [nextMatch, setNextMatch] = useState<Match>();
   useEffect(() => {
     const filtered = matches.filter(
-      (m) => !m.done && dayjs(m.time).format("YYYY-MM-DD") == daySelected
+      (m) => !m.done && dayjs(m.time).format("YYYY-MM-DD") == daySelected,
     );
     filtered.sort((a, b) => (a.time < b.time ? -1 : 1));
     if (filtered.length > 0) {
@@ -129,7 +129,7 @@ const MainPage = () => {
     <ThemeProvider theme={theme}>
       <Global styles={style} />
       <Loading ready={!isLoading}>
-        {!isXl && <MenuNav />}
+        {!isXl && !isInFrame && <MenuNav />}
         <Outlet />
         {!isCastPage && (
           <ButtonFixed>

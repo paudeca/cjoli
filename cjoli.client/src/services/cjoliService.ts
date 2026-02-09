@@ -10,14 +10,12 @@ import {
   Gallery,
   EventPhase,
 } from "../models";
-import Cookie from "universal-cookie";
 import { ModeScoreType } from "../contexts/CJoliContext";
 
 const url = import.meta.env.VITE_API_URL;
-const cookie = new Cookie();
 
 const setHeader = () => {
-  const token = cookie.get("CJOLI_AUTH_TOKEN");
+  const token = localStorage.getItem("CJOLI_AUTH_TOKEN");
   axios.defaults.headers.common = {
     Authorization: `Bearer ${token}`,
     "CJoli-UseEstimate": localStorage.getItem("useEstimate"),
@@ -27,7 +25,7 @@ setHeader();
 
 export const getTourneys = async (teamId: number) => {
   const { data } = await axios.get<Tourney[]>(
-    `${url}/cjoli/tourneys${teamId > 0 ? `/${teamId}` : ""}`
+    `${url}/cjoli/tourneys${teamId > 0 ? `/${teamId}` : ""}`,
   );
   return data;
 };
@@ -53,7 +51,7 @@ export const getTeam = async (teamId: number, modeScore: ModeScoreType) => {
     ].join("&");
   }
   const { data } = await axios.get<Ranking>(
-    `${url}/cjoli/team/${teamId}?${params}`
+    `${url}/cjoli/team/${teamId}?${params}`,
   );
   return data;
 };
@@ -67,7 +65,7 @@ export const login = async (user: User) => {
   return await axios
     .post<string>(`${url}/user/login`, user)
     .then(({ data }) => {
-      cookie.set("CJOLI_AUTH_TOKEN", data, { path: "/", maxAge: 24 * 60 * 60 });
+      localStorage.setItem("CJOLI_AUTH_TOKEN", data);
       setHeader();
       return true;
     })
@@ -105,7 +103,7 @@ export const update = async (user: User) => {
 export const updatePosition = async (uid: string, position: Position) => {
   const { data } = await axios.post<Ranking>(
     `${url}/cjoli/${uid}/updatePosition`,
-    position
+    position,
   );
   return data;
 };
@@ -128,7 +126,7 @@ export const getTeams = async () => {
 };
 
 export const logout = () => {
-  cookie.remove("CJOLI_AUTH_TOKEN", { path: "/" });
+  localStorage.removeItem("CJOLI_AUTH_TOKEN");
   setHeader();
 };
 
@@ -150,7 +148,7 @@ export const clearMatch = async (uid: string, match: Match) => {
 export const updateEvent = async (
   uid: string,
   event: EventPhase,
-  params: object
+  params: object,
 ) => {
   const { data } = await axios.post(`${url}/cjoli/${uid}/updateEvent`, {
     ...event,
@@ -162,14 +160,14 @@ export const updateEvent = async (
 export const clearSimulations = async (uid: string, ids: number[]) => {
   const { data } = await axios.post(
     `${url}/cjoli/${uid}/clearSimulations`,
-    ids
+    ids,
   );
   return data;
 };
 
 export const updateEstimate = async (uid: string) => {
   const { data } = await axios.get<Ranking>(
-    `${url}/cjoli/${uid}/updateEstimate`
+    `${url}/cjoli/${uid}/updateEstimate`,
   );
   return data;
 };
@@ -178,7 +176,7 @@ export const saveUserConfig = async (uid: string, userConfig: UserConfig) => {
   setHeader();
   const { data } = await axios.post<Ranking>(
     `${url}/cjoli/${uid}/saveUserConfig`,
-    userConfig
+    userConfig,
   );
   return data;
 };
@@ -192,11 +190,11 @@ export const getGallery = async (
   uid: string,
   page: number,
   waiting: boolean,
-  random: boolean
+  random: boolean,
   // eslint-disable-next-line max-params
 ) => {
   const { data } = await axios.get<Gallery>(
-    `${url}/cjoli/${uid}/gallery/${page}${waiting ? "?waiting=true" : ""}${random ? "?random=true" : ""}`
+    `${url}/cjoli/${uid}/gallery/${page}${waiting ? "?waiting=true" : ""}${random ? "?random=true" : ""}`,
   );
   return data;
 };
