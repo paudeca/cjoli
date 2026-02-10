@@ -30,6 +30,7 @@ import ImageModal from "../modals/ImageModal";
 import UploadImageModal from "../modals/UploadImageModal";
 import { useModal } from "../hooks/useModal";
 import useScreenSize from "../hooks/useScreenSize";
+import LoginModalMemo from "../modals/LoginModal";
 
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
@@ -190,6 +191,7 @@ const MainPage = () => {
         </InfoModal>
         <ImageModal />
         <UploadImageModal />
+        <LoginModalMemo />
       </Loading>
     </ThemeProvider>
   );

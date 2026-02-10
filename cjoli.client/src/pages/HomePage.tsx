@@ -10,10 +10,12 @@ import { useServer } from "../hooks/useServer";
 import { useEffect, useState } from "react";
 import CJoliStack from "../components/CJoliStack";
 import CJoliCard from "../components/CJoliCard";
-import { Alert } from "react-bootstrap";
+import { Alert, Button, Col, Row } from "react-bootstrap";
 import { Trans } from "react-i18next";
 import { useApi } from "../hooks/useApi";
 import RankStack from "./home/RankStack";
+import { useModal } from "../hooks/useModal";
+import useScreenSize from "../hooks/useScreenSize";
 
 const HomePage = () => {
   const { phases, matches } = useCJoli("home");
@@ -22,8 +24,10 @@ const HomePage = () => {
   const uid = useUid();
   const { phaseId } = useParams();
   const [loading, setLoading] = useState(true);
+  const { isInFrame } = useScreenSize();
 
   const { refetch, isFetching } = useQuery(getRanking(uid));
+  const { setShow: showLogin } = useModal("login");
 
   useEffect(() => {
     !isFetching && sendMessage({ type: "selectTourney", uid });
@@ -56,6 +60,19 @@ const HomePage = () => {
                   Tourney not configured
                 </Trans>
               </Alert>
+              {isInFrame && (
+                <Row className="p-3">
+                  <Col>
+                    <Button
+                      onClick={() => {
+                        showLogin(true);
+                      }}
+                    >
+                      Login
+                    </Button>
+                  </Col>
+                </Row>
+              )}
             </CJoliCard>
           </div>
         </CJoliStack>

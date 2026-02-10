@@ -11,7 +11,6 @@ import {
   Spinner,
 } from "react-bootstrap";
 import styled from "@emotion/styled";
-import LoginModal from "../../modals/LoginModal";
 import RegisterModal from "../../modals/RegisterModal";
 import UpdateModal from "../../modals/UpdateModal";
 import * as cjoliService from "../../services/cjoliService";
@@ -344,7 +343,6 @@ const MenuNav = () => {
           </Navbar.Offcanvas>
         )}
       </Container>
-      <LoginModal />
       <RegisterModal />
       <UpdateModal />
     </MyNavbar>
