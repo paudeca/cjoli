@@ -62,5 +62,9 @@ namespace cjoli.Server.Models
                 default: return MatchType.Normal;
             }
         }
+
+        public bool HasWebhook => !string.IsNullOrEmpty(Squad?.Phase.Tourney.WebhookConfig);
+        [NotMapped]
+        public Tourney? Tourney => Squad?.Phase.Tourney;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using cjoli.Server.Services.Rules;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace cjoli.Server.Models
 {
@@ -22,6 +23,7 @@ namespace cjoli.Server.Models
         public string? Tournify { get; set; }
         public bool HasTournifySynchroName { get; set; }
         public string? RuleConfig { get; set; }
+        public string? WebhookConfig { get; set; }
 
         [NotMapped]
         public IRule? Config { get; set; }
@@ -31,5 +33,12 @@ namespace cjoli.Server.Models
         public IList<Rank> Ranks { get; set; } = new List<Rank>();
         public IList<TeamData> TeamDatas { get; set; } = new List<TeamData>();
         public IList<Message> Messages { get; set; } = new List<Message>();
+
+    }
+
+    public class TourneyWebhook
+    {
+        [JsonPropertyName("url")]
+        public string? Url { get; set; }
     }
 }

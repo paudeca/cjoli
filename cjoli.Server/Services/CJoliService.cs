@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System.Data;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace cjoli.Server.Services
 {
@@ -1418,6 +1419,9 @@ namespace cjoli.Server.Services
                 {
                     CalculateBetScore(match, userMatch);
                 }
+
+                await NotifyWebhook(match);
+
             }
             else
             {
@@ -1448,6 +1452,20 @@ namespace cjoli.Server.Services
             ClearCache(uuid, user, context);
         }
 
+        private async Task NotifyWebhook(Match match)
+        {
+            if (match.HasWebhook)
+            {
+                var tourney = match.Tourney!;
+                var webhook = JsonSerializer.Deserialize<TourneyWebhook>(tourney.WebhookConfig!);
+                if (webhook?.Url != null)
+                {
+                    HttpClient client = new HttpClient();
+                    var dto = _mapper.Map<MatchWebhookDto>(match);
+                    await client.PostAsJsonAsync(webhook.Url, dto);
+                }
+            }
+        }
 
         private void RunThread(Func<CJoliContext, Task> callback, CJoliContext context)
         {
@@ -1506,8 +1524,10 @@ namespace cjoli.Server.Services
                 .Include(m => m.UserMatches.Where(u => u.User == user))
                 .Include(m => m.PositionA).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
                 .Include(m => m.PositionB).ThenInclude(p => p.Team).ThenInclude(t => t != null ? t.MatchResults : null)
+                .Include(m => m.Squad).ThenInclude(s => s!.Phase).ThenInclude(p => p.Tourney)
                 .Include(m => m.UserMatches)
                 .SingleOrDefaultAsync(m => m.Id == dto.Id, ct);
+
 
             if (match == null)
             {
@@ -1534,6 +1554,7 @@ namespace cjoli.Server.Services
                     userMatch.BetDiff = false;
                     userMatch.BetGoal = false;
                 }
+                await NotifyWebhook(match);
             }
             else
             {

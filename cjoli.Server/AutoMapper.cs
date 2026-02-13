@@ -35,6 +35,14 @@ namespace cjoli.Server
                 .ForMember(x => x.Estimate, opt => opt.MapFrom(a => a.Estimates.OrderByDescending(s => s.User).FirstOrDefault()))
                 .ForMember(x => x.WinnerA, opt => opt.MapFrom(a => a.Winner != null && a.Winner == a.PositionA))
                 .ForMember(x => x.WinnerB, opt => opt.MapFrom(a => a.Winner != null && a.Winner == a.PositionB));
+            CreateMap<Match, MatchWebhookDto>()
+                .ForMember(x => x.TeamA, opt => opt.MapFrom(a => a.PositionA.Team!.Name))
+                .ForMember(x => x.TeamB, opt => opt.MapFrom(a => a.PositionB.Team!.Name))
+                .ForMember(x => x.Tourney, opt => opt.MapFrom(a => a.Squad!.Phase.Tourney.Uid))
+                .ForMember(x => x.Action, opt => opt.MapFrom(a => a.Done ? "save" : "cancel"));
+
+
+
             CreateMap<UserMatch, UserMatchDto>().ForMember(x => x.Time, opt => opt.MapFrom(u => u.Match.Time));
             CreateMap<MatchEstimate, MatchEstimateDto>();
             CreateMap<Event, EventDto>()
