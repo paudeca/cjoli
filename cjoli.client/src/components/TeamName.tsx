@@ -56,7 +56,7 @@ const TeamName = ({
     ? getTeamInfo(positionId, defaultName, false)
     : team || getTeam(teamId!) || { name: defaultName };
 
-  let fullname = team?.datas?.name ? `${name} - ${team.datas.name}` : name;
+  let fullname = team?.datas?.name ? `${name} ${team.datas.name}` : name;
   if (uid == "cholet2026") {
     fullname = team?.datas?.name ? `${team.datas.name}` : name;
   }
