@@ -21,8 +21,6 @@ const AddRankModal = ({ onAddRank }: AddRankModalProps) => {
     undefined,
   );
 
-  console.log("SQUAD", squad);
-
   const fields: Field<Rank>[] = [
     {
       id: "phaseId",
