@@ -20,6 +20,7 @@ const RankTable = ({ phase, displayPhase }: RankTableProps) => {
   const squads = phase.squads.filter(filter);
   squads.sort((a, b) => (a.order > b.order ? 1 : -1)); //a.id > b.id ? 1 : -1));
 
+  console.log("SQUADS", squads);
   return (
     <>
       {displayPhase && <RankTableSquad phase={phase} squads={squads} />}

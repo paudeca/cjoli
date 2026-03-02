@@ -245,14 +245,18 @@ const DesktopBracket = ({
           {bracket.Final && bracket.Final[0] && (
             <Row className="h-50 d-flex align-items-end">
               <Col>
-                <FinalMatchBracket match={bracket.Final[0]} />
+                <MatchBracket match={bracket.Final[0]} max={true} height={20} />
               </Col>
             </Row>
           )}
           {bracket.Final && bracket.Final[1] && (
             <Row className="h-50 d-flex align-items-center">
               <Col>
-                <FinalMatchBracket match={bracket.Final[1]} />
+                <MatchBracket
+                  match={bracket.Final[1]}
+                  max={false}
+                  height={20}
+                />
               </Col>
             </Row>
           )}
@@ -314,14 +318,14 @@ const RankTableBracket = ({ squad }: RankTableBracketProps) => {
         list[m.matchOrder] = m;
         return { ...acc, [m.matchType!]: list };
       },
-      {} as Record<MatchType, Match[]>
+      {} as Record<MatchType, Match[]>,
     );
   bracket = Object.keys(bracket).reduce(
     (acc, k) => {
       const list = bracket[k as MatchType];
       return { ...acc, [k]: list.filter((v) => v) };
     },
-    {} as Record<MatchType, Match[]>
+    {} as Record<MatchType, Match[]>,
   );
   return isMobile ? (
     <MobileBracket bracket={bracket} />

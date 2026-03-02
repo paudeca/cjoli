@@ -32,6 +32,13 @@ import { initReactI18next } from "react-i18next";
 vi.mock("axios");
 vi.mock("react-chartjs-2");
 
+vi.stubGlobal("localStorage", {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+});
+
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 dayjs.extend(duration);

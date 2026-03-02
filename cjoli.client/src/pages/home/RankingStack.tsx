@@ -13,11 +13,23 @@ import styled from "@emotion/styled";
 import { useState } from "react";
 import { Trans } from "react-i18next";
 import useScreenSize from "../../hooks/useScreenSize";
+import { useTheme } from "@emotion/react";
+import { useColor } from "../../hooks/useColor";
 
 const Check = styled(Form.Check)`
   & label {
     cursor: pointer;
     user-select: none;
+  }
+`;
+
+const MyNav = styled(Nav)<{ color: string }>`
+  & div[data-active="true"] a {
+    background: ${(props) => props.color};
+    color: white;
+  }
+  & div[data-active="false"] a {
+    color: ${(props) => props.color};
   }
 `;
 
@@ -36,7 +48,7 @@ const RankingStack = ({ phase, modeCast }: RankingStackProps) => {
 
   const filterPhases =
     phases?.filter(
-      (phase: Phase) => !squadId || !phaseId || parseInt(phaseId) == phase.id
+      (phase: Phase) => !squadId || !phaseId || parseInt(phaseId) == phase.id,
     ) || [];
 
   const hasBracket = phase.squads.some((s) => s.type == "Bracket");
@@ -47,6 +59,13 @@ const RankingStack = ({ phase, modeCast }: RankingStackProps) => {
     navigate(`${path}phase/${phase.id}`);
   };
 
+  const theme = useTheme();
+  const { isWhite } = useColor();
+
+  const color = isWhite(theme.colors.secondary)
+    ? theme.colors.primary
+    : theme.colors.secondary;
+
   return (
     <CJoliStack
       gap={0}
@@ -54,20 +73,33 @@ const RankingStack = ({ phase, modeCast }: RankingStackProps) => {
       data-testid="ranking"
     >
       <div className="p-2">
+        {!isCastPage && (
+          <MyNav
+            justify
+            variant="pills"
+            activeKey={`${phase?.id}`}
+            className="pb-3"
+            color={color}
+          >
+            {filterPhases.map((phase, i) => (
+              <Nav.Item
+                key={phase.id}
+                data-active={
+                  parseInt(phaseId!) == phase!.id || (!phaseId && i == 0)
+                }
+              >
+                <Nav.Link onClick={() => handleClick(phase)}>
+                  {phase.name}
+                </Nav.Link>
+              </Nav.Item>
+            ))}
+          </MyNav>
+        )}
         <CJoliCard>
           <Element name="ranking">
             <Loading ready={!!phases && !!phase}>
               {!modeCast && (
                 <Card.Header>
-                  <Nav variant="underline" activeKey={`${phase?.id}`}>
-                    {filterPhases.map((phase) => (
-                      <Nav.Item key={phase.id}>
-                        <Nav.Link onClick={() => handleClick(phase)}>
-                          {phase.name}
-                        </Nav.Link>
-                      </Nav.Item>
-                    ))}
-                  </Nav>
                   {!hasBracket && hasMultipleSquad && (
                     <Check
                       type="switch"

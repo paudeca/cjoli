@@ -22,8 +22,6 @@ export const useGlobal = (theme: Theme) => {
     theme: { primary, secondary },
   } = useCJoli();
 
-  console.log("PRIM", theme.colors.primary);
-
   return css`
     body {
       background-color: ${theme.colors.primary};
