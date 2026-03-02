@@ -112,7 +112,8 @@
 
     "chart": {
       "general": "Général",
-      "timeline": "Chronologie"
+      "timeline": "Chronologie",
+      "players": "Joueurs"
     },
     "form": {
       "logo": "Logo",
@@ -202,7 +203,13 @@
     },
     "compare": "Comparer",
     "forfeit": "Forfait",
-    "simulated": "Résultat simulé"
+    "simulated": "Résultat simulé",
+    "eventStart": "Début",
+    "eventEnd": "Fin",
+    "eventGoal": "But",
+    "eventPenalty": "Pénalité",
+    "eventGoalKeeper": "Changement gardien"
+
   },
   "betScore": {
     "finalScore": "Score final",

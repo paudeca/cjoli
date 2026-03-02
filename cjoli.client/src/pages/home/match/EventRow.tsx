@@ -4,7 +4,7 @@ import TeamName from "../../../components/TeamName";
 import useScreenSize from "../../../hooks/useScreenSize";
 import { Col, Row, Stack } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import TeamSelect from "../../../components/TeamSelect";
+import TeamSelect from "../../../components/selects/TeamSelect";
 import { useCJoli } from "../../../hooks/useCJoli";
 import ScoreButton from "./ScoreButton";
 import { useState } from "react";

@@ -200,7 +200,12 @@
     },
     "compare": "Porovnat",
     "forfeit": "Kontumace",
-    "simulated": "Simulovaný výsledek"
+    "simulated": "Simulovaný výsledek",
+    "eventStart": "Začátek",
+    "eventEnd": "Konec",
+    "eventGoal": "Gól",
+    "eventPenalty": "Penalta",
+    "eventGoalKeeper": "Střídání brankáře"
   },
   "betScore": {
     "finalScore": "Konečné skóre",

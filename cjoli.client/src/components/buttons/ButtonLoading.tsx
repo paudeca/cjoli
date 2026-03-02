@@ -17,7 +17,7 @@ const ButtonLoading = ({ variant, children, onClick }: ButtonLoadingProps) => {
   return (
     <span className="d-inline-flex mx-2">
       {!loading && (
-        <Button variant={variant} onClick={handleClick}>
+        <Button variant={variant} onClick={handleClick} size="sm">
           {children}
         </Button>
       )}

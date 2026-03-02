@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import CJoliModal, { Field } from "../components/CJoliModal";
+import CJoliModal, { Field } from "../components/modals/CJoliModal";
 import { useToast } from "../hooks/useToast";
 import { useUser } from "../hooks/useUser";
 import { User } from "../models";
@@ -39,7 +39,7 @@ const RegisterModal = () => {
     if (!result) {
       showToast(
         "danger",
-        t("login.error.register", "Unable to register account")
+        t("login.error.register", "Unable to register account"),
       );
       return false;
     } else {

@@ -1,4 +1,4 @@
-import CJoliModal, { Field } from "../components/CJoliModal";
+import CJoliModal, { Field } from "../components/modals/CJoliModal";
 import { Team } from "../models";
 import useUid from "../hooks/useUid";
 import { useMutation, useQuery } from "@tanstack/react-query";

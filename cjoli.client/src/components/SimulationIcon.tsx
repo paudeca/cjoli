@@ -7,9 +7,9 @@ import {
   TooltipProps,
   PopoverProps,
 } from "react-bootstrap";
-import { Alt, Trash } from "react-bootstrap-icons";
-import ButtonLoading from "./ButtonLoading";
+import { Alt } from "react-bootstrap-icons";
 import { Trans, useTranslation } from "react-i18next";
+import { RemoveButton } from "./buttons/RemoveButton";
 
 interface SimulationIconProps {
   show: boolean;
@@ -45,9 +45,7 @@ const SimulationIcon = ({ show, title, onRemove }: SimulationIconProps) => {
           className="mb-3"
         >
           <Trans i18nKey="simulation.removeAll">Remove all simulations</Trans>
-          <ButtonLoading variant="danger" onClick={handleRemove}>
-            <Trash />
-          </ButtonLoading>
+          <RemoveButton handleRemove={handleRemove} />
         </div>
         <Button onClick={() => document.body.click()} size="sm">
           <Trans i18nKey="button.close">Close</Trans>

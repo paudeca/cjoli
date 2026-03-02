@@ -34,6 +34,7 @@ namespace cjoli.Server.Dtos
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public Models.MatchType MatchType { get; set; }
         public int MatchOrder { get; set; }
+        public List<MatchEventDto> Events { get; set; } = new List<MatchEventDto>();
     }
 
     public class MatchWebhookDto

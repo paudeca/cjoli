@@ -192,6 +192,55 @@ namespace cjoli.Server.Migrations
                     b.ToTable("MatchEstimate");
                 });
 
+            modelBuilder.Entity("cjoli.Server.Models.MatchEvent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Assist1Num")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Assist2Num")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GoalKeeperInNum")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MatchId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Penalty")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("PenaltyTime")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlayerNum")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TeamId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Time")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MatchId");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("MatchEvent");
+                });
+
             modelBuilder.Entity("cjoli.Server.Models.MatchResult", b =>
                 {
                     b.Property<int>("Id")
@@ -352,6 +401,59 @@ namespace cjoli.Server.Migrations
                     b.HasIndex("TourneyId");
 
                     b.ToTable("Phase");
+                });
+
+            modelBuilder.Entity("cjoli.Server.Models.Player", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly?>("Birthday")
+                        .HasColumnType("date");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Player");
+                });
+
+            modelBuilder.Entity("cjoli.Server.Models.PlayerTeam", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("BeginDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("PlayerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlayerId");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("PlayerTeam");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Position", b =>
@@ -614,6 +716,47 @@ namespace cjoli.Server.Migrations
                     b.ToTable("Tourneys");
                 });
 
+            modelBuilder.Entity("cjoli.Server.Models.TourneyTeamPlayer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsAssistant")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsCaptain")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsGoalKeeper")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PlayerId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TourneyId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlayerId");
+
+                    b.HasIndex("TourneyId");
+
+                    b.ToTable("TourneyTeamPlayer");
+                });
+
             modelBuilder.Entity("cjoli.Server.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -818,6 +961,23 @@ namespace cjoli.Server.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("cjoli.Server.Models.MatchEvent", b =>
+                {
+                    b.HasOne("cjoli.Server.Models.Match", "Match")
+                        .WithMany("Events")
+                        .HasForeignKey("MatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("cjoli.Server.Models.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId");
+
+                    b.Navigation("Match");
+
+                    b.Navigation("Team");
+                });
+
             modelBuilder.Entity("cjoli.Server.Models.MatchResult", b =>
                 {
                     b.HasOne("cjoli.Server.Models.Match", "Match")
@@ -890,6 +1050,25 @@ namespace cjoli.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("Tourney");
+                });
+
+            modelBuilder.Entity("cjoli.Server.Models.PlayerTeam", b =>
+                {
+                    b.HasOne("cjoli.Server.Models.Player", "Player")
+                        .WithMany("Teams")
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("cjoli.Server.Models.Team", "Team")
+                        .WithMany("Players")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Player");
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Position", b =>
@@ -968,6 +1147,23 @@ namespace cjoli.Server.Migrations
                     b.Navigation("Tourney");
                 });
 
+            modelBuilder.Entity("cjoli.Server.Models.TourneyTeamPlayer", b =>
+                {
+                    b.HasOne("cjoli.Server.Models.PlayerTeam", "Player")
+                        .WithMany("Tourneys")
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("cjoli.Server.Models.TeamData", "Tourney")
+                        .WithMany("Players")
+                        .HasForeignKey("TourneyId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Player");
+
+                    b.Navigation("Tourney");
+                });
+
             modelBuilder.Entity("cjoli.Server.Models.UserConfig", b =>
                 {
                     b.HasOne("cjoli.Server.Models.Team", "FavoriteTeam")
@@ -1016,6 +1212,8 @@ namespace cjoli.Server.Migrations
                 {
                     b.Navigation("Estimates");
 
+                    b.Navigation("Events");
+
                     b.Navigation("MatchResults");
 
                     b.Navigation("UserMatches");
@@ -1028,6 +1226,16 @@ namespace cjoli.Server.Migrations
                     b.Navigation("ParentPositions");
 
                     b.Navigation("Squads");
+                });
+
+            modelBuilder.Entity("cjoli.Server.Models.Player", b =>
+                {
+                    b.Navigation("Teams");
+                });
+
+            modelBuilder.Entity("cjoli.Server.Models.PlayerTeam", b =>
+                {
+                    b.Navigation("Tourneys");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Position", b =>
@@ -1052,11 +1260,18 @@ namespace cjoli.Server.Migrations
 
                     b.Navigation("MatchResults");
 
+                    b.Navigation("Players");
+
                     b.Navigation("Positions");
 
                     b.Navigation("TeamDatas");
 
                     b.Navigation("UserConfigs");
+                });
+
+            modelBuilder.Entity("cjoli.Server.Models.TeamData", b =>
+                {
+                    b.Navigation("Players");
                 });
 
             modelBuilder.Entity("cjoli.Server.Models.Tourney", b =>

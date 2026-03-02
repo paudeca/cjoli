@@ -1,5 +1,6 @@
 import { EventPhase } from "./EventPhase";
 import { IMatch } from "./IMatch";
+import { MatchEvent } from "./MatchEvent";
 import { UserMatch } from "./UserMatch";
 
 export interface BracketType {
@@ -60,4 +61,5 @@ export interface Match extends IMatch {
   name?: string;
   matchType?: MatchType;
   matchOrder: number;
+  events: MatchEvent[];
 }

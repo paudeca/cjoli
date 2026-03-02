@@ -41,7 +41,7 @@ import dayjs from "dayjs";
 import { useServer } from "../../hooks/useServer";
 import MenuBrand from "./MenuBrand";
 import BetScoreTotal from "./BetScoreTotal";
-import TeamSelect from "../../components/TeamSelect";
+import TeamSelect from "../../components/selects/TeamSelect";
 import { MyProgressBar } from "../../components/Loading";
 
 const MyNavbar = styled(Navbar)`

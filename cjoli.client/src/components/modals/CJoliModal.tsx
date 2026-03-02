@@ -14,7 +14,7 @@ import {
   PathValue,
 } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { useModal } from "../hooks/useModal";
+import { useModal } from "../../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
 import CreatableSelect from "react-select/creatable";
 import Select, { SingleValue } from "react-select";
@@ -29,7 +29,8 @@ export interface Field<T extends FieldValues> {
     | "datetime-local"
     | "number"
     | "select"
-    | "switch";
+    | "switch"
+    | "radio";
   required?: boolean;
   validate?: Path<T>;
   autoFocus?: boolean;
@@ -87,7 +88,7 @@ const CJoliModal = <T extends FieldValues>({
     switch (f.type) {
       case "select": {
         const onChange = (
-          v: SingleValue<{ label: string; value: string | number }>
+          v: SingleValue<{ label: string; value: string | number }>,
         ) => {
           const value = v?.value as PathValue<T, Path<T>>;
           setValue(f.id, value);
@@ -99,7 +100,7 @@ const CJoliModal = <T extends FieldValues>({
             onChange={onChange}
             isClearable
             defaultValue={f.options?.find(
-              (o) => values && o.value == values[f.id]
+              (o) => values && o.value == values[f.id],
             )}
             aria-label={f.label}
           />
@@ -109,7 +110,7 @@ const CJoliModal = <T extends FieldValues>({
             onChange={onChange}
             isClearable
             defaultValue={f.options?.find(
-              (o) => values && o.value == values[f.id]
+              (o) => values && o.value == values[f.id],
             )}
             aria-label={f.label}
           />
@@ -131,6 +132,30 @@ const CJoliModal = <T extends FieldValues>({
             })}
             className={`${errors[f.id] ? "is-invalid" : ""}`}
           />
+        );
+      case "radio":
+        return (
+          <>
+            {f.options?.map((opt) => (
+              <Form.Check
+                key={opt.value}
+                type="radio"
+                value={opt.value}
+                label={opt.label}
+                {...register(f.id, {
+                  required: f.required
+                    ? t("error.required", { field: f.label })
+                    : false,
+                  validate: (value) =>
+                    f.validate && watch(f.validate) !== value
+                      ? t("error.invalid", { field: f.label })
+                      : undefined,
+                })}
+                id={opt.value as string}
+                className={`${errors[f.id] ? "is-invalid" : ""}`}
+              />
+            ))}
+          </>
         );
       default:
         return (

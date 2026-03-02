@@ -40,6 +40,8 @@ namespace cjoli.Server
                 .ForMember(x => x.TeamB, opt => opt.MapFrom(a => a.PositionB.Team!.Name))
                 .ForMember(x => x.Tourney, opt => opt.MapFrom(a => a.Squad!.Phase.Tourney.Uid))
                 .ForMember(x => x.Action, opt => opt.MapFrom(a => a.Done ? "save" : "cancel"));
+            CreateMap<MatchEvent, MatchEventDto>()
+                .ForMember(x => x.TeamId, opt => opt.MapFrom(a => a.Team != null ? a.Team.Id : 0));
 
 
 
@@ -54,6 +56,10 @@ namespace cjoli.Server
                 .ForMember(x => x.Alias, opt => opt.MapFrom(t => t.Alias != null ? t.Alias.Name : null))
                 .ForMember(x => x.Logo, opt => opt.MapFrom(t => t.Logo == null && t.Alias != null ? t.Alias.Logo : t.Logo));
             CreateMap<TeamData, TeamDataDto>();
+            CreateMap<TourneyTeamPlayer, TeamPlayerDto>()
+                .ForMember(x => x.Name, opt => opt.MapFrom(t => t.Player != null ? $"{t.Player.Player.LastName.ToUpper()} {t.Player.Player.FirstName}" : null))
+                .ForMember(x => x.PlayerId, opt => opt.MapFrom(t => t.Player != null ? t.Player.Player.Id : 0));
+
 
             CreateMap<Ranking, RankingDto>();
 

@@ -200,7 +200,12 @@
     },
     "compare": "Vergleichen",
     "forfeit": "Kampflos",
-    "simulated": "Simuliertes Ergebnis"
+    "simulated": "Simuliertes Ergebnis",
+    "eventStart": "Start",
+    "eventEnd": "Ende",
+    "eventGoal": "Tor",
+    "eventPenalty": "Elfmeter",
+    "eventGoalKeeper": "Torwartwechsel"
   },
   "betScore": {
     "finalScore": "Endergebnis",

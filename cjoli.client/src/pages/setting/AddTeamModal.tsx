@@ -1,4 +1,4 @@
-import CJoliModal, { Field } from "../../components/CJoliModal";
+import CJoliModal, { Field } from "../../components/modals/CJoliModal";
 import { Team } from "../../models";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../../hooks/useToast";

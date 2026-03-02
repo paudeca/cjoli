@@ -1,7 +1,7 @@
 import Select, { SingleValue } from "react-select";
-import { Team } from "../models";
+import { Team } from "../../models";
 import { ReactNode, useCallback } from "react";
-import TeamName from "./TeamName";
+import TeamName from "../TeamName";
 
 interface TeamSelectProps {
   value?: number;
@@ -26,11 +26,11 @@ const TeamSelect = ({
         onChangeTeam(undefined);
       }
     },
-    [teams, onChangeTeam]
+    [teams, onChangeTeam],
   );
   const names: Record<number, string> = teams.reduce(
     (acc, t) => ({ ...acc, [t.id]: t.name }),
-    {}
+    {},
   );
   const options = teams.map((t) => ({
     value: t.id,

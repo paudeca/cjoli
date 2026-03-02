@@ -6,9 +6,11 @@ interface ScoreBadgeProps {
   match: IMatch;
   mode: "A" | "B";
   className?: string;
+  xl?: boolean;
+  sm?: boolean;
 }
 
-const ScoreBage = ({ match, mode, className }: ScoreBadgeProps) => {
+const ScoreBage = ({ match, mode, className, xl, sm }: ScoreBadgeProps) => {
   const { isXl } = useCJoli();
   let badge =
     (mode == "A" && (match.scoreA > match.scoreB || match.winnerA)) ||
@@ -29,7 +31,7 @@ const ScoreBage = ({ match, mode, className }: ScoreBadgeProps) => {
       bg={badge}
       text={text}
       style={{
-        fontSize: isXl ? "32px" : "18px",
+        fontSize: xl || isXl ? "32px" : sm ? "14px" : "18px",
         opacity: match.done ? 1 : 0.6,
       }}
       className={`my-1 ${className}`}

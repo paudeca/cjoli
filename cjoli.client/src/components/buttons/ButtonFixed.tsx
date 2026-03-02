@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import useScreenSize from "../hooks/useScreenSize";
+import useScreenSize from "../../hooks/useScreenSize";
 
 const ButtonFixed = ({ children }: { children: ReactNode }) => {
   const { isMobile } = useScreenSize();
