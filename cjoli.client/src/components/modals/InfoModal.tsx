@@ -1,6 +1,6 @@
 import { Modal, Button, Alert } from "react-bootstrap";
 import { ReactNode } from "react";
-import { useModal } from "../hooks/useModal";
+import { useModal } from "../../hooks/useModal";
 import { Trans } from "react-i18next";
 
 const InfoModal = ({

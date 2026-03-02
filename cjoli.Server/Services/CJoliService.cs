@@ -208,6 +208,7 @@ namespace cjoli.Server.Services
                  )
                 .Include(t => t.Phases).ThenInclude(p => p.Events.OrderBy(e => e.Time)).ThenInclude(e => e.Positions)
                 .Include(t => t.Teams).ThenInclude(t => t.TeamDatas.Where(d => d.Tourney.Uid == tourneyUid))
+                    .ThenInclude(t => t.Players).ThenInclude(t => t.Player).ThenInclude(t => t.Player)
                 .Include(t => t.Teams).ThenInclude(t => t.Alias)
                 .Include(t => t.Teams).ThenInclude(t => t.MatchResults)
                 //.Include(t => t.Messages.Where(m=>m.MessageType=="image").OrderByDescending(m=>m.Time))
@@ -274,6 +275,7 @@ namespace cjoli.Server.Services
                 CalculateHistory(dto, ranking.Tourney);
                 CalculateHistoryByTimes(dto, ranking.Tourney, context);
                 CalculateAllBetScores(dto, user, context);
+                await CalculatePlayers(dto, user, context, ct);
                 return dto;
             });
         }
@@ -637,6 +639,7 @@ namespace cjoli.Server.Services
                 { Models.MatchType.Match8, 8 },
                 { Models.MatchType.Match16, 16 },
                 { Models.MatchType.Match32, 32 },
+                { Models.MatchType.Normal, 64 },
             };
 
             IRule rule = GetRule(squad.Phase.Tourney);
@@ -1159,10 +1162,63 @@ namespace cjoli.Server.Services
             });
 
             ranking.Scores.Bet.History = mapUsers;
-
-
-
         }
+
+        private async Task CalculatePlayers(RankingDto ranking, User? user, CJoliContext context, CancellationToken ct)
+        {
+            var types = new List<MatchEventType>() { { MatchEventType.Goal }, { MatchEventType.Penalty } };
+            var datas = await context.MatchEvent
+                .Include(m => m.Team)
+                .Include(m => m.Match).ThenInclude(m => m.Squad).ThenInclude(s => s.Phase).ThenInclude(p => p.Tourney)
+                .Where(m => m.Match.Squad!.Phase.Tourney.Uid == ranking.Tourney!.Uid && types.Contains(m.Type) && m.Team != null)
+                .GroupBy(m => new
+                {
+                    Type = m.Type,
+                    Player = m.PlayerNum,
+                    Assist1 = m.Assist1Num,
+                    Assist2 = m.Assist2Num,
+                    Team = m.Team!.Id
+                }).ToDictionaryAsync(kv => kv.Key, kv => new { Count = kv.Count(), Penalty = kv.Sum(o => o.PenaltyTime) });
+            var teamPlayers = ranking.Tourney!.Teams.Select(t => new { Team = t.Id, Players = t.Datas!.Players });
+
+            var goals = datas.Where(d => d.Key.Type == MatchEventType.Goal)
+                .GroupBy(d => new { Team = d.Key.Team, Player = d.Key.Player }).ToDictionary(kv => $"{kv.Key.Team}_{kv.Key.Player}", kv => kv.Sum(o => o.Value.Count));
+            var assist1 = datas.Where(d => d.Key.Type == MatchEventType.Goal)
+                .GroupBy(d => new { Team = d.Key.Team, Player = d.Key.Assist1 }).ToDictionary(kv => $"{kv.Key.Team}_{kv.Key.Player}", kv => kv.Sum(o => o.Value.Count));
+            var assist2 = datas.Where(d => d.Key.Type == MatchEventType.Goal)
+                .GroupBy(d => new { Team = d.Key.Team, Player = d.Key.Assist2 }).ToDictionary(kv => $"{kv.Key.Team}_{kv.Key.Player}", kv => kv.Sum(o => o.Value.Count));
+            var penalties = datas.Where(d => d.Key.Type == MatchEventType.Penalty)
+                .GroupBy(d => new { Team = d.Key.Team, Player = d.Key.Player }).ToDictionary(kv => $"{kv.Key.Team}_{kv.Key.Player}", kv => kv.Sum(o => o.Value.Penalty));
+
+            foreach (var teamPlayer in teamPlayers)
+            {
+                foreach (var player in teamPlayer.Players)
+                {
+                    var key = $"{teamPlayer.Team}_{player.Number}";
+                    if (goals.ContainsKey(key))
+                    {
+                        player.Goal += goals[key];
+                        player.Total += goals[key];
+                    }
+                    if (assist1.ContainsKey(key))
+                    {
+                        player.Assist += assist1[key];
+                        player.Total += assist1[key];
+
+                    }
+                    if (assist2.ContainsKey(key))
+                    {
+                        player.Assist += assist2[key];
+                        player.Total += assist2[key];
+                    }
+                    if (penalties.ContainsKey(key))
+                    {
+                        player.Penalty += penalties[key];
+                    }
+                }
+            }
+        }
+
 
         public class ColumnDef
         {
@@ -1372,6 +1428,24 @@ namespace cjoli.Server.Services
             scoreB.GoalDiff += match.ScoreB - match.ScoreA;
             scoreB.ShutOut += !isForfeit && match.ScoreA == 0 ? 1 : 0;
 
+        }
+
+        public async Task<Match> GetMatch(string uuid, int matchId, CJoliContext context, CancellationToken ct)
+        {
+            var match = await context.Match
+                .Include(m => m.PositionA).ThenInclude(p => p.Team)
+                .Include(m => m.PositionB).ThenInclude(p => p.Team)
+                .SingleAsync(m => m.Id == matchId, ct);
+            match.Events.Add(new MatchEvent { Id = 1, Match = match, Time = 0, Type = MatchEventType.Start });
+            match.Events.Add(new MatchEvent { Id = 2, Match = match, Time = 60, Type = MatchEventType.Goal, PlayerNum = 7, Assist1Num = 5, Team = match.PositionA.Team });
+            match.Events.Add(new MatchEvent { Id = 3, Match = match, Time = 80, Type = MatchEventType.Penalty, PlayerNum = 17, Penalty = "ACC", PenaltyTime = 120, Team = match.PositionA.Team });
+            match.Events.Add(new MatchEvent { Id = 3, Match = match, Time = 100, Type = MatchEventType.Goal, PlayerNum = 7, Team = match.PositionB.Team });
+            match.Events.Add(new MatchEvent { Id = 4, Match = match, Time = 200, Type = MatchEventType.Goal, PlayerNum = 7, Assist1Num = 15, Assist2Num = 10, Team = match.PositionA.Team });
+            match.Events.Add(new MatchEvent { Id = 5, Match = match, Time = 200, Type = MatchEventType.GoalKeeper, PlayerNum = 30, GoalKeeperInNum = 1, Team = match.PositionB.Team });
+            match.Events.Add(new MatchEvent { Id = 6, Match = match, Time = 54 * 60, Type = MatchEventType.End });
+            match.Events = match.Events.OrderBy(e => e.Time).ToList();
+
+            return match;
         }
 
 

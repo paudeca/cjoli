@@ -128,6 +128,14 @@ namespace cjoli.Server.Controllers
             return tourney.Uid;
         }
 
+        [HttpGet]
+        [Route("{uuid}/Match/{matchId}")]
+        public async Task<MatchDto> GetMatch(string uuid, int matchId, CancellationToken ct)
+        {
+            return _mapper.Map<MatchDto>(await _service.GetMatch(uuid, matchId, _context, ct));
+        }
+
+
         [HttpPost]
         [Authorize]
         [Route("{uuid}/SaveMatch")]

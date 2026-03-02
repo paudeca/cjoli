@@ -10,7 +10,8 @@ namespace cjoli.Server.Server
         users,
         selectTourney,
         updateRanking,
-        estimation
+        estimation,
+        match
     }
 
     public abstract class ServerMessage
@@ -34,6 +35,8 @@ namespace cjoli.Server.Server
                     return new UsersMessage(json["value"]!.GetValue<int>());
                 case ServerMessageType.selectTourney:
                     return new SelectTourneyMessage(json["uid"]!.GetValue<string>());
+                case ServerMessageType.match:
+                    return new MatchMessage(json["matchId"]!.GetValue<int>());
             }
             throw new IllegalArgumentException("invalid type");
         }
@@ -57,6 +60,15 @@ namespace cjoli.Server.Server
         public SelectTourneyMessage(string uid) : base(ServerMessageType.selectTourney)
         {
             Uid = uid;
+        }
+    }
+
+    public class MatchMessage : ServerMessage
+    {
+        public int MatchId { get; set; }
+        public MatchMessage(int matchId) : base(ServerMessageType.match)
+        {
+            MatchId = matchId;
         }
     }
 

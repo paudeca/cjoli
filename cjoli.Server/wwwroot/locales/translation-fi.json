@@ -200,7 +200,12 @@
     },
     "compare": "Vertaa",
     "forfeit": "Luovutus",
-    "simulated": "Simuloitu tulos"
+    "simulated": "Simuloitu tulos",
+    "eventStart": "Alku",
+    "eventEnd": "Loppu",
+    "eventGoal": "Maali",
+    "eventPenalty": "Rangaistuspotku",
+    "eventGoalKeeper": "Maalivahdin vaihto"
   },
   "betScore": {
     "finalScore": "Lopputulos",

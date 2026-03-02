@@ -1,4 +1,4 @@
-import CJoliModal, { Field } from "../../components/CJoliModal";
+import CJoliModal, { Field } from "../../components/modals/CJoliModal";
 import { Phase, Position, Squad } from "../../models";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../../hooks/useToast";
@@ -10,7 +10,7 @@ import { MATCH_TYPES } from "../../models/Match";
 interface AddPositionModalProps {
   onAddPosition: (
     position: Position,
-    { phase, squad }: { phase: Phase; squad: Squad }
+    { phase, squad }: { phase: Phase; squad: Squad },
   ) => Promise<boolean>;
 }
 
@@ -74,7 +74,7 @@ const AddPositionModal = ({ onAddPosition }: AddPositionModalProps) => {
       options: phaseParent?.squads.map((s) => ({ label: s.name, value: s.id })),
       onChange: (value?: string) =>
         setSquadParent(
-          phaseParent?.squads.find((s) => s.id.toString() == value)
+          phaseParent?.squads.find((s) => s.id.toString() == value),
         ),
     },
     {

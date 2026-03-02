@@ -22,6 +22,16 @@ const MyTeam = styled("span")<{ color: string }>`
   color: ${(props) => props.color};
 `;
 
+interface TeamNameProps {
+  positionId?: number;
+  teamId?: number;
+  team?: Team;
+  defaultName?: string;
+  hideFavorite?: boolean;
+  className?: string;
+  xl?: boolean;
+}
+
 // eslint-disable-next-line complexity
 const TeamName = ({
   positionId,
@@ -30,14 +40,8 @@ const TeamName = ({
   defaultName,
   hideFavorite,
   className,
-}: {
-  positionId?: number;
-  teamId?: number;
-  team?: Team;
-  defaultName?: string;
-  hideFavorite?: boolean;
-  className?: string;
-}) => {
+  xl,
+}: TeamNameProps) => {
   const { getTeamInfo, getTeam, findTeam, isXl, getTeamLogo } = useCJoli();
   const { userConfig, saveFavoriteTeam } = useUser();
   const theme = useTheme();
@@ -90,15 +94,15 @@ const TeamName = ({
       <img
         src={getTeamLogo(team)}
         style={{
-          maxWidth: isXl ? "60px" : "30px",
-          maxHeight: isXl ? "60px" : "30px",
+          maxWidth: xl || isXl ? "60px" : "30px",
+          maxHeight: xl || isXl ? "60px" : "30px",
         }}
-        className={isXl ? "mx-3" : "mx-2"}
+        className={xl || isXl ? "mx-3" : "mx-2"}
       />
       <span
         className={className}
         style={{
-          maxWidth: 150,
+          maxWidth: xl ? 250 : 150,
           textOverflow: "ellipsis",
           overflow: "hidden",
           display: "inline-block",
@@ -106,7 +110,13 @@ const TeamName = ({
           verticalAlign: "middle",
         }}
       >
-        {isCurrentTeam ? <MyTeam color={color}>{fullname}</MyTeam> : fullname}
+        {xl ? (
+          <h2>{fullname}</h2>
+        ) : isCurrentTeam ? (
+          <MyTeam color={color}>{fullname}</MyTeam>
+        ) : (
+          fullname
+        )}
       </span>
       {team?.datas?.logo && uid != "cholet2026" && (
         <img

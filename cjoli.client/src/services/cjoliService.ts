@@ -56,6 +56,14 @@ export const getTeam = async (teamId: number, modeScore: ModeScoreType) => {
   return data;
 };
 
+export const getMatch = async (uid: string, matchId: number) => {
+  setHeader();
+  const { data } = await axios.get<Match>(
+    `${url}/cjoli/${uid}/match/${matchId}`,
+  );
+  return data;
+};
+
 export const listUsers = async () => {
   const { data } = await axios.get<User[]>(`${url}/user/list`);
   return data;

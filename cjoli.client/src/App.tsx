@@ -19,6 +19,7 @@ import { useServer } from "./hooks/useServer";
 //import CastPage from "./pages/CastPage";
 import { Suspense, lazy } from "react";
 import { MyProgressBar } from "./components/Loading";
+import MatchPage from "./pages/MatchPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -69,7 +70,9 @@ const App = () => {
           element: <HomePage />,
         },
         {
-          path: isUseDomain ? "team/:teamId" : ":uid/team/:teamId",
+          path: isUseDomain
+            ? "team/:teamId/:mode?"
+            : ":uid/team/:teamId/:mode?",
           element: <TeamPage />,
         },
         {
@@ -98,6 +101,10 @@ const App = () => {
         {
           path: isUseDomain ? "gallery/:mode?" : ":uid/gallery/:mode?",
           element: <GalleryPage />,
+        },
+        {
+          path: isUseDomain ? "match/:matchId" : ":uid/match/:matchId",
+          element: <MatchPage />,
         },
       ],
     },

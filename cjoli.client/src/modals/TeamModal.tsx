@@ -1,4 +1,4 @@
-import CJoliModal, { Field } from "../components/CJoliModal";
+import CJoliModal, { Field } from "../components/modals/CJoliModal";
 import { Team } from "../models";
 import * as cjoliService from "../services/cjoliService";
 import useUid from "../hooks/useUid";

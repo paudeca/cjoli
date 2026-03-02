@@ -200,7 +200,12 @@
     },
     "compare": "Comparar",
     "forfeit": "W.O.",
-    "simulated": "Resultado simulado"
+    "simulated": "Resultado simulado",
+    "eventStart": "Início",
+    "eventEnd": "Fim",
+    "eventGoal": "Gol",
+    "eventPenalty": "Pênalti",
+    "eventGoalKeeper": "Substituição de goleiro"
   },
   "betScore": {
     "finalScore": "Placar final",

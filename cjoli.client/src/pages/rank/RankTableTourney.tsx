@@ -4,7 +4,7 @@ import TeamName from "../../components/TeamName";
 import { useCJoli } from "../../hooks/useCJoli";
 import { useCallback } from "react";
 import { Rank, Score } from "../../models";
-import ButtonTeam from "../../components/ButtonTeam";
+import ButtonTeam from "../../components/buttons/ButtonTeam";
 import RankTable from "./RankTable";
 
 interface RankScore {

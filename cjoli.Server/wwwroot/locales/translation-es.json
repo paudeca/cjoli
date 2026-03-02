@@ -200,7 +200,12 @@
     },
     "compare": "Comparar",
     "forfeit": "Incomparecencia",
-    "simulated": "Resultado simulado"
+    "simulated": "Resultado simulado",
+    "eventStart": "Inicio",
+    "eventEnd": "Fin",
+    "eventGoal": "Gol",
+    "eventPenalty": "Penalti",
+    "eventGoalKeeper": "Cambio de portero"
   },
   "betScore": {
     "finalScore": "Resultado final",

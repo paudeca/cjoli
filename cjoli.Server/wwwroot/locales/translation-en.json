@@ -111,7 +111,8 @@
     "category": "Category",
     "chart": {
       "general": "General",
-      "timeline": "Timeline"
+      "timeline": "Timeline",
+      "players": "Players"
     },
     "form": {
       "logo": "Logo",
@@ -200,7 +201,12 @@
     },
     "compare": "Compare",
     "forfeit": "Forfeit",
-    "simulated": "Simulated result"
+    "simulated": "Simulated result",
+    "eventStart": "Start",
+    "eventEnd": "End",
+    "eventGoal": "Goal",
+    "eventPenalty": "Penalty",
+    "eventGoalKeeper": "GoalKeeper change"
   },
   "betScore": {
     "finalScore": "Final score",

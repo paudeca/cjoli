@@ -200,7 +200,12 @@
     },
     "compare": "Vergelijken",
     "forfeit": "Reglementair verlies",
-    "simulated": "Gesimuleerd resultaat"
+    "simulated": "Gesimuleerd resultaat",
+    "eventStart": "Start",
+    "eventEnd": "Einde",
+    "eventGoal": "Doelpunt",
+    "eventPenalty": "Strafschop",
+    "eventGoalKeeper": "Doelwissel"
   },
   "betScore": {
     "finalScore": "Eindscore",

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import CJoliModal, { Field } from "../components/CJoliModal";
+import CJoliModal, { Field } from "../components/modals/CJoliModal";
 import { useCJoli } from "../hooks/useCJoli";
 import { useToast } from "../hooks/useToast";
 import useUid from "../hooks/useUid";

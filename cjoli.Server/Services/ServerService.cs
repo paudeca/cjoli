@@ -38,6 +38,11 @@ namespace cjoli.Server.Services
                         _logger.LogInformation("users connected to {@uid} count:{@count}", m!.Uid, _clients.Where(c => c.Value.TourneyUid == m!.Uid).Count());
                         break;
                     }
+                case ServerMessageType.match:
+                    {
+                        var m = message as MatchMessage;
+                        break;
+                    }
             }
         }
 

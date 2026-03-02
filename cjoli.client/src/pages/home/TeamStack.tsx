@@ -16,7 +16,7 @@ import CJoliStack from "../../components/CJoliStack";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCJoli } from "../../hooks/useCJoli";
 import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Team } from "../../models";
 import { ArrowLeft } from "react-bootstrap-icons";
 import useScreenSize from "../../hooks/useScreenSize";
@@ -27,9 +27,11 @@ import TeamTable from "./team/TeamTable";
 import TeamTime from "./team/TeamTime";
 import { useModal } from "../../hooks/useModal";
 import { Trans, useTranslation } from "react-i18next";
-import TeamSelect from "../../components/TeamSelect";
+import TeamSelect from "../../components/selects/TeamSelect";
 import { ModeScoreType } from "../../contexts/CJoliContext";
 import useUid from "../../hooks/useUid";
+import TeamPlayer from "./team/TeamPlayer";
+import { useServer } from "../../hooks/useServer";
 
 interface TeamStackProps extends JSX.IntrinsicAttributes {
   teamId?: number;
@@ -53,17 +55,19 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
     getTeamLogo,
   } = useCJoli();
   const uid = useUid();
-  const { teamId: teamIdParam } = useParams();
+  const { teamId: teamIdParam, mode } = useParams();
   const { isMobile } = useScreenSize();
   const { t } = useTranslation();
+  const { path } = useServer();
 
   const [teamB, setTeamB] = React.useState<Team | undefined>(
-    teamIdB ? getTeam(teamIdB) : undefined
+    teamIdB ? getTeam(teamIdB) : undefined,
   );
   const { setShow: showTeam } = useModal("team");
   const { isRootAdmin } = useUser();
   const navigate = useNavigate();
-  const [activeKey, setActiveKey] = React.useState("general");
+  const [activeKey, setActiveKey] = React.useState(mode ?? "general");
+  console.log("MODE", mode, activeKey);
 
   useEffect(() => {
     if (teamIdB) {
@@ -75,6 +79,14 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
 
   const [seasons, setSeasons] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
+
+  const selectTab = useCallback(
+    (tab: string) => {
+      setActiveKey(tab);
+      navigate(`${path}team/${team?.id}/${tab}`);
+    },
+    [navigate, path, team],
+  );
 
   if (!team) {
     return <></>;
@@ -132,19 +144,27 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
           </Card.Header>
           <Card.Body>
             {!modeCast && uid && (
-              <Nav variant="underline" defaultActiveKey={activeKey}>
+              <Nav variant="underline" activeKey={activeKey}>
                 <Nav.Item>
                   <Nav.Link
                     eventKey="general"
-                    onClick={() => setActiveKey("general")}
+                    onClick={() => selectTab("general")}
                   >
                     <Trans i18nKey="team.chart.general">General</Trans>
                   </Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
                   <Nav.Link
+                    eventKey="players"
+                    onClick={() => selectTab("players")}
+                  >
+                    <Trans i18nKey="team.chart.players">Players</Trans>
+                  </Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link
                     eventKey="timeline"
-                    onClick={() => setActiveKey("timeline")}
+                    onClick={() => selectTab("timeline")}
                   >
                     <Trans i18nKey="team.chart.timeline">Timeline</Trans>
                   </Nav.Link>
@@ -190,7 +210,7 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
                                     }
                                     onChange={(e) =>
                                       selectModeScore(
-                                        e.target.value as ModeScoreType
+                                        e.target.value as ModeScoreType,
                                       )
                                     }
                                   >
@@ -266,6 +286,13 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
                 >
                   <TeamRadar team={team} teamB={teamB} />
                   <TeamTable team={team} teamB={teamB} />
+                </Stack>
+              </Card>
+            )}
+            {activeKey == "players" && (
+              <Card className="p-2">
+                <Stack className="py-3">
+                  <TeamPlayer team={team} />
                 </Stack>
               </Card>
             )}

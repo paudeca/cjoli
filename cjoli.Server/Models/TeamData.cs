@@ -14,5 +14,7 @@
 
         public string? Tournify { get; set; }
 
+        public IList<TourneyTeamPlayer> Players { get; set; } = new List<TourneyTeamPlayer>();
+
     }
 }

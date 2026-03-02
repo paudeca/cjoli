@@ -48,6 +48,7 @@ namespace cjoli.Server.Models
         public IList<MatchEstimate> Estimates { get; set; } = new List<MatchEstimate>();
         public IList<UserMatch> UserMatches { get; set; } = new List<UserMatch>();
         public IList<MatchResult> MatchResults { get; set; } = new List<MatchResult>();
+        public IList<MatchEvent> Events { get; set; } = new List<MatchEvent>();
 
         public static MatchType GetMatchTypeFromNum(int round)
         {

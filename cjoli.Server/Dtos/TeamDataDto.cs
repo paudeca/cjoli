@@ -11,5 +11,7 @@
         public string? SecondaryColor { get; set; }
 
         public string? Tournify { get; set; }
+
+        public List<TeamPlayerDto> Players { get; set; } = new List<TeamPlayerDto>();
     }
 }

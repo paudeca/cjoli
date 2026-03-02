@@ -14,7 +14,7 @@ import { memo, useCallback } from "react";
 import * as cjoliService from "../../../services/cjoliService";
 import InfoButton from "./InfoButton";
 import { Stack } from "react-bootstrap";
-import ButtonTeam from "../../../components/ButtonTeam";
+import ButtonTeam from "../../../components/buttons/ButtonTeam";
 import { useUser } from "../../../hooks/useUser";
 
 const MyTh = styled("th")`
@@ -56,7 +56,8 @@ const RankTableScore = ({ score, phase, squad }: RankTableScoreProps) => {
         m.userMatch &&
         !m.done &&
         userConfig.useCustomEstimate &&
-        (m.positionIdA == score.positionId || m.positionIdB == score.positionId)
+        (m.positionIdA == score.positionId ||
+          m.positionIdB == score.positionId),
     )
     .map((m) => m.userMatch!.id);
   const hasSimulation = userMatches.length > 0;
@@ -67,7 +68,7 @@ const RankTableScore = ({ score, phase, squad }: RankTableScoreProps) => {
       const ranking = await cjoliService.clearSimulations(uid, ids);
       loadRanking(ranking);
     },
-    [loadRanking, uid]
+    [loadRanking, uid],
   );
 
   return (

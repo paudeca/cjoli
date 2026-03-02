@@ -1,4 +1,4 @@
-import CJoliModal, { Field } from "../../components/CJoliModal";
+import CJoliModal, { Field } from "../../components/modals/CJoliModal";
 import { Match, Phase, Squad } from "../../models";
 import { useSetting } from "../../hooks/useSetting";
 import { useModal } from "../../hooks/useModal";
