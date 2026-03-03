@@ -19,7 +19,7 @@ interface CastPageProps {
 
 const CastPage = ({ xl }: CastPageProps) => {
   const { gallery, phases, teams, tourney } = useCJoli(
-    xl ? "fullcast" : "cast"
+    xl ? "fullcast" : "cast",
   );
   const { getGallery, getRanking } = useApi();
   const uid = useUid();
@@ -87,26 +87,28 @@ const CastPage = ({ xl }: CastPageProps) => {
           ),
           phase,
         });
-        if (i == 0 && tourney?.whatsappNumber) {
-          acc.push({
-            type: "qrcode",
-            content: (
-              <img
-                src={`/qrcodes/${uid}.png`}
-                className="img-fluid mx-auto d-block"
-                style={{
-                  height: isMobile ? "inherit" : isXl ? "100vh" : "80vh",
-                }}
-              />
-            ),
-            phase,
-          });
-        }
       }
+      if (i == 0 && tourney?.whatsappNumber) {
+        acc.push({
+          type: "qrcode",
+          content: (
+            <img
+              src={`/qrcodes/${uid}.png`}
+              className="img-fluid mx-auto d-block"
+              style={{
+                height: isMobile ? "inherit" : isXl ? "100vh" : "80vh",
+              }}
+            />
+          ),
+          phase,
+        });
+      }
+
       return acc;
     },
-    [] as { type: TypePage; content: ReactNode; phase: Phase }[]
+    [] as { type: TypePage; content: ReactNode; phase: Phase }[],
   );
+  console.log("ITEM", items, tourney);
 
   const id = useRef<ReturnType<typeof setInterval>>();
   useEffect(() => {
@@ -150,7 +152,7 @@ const CastPage = ({ xl }: CastPageProps) => {
                     const phase = items[eventKey].phase;
                     const matchesPhase = phase.squads.reduce<Match[]>(
                       (acc, s) => [...acc, ...s.matches],
-                      []
+                      [],
                     );
                     matchesPhase.sort((a, b) => (a.time > b.time ? 1 : -1));
                     const nextMatches = matchesPhase.filter(
@@ -158,7 +160,7 @@ const CastPage = ({ xl }: CastPageProps) => {
                         dayjs(m.time) > dayjs() &&
                         !m.done &&
                         m.teamIdA > 0 &&
-                        m.teamIdB > 0
+                        m.teamIdB > 0,
                     );
                     if (nextMatches.length > 0) {
                       setTeamId(nextMatches[0].teamIdA);

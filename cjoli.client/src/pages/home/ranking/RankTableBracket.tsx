@@ -12,6 +12,7 @@ import { Match, MatchType, Phase, Squad } from "../../../models";
 import TeamName from "../../../components/TeamName";
 import ScoreBage from "../../../components/ScoreBadge";
 import useScreenSize from "../../../hooks/useScreenSize";
+import { useCJoli } from "../../../hooks/useCJoli";
 
 const TeamBracket = ({
   match,
@@ -58,14 +59,17 @@ const MatchBracket = ({
   left?: boolean;
   height: number;
 }) => {
+  const { isXl } = useCJoli();
   const { isMobile } = useScreenSize();
   return (
     <Row
       className={`d-flex align-items-center ${max ? "h-100" : isMobile ? "my-2" : "my-5"}`}
     >
       <Col>
-        <Card className="p-2">
-          <Card.Title>{match.name}</Card.Title>
+        <Card className={isXl ? "p-2 display-5" : "p-2"}>
+          <Card.Title className={isXl ? "display-5" : ""}>
+            {match.name}
+          </Card.Title>
           <TeamBracket
             match={match}
             mode="A"
@@ -225,18 +229,21 @@ const DesktopBracket = ({
 }: {
   bracket: Record<MatchType, Match[]>;
 }) => {
+  const { isXl } = useCJoli();
   return (
     <div className="m-4">
       <Row>
-        <Col lg={2}>
-          {bracket.Quarter && bracket.Quarter[0] && (
-            <>
-              <MatchBracket match={bracket.Quarter[0]} height={40} />
-              <MatchBracket match={bracket.Quarter[1]} height={40} />
-            </>
-          )}
-        </Col>
-        <Col lg={2}>
+        {!isXl && (
+          <Col lg={2}>
+            {bracket.Quarter && bracket.Quarter[0] && (
+              <>
+                <MatchBracket match={bracket.Quarter[0]} height={40} />
+                <MatchBracket match={bracket.Quarter[1]} height={40} />
+              </>
+            )}
+          </Col>
+        )}
+        <Col lg={isXl ? 4 : 2}>
           {bracket.Semi && bracket.Semi[0] && (
             <MatchBracket match={bracket.Semi[0]} max height={120} />
           )}
@@ -262,7 +269,7 @@ const DesktopBracket = ({
           )}
         </Col>
         {bracket.Semi && bracket.Semi[1] && (
-          <Col lg={2}>
+          <Col lg={isXl ? 4 : 2}>
             <MatchBracket match={bracket.Semi[1]} max left height={120} />
           </Col>
         )}

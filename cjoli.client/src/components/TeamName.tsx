@@ -98,7 +98,7 @@ const TeamName = ({
       <span
         className={className}
         style={{
-          maxWidth: 150,
+          maxWidth: isXl ? 350 : 150,
           textOverflow: "ellipsis",
           overflow: "hidden",
           display: "inline-block",
