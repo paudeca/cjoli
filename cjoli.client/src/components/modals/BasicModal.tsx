@@ -26,6 +26,7 @@ const BasicModal = ({
       keyboard={false}
       centered
       style={{ color: "black" }}
+      size="lg"
     >
       <Modal.Header>
         <Modal.Title>{title}</Modal.Title>

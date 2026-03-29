@@ -5,7 +5,7 @@ import { useMatchRow } from "./useMatchRow";
 import CJoliTooltip from "../../../components/CJoliTooltip";
 import { Badge, Col, Row, Stack } from "react-bootstrap";
 import CompareButton from "./CompareButton";
-import { BracesAsterisk } from "react-bootstrap-icons";
+import { ArrowRightSquareFill, BracesAsterisk } from "react-bootstrap-icons";
 import ScoreCellInput from "./ScoreCellInput";
 import ScoreButton from "./ScoreButton";
 import dayjs from "dayjs";
@@ -15,6 +15,8 @@ import TeamCell from "./TeamCell";
 import { MyScoreDiv } from "./MatchRow";
 import BetScore from "./BetScore";
 import ScoreMatchView from "./ScoreMatchView";
+import { useNavigate } from "react-router-dom";
+import { useServer } from "../../../hooks/useServer";
 
 const CellInputDesk = () => {
   const { isConnected, isAdmin } = useUser();
@@ -142,6 +144,8 @@ const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
   const { match, imatch, isSimulation, done, hasLocation } = useMatchRow();
   const squad = getSquad(match.squadId);
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { path } = useServer();
   return (
     <tr data-testid={`match-${match.id}`}>
       {index == 0 && (
@@ -156,6 +160,12 @@ const MatchRowDesk = ({ index, rowSpan }: MatchRowDeskProps) => {
             : t("event.friendly", "🤝 Friendly match")}
           {!match.done && <SimulationIcon show={isSimulation} />}
           <BetScore match={match} />
+          <ArrowRightSquareFill
+            role="button"
+            className="mx-2"
+            size={26}
+            onClick={() => navigate(`${path}match/${match.id}`)}
+          />
         </LeftCenterDiv>
       </td>
       {hasLocation && <td>{match.location}</td>}

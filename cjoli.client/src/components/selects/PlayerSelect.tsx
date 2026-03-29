@@ -2,6 +2,7 @@ import Select, { SingleValue } from "react-select";
 import { Team } from "../../models";
 import { ReactNode, useCallback } from "react";
 //import TeamName from "../TeamName";
+import CreatableSelect from "react-select/creatable";
 
 interface PlayerSelectProps {
   value?: number;
@@ -39,7 +40,7 @@ const PlayerSelect = ({
     })) || [];
 
   return (
-    <Select
+    <CreatableSelect
       options={options}
       onChange={onChange}
       value={options.find((t) => t.value == value)}

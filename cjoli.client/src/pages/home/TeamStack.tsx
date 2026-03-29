@@ -144,7 +144,12 @@ const TeamStack = ({ teamId, teamIdB, modeCast }: TeamStackProps) => {
           </Card.Header>
           <Card.Body>
             {!modeCast && uid && (
-              <Nav variant="underline" activeKey={activeKey}>
+              <Nav
+                justify
+                variant="pills"
+                activeKey={activeKey}
+                className="pb-2"
+              >
                 <Nav.Item>
                   <Nav.Link
                     eventKey="general"

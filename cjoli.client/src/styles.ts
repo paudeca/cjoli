@@ -94,7 +94,9 @@ export const useGlobal = (theme: Theme) => {
     }
 
     .nav-pills {
-      --bs-nav-pills-link-active-bg: ${theme.colors.primary};
+      --bs-nav-pills-link-active-bg: ${theme.colors.secondary};
+      --bs-link-color: ${theme.colors.secondary};
+      --bs-link-hover-color: ${theme.colors.secondary};
     }
 
     :root {

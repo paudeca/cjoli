@@ -1,14 +1,20 @@
 import { ReactNode } from "react";
 import { Container, Nav } from "react-bootstrap";
 import styled from "@emotion/styled";
+import { useTheme } from "@emotion/react";
+import { useColor } from "../hooks/useColor";
 
-const MyNav = styled(Nav)``;
-
-const MyContainer = styled(Container)`
-  border: 1px solid black;
-  border-top: 0;
-  width: 434px;
+const MyNav = styled(Nav)<{ color: string }>`
+  & div[data-active="true"] a {
+    background: ${(props) => props.color};
+    color: white;
+  }
+  & div[data-active="false"] a {
+    color: ${(props) => props.color};
+  }
 `;
+
+const MyContainer = styled(Container)``;
 
 interface CJoliTabsProps {
   tabs: { id: string; label: ReactNode }[];
@@ -23,14 +29,22 @@ const CJoliTabs = ({
   defaultKey,
   children,
 }: CJoliTabsProps) => {
+  const theme = useTheme();
+  const { isWhite } = useColor();
+
+  const color = isWhite(theme.colors.secondary)
+    ? theme.colors.primary
+    : theme.colors.secondary;
+
   return (
     <>
       <MyNav
-        variant="tabs"
+        variant="pills"
         defaultActiveKey={defaultKey ?? tabs[0].id}
-        className="mx-3"
-        fill
+        className="m-3"
+        justify
         onSelect={onSelect}
+        color={color}
       >
         {tabs.map((tab) => (
           <Nav.Item key={tab.id}>

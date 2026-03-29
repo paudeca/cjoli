@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import Loading from "../components/Loading";
 import CJoliStack from "../components/CJoliStack";
 import { useCJoli } from "../hooks/useCJoli";
-import { Button, Card, Col, Container, Row } from "react-bootstrap";
+import { Button, Card, Col, Container, Row, Stack } from "react-bootstrap";
 import CJoliTimeline from "../components/CJoliTimeline";
 import CJoliTimeEvent from "../components/CJoliTimeEvent";
 import { useApi } from "../hooks/useApi";
@@ -215,33 +215,56 @@ const MatchPage = () => {
           ]}
           onSelect={() => {}}
         >
-          <>
-            <Row>
-              <Col className="d-flex">
-                <Button
-                  variant="outline-primary"
-                  className="mx-3"
-                  active={positionIdSelected == match?.positionIdA}
-                  onClick={() => setPositionIdSelected(match?.positionIdA || 0)}
-                >
-                  <TeamName positionId={match?.positionIdA} hideFavorite />
-                </Button>
-                <Button
-                  variant="outline-primary"
-                  className="mx-3"
-                  active={positionIdSelected == match?.positionIdB}
-                  onClick={() => setPositionIdSelected(match?.positionIdB || 0)}
-                >
-                  <TeamName positionId={match?.positionIdB} hideFavorite />
-                </Button>
+          <Container>
+            <Row className="pb-3">
+              <Col>
+                <Row>
+                  <Col className="d-grid">
+                    <Button
+                      variant="outline-primary"
+                      className="mx-3"
+                      active={positionIdSelected == match?.positionIdA}
+                      onClick={() =>
+                        setPositionIdSelected(match?.positionIdA || 0)
+                      }
+                    >
+                      <TeamName positionId={match?.positionIdA} hideFavorite />
+                    </Button>
+                  </Col>
+                  <Col className="d-grid">
+                    <Button
+                      variant="outline-primary"
+                      className="mx-3"
+                      active={positionIdSelected == match?.positionIdB}
+                      onClick={() =>
+                        setPositionIdSelected(match?.positionIdB || 0)
+                      }
+                    >
+                      <TeamName positionId={match?.positionIdB} hideFavorite />
+                    </Button>
+                  </Col>
+                </Row>
               </Col>
             </Row>
-            <Row>
+            <Row className="pb-3">
               <Col>
+                Goaler:
                 <PlayerSelect team={teamA} isClearable />
               </Col>
             </Row>
-          </>
+            <Row className="pb-3">
+              <Col>
+                Assist1:
+                <PlayerSelect team={teamA} isClearable />
+              </Col>
+            </Row>
+            <Row className="pb-3">
+              <Col>
+                Assist2:
+                <PlayerSelect team={teamA} isClearable />
+              </Col>
+            </Row>
+          </Container>
         </CJoliTabs>
       </BasicModal>
     </Loading>
