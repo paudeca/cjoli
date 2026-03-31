@@ -27,6 +27,7 @@ export const useGlobal = (theme: Theme) => {
       background-color: ${theme.colors.primary};
       color: white;
       uuser-select: none;
+      padding-bottom: 50px;
     }
     input::placeholder {
       opacity: 0.5 !important;
