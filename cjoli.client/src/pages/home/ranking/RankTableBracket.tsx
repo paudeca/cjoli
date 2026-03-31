@@ -8,11 +8,12 @@ import {
   Row,
   Stack,
 } from "react-bootstrap";
-import { Match, MatchType, Phase, Squad } from "../../../models";
+import { IMatch, Match, MatchType, Phase, Squad } from "../../../models";
 import TeamName from "../../../components/TeamName";
 import ScoreBage from "../../../components/ScoreBadge";
 import useScreenSize from "../../../hooks/useScreenSize";
 import { useCJoli } from "../../../hooks/useCJoli";
+import { useUser } from "../../../hooks/useUser";
 
 const TeamBracket = ({
   match,
@@ -20,12 +21,13 @@ const TeamBracket = ({
   positionId,
   left,
 }: {
-  match: Match;
+  match: IMatch;
   mode: "A" | "B";
   positionId: number;
   left?: boolean;
 }) => {
   const { isMobile } = useScreenSize();
+
   return (
     <Row>
       <Col
@@ -61,6 +63,16 @@ const MatchBracket = ({
 }) => {
   const { isXl } = useCJoli();
   const { isMobile } = useScreenSize();
+
+  const { isAdmin, userConfig } = useUser();
+  const hasUserMatch =
+    match.userMatch && (!isAdmin || (isAdmin && userConfig.useCustomEstimate));
+  const imatch: IMatch = match.done
+    ? match
+    : match.userMatch && hasUserMatch
+      ? { ...match.userMatch, done: true }
+      : match;
+
   return (
     <Row
       className={`d-flex align-items-center ${max ? "h-100" : isMobile ? "my-2" : "my-5"}`}
@@ -71,18 +83,18 @@ const MatchBracket = ({
             {match.name}
           </Card.Title>
           <TeamBracket
-            match={match}
+            match={imatch}
             mode="A"
             positionId={match.positionIdA}
             left={left}
           />
           <ProgressBar
-            now={match.done ? 100 : 0}
+            now={imatch.done ? 100 : 0}
             className="mx-auto"
             style={{ width: 5, height }}
           />
           <TeamBracket
-            match={match}
+            match={imatch}
             mode="B"
             positionId={match.positionIdB}
             left={left}
