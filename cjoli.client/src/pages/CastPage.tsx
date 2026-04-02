@@ -32,7 +32,7 @@ const CastPage = ({ xl }: CastPageProps) => {
   const [images, setImages] = useState(gallery?.messages ?? []);
   const [index, setIndex] = useState(0);
   const [searchParams] = useSearchParams();
-  const height = searchParams.get("height");
+  const time = searchParams.get("time");
 
   useEffect(() => {
     if (gallery) {
@@ -119,7 +119,6 @@ const CastPage = ({ xl }: CastPageProps) => {
     try {
       id.current = setInterval(() => {
         const height = screen.height;
-        console.log("scroll", window.scrollY);
         if (window.scrollY + height < document.body.scrollHeight) {
           window.scrollTo({
             top: window.scrollY + height - 250,
@@ -137,6 +136,9 @@ const CastPage = ({ xl }: CastPageProps) => {
     };
   }, [index, items.length]);
 
+  const interval =
+    Math.floor(document.body.scrollHeight / (screen.height - 250)) + 1;
+
   return (
     <Loading ready={!isLoading}>
       <Container fluid>
@@ -146,7 +148,7 @@ const CastPage = ({ xl }: CastPageProps) => {
               fade={false}
               wrap
               slide={false}
-              interval={null}
+              interval={time ? parseInt(time) : interval * 5000}
               activeIndex={index}
               onSelect={setIndex}
               pause={false}
@@ -193,11 +195,6 @@ const CastPage = ({ xl }: CastPageProps) => {
             </Carousel>
           </Col>
         </Row>
-        {height && (
-          <Row>
-            <Col style={{ height: `${height}px` }}></Col>
-          </Row>
-        )}
       </Container>
     </Loading>
   );
