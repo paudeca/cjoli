@@ -18,7 +18,7 @@ const RegisterModal = () => {
       label: t("login.form.login", "Login"),
       type: "text",
       required: true,
-      autoFocus: true,
+      autoFocus: false,
     },
     {
       id: "password",
@@ -39,7 +39,7 @@ const RegisterModal = () => {
     if (!result) {
       showToast(
         "danger",
-        t("login.error.register", "Unable to register account")
+        t("login.error.register", "Unable to register account"),
       );
       return false;
     } else {
