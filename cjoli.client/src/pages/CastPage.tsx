@@ -100,8 +100,9 @@ const CastPage = ({ xl }: CastPageProps) => {
               src={`/qrcodes/${uid}.png`}
               className="img-fluid mx-auto d-block"
               style={{
-                height: isMobile ? "inherit" : isXl ? "100vh" : "80vh",
+                height: isMobile ? "inherit" : isXl ? "50vh" : "80vh",
                 padding: "100px 100px 0px 100px",
+                width: "60%",
               }}
             />
           ),
