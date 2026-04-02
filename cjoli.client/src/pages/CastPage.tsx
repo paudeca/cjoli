@@ -98,6 +98,7 @@ const CastPage = ({ xl }: CastPageProps) => {
               className="img-fluid mx-auto d-block"
               style={{
                 height: isMobile ? "inherit" : isXl ? "100vh" : "80vh",
+                padding: "100px 100px 0px 100px",
               }}
             />
           ),
@@ -109,7 +110,6 @@ const CastPage = ({ xl }: CastPageProps) => {
     },
     [] as { type: TypePage; content: ReactNode; phase: Phase }[],
   );
-  console.log("ITEM", items, tourney);
 
   const id = useRef<ReturnType<typeof setInterval>>();
   useEffect(() => {
