@@ -56,7 +56,8 @@ const RankTableScore = ({ score, phase, squad }: RankTableScoreProps) => {
         m.userMatch &&
         !m.done &&
         userConfig.useCustomEstimate &&
-        (m.positionIdA == score.positionId || m.positionIdB == score.positionId)
+        (m.positionIdA == score.positionId ||
+          m.positionIdB == score.positionId),
     )
     .map((m) => m.userMatch!.id);
   const hasSimulation = userMatches.length > 0;
@@ -67,7 +68,7 @@ const RankTableScore = ({ score, phase, squad }: RankTableScoreProps) => {
       const ranking = await cjoliService.clearSimulations(uid, ids);
       loadRanking(ranking);
     },
-    [loadRanking, uid]
+    [loadRanking, uid],
   );
 
   return (
@@ -120,7 +121,7 @@ const RankTableScore = ({ score, phase, squad }: RankTableScoreProps) => {
         )}
       </tr>
       {isMobile && (
-        <tr style={{ fontSize: "12px" }}>
+        <tr style={{ fontSize: `${isXl ? "32px" : "12px"}` }}>
           <td className="w-25">
             <CJoliTooltip info={t("rank.game", "Games played")}>
               PJ:{score.game}

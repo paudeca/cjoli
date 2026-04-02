@@ -16,10 +16,12 @@ export const bgSecondary = ({ theme }: { theme: Theme }) =>
     textAlign: "center",
   });
 
+// eslint-disable-next-line complexity
 export const useGlobal = (theme: Theme) => {
   const { lightness, isWhite } = useColor();
   const {
     theme: { primary, secondary },
+    isXl,
   } = useCJoli();
 
   return css`
@@ -27,7 +29,7 @@ export const useGlobal = (theme: Theme) => {
       background-color: ${theme.colors.primary};
       color: white;
       uuser-select: none;
-      padding-bottom: 50px;
+      padding-bottom: ${isXl ? "0px" : "50px"};
     }
     input::placeholder {
       opacity: 0.5 !important;

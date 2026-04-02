@@ -80,7 +80,8 @@ const CastPage = ({ xl }: CastPageProps) => {
                 src={m.mediaUrl}
                 className="img-fluid mx-auto d-block"
                 style={{
-                  height: isMobile ? "inherit" : isXl ? "100vh" : "80vh",
+                  height:
+                    isMobile && !isXl ? "inherit" : isXl ? "100vh" : "80vh",
                 }}
               />
             </div>
