@@ -12,6 +12,7 @@ import TeamStack from "./home/TeamStack";
 import { useRef } from "react";
 import dayjs from "dayjs";
 import { Match, Phase } from "../models";
+import { useSearchParams } from "react-router-dom";
 
 interface CastPageProps {
   xl?: boolean;
@@ -30,6 +31,8 @@ const CastPage = ({ xl }: CastPageProps) => {
   const [teamIdB, setTeamIdB] = useState(0);
   const [images, setImages] = useState(gallery?.messages ?? []);
   const [index, setIndex] = useState(0);
+  const [searchParams] = useSearchParams();
+  const height = searchParams.get("height");
 
   useEffect(() => {
     if (gallery) {
@@ -116,6 +119,7 @@ const CastPage = ({ xl }: CastPageProps) => {
     try {
       id.current = setInterval(() => {
         const height = screen.height;
+        console.log("scroll", window.scrollY);
         if (window.scrollY + height < document.body.scrollHeight) {
           window.scrollTo({
             top: window.scrollY + height - 250,
@@ -142,7 +146,7 @@ const CastPage = ({ xl }: CastPageProps) => {
               fade={false}
               wrap
               slide={false}
-              interval={20000}
+              interval={null}
               activeIndex={index}
               onSelect={setIndex}
               pause={false}
@@ -189,6 +193,11 @@ const CastPage = ({ xl }: CastPageProps) => {
             </Carousel>
           </Col>
         </Row>
+        {height && (
+          <Row>
+            <Col style={{ height: `${height}px` }}></Col>
+          </Row>
+        )}
       </Container>
     </Loading>
   );
